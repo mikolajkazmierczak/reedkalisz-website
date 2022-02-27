@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "name": "reedkalisz-frontend",
+  "description": "REED Kalisz public website and CMS",
+  "author": {
+    "name": "Mikołaj Kaźmierczak",
+    "email": "mikolaj@kazmierczak.pl",
+    "url": "https://github.com/mikolajkazmierczak"
+  },
+  "scripts": {
+    "dev": "svelte-kit dev --host",
+    "build": "svelte-kit build",
+    "preview": "svelte-kit preview --host"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "next",
+    "@sveltejs/kit": "next",
+    "prettier": "^2.5.1",
+    "prettier-plugin-svelte": "^2.5.0",
+    "svelte": "^3.44.0"
+  },
+  "type": "module"
+}
