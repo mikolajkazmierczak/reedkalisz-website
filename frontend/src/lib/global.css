@@ -1,0 +1,62 @@
+:root {
+  --main-light: #fb263b;
+  --main: #bf0417;
+  --main-dark: #850310;
+  --accent: #4392f1;
+  --teriary: #ece8ef;
+  --bg-1: #e3ebff;
+  --bg-2: #e7f0ff;
+
+  --text: #0f0f0f;
+  --light: #ffffff;
+  --grey-light: #9c9c9c;
+  --grey-dark: #505050;
+
+  --border: solid 2px var(--grey-light);
+  --border-focus: solid 1px var(--main);
+  --border-radius: 10px;
+  --shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
+
+  --scroll-thumb: var(--grey-dark);
+  --scroll-track: var(--teriary);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--light);
+}
+
+:is(h1, h2, h3, h4, h5, h6, p) {
+  margin: 0;
+  padding: 0;
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--scroll-track);
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--scroll-thumb);
+  border: solid 3px var(--scroll-track);
+}
+
+button {
+  cursor: pointer;
+  outline: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+}
