@@ -1,14 +1,10 @@
-<script>
-  export let datetime;
+export default function (datetime) {
   let date;
   let time;
-  $: if (datetime) {
+  if (datetime) {
     const splt = datetime.split('T');
     date = splt[0].replaceAll('-', '.');
     time = splt[1];
+    return `${date}&nbsp;|&nbsp;${time}`;
   }
-</script>
-
-{#if datetime}
-  <span>{date}&nbsp;|&nbsp;{time}</span>
-{/if}
+}

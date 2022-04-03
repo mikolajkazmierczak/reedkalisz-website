@@ -2,15 +2,14 @@
   import api from '$lib/api';
   import { auth, readme } from '$lib/auth';
   import { error } from '$lib/error';
+  import datetime from '$lib/datetime';
 
   import { goto } from '$app/navigation';
 
   import { onMount } from 'svelte';
   import Title from '$lib/admin/Title.svelte';
   import Content from '$lib/admin/Content.svelte';
-
-  import DateTime from '$lib/components/DateTime.svelte';
-  import Input from '$lib/components/Input.svelte';
+  import Table from '$lib/admin/Table.svelte';
 
   let products;
   let filters = ['<b>Kategoria</b>&nbsp;Długopisy'];
@@ -19,7 +18,7 @@
     try {
       const res = await api.items('products').readByQuery({
         meta: '*',
-        limit: 1,
+        limit: 100,
         offset: 0,
         fields: [
           'id',
@@ -54,16 +53,28 @@
 
   onMount(read);
   // $: if ($auth && !products) read();
-
-  function open(slug) {
-    goto('/admin/produkty/' + slug);
-  }
 </script>
 
 {#if products}
   <Title title="Produkty" />
   <Content>
-    <div class="wrapper">
+    <Table
+      {filters}
+      head={[
+        { centered: true, icon: { src: 'shown.svg', alt: 'włączony' } },
+        { centered: true, icon: { src: 'discount.svg', alt: 'promocja' } },
+        { centered: true, icon: { src: 'new.svg', alt: 'nowość' } },
+        { title: 'ID' },
+        { title: 'Kod' },
+        { title: 'Nazwa' },
+        { title: 'Dodano' },
+        { title: 'Ostatnia edycja' },
+        { title: 'Autor' },
+        { title: 'Ostatnia aktualizacja' }
+      ]}
+      items={[{ href: '/produkty/cosmo', data: { centered: true, checkbox: true, checked: true } }, {}]}
+    />
+    <!-- <div class="wrapper">
       <div class="filters">
         <img src="/icon/filter.svg" alt="Filtry" />
         {#each filters as filter}
@@ -77,12 +88,12 @@
           <td class="center"><img src="/icon/new.svg" alt="Nowość" /></td>
           <td>ID</td>
           <td>Kod</td>
-          <td>Nazwa</td>
-          <!-- <td><div><img src="/icon/date_created.svg" alt="Dodano" />Dodano</div></td>
+          <td>Nazwa</td>-->
+    <!-- <td><div><img src="/icon/date_created.svg" alt="Dodano" />Dodano</div></td>
           <td><div><img src="/icon/date_updated.svg" alt="Ostatnia edycja" />Ostatnia edycja</div></td>
           <td><div><img src="/icon/user_created.svg" alt="Autor" />Autor</div></td>
           <td><div><img src="/icon/user_updated.svg" alt="Ostatnia aktualizacja" />Ostatnia aktualizacja</div></td> -->
-          <td>Dodano</td>
+    <!--<td>Dodano</td>
           <td>Ostatnia edycja</td>
           <td>Autor</td>
           <td>Ostatnia aktualizacja</td>
@@ -118,13 +129,19 @@
         <div class="prev"><img src="/icon/arrow_left.svg" alt="poprzednie" /></div>
         <div class="next"><img src="/icon/arrow_right.svg" alt="następne" /></div>
       </div>
-    </div>
+    </div> -->
   </Content>
 {/if}
 
 <style>
+  .wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
   /* filters */
   .filters {
+    align-self: stretch;
     display: flex;
     align-items: center;
     border: var(--border);
@@ -160,7 +177,7 @@
     border: var(--border);
     border-spacing: 0px;
     border-collapse: collapse;
-    width: 100%;
+    /* width: 100%; */
   }
   tr {
     --border: solid 1px var(--grey-dark);
@@ -190,6 +207,7 @@
   }
 
   .pagination {
+    align-self: stretch;
     display: flex;
     border: var(--border);
     border-top: none;
