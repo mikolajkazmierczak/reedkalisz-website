@@ -1,6 +1,6 @@
 <script>
-  import Input from '$lib/components/Input.svelte';
-  import Button from '$lib/components/Button.svelte';
+  import Input from '$lib/admin/Input.svelte';
+  import Button from '$lib/admin/Button.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import { auth, me, login } from '$lib/auth';
   import { fade, fly } from 'svelte/transition';
@@ -34,11 +34,12 @@
     <form>
       <h1>Logowanie</h1>
       <Input placeholder="E-mail" bind:value={email} />
-      <Input placeholder="Password" bind:value={password} type="password" />
-      <br />
-      <Button submit={true} onclick={handleLogin}>
+      <Input placeholder="Hasło" bind:value={password} type="password" />
+      <div class="gap" />
+      <Button action on:click={handleLogin}>
         {#if awaitingLogin}<Loader />{:else}Zaloguj{/if}
       </Button>
+      <div class="gap" />
     </form>
     {#if error}{error}{/if}
   </div>
@@ -87,9 +88,10 @@
   }
 
   form {
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
+    display: grid;
+    row-gap: 0.5rem;
+    /* flex-flow: column; */
+    /* justify-content: center; */
   }
   h1 {
     margin-top: 1rem;

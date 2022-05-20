@@ -6,7 +6,7 @@
 <div class="user">
   {$me.first_name}
   {$me.last_name}
-  <Button onclick={logout}>Wyloguj</Button>
+  <Button on:click={logout}>Wyloguj</Button>
 </div>
 
 <style>

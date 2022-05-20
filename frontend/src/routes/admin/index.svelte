@@ -1,9 +1,7 @@
 <script>
-  import Title from '$lib/admin/Title.svelte';
-  import Content from '$lib/admin/Content.svelte';
+  import { page } from '$lib/admin/stores';
+
+  $page = 'Dashboard';
 </script>
 
-<Title title="Dashboard" />
-<Content>
-  <p>Cicho tu.<br />Zbyt cicho...</p>
-</Content>
+<p>Cicho tu.<br />Zbyt cicho...</p>

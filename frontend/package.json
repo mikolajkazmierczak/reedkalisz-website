@@ -2,7 +2,7 @@
   "private": true,
   "version": "1.0.0",
   "name": "reedkalisz-frontend",
-  "description": "REED Kalisz public website and CMS",
+  "description": "REED Kalisz public website and CMS frontend",
   "author": {
     "name": "Mikołaj Kaźmierczak",
     "email": "mikolaj@kazmierczak.pl",
@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
-    "preview": "svelte-kit preview --host"
+    "start": "svelte-kit preview --host"
   },
   "devDependencies": {
     "@directus/sdk": "^9.6.0",

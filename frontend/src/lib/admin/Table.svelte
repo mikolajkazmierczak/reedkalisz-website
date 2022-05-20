@@ -1,11 +1,10 @@
 <script>
   import { goto } from '$app/navigation';
 
-  import Input from '$lib/components/Input.svelte';
+  export let filters;
 
   export let head;
-  export let items;
-  export let filters;
+  export let rows;
 </script>
 
 <div class="wrapper">
@@ -25,32 +24,34 @@
   </div>
   <table>
     <tr class="head">
-      {#each head as item}
+      {#each head as value}
         <td
-          class:centered={item.centered}
+          class="value head-value"
+          class:checkbox={value.checkbox}
           on:click={() => {
             // TODO: change sorting
           }}
         >
-          {#if item.icon}<img src="/icon/{item.icon.src}" alt={item.icon.alt} />{/if}
-          {#if item.title}{item.title}{/if}
+          {#if value.icon}<img src="/icon/{value.icon.src}" alt={value.icon.alt} />{/if}
+          {#if value.title}{value.title}{/if}
         </td>
       {/each}
     </tr>
-    {#each items as item}
-      <tr class="item">
-        {#each item.data as data}
+    {#each rows as row}
+      <tr class="row">
+        {#each row.data as value, i}
           <td
-            class:centered={data.centered}
-            class:checkbox={data.checkbox}
+            class="value row-value"
+            class:checkbox={head[i].checkbox}
             on:click={() => {
-              if (!data.checkbox) goto(item.href);
+              if (head[i].checkbox) value = !value;
+              else goto(row.href);
             }}
           >
-            {#if data.checkbox}
-              <Input type="checkbox" checked={item.checked} />
+            {#if head[i].checkbox}
+              <input type="checkbox" checked={value} />
             {:else}
-              {data.text}
+              {value}
             {/if}
           </td>
         {/each}
@@ -133,18 +134,25 @@
     background-color: var(--bg-2);
   }
 
-  td {
+  .value {
     padding: 0.4rem 0.5rem;
     white-space: nowrap;
   }
-  td.centered {
+  .value.checkbox {
     text-align: center;
   }
-  .item {
+  .row-value {
     cursor: pointer;
   }
-  .item .checkbox {
+  .row-value.checkbox {
     background-color: var(--teriary);
+  }
+
+  input {
+    cursor: pointer;
+    margin: 0;
+    height: 1rem;
+    width: 1rem;
   }
 
   .pagination {

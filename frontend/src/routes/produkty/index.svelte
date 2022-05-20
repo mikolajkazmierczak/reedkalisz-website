@@ -1,5 +1,6 @@
 <script context="module">
   import api from '$lib/api';
+
   export async function load() {
     try {
       const res = await api.items('products').readByQuery({

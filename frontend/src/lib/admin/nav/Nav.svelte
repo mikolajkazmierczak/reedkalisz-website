@@ -50,12 +50,7 @@
       <img src="/logo.svg" alt="logo" />
     </a>
     {#each buttons as { href, icon, name }}
-      <a
-        sveltekit:prefetch
-        class="button"
-        href={'/admin' + href}
-        class:current={path == href}
-      >
+      <a sveltekit:prefetch class="button" href={'/admin' + href} class:current={path == href}>
         <img src={'/icon/' + icon} alt={name} />
       </a>
     {/each}
@@ -90,7 +85,7 @@
     top: 0;
     left: 0;
     width: var(--width);
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -112,8 +107,13 @@
     display: grid;
     place-items: center;
     aspect-ratio: 1 / 1;
+    outline: none;
+    border: none;
     padding: 0.3rem;
     width: 100%;
+    font: inherit;
+    color: inherit;
+    background-color: rgba(0, 0, 0, 0);
   }
   .button::before {
     content: '';

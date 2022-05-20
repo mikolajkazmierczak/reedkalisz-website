@@ -1,11 +1,12 @@
 <script>
   import { fly } from 'svelte/transition';
-  export let path = null;
-  $: console.log(path);
-  export let title;
+  import { page } from '$lib/admin/stores';
+  $: console.log($page);
+  $: title = typeof $page == 'string' ? $page : $page?.title ? $page.title : 'Wczytywanie...';
+  $: path = $page?.path;
 </script>
 
-<div class="wrapper">
+<header>
   {#if path}
     <a class="back" href={'/admin' + path[path.length - 1].href}>
       <img src="/icon/arrow_left.svg" alt="return arrow" />
@@ -22,12 +23,14 @@
         {/each}
       </div>
     {/if}
-    <h1 transition:fly={{ y: 50, duration: 500 }}>{title}</h1>
+    {#key title}
+      <h1 in:fly={{ y: 50, duration: 500 }}>{title}</h1>
+    {/key}
   </div>
-</div>
+</header>
 
 <style>
-  .wrapper {
+  header {
     z-index: 1;
     overflow: hidden;
     position: fixed;
@@ -89,8 +92,8 @@
   .path {
     z-index: 1;
     top: 0;
-    margin-top: -0.3rem;
-    font-size: 1.5rem;
+    margin-top: -0.4rem;
+    font-size: 1.25rem;
   }
   .path * {
     text-decoration: none;
@@ -99,7 +102,7 @@
   }
   h1 {
     z-index: 0;
-    bottom: -0.5rem;
+    bottom: -0.55rem;
     margin-top: -0.5rem;
     font-size: 2rem;
     font-weight: 900;

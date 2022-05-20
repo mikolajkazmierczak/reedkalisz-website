@@ -7,17 +7,15 @@
 </script>
 
 <script>
+  import { onMount } from 'svelte';
+
   import api from '$lib/api';
   import { auth, readme } from '$lib/auth';
-  import { error } from '$lib/error';
+  import { page, error } from '$lib/admin/stores';
+  import Input from '$lib/admin/Input.svelte';
+  import Button from '$lib/admin/Button.svelte';
 
-  import { onMount } from 'svelte';
-  import Title from '$lib/admin/Title.svelte';
-  import Content from '$lib/admin/Content.svelte';
-
-  import Input from '$lib/components/Input.svelte';
-  import Button from '$lib/components/Input.svelte';
-
+  $: $page = { title: product?.name, path: [{ href: '/produkty', name: 'Produkty' }] };
   export let slug;
 
   let product;
@@ -39,15 +37,12 @@
 </script>
 
 {#if product}
-  <Title path={[{ href: '/produkty', name: 'Produkty' }]} title={product.name} />
-  <Content>
-    <div class="box main">
-      <h2>Główne</h2>
-      <!-- <Input bind:product.name></Input> -->
-      <p>{product.name}</p>
-      <pre>{JSON.stringify(product, null, 2)}</pre>
-    </div>
-  </Content>
+  <div class="box main">
+    <h2>Główne</h2>
+    <!-- <Input bind:product.name></Input> -->
+    <p>{product.name}</p>
+    <pre>{JSON.stringify(product, null, 2)}</pre>
+  </div>
 {/if}
 
 <style>

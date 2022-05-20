@@ -1,15 +1,12 @@
 <script>
-  import '$lib/global.css';
-
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
 
   import { me, readme } from '$lib/auth';
   import User from '$lib/components/User.svelte';
-
   import Button from '$lib/components/Button.svelte';
 
-  function admin() {
+  function gotoAdmin() {
     goto('/admin');
   }
 
@@ -22,7 +19,7 @@
 {/if}
 
 <nav>
-  <Button onclick={admin}>Admin panel</Button>
+  <Button on:click={gotoAdmin}>Admin panel</Button>
   <li><a href="/">Strona główna</a></li>
   <li><a href="/produkty">Produkty</a></li>
   <li><a href="/kolory">Kolory</a></li>

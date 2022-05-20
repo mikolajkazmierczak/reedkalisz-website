@@ -1,12 +1,14 @@
 <script>
-  export let onclick;
+  import { createEventDispatcher } from 'svelte';
+  const dispatch = createEventDispatcher();
+
   export let submit = false;
 </script>
 
 {#if submit}
-  <button type="submit" on:click|preventDefault={onclick}><slot /></button>
+  <button type="submit" on:click|preventDefault={() => dispatch('click')}><slot /></button>
 {:else}
-  <button on:click={onclick}><slot /></button>
+  <button on:click={() => dispatch('click')}><slot /></button>
 {/if}
 
 <style>

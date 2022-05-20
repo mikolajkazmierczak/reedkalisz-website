@@ -1,14 +1,17 @@
 {
-  "name": "backend",
+  "private": true,
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "reedkalisz-backend",
+  "description": "REED Kalisz public website and CMS backend",
+  "author": {
+    "name": "Mikołaj Kaźmierczak",
+    "email": "mikolaj@kazmierczak.pl",
+    "url": "https://github.com/mikolajkazmierczak"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "start": "npx directus start",
+    "update": "npm update && npx directus database migrate:latest"
+  },
   "dependencies": {
     "directus": "^9.5.2",
     "sqlite3": "^5.0.2"

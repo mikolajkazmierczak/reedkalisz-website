@@ -1,6 +1,6 @@
 <script>
   import { fade, fly } from 'svelte/transition';
-  import { error } from '$lib/error';
+  import { error } from '$lib/admin/stores';
 
   function hide() {
     $error = null;
