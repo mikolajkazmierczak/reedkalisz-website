@@ -1,28 +1,79 @@
 <script>
   import { fly } from 'svelte/transition';
-  import { page } from '$lib/admin/stores';
-  $: console.log($page);
-  $: title = typeof $page == 'string' ? $page : $page?.title ? $page.title : 'Wczytywanie...';
+  import { cubicOut } from 'svelte/easing';
+  import { page, edited, save, cancel } from '$lib/admin/stores';
+  import HoverCircle from '$lib/components/HoverCircle.svelte';
+
+  function spin(node, { duration }) {
+    return {
+      duration,
+      css: t => {
+        const eased = cubicOut(t);
+        return `transform: rotate(${eased * 360}deg);`;
+      }
+    };
+  }
+
+  let saving = false;
+
+  $: titleString = typeof $page == 'string' ? $page : $page?.title;
+  $: title = titleString ?? 'Wczytywanie...';
   $: path = $page?.path;
 </script>
 
 <header>
-  {#if path}
-    <a class="back" href={'/admin' + path[path.length - 1].href}>
-      <img src="/icon/arrow_left.svg" alt="return arrow" />
+  {#if path && !$edited}
+    <a class="button back" href={'/admin' + path[path.length - 1].href}>
+      <HoverCircle color={'var(--accent-light)'} />
+      <img src="/icons/dark/arrow_left.svg" alt="return arrow" in:spin />
     </a>
   {/if}
+
+  {#if $edited}
+    <div
+      class="button back"
+      role="button"
+      on:click={() => {
+        $cancel();
+        $edited = false;
+      }}
+    >
+      <HoverCircle color={'var(--main-3)'} />
+      <img src="/icons/dark/close.svg" alt="cancel" in:spin />
+    </div>
+  {/if}
+  <div class="actions" class:visible={$edited}>
+    <div
+      class="button save"
+      role="button"
+      on:click={async () => {
+        saving = true;
+        await $save();
+        saving = false;
+        $edited = false;
+      }}
+    >
+      <HoverCircle color={'var(--success)'} />
+      {#if !saving}<img src="/icons/dark/ok.svg" alt="save" />{/if}
+      <span>
+        {#if saving}Zapisuję...{:else}Zapisz{/if}
+      </span>
+    </div>
+  </div>
+
   <div class="text">
-    {#if path}
-      <div class="path">
+    <div class="path">
+      {#if path}
         {#each path as { href, name }, i}
           {#if i != 0}
-            <span> &nbsp;&nbsp;/&nbsp; </span>
+            <span>&nbsp;/</span>
           {/if}
           <a href={'/admin' + href}> {name} </a>
         {/each}
-      </div>
-    {/if}
+      {:else}
+        <span>&nbsp;</span>
+      {/if}
+    </div>
     {#key title}
       <h1 in:fly={{ y: 50, duration: 500 }}>{title}</h1>
     {/key}
@@ -31,80 +82,79 @@
 
 <style>
   header {
+    --height: 4rem;
+    --gap: 0.9rem;
     z-index: 1;
     overflow: hidden;
     position: fixed;
     top: 0;
     left: 0;
     display: flex;
-    border-top: var(--border);
-    border-right: var(--border);
-    border-bottom: var(--border);
-    padding: 0.75rem 1.5rem 0.75rem 4.75rem;
+    padding: var(--gap) 1.5rem var(--gap) 4.75rem;
+    height: var(--height);
     width: 100%;
-    height: 5rem;
-    background-color: var(--light);
+    background-color: var(--accent);
+  }
+  .actions {
+    overflow: hidden;
+    display: flex;
+    width: 0;
+    transition: width 200ms;
+  }
+  .actions.visible {
+    width: 7.5rem;
   }
 
-  .back {
+  .button {
     cursor: pointer;
     overflow: hidden;
     position: relative;
-    display: grid;
-    place-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
     margin-left: 0.75rem;
-    aspect-ratio: 1.1 / 1;
-    height: 100%;
-    border: var(--border);
+    padding: 0 1rem;
+    border: solid 2px var(--accent-text);
   }
-  .back::before {
-    content: '';
-    z-index: -1;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 0%;
-    height: 0%;
-    border-radius: 50%;
-    background-color: var(--teriary);
-    transition: width 200ms, height 200ms;
+  .button img,
+  .button span {
+    z-index: 1;
+    position: relative;
   }
-  .back:hover::before {
-    width: 200%;
-    height: 200%;
+  .back {
+    padding: 0;
+    aspect-ratio: 1.2 / 1;
   }
-  .back img {
-    width: 70%;
+  .button img {
+    height: 80%;
   }
 
   .text {
     position: relative;
+    display: flex;
+    flex-direction: column;
     margin-left: 1rem;
-    width: 100%;
+    /* flex: 1; */
   }
 
-  .path,
-  h1 {
-    position: absolute;
-    left: 0;
-  }
   .path {
     z-index: 1;
-    top: 0;
-    margin-top: -0.4rem;
-    font-size: 1.25rem;
+    position: relative;
+    top: -0.2rem;
   }
   .path * {
     text-decoration: none;
     font-weight: bold;
-    color: rgb(121, 121, 121);
+    opacity: 0.5;
+    font-size: 0.9rem;
   }
   h1 {
     z-index: 0;
-    bottom: -0.55rem;
-    margin-top: -0.5rem;
-    font-size: 2rem;
+    position: relative;
+    top: -0.4rem;
+    font-size: 1.5rem;
     font-weight: 900;
+    white-space: nowrap;
   }
 </style>

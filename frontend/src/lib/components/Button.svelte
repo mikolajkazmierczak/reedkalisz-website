@@ -13,6 +13,7 @@
 
 <style>
   button {
+    cursor: pointer;
     background-color: var(--main);
     color: var(--light);
     border: none;

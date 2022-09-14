@@ -1,6 +1,8 @@
 <script>
   import { goto } from '$app/navigation';
 
+  import Input from '$lib/admin/input/Input.svelte';
+
   export let filters;
 
   export let head;
@@ -9,7 +11,7 @@
 
 <div class="wrapper">
   <div class="filters">
-    <img src="/icon/filter.svg" alt="Filtry" />
+    <img src="/icons/dark/filters.svg" alt="Filtry" />
     {#each filters as filter}
       <div
         class="filter"
@@ -18,7 +20,7 @@
           // TODO: remove from filters list
         }}
       >
-        {@html filter} <img src="/icon/x.svg" alt="Usuń" />
+        {@html filter} <img src="/icons/dark/close.svg" alt="Usuń" />
       </div>
     {/each}
   </div>
@@ -32,7 +34,7 @@
             // TODO: change sorting
           }}
         >
-          {#if value.icon}<img src="/icon/{value.icon.src}" alt={value.icon.alt} />{/if}
+          {#if value.icon}<img src="/icons/dark/{value.icon.src}" alt={value.icon.alt} />{/if}
           {#if value.title}{value.title}{/if}
         </td>
       {/each}
@@ -41,7 +43,7 @@
       <tr class="row">
         {#each row.data as value, i}
           <td
-            class="value row-value"
+            class="value"
             class:checkbox={head[i].checkbox}
             on:click={() => {
               if (head[i].checkbox) value = !value;
@@ -49,7 +51,7 @@
             }}
           >
             {#if head[i].checkbox}
-              <input type="checkbox" checked={value} />
+              <Input type="checkbox" {value} />
             {:else}
               {value}
             {/if}
@@ -65,7 +67,7 @@
         // dispatch event to change data
       }}
     >
-      <img src="/icon/arrow_left.svg" alt="poprzednie" />
+      <img src="/icons/dark/arrow_left.svg" alt="poprzednie" />
     </div>
     <div
       class="next"
@@ -73,7 +75,7 @@
         // dispatch event to change data
       }}
     >
-      <img src="/icon/arrow_right.svg" alt="następne" />
+      <img src="/icons/dark/arrow_right.svg" alt="następne" />
     </div>
   </div>
 </div>
@@ -83,6 +85,9 @@
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
+  }
+  img {
+    max-height: 100%;
   }
 
   .filters {
@@ -122,37 +127,29 @@
     border-collapse: collapse;
   }
   tr {
-    --border: solid 1px var(--grey-dark);
     border-bottom: var(--border);
     background-color: var(--light);
   }
   tr:not(.head):hover {
-    background-color: rgb(245, 245, 245);
+    background-color: var(--accent-light);
   }
   .head {
-    height: 50px;
-    background-color: var(--bg-2);
+    height: 40px;
+    background-color: var(--accent-white);
   }
 
   .value {
     padding: 0.4rem 0.5rem;
     white-space: nowrap;
   }
+  .value img {
+    height: 22px;
+  }
   .value.checkbox {
     text-align: center;
   }
-  .row-value {
+  .row .value {
     cursor: pointer;
-  }
-  .row-value.checkbox {
-    background-color: var(--teriary);
-  }
-
-  input {
-    cursor: pointer;
-    margin: 0;
-    height: 1rem;
-    width: 1rem;
   }
 
   .pagination {

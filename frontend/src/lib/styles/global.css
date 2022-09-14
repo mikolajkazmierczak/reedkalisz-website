@@ -1,0 +1,51 @@
+:root {
+  --main-0: #fbf2f3;
+  --main-1: #efc2c7;
+  --main-2: #e3939b;
+  --main-3: #d7636f;
+  --main-4: #cb3343;
+  --main-5: #bf0417;
+  --main-6: #980312;
+  --main-7: #72020d;
+  --main-8: #4c0109;
+  --main-9: #260004;
+  --main-light: var(--main-4);
+  --main: var(--main-5);
+  --main-dark: var(--main-7);
+
+  --text: #0d1821;
+  --light: #ffffff;
+
+  --border: solid 1px var(--primary);
+  --border-focus: solid 1px var(--main);
+  --border-radius: 10px;
+  --shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Fira Sans', sans-serif;
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+:is(h1, h2, h3, h4, h5, h6, p) {
+  margin: 0;
+  padding: 0;
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--scroll-track);
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--scroll-thumb);
+  border: solid 3px var(--scroll-track);
+}

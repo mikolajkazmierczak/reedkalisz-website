@@ -1,5 +1,5 @@
 import api from '$lib/api';
-import { error } from '$lib/admin/stores';
+import { errors } from '$lib/admin/stores';
 import { writable } from 'svelte/store';
 
 export const auth = writable(false);
@@ -19,7 +19,7 @@ export async function readme() {
       auth.set(false);
     } else {
       // unexpected error
-      error.set(err);
+      errors.update(e => e.concat(err));
     }
     return null;
   }

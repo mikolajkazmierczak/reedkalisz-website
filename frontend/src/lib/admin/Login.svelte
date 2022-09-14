@@ -1,6 +1,6 @@
 <script>
-  import Input from '$lib/admin/Input.svelte';
-  import Button from '$lib/admin/Button.svelte';
+  import Input from '$lib/admin/input/Input.svelte';
+  import Button from '$lib/admin/input/Button.svelte';
   import Loader from '$lib/components/Loader.svelte';
   import { auth, me, login } from '$lib/auth';
   import { fade, fly } from 'svelte/transition';
@@ -29,10 +29,10 @@
 
   <div class="login" transition:fly={{ y: 20, duration: 600 }}>
     <div class="circle">
-      <img src="/icon/lock.svg" alt="security icon" />
+      <img src="/icons/dark/lock.svg" alt="security icon" />
     </div>
     <form>
-      <h1>Logowanie</h1>
+      <h1>Zaloguj się</h1>
       <Input placeholder="E-mail" bind:value={email} />
       <Input placeholder="Hasło" bind:value={password} type="password" />
       <div class="gap" />
@@ -64,7 +64,7 @@
     transform: translate(-50%, -50%);
     padding: 1rem 2rem;
     width: 30ch;
-    border: solid 2px var(--grey-light);
+    border: var(--border);
     background-color: var(--light);
   }
 
@@ -77,7 +77,7 @@
     justify-content: center;
     align-items: center;
     box-shadow: var(--shadow);
-    border: solid 2px var(--grey-light);
+    border: var(--border);
     border-radius: 50%;
     width: 50px;
     height: 50px;

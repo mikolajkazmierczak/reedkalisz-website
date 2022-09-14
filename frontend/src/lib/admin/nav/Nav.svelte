@@ -3,6 +3,8 @@
   import { baseUrl } from '$lib/api';
   import { auth, me, logout } from '$lib/auth';
   import { fly } from 'svelte/transition';
+  import { spring } from 'svelte/motion';
+  import HoverCircle from '$lib/components/HoverCircle.svelte';
   import User from '$lib/admin/nav/User.svelte';
   import Notifications from '$lib/admin/nav/Notifications.svelte';
   import Loader from '$lib/components/Loader.svelte';
@@ -16,7 +18,8 @@
     { href: '/menu', icon: 'menu.svg', name: 'Menu' },
     { href: '/strony', icon: 'page.svg', name: 'Strony' },
     { href: '/fragmenty', icon: 'fragment.svg', name: 'Fragmenty' },
-    { href: '/zapytania', icon: 'question.svg', name: 'Zapytania' },
+    { href: '/zapytania', icon: 'message.svg', name: 'Zapytania' },
+    { href: '/biblioteka', icon: 'library.svg', name: 'Biblioteka' },
     { href: '/api', icon: 'api.svg', name: 'API' }
   ];
 
@@ -42,28 +45,38 @@
     await logout();
     awaitingLogout = false;
   }
+
+  let mouse = spring({ x: 0, y: 0 }, { stiffness: 0.1, damping: 0.5 });
 </script>
 
 <nav transition:fly={{ x: -20, duration: 600 }}>
   <div class="wrapper">
-    <a sveltekit:prefetch class="button tile logo" href="/" rel="external">
+    <a data-sveltekit-prefetch class="button tile logo" href="/" rel="external">
       <img src="/logo.svg" alt="logo" />
     </a>
     {#each buttons as { href, icon, name }}
-      <a sveltekit:prefetch class="button" href={'/admin' + href} class:current={path == href}>
-        <img src={'/icon/' + icon} alt={name} />
+      <a
+        data-sveltekit-prefetch
+        class="button"
+        href={'/admin' + href}
+        class:current={path == href}
+        on:mousemove={e => ($mouse = { x: e.clientX + 25, y: e.clientY })}
+      >
+        <HoverCircle color={'var(--primary-dark)'} show={path == href} />
+        <div class="tooltip" style="top:{$mouse.y}px; left:{$mouse.x}px;">{name}</div>
+        <img src={'/icons/light/' + icon} alt={name} />
       </a>
     {/each}
   </div>
   <div class="wrapper">
     <button class="button" on:click={toggleNotifications}>
-      <img src="/icon/notification.svg" alt="Powiadomienia" />
+      <img src="/icons/light/notifications.svg" alt="Powiadomienia" />
     </button>
     <button class="button" on:click={handleLogout}>
       {#if awaitingLogout}
         <Loader dark={true} />
       {:else}
-        <img src="/icon/logout.svg" alt="Wyloguj" />
+        <img src="/icons/light/logout.svg" alt="Wyloguj" />
       {/if}
     </button>
     <button class="button tile avatar" on:click={toggleUserCard}>
@@ -89,14 +102,13 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: var(--border);
-    background-color: var(--light);
+    background-color: var(--primary);
   }
 
   .wrapper {
     display: grid;
     row-gap: var(--gap);
-    padding: var(--gap) 0.75rem;
+    padding: 0.9rem;
     width: 100%;
   }
   .button {
@@ -115,27 +127,25 @@
     color: inherit;
     background-color: rgba(0, 0, 0, 0);
   }
-  .button::before {
-    content: '';
-    z-index: -1;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 0%;
-    height: 0%;
-    border-radius: 50%;
-    background-color: var(--teriary);
-    transition: width 200ms, height 200ms;
-  }
-  .button:hover::before,
-  .button.current::before {
-    width: 200%;
-    height: 200%;
-  }
   .button img {
+    z-index: 1;
+    position: relative;
     object-fit: cover;
     width: 100%;
+  }
+  .tooltip {
+    pointer-events: none;
+    z-index: 1000;
+    position: fixed;
+    border: var(--border);
+    padding: 0.25rem 0.5rem;
+    background-color: var(--light);
+    transform: scale(0);
+    transform-origin: top left;
+    transition: transform 200ms;
+  }
+  .button:hover .tooltip {
+    transform: scale(1);
   }
 
   .tile {
@@ -145,6 +155,11 @@
     background-color: var(--main);
   }
   .avatar {
-    outline: var(--border);
+    border-radius: 50%;
+  }
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 </style>

@@ -1,24 +1,29 @@
 <script>
-  import { fade, fly } from 'svelte/transition';
-  import { error } from '$lib/admin/stores';
+  import { fly } from 'svelte/transition';
+  import { errors } from '$lib/admin/stores';
 
   function hide() {
-    $error = null;
+    show = false;
   }
+
+  $: show = $errors.length > 0;
 </script>
 
-{#if $error}
-  <div class="bg" transition:fade={{ duration: 300 }} />
-  <div class="wrapper" transition:fly={{ y: 20, duration: 600 }}>
+{#if show}
+  <div class="bg" />
+  <div class="wrapper" transition:fly={{ y: 20, duration: 300 }}>
     <div class="head">
       <div class="hide" on:click={hide}>
-        <img src="/icon/x.svg" alt="close" />
+        <img src="/icons/dark/close.svg" alt="close" />
       </div>
       <h1>Wystąpił nieoczekiwany błąd</h1>
       <p>Każdemu może się zdarzyć...</p>
     </div>
     <div class="content">
-      <pre>{JSON.stringify($error, null, 4)}</pre>
+      {#each $errors as error}
+        <pre>{JSON.stringify(error, null, 4)}</pre>
+        <hr />
+      {/each}
     </div>
   </div>
 {/if}
@@ -63,7 +68,7 @@
   }
 
   .content {
-    overflow: auto;
+    overflow-y: auto;
     height: calc(100vh - 9rem - 10px);
     padding: 1rem;
   }
@@ -76,5 +81,7 @@
   }
   pre {
     margin: 0;
+    width: 100%;
+    white-space: pre-wrap;
   }
 </style>

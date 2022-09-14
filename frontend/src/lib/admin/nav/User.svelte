@@ -14,11 +14,12 @@
 
 <style>
   .card {
+    z-index: 100;
     position: fixed;
     left: 4.75rem;
     bottom: 0.75rem;
     padding: 1.5rem;
-    border: solid 2px var(--grey-light);
+    border: var(--border);
     background-color: var(--light);
   }
   h2 {

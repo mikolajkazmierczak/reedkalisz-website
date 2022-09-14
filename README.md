@@ -1,46 +1,50 @@
 # Reed Kalisz
 
-#### Public website and a CMS to manage it.
+## Public website and a CMS to manage it.
 
-The public website and the admin panel are both statically generated. Powered by [SvelteKit](https://kit.svelte.dev/).\
-The admin panel is using a REST API that runs as a node server. Powered by [Strapi](https://strapi.io/).\
+Both the public website and admin panel are statically generated. Powered by [SvelteKit](https://kit.svelte.dev/).\
+The admin panel is using a REST API that runs as a node server. Powered by [Directus](https://directus.io/).
+
 <br/>
 
 ## `Develop 👨‍💻`
 
-#### Backend: <small>`cd backend`</small>
+### Backend: <small>`/backend`</small>
 
-`npm run develop`
+#### Directus: <small>`/backend/directus`</small>
 
-To rebuild the [admin panel](http://localhost:1337) run <small>`npm run build`</small>.
+Directus turns an SQL database into a REST API.
 
-#### Frontend: <small>`cd frontend`</small>
+`npm run start` ([docs](https://docs.directus.io/self-hosted/installation/cli/#_3-start-your-project))
+
+#### Heimdall: <small>`/backend/heimdall`</small>
+
+Heimdall is a server that performs actions based on the information from the admin panel.
 
 `npm run dev`
+
+### Frontend: <small>`/frontend`</small>
+
+`npm run dev` ([docs](https://kit.svelte.dev/docs/introduction#getting-started))
 
 <br/>
 
 ## `Deploy 🏃`
 
-Configure a tool like [nginx](https://www.nginx.com/).\
-Serve the static frontend files from the <small>`frontend/build`</small> folder on port **80**.\
-Serve the REST API on port **1337**.
+Configure a tool like [nginx](https://www.nginx.com/). Make sure you run everything on HTTPS.\
+Serve SvelteKit on port **80**.\
+Serve Directus on port **8055**.\
+Serve Heimdall on port **999**.
 
-#### Backend: <small>`cd backend`</small>
-
-0. Clone this repo to the server.
-1. Read the official Strapi docs on [configuration](https://docs.strapi.io/developer-docs/latest/setup-deployment-guides/deployment.html#application-configuration) and [admin panel customization](https://docs.strapi.io/developer-docs/latest/development/admin-customization.html).
-2. The Strapi admin panel is not actually needed in a production environment.\
-   You can safely remove it by deleting the <small>`backend/build`</small> folder if it exists. **This will save some resources!**
-3. `NODE_ENV=production npm run start`
-
-Consider running the REST API server with [pm2](https://github.com/Unitech/pm2).\
-You will need to install it, create a <small>`server.js`</small> file and run <small>`pm2 start ./server.js`</small>
-
-If you ever need it you can build the **Strapi admin panel** with <small>`NODE_ENV=production npm run build`</small>.\
-However: **it really shouldn't be needed.** If something is wrong find the cause in a local dev environment.
-
-#### Frontend: <small>`cd frontend`</small>
+#### Backend: <small>`/backend`</small>
 
 0. Clone this repo to the server.
-1. `npm run build`
+1. Read the official [docs on Directus deployment](https://docs.directus.io/self-hosted/installation/ubuntu/).
+2. Run Heimdall. (<small>`npm run start`</small>)
+
+Consider running the backend with [pm2](https://github.com/Unitech/pm2).
+
+#### Frontend: <small>`/frontend`</small>
+
+0. Clone this repo to the server.
+1. Build (<small>`npm run build`</small>) and run the node server.
