@@ -10,7 +10,7 @@
 </script>
 
 {#if show}
-  <div class="bg" />
+  <div class="bg" on:click={hide} />
   <div class="wrapper" transition:fly={{ y: 20, duration: 300 }}>
     <div class="head">
       <div class="hide" on:click={hide}>

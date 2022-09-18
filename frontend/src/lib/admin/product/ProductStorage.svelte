@@ -1,5 +1,5 @@
 <script>
-  import api, { baseUrl } from '$lib/api';
+  import api from '$lib/api';
   import Input from '$lib/admin/input/Input.svelte';
   import Button from '$lib/admin/input/Button.svelte';
   import Picker from '$lib/admin/library/Picker.svelte';
@@ -64,7 +64,7 @@
           <div class="imgs-wrapper">
             {#each storage.img as img, j (img)}
               <div class="img">
-                <Picker bind:id={img.img} />
+                <Picker bind:selected={img.img} />
                 <div class="actions">
                   <Input type="checkbox" bind:value={img.enabled}>Włączone</Input>
                   <Input type="checkbox" bind:value={img.show_in_gallery}>W galerii</Input>
@@ -95,6 +95,7 @@
 
 <style>
   .imgs {
+    --border: solid 1px rgba(0, 0, 0, 0.1);
     border-top: var(--border);
     border-bottom: var(--border);
     padding: 1rem 0;

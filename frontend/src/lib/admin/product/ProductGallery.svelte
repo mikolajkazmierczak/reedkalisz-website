@@ -1,5 +1,4 @@
 <script>
-  import { baseUrl } from '$lib/api';
   import Input from '$lib/admin/input/Input.svelte';
   import Button from '$lib/admin/input/Button.svelte';
   import Picker from '$lib/admin/library/Picker.svelte';
@@ -35,7 +34,7 @@
     {#each gallery as img, i (img)}
       <div class="ui-box ui-box--element" class:ui-box--uneditable={!img.enabled} class:main={i == 0}>
         <Button icon="delete.svg" on:click={() => removeImg(i)} dangerous>Usuń</Button>
-        <Picker bind:id={img.img} />
+        <Picker bind:selected={img.img} />
         {#if !img.main}
           <Input type="checkbox" bind:value={img.enabled}>Włączone</Input>
         {/if}

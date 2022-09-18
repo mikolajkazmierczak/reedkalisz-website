@@ -179,7 +179,7 @@
           </p>
         </div>
 
-        <div class="ui-box ui-box--uneditable">
+        <div class="ui-box">
           <!-- <h3 class="ui-h3">DANGER</h3> -->
           <Button icon="delete.svg" on:click={deleteProduct} dangerous>Usuń</Button>
         </div>

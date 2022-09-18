@@ -6,13 +6,13 @@
 
   export let update = null; // id of file to update
 
-  export let open = true;
+  let uploading = true;
   let highlighted = false;
 
   let input;
 
   async function handleInput() {
-    open = false;
+    uploading = false;
     const files = input.files;
     if (files.length) {
       const form = new FormData();
@@ -24,16 +24,16 @@
       } else {
         await api.files.createMany(form);
       }
-      dispatch('uploaded');
+      dispatch('upload');
     }
-    open = true;
+    uploading = true;
     highlighted = false;
   }
 </script>
 
 <div class="wrapper" class:highlighted>
   <div class="text">
-    {#if open}
+    {#if uploading}
       <img src="/icons/dark/upload.svg" alt="" />
       <span>Przeciągnij lub <span style:text-decoration="underline">Wybierz</span></span>
     {:else}
@@ -41,7 +41,7 @@
     {/if}
   </div>
   <input
-    disabled={!open}
+    disabled={!uploading}
     multiple={!update}
     type="file"
     on:input={handleInput}

@@ -53,7 +53,7 @@
         if (labeling.labeling) {
           const data = calculateLabeling(
             priceView.amounts,
-            globalMargins,
+            $globalMargins,
             $labelings.find(l => l.id == labeling.labeling),
             product,
             labeling
@@ -217,7 +217,7 @@
                     fixedPrices
                   />
                   <Input type="checkbox" bind:value={labeling.global_margin}>
-                    Odgórna marża na znakowanie ({labeling.margin ?? 0}%, {labeling.minimum ?? 0}zł)
+                    Odgórna marża na znakowanie ({chosenLabeling.margin ?? 0}%, {chosenLabeling.minimum ?? 0}zł)
                   </Input>
                   {#if !labeling.global_margin}
                     <div class="ui-box ui-box--optional">

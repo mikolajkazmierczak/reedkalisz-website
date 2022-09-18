@@ -49,15 +49,18 @@
     cursor: pointer;
     --border-radius: 0.5rem;
     border-radius: var(--border-radius);
-    transition: padding 100ms;
+    transition: padding 100ms, border 100ms;
   }
   .wrapper:hover {
     padding: 0.5rem;
-    background-color: var(--accent);
+    /* background-color: var(--accent); */
+    background-color: rgba(0, 0, 0, 0.2);
   }
   .wrapper.marked {
     padding: 0.5rem;
-    background-color: var(--accent-dark);
+    /* background-color: var(--accent-dark); */
+    /* background-color: rgba(0, 0, 0, 0.2); */
+    border: solid 2px var(--primary);
   }
 
   .icon {

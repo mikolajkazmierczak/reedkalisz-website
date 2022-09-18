@@ -1,41 +1,32 @@
 <script>
   import { fly, fade } from 'svelte/transition';
+  import { createEventDispatcher } from 'svelte';
 
   import api from '$lib/api';
   import { read as fields } from '$lib/fields/files';
   import File from '$lib/admin/library/File.svelte';
   import Library from '$lib/admin/library/Library.svelte';
 
-  export let types = [];
+  const dispatch = createEventDispatcher();
+
+  export let selected;
+  let file;
 
   let opened;
 
-  export let id;
-  let file;
-
-  async function read() {
+  async function read(id) {
     if (id) file = await api.files.readOne(id, { fields });
   }
 
-  read();
-
   function handleSelect(e) {
-    file = e.detail;
-    id = file.id;
     opened = false;
-    console.log(selected);
+    file = e.detail;
+    selected = file.id;
+    dispatch('select', file);
   }
-</script>
 
-<svelte:head>
-  {#if opened}
-    <style>
-      body {
-        /* overflow: hidden; */
-      }
-    </style>
-  {/if}
-</svelte:head>
+  $: read(selected);
+</script>
 
 <File {...file} on:click={() => (opened = true)} />
 
@@ -43,7 +34,7 @@
   <div class="bg" transition:fade={{ duration: 200 }} />
   <div class="wrapper" on:click|self={() => (opened = false)}>
     <div class="library" transition:fly={{ y: -50, duration: 200 }}>
-      <Library picker {types} selected={id} on:select={handleSelect} />
+      <Library picker bind:selected on:select={handleSelect} />
     </div>
   </div>
 {/if}

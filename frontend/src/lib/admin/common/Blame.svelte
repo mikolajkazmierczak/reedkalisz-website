@@ -27,7 +27,7 @@
     border-radius: 1rem;
     padding: 0.1rem 0.25rem;
     width: auto;
-    background-color: var(--accent-light);
+    background-color: rgba(0, 0, 0, 0.1);
   }
 
   .user {
