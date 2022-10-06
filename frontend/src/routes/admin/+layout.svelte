@@ -1,12 +1,12 @@
 <script>
-  import socket from '$lib/admin/heimdall';
-
+  import { beforeNavigate } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   import api from '$lib/api';
+  import socket from '$lib/admin/heimdall';
   import { me, readme } from '$lib/auth';
-  import { errors } from '$lib/admin/stores';
+  import { errors, edited } from '$lib/admin/stores';
   import { users } from '$lib/admin/global';
   import { read as fieldsUsers } from '$lib/fields/users';
   import Error from '$lib/admin/Error.svelte';
@@ -14,6 +14,16 @@
   import Nav from '$lib/admin/nav/Nav.svelte';
   import Header from '$lib/admin/Header.svelte';
   import Loader from '$lib/components/Loader.svelte';
+
+  beforeNavigate(navigation => {
+    if ($edited) {
+      if (confirm('Zmiany nie zostały zapisane. Czy na pewno chcesz opuścić stronę?')) {
+        $edited = false;
+      } else {
+        navigation.cancel();
+      }
+    }
+  });
 
   async function getGlobals() {
     // read all users
@@ -80,8 +90,6 @@
   }
 
   .content {
-    position: relative;
     padding: 5.5rem 1.5rem 1.5rem 5.5rem;
-    width: 100%;
   }
 </style>

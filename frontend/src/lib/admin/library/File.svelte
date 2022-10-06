@@ -1,6 +1,7 @@
 <script>
   import { baseUrl } from '$lib/api';
   import { filetypeToReadable, bytesToReadable } from '$lib/utils';
+  import Icon from '$lib/common/Icon.svelte';
 
   export let id;
   export let title;
@@ -15,25 +16,25 @@
 </script>
 
 <div class="wrapper" class:marked on:click>
-  <div class="icon" class:boilerplate={!isImg || loading || imgError}>
+  <div class="thumbnail" class:boilerplate={!isImg || loading || imgError}>
     {#if isImg}
       {#if imgError}
-        <img src={`/icons/dark/img.svg`} alt="" />
+        <Icon name="img" dark />
       {:else}
         <img
-          src={`${baseUrl}/assets/${id}?key=thumbnail`}
+          src="{baseUrl}/assets/{id}?key=thumbnail"
           alt=""
           on:error={() => (imgError = true)}
           on:load={() => (loading = false)}
         />
         {#if loading}
-          <img src={`/icons/dark/img.svg`} alt="" />
+          <Icon name="img" dark />
         {/if}
       {/if}
     {:else if id}
-      <img src={`/icons/dark/file.svg`} alt="" />
+      <Icon name="file" dark />
     {:else}
-      <img src={`/icons/dark/edit.svg`} alt="" />
+      <Icon name="edit" dark />
     {/if}
   </div>
   <div class="text">
@@ -63,7 +64,7 @@
     border: solid 2px var(--primary);
   }
 
-  .icon {
+  .thumbnail {
     overflow: hidden;
     aspect-ratio: 1 / 1;
     display: grid;
@@ -71,15 +72,14 @@
     border-radius: var(--border-radius);
     background-color: var(--accent-white);
   }
-  .icon img {
+  .thumbnail.boilerplate {
+    padding: 30%;
+  }
+  .thumbnail img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-  .icon.boilerplate img {
-    width: auto;
-    height: auto;
   }
 
   .text {

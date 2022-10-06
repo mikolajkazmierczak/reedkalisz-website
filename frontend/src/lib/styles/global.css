@@ -15,11 +15,6 @@
 
   --text: #0d1821;
   --light: #ffffff;
-
-  --border: solid 1px var(--primary);
-  --border-focus: solid 1px var(--main);
-  --border-radius: 10px;
-  --shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
 }
 
 * {
@@ -47,5 +42,10 @@ body {
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: var(--scroll-thumb);
-  border: solid 3px var(--scroll-track);
+  border: solid 3px var(--scroll-track); /* makes the horizontal thumb invisible on mobile */
+}
+@media screen and (max-width: 600px) {
+  ::-webkit-scrollbar-thumb {
+    border: none;
+  }
 }

@@ -1,10 +1,10 @@
 <script>
   import { baseUrl } from '$lib/api';
-  import datetime from '$lib/datetime';
+  import { getDatetime } from '$lib/datetime';
   import { users } from '$lib/admin/global';
 
   export let user;
-  export let time;
+  export let datetime;
 
   $: userData = $users.find(u => u.id == user);
 </script>
@@ -13,32 +13,50 @@
   {#if userData}
     {@const { first_name, last_name, avatar } = userData}
     <div class="user">
-      <img src="{baseUrl}/assets/{avatar}" alt="avatar" />
+      <div class="img">
+        <img src="{baseUrl}/assets/{avatar}" alt="avatar" />
+      </div>
       {first_name}
       {last_name}
     </div>
   {/if}
-  {datetime(time).str()}
+
+  {#if datetime}
+    <div class="time">
+      {getDatetime(datetime).str()}
+    </div>
+  {/if}
 </div>
 
 <style>
   .wrapper {
-    display: inline-block;
-    border-radius: 1rem;
-    padding: 0.1rem 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 100px;
+    padding: 0.15em 0.3em;
+    padding-right: 0.5em;
     width: auto;
     background-color: rgba(0, 0, 0, 0.1);
+    font-size: 0.9em;
   }
 
   .user {
-    display: inline-block;
-    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+    margin-right: 0.5em;
   }
-  .user img {
+  .img {
+    overflow: hidden;
+    margin-right: 0.25em;
     border-radius: 50%;
-    border: 1px solid var(--primary);
-    position: relative;
-    top: 0.125rem;
-    height: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    height: 1em;
+    width: 1em;
+  }
+  .img img {
+    display: block;
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
   }
 </style>

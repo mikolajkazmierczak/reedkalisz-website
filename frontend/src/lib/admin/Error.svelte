@@ -1,6 +1,7 @@
 <script>
   import { fly } from 'svelte/transition';
   import { errors } from '$lib/admin/stores';
+  import Icon from '$lib/common/Icon.svelte';
 
   function hide() {
     show = false;
@@ -14,7 +15,7 @@
   <div class="wrapper" transition:fly={{ y: 20, duration: 300 }}>
     <div class="head">
       <div class="hide" on:click={hide}>
-        <img src="/icons/dark/close.svg" alt="close" />
+        <Icon name="close" />
       </div>
       <h1>Wystąpił nieoczekiwany błąd</h1>
       <p>Każdemu może się zdarzyć...</p>
@@ -56,21 +57,30 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 2rem;
-    height: 5rem;
-    border-bottom: solid 2px var(--grey-light);
+    margin: 1rem 1rem;
+  }
+  .head p {
+    margin: 0;
   }
   .hide {
     cursor: pointer;
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 0;
+    right: 0;
+    border-radius: 50%;
+    padding: 0.5rem;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+  }
+  .hide:hover {
+    background-color: var(--accent-white);
   }
 
   .content {
     overflow-y: auto;
     height: calc(100vh - 9rem - 10px);
     padding: 1rem;
+    border-top: var(--border-light);
   }
   h1 {
     font-size: 1.25rem;

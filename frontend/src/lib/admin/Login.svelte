@@ -4,6 +4,7 @@
   import Loader from '$lib/components/Loader.svelte';
   import { auth, me, login } from '$lib/auth';
   import { fade, fly } from 'svelte/transition';
+  import Icon from '$lib/common/Icon.svelte';
 
   let email;
   let password;
@@ -29,7 +30,9 @@
 
   <div class="login" transition:fly={{ y: 20, duration: 600 }}>
     <div class="circle">
-      <img src="/icons/dark/lock.svg" alt="security icon" />
+      <div class="icon">
+        <Icon name="lock" dark />
+      </div>
     </div>
     <form>
       <h1>Zaloguj się</h1>
@@ -62,6 +65,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    border-radius: var(--border-radius);
     padding: 1rem 2rem;
     width: 30ch;
     border: var(--border);
@@ -72,7 +76,7 @@
     position: absolute;
     top: 0;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -75%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -83,8 +87,8 @@
     height: 50px;
     background-color: var(--light);
   }
-  .circle img {
-    width: 60%;
+  .circle .icon {
+    height: 60%;
   }
 
   form {

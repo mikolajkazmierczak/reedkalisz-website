@@ -5,13 +5,14 @@ export const read = [
   'user_updated',
   'date_updated',
   'enabled',
-  'index',
   'name',
   'slug',
   'seo_title',
   'seo_description',
   'description',
-  'img'
+  'img',
+  'children',
+  'parent'
 ];
 export const search = [...read];
 export const show = [...read];
@@ -30,7 +31,9 @@ export const defaults = () => ({
   seo_title: '',
   seo_description: '',
   description: '',
-  img: null
+  img: null,
+  children: [],
+  parent: null
 });
 
 export default { search, show, read, edit, defaults };

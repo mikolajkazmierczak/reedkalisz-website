@@ -1,12 +1,13 @@
 <script>
   import { onDestroy } from 'svelte';
+  import { page as pageStore } from '$app/stores';
   import { goto } from '$app/navigation';
 
-  import api, { baseUrl } from '$lib/api';
+  import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
   import { page, edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
-  import { diff, isDiff, diffToHtml } from '$lib/utils';
+  import { diff, makeTree, treeFlatten } from '$lib/utils';
 
   import slugify from 'slugify';
   import { marked } from 'marked';
@@ -16,9 +17,13 @@
 
   import { updateGlobal, users, companies, categories } from '$lib/admin/global';
   import { edit as fields, defaults } from '$lib/fields/products';
-  import ProductPricing from '$lib/admin/product/ProductPricing.svelte';
-  import ProductStorage from '$lib/admin/product/ProductStorage.svelte';
-  import ProductGallery from '$lib/admin/product/ProductGallery.svelte';
+  import ProductPricing from '$lib/admin/collections/product/ProductPricing.svelte';
+  import ProductStorage from '$lib/admin/collections/product/ProductStorage.svelte';
+  import ProductGallery from '$lib/admin/collections/product/ProductGallery.svelte';
+
+  const searchParams = {
+    c: Number($pageStore.url.searchParams.get('c'))
+  };
 
   $: $page = {
     title: product?.name || (product?.name == '' ? '...' : slug == '+' ? 'Nowy produkt...' : null),
@@ -35,14 +40,14 @@
   let productDiff;
 
   $save = async () => {
-    console.log(JSON.parse(JSON.stringify(product)));
     [product, productOriginal] = await editing.save(
       'products',
       product,
       productOriginal,
+      fields,
       fieldsToIgnore,
       product.slug != slug,
-      '/admin/produkty' + product.slug
+      '/admin/produkty/' + product.slug
     );
   };
   $cancel = async () => {
@@ -55,6 +60,8 @@
 
     if (slug == '+') {
       product = defaults();
+      // add category from search params
+      if (searchParams.c) product.categories = [...product.categories, { category: searchParams.c }];
     } else {
       product = (await api.items('products').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
     }
@@ -82,8 +89,10 @@
   $: if (product) product.slug = slugify(product?.code + '-' + product?.name, { lower: true, strict: true });
   $: correctSlug = product && !['+', ''].includes(product.slug);
 
-  $: diff(product, productOriginal, fieldsToIgnore).then(d => (productDiff = d));
-  $: $edited = correctSlug && isDiff(productDiff);
+  $: diff(product, productOriginal, fieldsToIgnore).then(({ changed, html }) => {
+    productDiff = html;
+    $edited = correctSlug && changed;
+  });
 
   async function listener(data) {
     if (data.collection == 'products' && data.id == product.id) {
@@ -123,15 +132,20 @@
           <h3 class="ui-h3">Kategorie</h3>
           {#each product.categories as { category }, i}
             <div class="ui-list">
-              <Input
-                type="select"
-                bind:value={category}
-                options={$categories.map(({ id, index, name }) => ({ id, text: `(${index}) ${name}` }))}
-              />
-              <Button icon="delete.svg" on:click={() => removeCategory(i)} dangerous />
+              {#await makeTree($categories) then tree}
+                <Input
+                  type="select"
+                  bind:value={category}
+                  options={treeFlatten(tree).map(({ id, name, _meta }) => {
+                    const path = _meta.path.map(p => p + 1).join('.');
+                    return { id, text: `${path} ${name}` };
+                  })}
+                />
+              {/await}
+              <Button icon="delete" on:click={() => removeCategory(i)} dangerous square />
             </div>
           {/each}
-          <Button icon="add.svg" on:click={pushCategory}>Dodaj</Button>
+          <Button icon="add" on:click={pushCategory}>Dodaj</Button>
         </div>
       </div>
 
@@ -158,13 +172,17 @@
       </div>
 
       <div class="ui-section__col">
+        <div class="ui-box">
+          <Button icon="delete" on:click={deleteProduct} dangerous>Usuń</Button>
+        </div>
+
         <div class="ui-box ui-box--uneditable">
           <h3 class="ui-h3">Bezpośredni link</h3>
           <a href="/produkty/{product.slug}">/produkty/{product.slug}</a>
           <h3 class="ui-h3">Dodano</h3>
           <p>
             {#if $users && product.date_created}
-              <Blame user={product.user_created} time={product.date_created} />
+              <Blame user={product.user_created} datetime={product.date_created} />
             {:else}
               Tu będziesz ty
             {/if}
@@ -172,16 +190,11 @@
           <h3 class="ui-h3">Zaktualizowano</h3>
           <p>
             {#if $users && product.date_updated}
-              <Blame user={product.user_updated} time={product.date_updated} />
+              <Blame user={product.user_updated} datetime={product.date_updated} />
             {:else}
               Nie aktualizowano
             {/if}
           </p>
-        </div>
-
-        <div class="ui-box">
-          <!-- <h3 class="ui-h3">DANGER</h3> -->
-          <Button icon="delete.svg" on:click={deleteProduct} dangerous>Usuń</Button>
         </div>
       </div>
 
@@ -189,7 +202,7 @@
         <div class="diff">
           EDITED: {$edited}
           <h3 class="ui-h3">PRODUCT</h3>
-          <pre>{@html diffToHtml(productDiff)}</pre>
+          <pre>{@html productDiff}</pre>
         </div>
       </div>
     </div>

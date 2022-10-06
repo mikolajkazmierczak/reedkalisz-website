@@ -1,4 +1,17 @@
-export const search = [];
+export const search = [
+  'id',
+  'user_created',
+  'date_created',
+  'user_updated',
+  'date_updated',
+  'name',
+  'code',
+  'slug',
+  'enabled',
+  'new',
+  'sale',
+  'categories'
+];
 export const show = [];
 
 export const read = [];

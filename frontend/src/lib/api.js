@@ -1,7 +1,9 @@
 import { Directus } from '@directus/sdk';
 
-export const baseUrl = 'http://localhost:8055';
-// export const baseUrl = 'http://83.21.66.94:8055';
+// export const baseUrl = 'http://localhost:8055';
+// export const baseUrl = 'http://192.168.1.10:8055';
+// export const baseUrl = 'http://formixhome.ddns.net:8055';
+export const baseUrl = 'http://produktpolski.ddns.net:8055';
 
 export default new Directus(baseUrl);
 

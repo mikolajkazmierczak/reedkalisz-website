@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import api from '$lib/api';
+  import Icon from '$lib/common/Icon.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -34,7 +35,9 @@
 <div class="wrapper" class:highlighted>
   <div class="text">
     {#if uploading}
-      <img src="/icons/dark/upload.svg" alt="" />
+      <div class="icon">
+        <Icon name="upload" dark />
+      </div>
       <span>Przeciągnij lub <span style:text-decoration="underline">Wybierz</span></span>
     {:else}
       <span>Przetwarzanie...</span>
@@ -70,11 +73,12 @@
     transform: translate(-50%, -50%);
     display: flex;
     align-items: center;
+    gap: 1rem;
     font-size: 1.5rem;
     padding: 0.5rem;
   }
-  img {
-    margin-right: 0.5rem;
+  .icon {
+    height: 2rem;
   }
   input {
     cursor: pointer;

@@ -8,19 +8,20 @@
   import User from '$lib/admin/nav/User.svelte';
   import Notifications from '$lib/admin/nav/Notifications.svelte';
   import Loader from '$lib/components/Loader.svelte';
+  import Icon from '$lib/common/Icon.svelte';
 
   const buttons = [
-    { href: '/', icon: 'dashboard.svg', name: 'Aktywność' },
-    { href: '/produkty', icon: 'product.svg', name: 'Produkty' },
-    { href: '/kategorie', icon: 'category.svg', name: 'Kategorie' },
-    { href: '/kalkulator', icon: 'calculator.svg', name: 'Kalkulatory' },
-    { href: '/kolory', icon: 'color.svg', name: 'Kolory' },
-    { href: '/menu', icon: 'menu.svg', name: 'Menu' },
-    { href: '/strony', icon: 'page.svg', name: 'Strony' },
-    { href: '/fragmenty', icon: 'fragment.svg', name: 'Fragmenty' },
-    { href: '/zapytania', icon: 'message.svg', name: 'Zapytania' },
-    { href: '/biblioteka', icon: 'library.svg', name: 'Biblioteka' },
-    { href: '/api', icon: 'api.svg', name: 'API' }
+    { href: '/', icon: 'dashboard', name: 'Aktywność' },
+    { href: '/produkty', icon: 'products', name: 'Produkty' },
+    { href: '/kategorie', icon: 'categories', name: 'Kategorie' },
+    { href: '/kalkulator', icon: 'calculator', name: 'Kalkulatory' },
+    { href: '/kolory', icon: 'colors', name: 'Kolory' },
+    { href: '/menu', icon: 'menu', name: 'Menu' },
+    { href: '/strony', icon: 'pages', name: 'Strony' },
+    { href: '/fragmenty', icon: 'fragments', name: 'Fragmenty' },
+    { href: '/zapytania', icon: 'questions', name: 'Zapytania' },
+    { href: '/biblioteka', icon: 'library', name: 'Biblioteka' },
+    { href: '/api', icon: 'api', name: 'API' }
   ];
 
   $: path = $page.url.pathname.replace('/admin', '/').replace('//', '/');
@@ -64,19 +65,21 @@
       >
         <HoverCircle color={'var(--primary-dark)'} show={path == href} />
         <div class="tooltip" style="top:{$mouse.y}px; left:{$mouse.x}px;">{name}</div>
-        <img src={'/icons/light/' + icon} alt={name} />
+        <div class="icon">
+          <Icon name={icon} light />
+        </div>
       </a>
     {/each}
   </div>
   <div class="wrapper">
     <button class="button" on:click={toggleNotifications}>
-      <img src="/icons/light/notifications.svg" alt="Powiadomienia" />
+      <Icon name="notifications" light />
     </button>
     <button class="button" on:click={handleLogout}>
       {#if awaitingLogout}
-        <Loader dark={true} />
+        <Loader />
       {:else}
-        <img src="/icons/light/logout.svg" alt="Wyloguj" />
+        <Icon name="logout" light />
       {/if}
     </button>
     <button class="button tile avatar" on:click={toggleUserCard}>
@@ -132,6 +135,11 @@
     position: relative;
     object-fit: cover;
     width: 100%;
+  }
+  .button .icon {
+    z-index: 1;
+    display: grid;
+    place-items: center;
   }
   .tooltip {
     pointer-events: none;

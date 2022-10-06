@@ -29,13 +29,18 @@ export async function updateGlobal(store, ids = []) {
   // update a global store with new items from the api
   if (!Array.isArray(ids)) ids = [ids];
   const collection = collections.find(c => c.store === store);
-  if (ids.length > 0) {
+  if (ids.length) {
+    // only update specified ids
     const updated = (await api.items(collection.collection).readMany(ids)).data;
     store.update(items => {
-      const unchanged = items.filter(item => !ids.includes(item.id));
-      return [...unchanged, ...updated];
+      for (const u of updated) {
+        const i = items.findIndex(item => item.id === u.id);
+        if (i > -1) items[i] = u;
+      }
+      return items;
     });
   } else {
+    // update all items
     const items = (await api.items(collection.collection).readByQuery({ limit: -1, fields: collection.fields })).data;
     store.set(items);
   }

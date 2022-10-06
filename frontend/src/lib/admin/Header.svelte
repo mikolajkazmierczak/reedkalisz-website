@@ -3,6 +3,7 @@
   import { cubicOut } from 'svelte/easing';
   import { page, edited, save, cancel } from '$lib/admin/stores';
   import HoverCircle from '$lib/components/HoverCircle.svelte';
+  import Icon from '$lib/common/Icon.svelte';
 
   function spin(node, { duration }) {
     return {
@@ -25,7 +26,9 @@
   {#if path && !$edited}
     <a class="button back" href={'/admin' + path[path.length - 1].href}>
       <HoverCircle color={'var(--accent-light)'} />
-      <img src="/icons/dark/arrow_left.svg" alt="return arrow" in:spin />
+      <div class="icon" in:spin>
+        <Icon name="arrow_left" dark />
+      </div>
     </a>
   {/if}
 
@@ -39,7 +42,9 @@
       }}
     >
       <HoverCircle color={'var(--main-3)'} />
-      <img src="/icons/dark/close.svg" alt="cancel" in:spin />
+      <div class="icon" in:spin>
+        <Icon name="close" dark />
+      </div>
     </div>
   {/if}
   <div class="actions" class:visible={$edited}>
@@ -54,7 +59,7 @@
       }}
     >
       <HoverCircle color={'var(--success)'} />
-      {#if !saving}<img src="/icons/dark/ok.svg" alt="save" />{/if}
+      {#if !saving}<div class="icon"><Icon name="ok" dark /></div>{/if}
       <span>
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </span>
@@ -102,7 +107,7 @@
     transition: width 200ms;
   }
   .actions.visible {
-    width: 7.5rem;
+    width: 7.75rem;
   }
 
   .button {
@@ -117,7 +122,7 @@
     padding: 0 1rem;
     border: solid 2px var(--accent-text);
   }
-  .button img,
+  .button .icon,
   .button span {
     z-index: 1;
     position: relative;
@@ -126,8 +131,8 @@
     padding: 0;
     aspect-ratio: 1.2 / 1;
   }
-  .button img {
-    height: 80%;
+  .button .icon {
+    height: 65%;
   }
 
   .text {
@@ -135,7 +140,6 @@
     display: flex;
     flex-direction: column;
     margin-left: 1rem;
-    /* flex: 1; */
   }
 
   .path {

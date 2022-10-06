@@ -1,92 +1,126 @@
 <script>
-  import { onMount } from 'svelte';
-
   import { goto } from '$app/navigation';
+
   import api from '$lib/api';
-  import { auth, readme } from '$lib/auth';
+  import { makeTree } from '$lib/utils';
   import { page, edited } from '$lib/admin/stores';
-  import datetime from '$lib/datetime';
-  import Table from '$lib/admin/Table.svelte';
+  import { updateGlobal, categories } from '$lib/admin/global';
+
+  import { search as fields } from '$lib/fields/products';
+  import Table from '$lib/admin/common/Table.svelte';
   import Button from '$lib/admin/input/Button.svelte';
 
+  import Category from '$lib/admin/collections/product/Category.svelte';
+
   $page = 'Produkty';
-  $edited = false;
+
+  let categoriesTree;
+  let selectedCategory = null;
+
+  $: if (categoriesTree) readProducts(selectedCategory);
 
   let products;
-  let filters = ['<b>Kategoria</b>&nbsp;Długopisy'];
+  let productsOriginal;
 
-  async function read() {
-    try {
-      const res = await api.items('products').readByQuery({
-        meta: '*',
-        limit: 100,
-        offset: 0,
-        fields: [
-          'id',
-          'slug',
-          'code',
-          'name',
-          'enabled',
-          'sale',
-          'new',
-          'date_created',
-          'date_updated',
-          'user_created.first_name',
-          'user_created.last_name',
-          'user_updated.first_name',
-          'user_updated.last_name'
-        ]
-      });
-      products = res.data;
-    } catch (err) {
-      // $error = 'TOKEN';
-      // setTimeout(async () => {
-      //   const me = await readme();
-      //   if (me) read();
-      //   else {
-      //     $auth = false;
-      //     $error = err;
-      //   }
-      // }, 2000);
-    }
+  async function readProducts(category = null) {
+    const filter = category ? { categories: { category: { _eq: category } } } : {};
+    products = (await api.items('products').readByQuery({ fields, limit: 100, page: 1, filter })).data;
+    productsOriginal = JSON.parse(JSON.stringify(products));
   }
 
-  onMount(read);
-  // $: if ($auth && !products) read();
+  async function read() {
+    await updateGlobal(categories);
+    categoriesTree = makeTree($categories);
+    await readProducts();
+  }
+
+  read();
 </script>
 
-{#if products}
-  <Table
-    {filters}
-    head={[
-      { checkbox: true, icon: { src: 'visibility.svg', alt: 'Włączony' } },
-      { checkbox: true, icon: { src: 'new.svg', alt: 'Nowość' } },
-      { checkbox: true, icon: { src: 'sale.svg', alt: 'Promocja' } },
-      { title: 'ID' },
-      { title: 'Kod' },
-      { title: 'Nazwa' },
-      { title: 'Dodano' },
-      { title: '' },
-      { title: 'Zaktualizowano' },
-      { title: '' }
-    ]}
-    rows={products.map(p => ({
-      href: `/admin/produkty/${p.slug}`,
-      data: [
-        p.enabled,
-        p.new,
-        p.sale,
-        p.id,
-        p.code,
-        p.name,
-        datetime(p.date_created).str(),
-        p.user_created.first_name + ' ' + p.user_created.last_name,
-        p?.date_updated ? datetime(p.date_updated).str() : '-',
-        p?.user_updated ? p.user_updated.first_name + ' ' + p.user_updated.last_name : '-'
-      ]
-    }))}
-  />
-{/if}
+<div class="wrapper">
+  {#if categoriesTree}
+    <div class="categories">
+      <div class="top">
+        <h3 class="title">Kategorie</h3>
+      </div>
+      <Category id={null} name={'Wszystkie'} enabled children={[]} depth={0} bind:selected={selectedCategory} />
+      {#each categoriesTree as { id, name, enabled, children }, i}
+        <Category {id} {name} {enabled} {children} depth={i + 1} bind:selected={selectedCategory} />
+      {/each}
+    </div>
+  {/if}
 
-<br /><br />
-<Button on:click={() => goto('/admin/produkty/+')} icon="add.svg">Dodaj</Button>
+  {#if products}
+    <div class="products">
+      <div class="actions">
+        <Button
+          on:click={() => goto(`/admin/produkty/+${selectedCategory ? `?c=${selectedCategory}` : ''}`)}
+          icon="add"
+        >
+          Dodaj
+        </Button>
+      </div>
+
+      <Table
+        items={products}
+        head={[
+          { checkbox: true, icon: 'eye' },
+          { checkbox: true, icon: 'new' },
+          { checkbox: true, icon: 'sale' },
+          { id: true, label: 'ID' },
+          { label: 'Kod' },
+          { label: 'Nazwa' },
+          { blame: true, label: 'Dodano' },
+          { blame: true, label: 'Zaktualizowano' }
+        ]}
+        mapper={$ => ({
+          href: `/admin/produkty/${$.slug}`,
+          values: [
+            $.enabled,
+            $.new,
+            $.sale,
+            $.id,
+            $.code,
+            $.name,
+            { user: $.user_created, datetime: $.date_created },
+            { user: $.user_updated, datetime: $.date_updated }
+          ]
+        })}
+      />
+    </div>
+  {/if}
+</div>
+
+<style>
+  .wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+  }
+
+  .categories {
+    padding: 1rem;
+    min-width: 350px;
+    border-radius: var(--border-radius);
+    border: var(--border-light);
+    background-color: var(--light);
+  }
+  .categories .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .products {
+    overflow-x: auto;
+  }
+  .products .actions {
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius);
+    border: var(--border-light);
+    background-color: var(--light);
+  }
+</style>

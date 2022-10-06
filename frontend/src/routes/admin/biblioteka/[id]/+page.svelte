@@ -7,6 +7,7 @@
   import { page, edited } from '$lib/admin/stores';
   import Button from '$lib/admin/input/Button.svelte';
   import Blame from '$lib/admin/common/Blame.svelte';
+  import Icon from '$lib/common/Icon.svelte';
 
   import Upload from '$lib/admin/library/Upload.svelte';
 
@@ -62,9 +63,9 @@
       </div>
       <br />
 
-      <div><b>Dodano:</b> <br /> <Blame user={file.uploaded_by} time={file.uploaded_on} /></div>
+      <div><b>Dodano:</b> <br /> <Blame user={file.uploaded_by} datetime={file.uploaded_on} /></div>
       {#if file.modified_by}
-        <div><b>Zaktualizowano:</b> <br /> <Blame user={file.modified_by} time={file.modified_on} /></div>
+        <div><b>Zaktualizowano:</b> <br /> <Blame user={file.modified_by} datetime={file.modified_on} /></div>
       {/if}
       <br />
 
@@ -76,7 +77,7 @@
     </div>
 
     <div class="ui-section__col ui-box actions">
-      <Button icon="delete.svg" dangerous on:click={handleDelete}>Usuń</Button>
+      <Button icon="delete" dangerous on:click={handleDelete}>Usuń</Button>
       <br /><br />
       <div>
         <b>Zamień plik:</b> <br />
@@ -92,7 +93,9 @@
         <div class="error">Nie można wyświetlić obrazka</div>
       {/if}
     {:else}
-      <img src={`/icons/dark/file.svg`} alt="" />
+      <div class="icon">
+        <Icon name="file" />
+      </div>
     {/if}
   </div>
 {/if}
@@ -108,8 +111,9 @@
   .file {
     margin-top: 1.5rem;
   }
-  img {
+  .icon {
     display: block;
-    max-width: 100%;
+    max-width: 3rem;
+    opacity: 0.5;
   }
 </style>

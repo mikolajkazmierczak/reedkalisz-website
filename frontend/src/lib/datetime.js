@@ -1,4 +1,4 @@
-export default function (datetime) {
+export function getDatetime(datetime) {
   let date;
   let time;
   if (datetime) {
@@ -12,3 +12,5 @@ export default function (datetime) {
     };
   }
 }
+
+export default getDatetime;

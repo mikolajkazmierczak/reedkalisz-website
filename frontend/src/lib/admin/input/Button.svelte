@@ -1,5 +1,6 @@
 <script>
   import HoverCircle from '$lib/components/HoverCircle.svelte';
+  import Icon from '$lib/common/Icon.svelte';
 
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
@@ -19,17 +20,19 @@
 <button
   on:click|preventDefault={() => (disabled ? {} : dispatch('click'))}
   class:secondary
-  class:edited
   class:dangerous
   class:square
+  class:edited
   {disabled}
 >
   {#if !disabled}
     <HoverCircle color={hoverColor} />
   {/if}
-  <div class="content">
+  <div class="content" class:label={$$slots.default} class:square>
     {#if icon}
-      <img src="/icons/{secondary ? 'dark' : 'light'}/{icon}" alt={icon} class:margin={$$slots.default} />
+      <div class="icon">
+        <Icon name={icon} light={!secondary} dark={secondary} />
+      </div>
     {/if}
     {#if $$slots.default}<slot />{/if}
   </div>
@@ -40,28 +43,35 @@
     cursor: pointer;
     overflow: hidden;
     position: relative;
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius);
     border: none;
-    /* width: 100%; */
+    padding: 0;
     height: 2rem;
     background-color: var(--primary);
   }
+  button.square {
+    width: 2rem;
+  }
   .dangerous {
     background-color: var(--primary-dark);
-  }
-  .square {
-    border-radius: 0;
   }
   .content {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.25rem 1rem;
+    padding: 0 1rem;
     width: 100%;
     height: 100%;
     font-size: 1.1rem;
     color: var(--primary-text);
+    font-size: 0.95rem;
+  }
+  .content.label {
+    gap: 0.5rem;
+  }
+  .content.square {
+    padding: 0;
   }
   .secondary .content {
     color: var(--accent-text);
@@ -77,10 +87,7 @@
     background-color: var(--accent-white);
   }
 
-  img {
-    height: 100%;
-  }
-  img.margin {
-    margin-right: 0.5rem;
+  .icon {
+    height: 58%;
   }
 </style>

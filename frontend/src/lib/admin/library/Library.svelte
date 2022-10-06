@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { onDestroy } from 'svelte';
   import { createEventDispatcher } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
@@ -11,6 +12,7 @@
 
   import Upload from '$lib/admin/library/Upload.svelte';
   import File from '$lib/admin/library/File.svelte';
+  import Filters from '$lib/admin/common/Filters.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -18,6 +20,9 @@
   export let selected = null;
 
   let files;
+
+  let filterUse = null;
+  let filterType = null;
 
   async function read() {
     files = (await api.files.readByQuery({ fields, sort: '-uploaded_on', limit: 50 })).data;
@@ -80,27 +85,51 @@
 </script>
 
 <div class="actions" class:picker>
-  {#if marked && !picker}
+  <Filters
+    title={'Użycie'}
+    filters={[
+      { label: 'Nieużywane', value: null },
+      {
+        label: 'Produkt',
+        value: 'products',
+        children: [
+          { label: 'Magazyn', value: 'products.storage' },
+          { label: 'Galeria', value: 'products.gallery' },
+          { label: 'Opis', value: 'products.description' }
+        ]
+      },
+      { label: 'Kategoria', value: 'categories' },
+      { label: 'Strona', value: 'pages' },
+      { label: 'Fragment', value: 'fragments' },
+      { label: 'Menu', value: 'menus' }
+    ]}
+    bind:selected={filterUse}
+  />
+  <Filters
+    title={'Rozszerzenie'}
+    filters={[
+      {
+        label: 'Obraz',
+        value: 'image',
+        children: [
+          { label: 'JPG', value: 'image/jpeg' },
+          { label: 'PNG', value: 'image/png' },
+          { label: 'WEBP', value: 'image/webp' },
+          { label: 'SVG', value: 'image/svg+xml' }
+        ]
+      },
+      { label: 'Inne', value: null, children: [{ label: 'PDF', value: 'application/pdf' }] }
+    ]}
+    bind:selected={filterType}
+  />
+</div>
+
+{#if marked && !picker}
+  <div class="buttons" transition:slide>
     <Button on:click={unmark}>Anuluj</Button>
     <Button on:click={handleDelete} dangerous>Usuń</Button>
-  {/if}
-  <div class="filters">
-    <img src="/icons/dark/filters.svg" alt="filters" title="Filtrowanie" />
-    <div
-      on:click={e => {
-        console.log(e.target.classList);
-        e.target.classList.toggle('active');
-      }}
-    >
-      Nieużywane
-    </div>
-    <div>Produkt</div>
-    <div>Kategoria</div>
-    <div>Strona</div>
-    <div>Fragment</div>
-    <div>Menu</div>
   </div>
-</div>
+{/if}
 
 <Upload on:upload={read} />
 
@@ -119,50 +148,22 @@
     top: calc(4rem + 1.5rem);
     left: 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
     gap: 0.5rem;
     border-radius: 0.5rem;
     margin-bottom: 1.5rem;
     padding: 0.5rem;
     width: 100%;
-    height: 3rem;
     background-color: var(--accent);
   }
   .actions.picker {
     top: 1rem;
   }
-  .actions img {
-    max-height: 100%;
-  }
 
-  .filters {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: 0.5rem;
+  .buttons {
+    margin-bottom: 1rem;
   }
-  .filters img {
-    height: 1.5rem;
-  }
-  .filters div {
-    cursor: pointer;
-    user-select: none;
-    display: grid;
-    place-items: center;
-    border: var(--border);
-    border-radius: 2rem;
-    height: 1.75rem;
-    padding: 0 0.75rem;
-    transition: background-color 200ms, color 200ms;
-  }
-  .filters div:hover {
-    background-color: var(--primary-white);
-  }
-  :global(.filters div.active) {
-    background-color: var(--primary) !important;
-    color: var(--primary-text);
-  }
-
   .files {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
