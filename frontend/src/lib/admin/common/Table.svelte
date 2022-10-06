@@ -9,6 +9,7 @@
   export let items;
   export let head;
   export let mapper;
+  export let editor = null;
 
   $: hierarchy = items.some(item => item.children); // has children
   export let order = false;
@@ -37,66 +38,25 @@
   }
 
   $: widths = getWidths(head, hierarchy, order, maxDepth);
-
-  // function findNestedItem(items, id) {
-  //   for (let item of items) {
-  //     if (item.id === id) return item;
-  //     if (item.children) {
-  //       let nestedItem = findNestedItem(item.children, id);
-  //       if (nestedItem) return nestedItem;
-  //     }
-  //   }
-  // }
-
-  // let dragging = false;
-  // let dragged;
-  // let draggedItem;
-  // let sortable;
-  // let sortableConfig = {
-  //   group: 'nested',
-  //   animation: 150,
-  //   handle: '.value--order',
-  //   fallbackOnBody: true,
-  //   swapThreshold: 0.65,
-  //   onStart: e => {
-  //     dragging = true;
-  //     dragged = e.item;
-  //     maxDepth++;
-  //     const id = Number(dragged?.getAttribute('data-id'));
-  //     draggedItem = findNestedItem(items, id);
-  //   },
-  //   onMove: e => {
-  //     const parent = dragged?.parentElement;
-  //     const parentDepth = Number(parent.getAttribute('data-depth'));
-  //     draggedItem._meta.depth = parentDepth + 1;
-  //     console.log(draggedItem, parentDepth);
-  //     items = items;
-  //   },
-  //   onEnd: e => {
-  //     dragging = false;
-  //     dragged = null;
-  //     draggedItem = null;
-  //     maxDepth--;
-  //   }
-  // };
-  // onMount(() => {
-  //   new Sortable.create(sortable, sortableConfig);
-  // });
-
-  // $: padded = dragging;
 </script>
 
 <div class="table-wrapper">
   <div class="table">
     <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} />
-    <!-- <div class="sortable" bind:this={sortable} class:padded data-depth={-1}> -->
     {#each items as item (item)}
-      <TableRow bind:items bind:expandedItems {head} {hierarchy} {order} {maxDepth} {widths} {item} {mapper} />
+      <TableRow
+        bind:items
+        bind:expandedItems
+        {head}
+        {hierarchy}
+        {order}
+        {maxDepth}
+        {widths}
+        bind:item
+        {mapper}
+        {editor}
+      />
     {/each}
-    <!-- {dragging} -->
-    <!-- {dragged} -->
-    <!-- {sortableConfig} -->
-    <!-- </div> -->
   </div>
 </div>
 
@@ -124,14 +84,6 @@
 </div>
 
 <style>
-  /* .sortable {
-    background-color: var(--accent-light);
-    transition: padding 0.2s;
-  }
-  .sortable.padded {
-    padding-bottom: 1rem;
-  } */
-
   .table-wrapper {
     overflow-x: auto;
     border-radius: var(--border-radius);

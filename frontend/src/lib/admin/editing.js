@@ -31,6 +31,15 @@ async function save(collection, item, itemOriginal, fields, fieldsToIgnore = [],
   return [item, itemOriginal];
 }
 
+async function del(collection, item, message = null, path = null) {
+  await api.items(collection).deleteOne(item.id);
+  if (confirm(message ?? 'Czy na pewno chcesz usunąć ten element?')) {
+    await api.items(collection).deleteOne(item.id);
+    socket.emitChanges(collection, item.id);
+    if (path) goto(path);
+  }
+}
+
 async function cancel(item, itemOriginal, path) {
   if (item.id == '+') goto(path);
   else item = JSON.parse(JSON.stringify(itemOriginal));
@@ -38,4 +47,4 @@ async function cancel(item, itemOriginal, path) {
   return [item, itemOriginal];
 }
 
-export default { save, cancel };
+export default { save, del, cancel };

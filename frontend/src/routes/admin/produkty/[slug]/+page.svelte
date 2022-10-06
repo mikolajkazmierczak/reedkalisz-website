@@ -212,8 +212,8 @@
     <h2 class="ui-h2">Opis</h2>
     <div class="ui-section__row">
       <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
-        <div class="ui-pair editor">
-          <div class="draft">
+        <div class="ui-pair ui-texteditor">
+          <div class="ui-texteditor__draft">
             <Input
               type="textarea"
               bind:value={product.description}
@@ -221,7 +221,7 @@
               placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..."
             />
           </div>
-          <div class="render">
+          <div class="ui-texteditor__render">
             {#if product.description}
               {@html marked.parse(product.description)}
             {/if}
@@ -237,12 +237,6 @@
 {/if}
 
 <style>
-  .render {
-    height: 280px;
-    overflow-y: auto;
-    padding: 1rem;
-    border: var(--border);
-  }
   .diff {
     overflow-y: scroll;
     border: var(--border);

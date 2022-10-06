@@ -1,15 +1,16 @@
 <script>
-  import { makeTree } from '$lib/utils';
+  import { makeTree, diff } from '$lib/utils';
   import { page, edited } from '$lib/admin/stores';
   import { updateGlobal, categories } from '$lib/admin/global';
 
   import Table from '$lib/admin/common/Table.svelte';
   import Button from '$lib/admin/input/Button.svelte';
+  import Editor from '$lib/admin/collections/category/Editor.svelte';
 
   $page = 'Kategorie';
 
+  const fieldsToIgnore = ['*._meta', 'user_created', 'date_created', 'user_updated', 'date_updated'];
   let categoriesTree;
-  $: console.log('tree', categoriesTree);
   let categoriesTreeOriginal;
 
   async function read() {
@@ -19,6 +20,8 @@
   }
 
   read();
+
+  $: diff(categoriesTree, categoriesTreeOriginal, fieldsToIgnore).then(({ changed }) => ($edited = changed));
 </script>
 
 {#if categoriesTree}
@@ -37,16 +40,15 @@
         { blame: true, label: 'Zaktualizowano' }
       ]}
       mapper={$ => ({
-        href: `/admin/kategorie/${$.slug}`,
         values: [
           $.enabled,
           $.id,
           $._meta.path.map(p => p + 1).join('.') + ' ' + $.name,
-          // $._meta.path.join('.') + ' ' + $.name,
           { user: $.user_created, datetime: $.date_created },
           { user: $.user_updated, datetime: $.date_updated }
         ]
       })}
+      editor={Editor}
       order
     />
   </div>

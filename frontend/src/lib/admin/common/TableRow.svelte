@@ -21,6 +21,7 @@
 
   export let item = null;
   export let mapper = null;
+  export let editor = null;
   $: row = item ? mapper(item) : null; // href, values
   $: meta = item?._meta; // depth, index, path, isFirst, isLast
   $: children = item?.children;
@@ -33,20 +34,7 @@
     else if (expandable) expandedItems = [...expandedItems, item.id];
   }
 
-  // export let dragging = false;
-  // export let dragged = null;
-  // let wrapper = null;
-  // let sortable = null;
-  // export let sortableConfig = null;
-  // onMount(() => {
-  //   if (!headRow) new Sortable.create(sortable, sortableConfig);
-  // });
-  // $: padded =
-  //   dragging && (dragged?.previousElementSibling === wrapper || dragged?.parentElement === wrapper.children[1]);
-  // // $: console.log(row?.values[2], padded);
-
-  // // $: console.log(dragged);
-  // $: console.log(maxDepth);
+  let editing;
 </script>
 
 {#if headRow}
@@ -87,13 +75,10 @@
   </div>
 {/if}
 
-<!-- <div class="row-wrapper" bind:this={wrapper} data-id={item?.id}> -->
-<!-- <div class="row-wrapper"> -->
 {#if item}
   <div class="row row--item" style:grid-template-columns={widths} transition:slide={{ duration: 200 }}>
     {#if hierarchy}
       {@const width = ((maxDepth + 1 - meta.depth) / (maxDepth + 1)) * 100}
-      <!-- {width} -->
       <div class="value value--item value--hierarchy" class:expandable>
         <div
           on:click={toggle}
@@ -166,6 +151,7 @@
         on:click={() => {
           if (checkbox) value = !value;
           else if (row.href) goto(row.href);
+          else editing = !editing;
         }}
         on:mouseenter={e => {
           const table = e.target.parentNode.parentNode;
@@ -197,31 +183,31 @@
     {/each}
   </div>
 {/if}
-<!-- </div> -->
 
-{#if !headRow}
-  <!-- <div class="children" bind:this={sortable} class:padded data-depth={meta.depth}> -->
-  <!-- <div class="children"> -->
-  {#if expanded}
-    {#each children as child (child)}
-      <svelte:self bind:items bind:expandedItems {head} {hierarchy} {order} {maxDepth} {widths} item={child} {mapper} />
-    {/each}
-  {/if}
-  <!-- {dragging}
-            {dragged}
-            {sortableConfig} -->
-  <!-- </div> -->
+{#if editor && editing}
+  <div class="editor" transition:slide={{ duration: 200 }}>
+    <svelte:component this={editor} bind:item />
+  </div>
+{/if}
+
+{#if !headRow && expanded}
+  {#each children as child (child)}
+    <svelte:self
+      bind:items
+      bind:expandedItems
+      {head}
+      {hierarchy}
+      {order}
+      {maxDepth}
+      {widths}
+      bind:item={child}
+      {mapper}
+      {editor}
+    />
+  {/each}
 {/if}
 
 <style>
-  /* .children {
-    background-color: var(--primary-white);
-    transition: padding 0.2s;
-  }
-  .children.padded {
-    padding: 1rem;
-  } */
-
   .row {
     cursor: pointer;
     display: grid;
@@ -311,5 +297,10 @@
   }
   .value--order[disabled='true'] .icon {
     display: none;
+  }
+
+  .editor {
+    padding: 1rem;
+    background-color: var(--primary-white);
   }
 </style>

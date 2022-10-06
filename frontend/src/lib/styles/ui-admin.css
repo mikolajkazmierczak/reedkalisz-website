@@ -124,3 +124,10 @@
   width: 3rem;
   background-color: var(--accent-white);
 }
+
+.ui-texteditor__render {
+  height: 280px;
+  overflow-y: auto;
+  padding: 1rem;
+  border: var(--border);
+}
