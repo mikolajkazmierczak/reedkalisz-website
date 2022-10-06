@@ -7,7 +7,6 @@
   import { treeFlatten } from '$lib/utils';
 
   export let items;
-  $: console.log(items);
   export let head;
   export let mapper;
 
@@ -92,18 +91,7 @@
     <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} />
     <!-- <div class="sortable" bind:this={sortable} class:padded data-depth={-1}> -->
     {#each items as item (item)}
-      <TableRow
-        {head}
-        {items}
-        {hierarchy}
-        {order}
-        {maxDepth}
-        {widths}
-        {item}
-        {mapper}
-        bind:expandedItems
-        on:update={() => (items = items)}
-      />
+      <TableRow bind:items bind:expandedItems {head} {hierarchy} {order} {maxDepth} {widths} {item} {mapper} />
     {/each}
     <!-- {dragging} -->
     <!-- {dragged} -->

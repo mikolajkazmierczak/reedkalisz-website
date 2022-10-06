@@ -9,6 +9,7 @@
   $page = 'Kategorie';
 
   let categoriesTree;
+  $: console.log('tree', categoriesTree);
   let categoriesTreeOriginal;
 
   async function read() {
@@ -27,7 +28,7 @@
     </div>
 
     <Table
-      items={categoriesTree}
+      bind:items={categoriesTree}
       head={[
         { checkbox: true, icon: 'eye' },
         { id: true, label: 'ID' },

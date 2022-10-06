@@ -166,8 +166,11 @@ export function treeRemoveItemAtPath(tree, path, refresh = true, _root = true) {
   const item = tree[path[0]];
   if (path.length === 1) {
     tree.splice(path[0], 1);
-  } else treeRemoveItemAtPath(item.children, path.slice(1), refresh, false);
-  if (_root && refresh) treeRefreshMetaAndParent(tree);
+    return JSON.parse(JSON.stringify(item));
+  } else {
+    if (_root && refresh) treeRefreshMetaAndParent(tree);
+    return treeRemoveItemAtPath(item.children, path.slice(1), refresh, false);
+  }
 }
 
 export function treePushItemAtPath(tree, path, item, refresh = true, _root = true) {
@@ -182,7 +185,12 @@ export function treePushItemAtPath(tree, path, item, refresh = true, _root = tru
 export function treeMoveItemToPath(tree, item, newPath) {
   // Move item to newPath.
   const oldPath = item._meta.path;
-  treePushItemAtPath(tree, newPath, item, false);
-  treeRemoveItemAtPath(tree, oldPath, false);
+  console.log('old', oldPath, 'new', newPath);
+  console.log('before', JSON.parse(JSON.stringify(tree)));
+  const removedItem = treeRemoveItemAtPath(tree, oldPath, false);
+  console.log('removedItem', removedItem);
+  treePushItemAtPath(tree, newPath, removedItem, false);
   treeRefreshMetaAndParent(tree);
+  console.log('after', JSON.parse(JSON.stringify(tree)));
+  return tree;
 }

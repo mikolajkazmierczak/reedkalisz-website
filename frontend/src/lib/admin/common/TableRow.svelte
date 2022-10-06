@@ -1,9 +1,6 @@
 <script>
   // import { onMount } from 'svelte';
   // import Sortable from 'sortablejs';
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher();
 
   import { goto } from '$app/navigation';
   import { slide } from 'svelte/transition';
@@ -13,9 +10,9 @@
   import Input from '$lib/admin/input/Input.svelte';
   import Blame from '$lib/admin/common/Blame.svelte';
 
+  export let items = null;
   export let headRow = false;
   export let head;
-  export let items;
 
   export let hierarchy = false;
   export let order = false;
@@ -116,11 +113,9 @@
         class="value value--item value--order"
         disabled={meta.depth == 0}
         on:click={() => {
-          const newPath = [...meta.path];
-          newPath.pop();
+          const newPath = meta.path.slice(0, -1);
           newPath[newPath.length - 1]++;
-          treeMoveItemToPath(items, item, newPath);
-          dispatch('update');
+          items = treeMoveItemToPath(items, item, newPath);
         }}
       >
         <div><div class="icon"><div><Icon name="arrow_left" dark /></div></div></div>
@@ -131,22 +126,33 @@
         on:click={() => {
           const prevPath = [...meta.path];
           prevPath[prevPath.length - 1]--;
-          console.log(meta.path, prevPath);
-
           const prev = treeGetItemAtPath(items, prevPath);
-          console.log(prev);
-          const newPath = [...meta.path, prev.children.length];
-          console.log(meta.path, newPath);
-          treeMoveItemToPath(items, item, newPath);
-          dispatch('update');
+          const newPath = [...prevPath, prev.children.length];
+          items = treeMoveItemToPath(items, item, newPath);
         }}
       >
         <div><div class="icon"><div><Icon name="arrow_right" dark /></div></div></div>
       </div>
-      <div class="value value--item value--order" disabled={meta.isFirst}>
+      <div
+        class="value value--item value--order"
+        disabled={meta.isFirst}
+        on:click={() => {
+          const newPath = [...meta.path];
+          newPath[newPath.length - 1]--;
+          items = treeMoveItemToPath(items, item, newPath);
+        }}
+      >
         <div><div class="icon"><div><Icon name="arrow_up" dark /></div></div></div>
       </div>
-      <div class="value value--item value--order" disabled={meta.isLast}>
+      <div
+        class="value value--item value--order"
+        disabled={meta.isLast}
+        on:click={() => {
+          const newPath = [...meta.path];
+          newPath[newPath.length - 1]++;
+          items = treeMoveItemToPath(items, item, newPath);
+        }}
+      >
         <div><div class="icon"><div><Icon name="arrow_down" dark /></div></div></div>
       </div>
     {/if}
@@ -197,19 +203,8 @@
   <!-- <div class="children" bind:this={sortable} class:padded data-depth={meta.depth}> -->
   <!-- <div class="children"> -->
   {#if expanded}
-    {#each children as child}
-      <svelte:self
-        {head}
-        {items}
-        {hierarchy}
-        {order}
-        {maxDepth}
-        {widths}
-        item={child}
-        {mapper}
-        bind:expandedItems
-        on:update={() => dispatch('update')}
-      />
+    {#each children as child (child)}
+      <svelte:self bind:items bind:expandedItems {head} {hierarchy} {order} {maxDepth} {widths} item={child} {mapper} />
     {/each}
   {/if}
   <!-- {dragging}
