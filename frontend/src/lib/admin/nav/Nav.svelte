@@ -14,7 +14,7 @@
     { href: '/', icon: 'dashboard', name: 'Aktywność' },
     { href: '/produkty', icon: 'products', name: 'Produkty' },
     { href: '/kategorie', icon: 'categories', name: 'Kategorie' },
-    { href: '/kalkulator', icon: 'calculator', name: 'Kalkulatory' },
+    { href: '/kalkulacje', icon: 'calculator', name: 'Kalkulacje' },
     { href: '/kolory', icon: 'colors', name: 'Kolory' },
     { href: '/menu', icon: 'menu', name: 'Menu' },
     { href: '/strony', icon: 'pages', name: 'Strony' },

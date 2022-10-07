@@ -3,6 +3,7 @@
   import { page, edited } from '$lib/admin/stores';
   import { updateGlobal, categories } from '$lib/admin/global';
 
+  import { read as fields, defaults } from '$lib/fields/categories';
   import Table from '$lib/admin/common/Table.svelte';
   import Button from '$lib/admin/input/Button.svelte';
   import Editor from '$lib/admin/collections/category/Editor.svelte';
@@ -21,13 +22,19 @@
 
   read();
 
+  function pushItem() {
+    $categories.push(defaults());
+    console.log($categories);
+    categoriesTree = makeTree($categories);
+  }
+
   $: diff(categoriesTree, categoriesTreeOriginal, fieldsToIgnore).then(({ changed }) => ($edited = changed));
 </script>
 
 {#if categoriesTree}
   <div class="wrapper">
     <div class="actions">
-      <Button on:click={() => console.log('nowa kategoria')} icon="add">Dodaj</Button>
+      <Button on:click={pushItem} icon="add">Dodaj</Button>
     </div>
 
     <Table

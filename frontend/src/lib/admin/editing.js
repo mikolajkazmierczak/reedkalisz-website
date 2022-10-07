@@ -31,12 +31,11 @@ async function save(collection, item, itemOriginal, fields, fieldsToIgnore = [],
   return [item, itemOriginal];
 }
 
-async function del(collection, item, message = null, path = null) {
-  await api.items(collection).deleteOne(item.id);
+async function del(collection, id, path = null, message = null) {
   if (confirm(message ?? 'Czy na pewno chcesz usunąć ten element?')) {
-    await api.items(collection).deleteOne(item.id);
-    socket.emitChanges(collection, item.id);
-    if (path) goto(path);
+    await api.items(collection).deleteOne(id);
+    socket.emitChanges(collection, id);
+    if (path) goto(path, { replace: true });
   }
 }
 

@@ -14,9 +14,9 @@
   $: if (item) item.slug = slugify(item?.name, { lower: true, strict: true });
 
   async function deleteItem() {
-    if (confirm('Czy na pewno chcesz usunąć tę kategorię?')) {
-      await api.items('categories').deleteOne(item.id);
-      socket.emitChanges('categories', item.id);
+    if (item.id != '+') del('categories', item.id);
+    else {
+      // TODO: remove from $categories or categoriesTree?
     }
   }
 </script>
