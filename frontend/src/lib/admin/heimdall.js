@@ -22,10 +22,11 @@ class Socket {
   offChanges(listener) {
     this.socket.off('changes', listener);
   }
-  emitChanges(collection, id) {
+  emitChanges(collection, ids) {
+    if (!Array.isArray(ids)) ids = [ids];
     this.socket.emit('changes', {
       collection,
-      id,
+      ids,
       user: get(me).id
     });
   }

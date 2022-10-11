@@ -1,5 +1,7 @@
 <script>
   import { users } from '$lib/admin/global';
+  import editing from '$lib/admin/editing';
+  import { treeRefreshMetaAndParent, treeRemoveItemAtPath } from '$lib/utils';
   import socket from '$lib/admin/heimdall';
 
   import slugify from 'slugify';
@@ -9,15 +11,17 @@
   import Blame from '$lib/admin/common/Blame.svelte';
   import Picker from '$lib/admin/library/Picker.svelte';
 
+  export let items;
   export let item;
 
   $: if (item) item.slug = slugify(item?.name, { lower: true, strict: true });
 
   async function deleteItem() {
-    if (item.id != '+') del('categories', item.id);
-    else {
-      // TODO: remove from $categories or categoriesTree?
-    }
+    editing.del('categories', item.id, null, null, () => {
+      treeRemoveItemAtPath(items, item._meta.path);
+      treeRefreshMetaAndParent(items);
+      items = items;
+    });
   }
 </script>
 

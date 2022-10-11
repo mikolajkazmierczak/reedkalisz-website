@@ -135,7 +135,7 @@ export function treeFlatten(tree, inplace = false, _root = true) {
   }, []);
 }
 
-function treeRefreshMetaAndParent(tree, _parent = null, _depth = 0, _path = [], _prev = null) {
+export function treeRefreshMetaAndParent(tree, _parent = null, _depth = 0, _path = [], _prev = null) {
   // Recalculate metadata and parent field for a tree structure.
   let prev;
   let index = 0;
@@ -161,32 +161,30 @@ export function treeGetItemAtPath(tree, path) {
   return treeGetItemAtPath(tree[path[0]].children, path.slice(1));
 }
 
-export function treeRemoveItemAtPath(tree, path, refresh = true, _root = true) {
+export function treeRemoveItemAtPath(tree, path) {
   // Remove item at path.
   const item = tree[path[0]];
   if (path.length === 1) {
     tree.splice(path[0], 1);
     return JSON.parse(JSON.stringify(item));
   } else {
-    if (_root && refresh) treeRefreshMetaAndParent(tree);
-    return treeRemoveItemAtPath(item.children, path.slice(1), refresh, false);
+    return treeRemoveItemAtPath(item.children, path.slice(1));
   }
 }
 
-export function treePushItemAtPath(tree, path, item, refresh = true, _root = true) {
+export function treePushItemAtPath(tree, path, item) {
   // Insert item at path.
   const parent = tree[path[0]];
   if (path.length === 1) {
     tree.splice(path[0], 0, item);
-  } else treePushItemAtPath(parent.children, path.slice(1), item, refresh, false);
-  if (_root && refresh) treeRefreshMetaAndParent(tree);
+  } else treePushItemAtPath(parent.children, path.slice(1), item);
 }
 
 export function treeMoveItemToPath(tree, item, newPath) {
   // Move item to newPath.
   const oldPath = item._meta.path;
-  const removedItem = treeRemoveItemAtPath(tree, oldPath, false);
-  treePushItemAtPath(tree, newPath, removedItem, false);
+  const removedItem = treeRemoveItemAtPath(tree, oldPath);
+  treePushItemAtPath(tree, newPath, removedItem);
   treeRefreshMetaAndParent(tree);
   return tree;
 }

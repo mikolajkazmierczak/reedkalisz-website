@@ -186,7 +186,7 @@
 
 {#if editor && editing}
   <div class="editor" transition:slide={{ duration: 200 }}>
-    <svelte:component this={editor} bind:item />
+    <svelte:component this={editor} bind:items bind:item />
   </div>
 {/if}
 
