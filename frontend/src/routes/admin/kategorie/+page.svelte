@@ -1,9 +1,8 @@
 <script>
-  import { makeTree, diff } from '$lib/utils';
+  import { makeTree, diff, treeRefreshMetaAndParent } from '$lib/utils';
   import { page, edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
   import { updateGlobal, categories } from '$lib/admin/global';
-  import { treeRefreshMetaAndParent } from '$lib/utils';
 
   import { read as fields, defaults } from '$lib/fields/categories';
   import Table from '$lib/admin/common/Table.svelte';
@@ -12,21 +11,22 @@
 
   $page = 'Kategorie';
 
-  $save = async () => {
-    [item, itemOriginal] = await editing.save(
-      'categories',
-      item,
-      itemOriginal,
-      fields,
-      [],
-      item.slug != slug,
-      '/admin/kategorie/' + item.slug
-    );
-  };
-
   const fieldsToIgnore = ['*._meta', 'user_created', 'date_created', 'user_updated', 'date_updated'];
   let categoriesTree;
   let categoriesTreeOriginal;
+
+  $save = async () => {
+    [categoriesTree, categoriesTreeOriginal] = await editing.save(
+      'categories',
+      categoriesTree,
+      categoriesTreeOriginal,
+      fields,
+      fieldsToIgnore,
+      null,
+      null,
+      true
+    );
+  };
 
   async function read() {
     await updateGlobal(categories);
@@ -43,7 +43,11 @@
     console.log(categoriesTree);
   }
 
-  $: diff(categoriesTree, categoriesTreeOriginal, fieldsToIgnore).then(({ changed }) => ($edited = changed));
+  let itemsDiff;
+  $: diff(categoriesTree, categoriesTreeOriginal, fieldsToIgnore).then(({ changed, html }) => {
+    itemsDiff = html;
+    $edited = changed;
+  });
 </script>
 
 {#if categoriesTree}
@@ -73,6 +77,8 @@
       editor={Editor}
       order
     />
+
+    <pre>{@html itemsDiff}</pre>
   </div>
 {/if}
 

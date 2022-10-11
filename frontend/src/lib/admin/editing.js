@@ -3,26 +3,63 @@ import { goto } from '$app/navigation';
 import api from '$lib/api';
 import socket from '$lib/admin/heimdall';
 import { edited } from '$lib/admin/stores';
-import { deleteFields } from '$lib/utils';
+import { deleteFields, diff, makeTree, treeFlatten } from '$lib/utils';
 
-async function save(collection, items, itemsOriginal, fields, fieldsToIgnore = [], reload = false, path = '/admin') {
+async function save(
+  collection,
+  items,
+  itemsOriginal,
+  fields,
+  fieldsToIgnore = [],
+  reload = false,
+  path = '/admin',
+  tree = false
+) {
+  console.log(JSON.parse(JSON.stringify(items)));
   const isSingle = !Array.isArray(items);
   if (isSingle) items = [items];
 
-  for (let item of items) {
-    // get data and cleanup
+  if (tree) {
+    items = treeFlatten(items);
+    itemsOriginal = treeFlatten(itemsOriginal);
+  }
+  for (let i = 0; i < items.length; i++) {
+    let item = items[i];
+    let itemOriginal = itemsOriginal.find(i => i.id == item.id);
     const itemData = JSON.parse(JSON.stringify(item));
     await deleteFields(itemData, fieldsToIgnore);
+    if (itemOriginal) {
+      const itemOriginalData = JSON.parse(JSON.stringify(itemOriginal));
+      await deleteFields(itemOriginalData, fieldsToIgnore);
+      console.log(item.id, itemOriginal);
+      let diffData = await diff(itemData, itemOriginalData, fieldsToIgnore);
+      let changed = diffData.changed;
+      let changes = diffData.diff;
+      console.log(changes);
+      console.log(item.id, changed);
+      if (!changed) continue;
+    }
+
+    // get data and cleanup
     // save
     if (item.id == '+') {
       delete itemData.id;
+      console.log('create', itemData);
       const res = await api.items(collection).createOne(itemData);
       item.id = res.id;
     } else {
+      console.log('update', item.id, itemData);
       await api.items(collection).updateOne(item.id, itemData);
     }
     // read item again beacuse nested fields may have been added (with their ids)
-    item = await api.items(collection).readOne(item.id, { fields });
+    items[i] = await api.items(collection).readOne(item.id, { fields });
+    console.log('item', JSON.parse(JSON.stringify(item)));
+    console.log(JSON.parse(JSON.stringify(item)));
+  }
+  if (tree) {
+    console.log('tree', JSON.parse(JSON.stringify(items)));
+    items = makeTree(items);
+    console.log('after', JSON.parse(JSON.stringify(items)));
   }
 
   // replace original
