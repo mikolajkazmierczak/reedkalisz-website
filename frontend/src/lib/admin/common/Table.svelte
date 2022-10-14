@@ -1,7 +1,4 @@
 <script>
-  // import { onMount } from 'svelte';
-  // import Sortable from 'sortablejs';
-
   import TableRow from '$lib/admin/common/TableRow.svelte';
   import Icon from '$lib/common/Icon.svelte';
   import { treeFlatten } from '$lib/utils';
@@ -9,7 +6,6 @@
   export let items;
   export let head;
   export let mapper;
-  export let editor = null;
 
   $: hierarchy = items.some(item => item.children); // has children
   export let order = false;
@@ -44,18 +40,7 @@
   <div class="table">
     <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} />
     {#each items as item (item)}
-      <TableRow
-        bind:items
-        bind:expandedItems
-        {head}
-        {hierarchy}
-        {order}
-        {maxDepth}
-        {widths}
-        bind:item
-        {mapper}
-        {editor}
-      />
+      <TableRow bind:items bind:expandedItems {head} {hierarchy} {order} {maxDepth} {widths} bind:item {mapper} />
     {/each}
   </div>
 </div>

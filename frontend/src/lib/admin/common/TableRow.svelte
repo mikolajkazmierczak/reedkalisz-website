@@ -1,7 +1,4 @@
 <script>
-  // import { onMount } from 'svelte';
-  // import Sortable from 'sortablejs';
-
   import { goto } from '$app/navigation';
   import { slide } from 'svelte/transition';
   import { treeMoveItemToPath, treeGetItemAtPath } from '$lib/utils';
@@ -21,7 +18,6 @@
 
   export let item = null;
   export let mapper = null;
-  export let editor = null;
   $: row = item ? mapper(item) : null; // href, values
   $: meta = item?._meta; // depth, index, path, isFirst, isLast
   $: children = item?.children;
@@ -33,8 +29,6 @@
     if (expanded) expandedItems = expandedItems.filter(id => id !== item.id);
     else if (expandable) expandedItems = [...expandedItems, item.id];
   }
-
-  let editing;
 </script>
 
 {#if headRow}
@@ -98,9 +92,11 @@
         class="value value--item value--order"
         disabled={meta.depth == 0}
         on:click={() => {
-          const newPath = meta.path.slice(0, -1);
-          newPath[newPath.length - 1]++;
-          items = treeMoveItemToPath(items, item, newPath);
+          if (meta.depth != 0) {
+            const newPath = meta.path.slice(0, -1);
+            newPath[newPath.length - 1]++;
+            items = treeMoveItemToPath(items, item, newPath);
+          }
         }}
       >
         <div><div class="icon"><div><Icon name="arrow_left" dark /></div></div></div>
@@ -109,11 +105,13 @@
         class="value value--item value--order"
         disabled={meta.isFirst || (!maxDepth === 0 && meta.depth === maxDepth)}
         on:click={() => {
-          const prevPath = [...meta.path];
-          prevPath[prevPath.length - 1]--;
-          const prev = treeGetItemAtPath(items, prevPath);
-          const newPath = [...prevPath, prev.children.length];
-          items = treeMoveItemToPath(items, item, newPath);
+          if (!(meta.isFirst || (!maxDepth === 0 && meta.depth === maxDepth))) {
+            const prevPath = [...meta.path];
+            prevPath[prevPath.length - 1]--;
+            const prev = treeGetItemAtPath(items, prevPath);
+            const newPath = [...prevPath, prev.children.length];
+            items = treeMoveItemToPath(items, item, newPath);
+          }
         }}
       >
         <div><div class="icon"><div><Icon name="arrow_right" dark /></div></div></div>
@@ -122,9 +120,11 @@
         class="value value--item value--order"
         disabled={meta.isFirst}
         on:click={() => {
-          const newPath = [...meta.path];
-          newPath[newPath.length - 1]--;
-          items = treeMoveItemToPath(items, item, newPath);
+          if (!meta.isFirst) {
+            const newPath = [...meta.path];
+            newPath[newPath.length - 1]--;
+            items = treeMoveItemToPath(items, item, newPath);
+          }
         }}
       >
         <div><div class="icon"><div><Icon name="arrow_up" dark /></div></div></div>
@@ -133,9 +133,11 @@
         class="value value--item value--order"
         disabled={meta.isLast}
         on:click={() => {
-          const newPath = [...meta.path];
-          newPath[newPath.length - 1]++;
-          items = treeMoveItemToPath(items, item, newPath);
+          if (!meta.isLast) {
+            const newPath = [...meta.path];
+            newPath[newPath.length - 1]++;
+            items = treeMoveItemToPath(items, item, newPath);
+          }
         }}
       >
         <div><div class="icon"><div><Icon name="arrow_down" dark /></div></div></div>
@@ -151,7 +153,6 @@
         on:click={() => {
           if (checkbox) value = !value;
           else if (row.href) goto(row.href);
-          else editing = !editing;
         }}
         on:mouseenter={e => {
           const table = e.target.parentNode.parentNode;
@@ -184,12 +185,6 @@
   </div>
 {/if}
 
-{#if editor && editing}
-  <div class="editor" transition:slide={{ duration: 200 }}>
-    <svelte:component this={editor} bind:items bind:item />
-  </div>
-{/if}
-
 {#if !headRow && expanded}
   {#each children as child (child)}
     <svelte:self
@@ -202,7 +197,6 @@
       {widths}
       bind:item={child}
       {mapper}
-      {editor}
     />
   {/each}
 {/if}

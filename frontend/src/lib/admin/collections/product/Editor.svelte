@@ -29,7 +29,7 @@
     path: [{ href: '/produkty', name: 'Produkty' }]
   };
 
-  const fieldsToIgnore = ['*.uuid', '*.file', 'user_created', 'date_created', 'user_updated', 'date_updated'];
+  const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
   export let slug;
 
@@ -44,8 +44,7 @@
       itemOriginal,
       fields,
       fieldsToIgnore,
-      item.slug != slug,
-      '/admin/produkty/' + item.slug
+      item.slug != slug ? '/admin/produkty/' + item.slug : null
     );
   };
   $cancel = async () => {
