@@ -12,15 +12,15 @@ export async function readme() {
     auth.set(true);
     return me;
   } catch (err) {
-    if (err.response.status == 401) {
+    // DO NOT set $me to null or the user will loose all their progress
+    // instead try to reauthenticate ($auth=false will show the login form)
+    if (err.response?.status == 401) {
       // unathorized
-      // DO NOT set $me to null or the user will loose all their progress
-      // instead try to reauthenticate ($auth=false will show the login form)
-      auth.set(false);
     } else {
       // unexpected error
       errors.update(e => e.concat(err));
     }
+    auth.set(false);
     return null;
   }
 }

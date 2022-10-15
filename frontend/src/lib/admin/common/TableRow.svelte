@@ -152,7 +152,7 @@
         class:blame
         on:click={() => {
           if (checkbox) value = !value;
-          else if (row.href) goto(row.href);
+          else if (row.href) goto(row.href, { replace: true, noscroll: true });
         }}
         on:mouseenter={e => {
           const table = e.target.parentNode.parentNode;
