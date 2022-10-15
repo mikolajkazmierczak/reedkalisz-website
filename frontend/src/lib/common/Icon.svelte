@@ -1,6 +1,4 @@
 <script>
-  export let name;
-
   const source = 'microsoft';
   const aliases = {
     unicons: {
@@ -90,7 +88,9 @@
     }
   };
 
-  $: raw = import(`$lib/icons/${source}/${aliases[source][name] ?? name}.svg?raw`);
+  export let name;
+
+  $: icon = aliases[source][name] ?? name;
 
   const colors = {
     dark: '#000',
@@ -107,29 +107,17 @@
   $: strokeColor = stroke ?? color;
   $: fillColor = fill ?? color;
 
-  export let width = null;
-  export let height = null;
-
-  const parser = new DOMParser();
-
-  async function svg(raw) {
-    const str = (await raw).default;
-    const html = parser.parseFromString(str, 'text/html');
-
-    const svg = html.body.firstChild;
-    svg.setAttribute('width', width ? width : '100%');
-    svg.setAttribute('height', height ? height : '100%');
-    svg.setAttribute('stroke-width', strokeWidth);
-    svg.setAttribute('stroke', strokeColor);
-    svg.setAttribute('fill', 'none');
-
-    const path = svg.children[0];
-    path.setAttribute('fill', fillColor);
-
-    return svg.outerHTML;
-  }
+  export let width = 20;
+  export let height = 20;
 </script>
 
-{#await svg(raw) then svg}
-  {@html svg}
-{/await}
+<svg viewBox="0 0 {width} {height}" stroke-width={strokeWidth} stroke={strokeColor} fill={fillColor}>
+  <use href="/icons/{source}/{icon}.svg#svg" />
+</svg>
+
+<style>
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+</style>
