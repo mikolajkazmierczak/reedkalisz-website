@@ -1,84 +1,17 @@
 <script>
   import { fly } from 'svelte/transition';
-  import { cubicOut } from 'svelte/easing';
-  import { page, edited, save, cancel } from '$lib/admin/stores';
-  import HoverCircle from '$lib/components/HoverCircle.svelte';
+  import { page } from '$lib/admin/stores';
   import Icon from '$lib/common/Icon.svelte';
 
-  function spin(node, { duration }) {
-    return {
-      duration,
-      css: t => {
-        const eased = cubicOut(t);
-        return `transform: rotate(${eased * 360}deg);`;
-      }
-    };
-  }
-
-  let saving = false;
-
-  $: titleString = typeof $page == 'string' ? $page : $page?.title;
-  $: title = titleString ?? 'Wczytywanie...';
-  $: path = $page?.path;
+  $: title = $page?.title;
+  $: icon = $page?.icon;
 </script>
 
 <header>
-  {#if path && !$edited}
-    <a class="button back" href={'/admin' + path[path.length - 1].href}>
-      <HoverCircle color={'var(--accent-light)'} />
-      <div class="icon" in:spin>
-        <Icon name="arrow_left" dark />
-      </div>
-    </a>
-  {/if}
-
-  {#if $edited}
-    <div
-      class="button back"
-      role="button"
-      on:click={() => {
-        $cancel();
-        $edited = false;
-      }}
-    >
-      <HoverCircle color={'var(--main-3)'} />
-      <div class="icon" in:spin>
-        <Icon name="close" dark />
-      </div>
-    </div>
-  {/if}
-  <div class="actions" class:visible={$edited}>
-    <div
-      class="button save"
-      role="button"
-      on:click={async () => {
-        saving = true;
-        await $save();
-        saving = false;
-        $edited = false;
-      }}
-    >
-      <HoverCircle color={'var(--success)'} />
-      {#if !saving}<div class="icon"><Icon name="ok" dark /></div>{/if}
-      <span>
-        {#if saving}Zapisuję...{:else}Zapisz{/if}
-      </span>
-    </div>
-  </div>
-
   <div class="text">
-    <div class="path">
-      {#if path}
-        {#each path as { href, name }, i}
-          {#if i != 0}
-            <span>&nbsp;/</span>
-          {/if}
-          <a href={'/admin' + href}> {name} </a>
-        {/each}
-      {:else}
-        <span>&nbsp;</span>
-      {/if}
-    </div>
+    {#key icon}
+      <div class="icon" in:fly={{ y: 50, duration: 350 }}><Icon name={icon} /></div>
+    {/key}
     {#key title}
       <h1 in:fly={{ y: 50, duration: 500 }}>{title}</h1>
     {/key}
@@ -100,65 +33,17 @@
     width: 100%;
     background-color: var(--accent);
   }
-  .actions {
-    overflow: hidden;
-    display: flex;
-    width: 0;
-    transition: width 200ms;
-  }
-  .actions.visible {
-    width: 7.75rem;
-  }
-
-  .button {
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.25rem;
-    margin-left: 0.75rem;
-    padding: 0 1rem;
-    border: solid 2px var(--accent-text);
-  }
-  .button .icon,
-  .button span {
-    z-index: 1;
-    position: relative;
-  }
-  .back {
-    padding: 0;
-    aspect-ratio: 1.2 / 1;
-  }
-  .button .icon {
-    height: 65%;
-  }
 
   .text {
-    position: relative;
     display: flex;
-    flex-direction: column;
+    gap: 1rem;
     margin-left: 1rem;
   }
-
-  .path {
-    z-index: 1;
-    position: relative;
-    top: -0.2rem;
-  }
-  .path * {
-    text-decoration: none;
-    font-weight: bold;
-    opacity: 0.5;
-    font-size: 0.9rem;
+  .icon {
+    height: 100%;
   }
   h1 {
-    z-index: 0;
-    position: relative;
-    top: -0.4rem;
-    font-size: 1.5rem;
-    font-weight: 900;
     white-space: nowrap;
+    font-weight: 900;
   }
 </style>

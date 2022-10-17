@@ -4,7 +4,7 @@
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
-  import { page, edited, save, cancel } from '$lib/admin/stores';
+  import { edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
   import { diff, makeTree, treeFlatten } from '$lib/utils';
 
@@ -24,14 +24,11 @@
     c: Number($pageStore.url.searchParams.get('c'))
   };
 
-  $: $page = {
-    title: item?.name || (item?.name == '' ? '...' : slug == '+' ? 'Nowy produkt...' : null),
-    path: [{ href: '/produkty', name: 'Produkty' }]
-  };
-
   const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
   export let slug;
+  export let title;
+  $: if (item) title = item.name;
 
   let item;
   let itemOriginal;

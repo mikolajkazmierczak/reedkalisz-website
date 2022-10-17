@@ -12,7 +12,10 @@
 
   import Category from '$lib/admin/collections/product/Category.svelte';
 
-  $page = 'Produkty';
+  $page = {
+    title: 'Produkty',
+    icon: 'products'
+  };
 
   let categoriesTree;
   let selectedCategory = null;

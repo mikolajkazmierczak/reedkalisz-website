@@ -4,8 +4,10 @@
 
   export let data;
   let { slug } = data;
+
+  let title;
 </script>
 
-<Editor back="/admin/produkty">
-  <Product {slug} />
+<Editor back="/admin/produkty" icon="products" {title}>
+  <Product {slug} bind:title />
 </Editor>
