@@ -3,7 +3,7 @@
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
-  import { page, edited, save, cancel } from '$lib/admin/stores';
+  import { edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
   import { diff } from '$lib/utils';
   import { updateGlobal, users, categories } from '$lib/admin/global';
@@ -16,21 +16,18 @@
   import Blame from '$lib/admin/common/Blame.svelte';
   import Picker from '$lib/admin/library/Picker.svelte';
 
-  $: $page = {
-    title: item?.name || (item?.name == '' ? '...' : slug == '+' ? 'Nowa kategoria...' : null),
-    path: [{ href: '/kategorie', name: 'Kategorie' }]
-  };
-
   const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
   export let slug;
+  export let title;
+  $: if (item) title = item.name;
 
   let item;
   let itemOriginal;
 
   $save = async () => {
     [item, itemOriginal] = await editing.save(
-      'products',
+      'categories',
       item,
       itemOriginal,
       fields,
@@ -50,7 +47,7 @@
     } else {
       item = (await api.items('categories').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
     }
-    itemOriginal = JSON.parse(JSON.stringify(item));
+    itemOriginal = item ? JSON.parse(JSON.stringify(item)) : null;
   }
 
   async function deleteItem() {
@@ -67,7 +64,7 @@
   });
 
   async function listener(data) {
-    if (data.collection == 'categories' && data.id == item.id) {
+    if (data.collection == 'categories' && data.ids.includes(item.id)) {
       // WIP
       alert(
         'UWAGA!\nInny użytkownik właśnie wprowadził zmiany w tym dokumencie!\nMożliwe że nadpiszesz jego zmiany...'
@@ -156,6 +153,8 @@
       </div>
     </div>
   </section>
+{:else}
+  Podano błędny kod kategorii
 {/if}
 
 <style>

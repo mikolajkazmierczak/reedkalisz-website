@@ -3,7 +3,6 @@
 
   import api from '$lib/api';
   import { makeTree } from '$lib/utils';
-  import { page, edited } from '$lib/admin/stores';
   import { updateGlobal, categories } from '$lib/admin/global';
 
   import { search as fields } from '$lib/fields/products';
@@ -11,11 +10,6 @@
   import Button from '$lib/admin/input/Button.svelte';
 
   import Category from '$lib/admin/collections/product/Category.svelte';
-
-  $page = {
-    title: 'Produkty',
-    icon: 'products'
-  };
 
   let categoriesTree;
   let selectedCategory = null;

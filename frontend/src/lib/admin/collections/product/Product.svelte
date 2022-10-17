@@ -59,7 +59,7 @@
     } else {
       item = (await api.items('products').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
     }
-    itemOriginal = JSON.parse(JSON.stringify(item));
+    itemOriginal = item ? JSON.parse(JSON.stringify(item)) : null;
   }
 
   function deleteProduct() {
@@ -86,7 +86,7 @@
   });
 
   async function listener(data) {
-    if (data.collection == 'products' && data.id == item.id) {
+    if (data.collection == 'products' && data.ids.includes(item.id)) {
       // WIP
       alert(
         'UWAGA!\nInny użytkownik właśnie wprowadził zmiany w tym dokumencie!\nMożliwe że nadpiszesz jego zmiany...'
@@ -225,6 +225,8 @@
   <ProductPricing bind:product={item} />
   <ProductStorage bind:product={item} />
   <ProductGallery bind:gallery={item.gallery} />
+{:else}
+  Podano błędny kod produktu
 {/if}
 
 <style>

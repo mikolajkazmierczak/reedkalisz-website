@@ -17,7 +17,7 @@
     };
   }
 
-  export let back = null;
+  export let back;
   export let icon;
   export let title;
 
@@ -27,6 +27,18 @@
     // nagivate back
     if (back) goto(back, { replace: true, noscroll: true });
   }
+
+  async function handleCancel() {
+    $cancel();
+    $edited = false;
+  }
+
+  async function handleSave() {
+    saving = true;
+    await $save();
+    saving = false;
+    $edited = false;
+  }
 </script>
 
 <div class="wrapper" on:click|self={handleExit} in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
@@ -34,14 +46,7 @@
     <div class="bar">
       <div class="actions">
         {#if $edited}
-          <div
-            class="button back"
-            role="button"
-            on:click={() => {
-              $cancel();
-              $edited = false;
-            }}
-          >
+          <div class="button back" role="button" on:click={handleCancel}>
             <HoverCircle color={'var(--main-3)'} />
             <div class="icon" in:spin>
               <Icon name="close" dark />
@@ -58,16 +63,7 @@
 
         <div class="save-wrapper" class:visible={$edited}>
           {#if $edited}
-            <div
-              class="button save"
-              role="button"
-              on:click={async () => {
-                saving = true;
-                await $save();
-                saving = false;
-                $edited = false;
-              }}
-            >
+            <div class="button save" role="button" on:click={handleSave}>
               <HoverCircle color={'var(--success)'} />
               {#if !saving}
                 <div class="icon"><Icon name="ok" dark /></div>
@@ -105,7 +101,6 @@
     border: solid 2px var(--accent-text);
     padding: 0 1rem;
     height: 100%;
-    /* background-color: var(--light); */
   }
   .button .icon,
   .button span {
@@ -154,7 +149,7 @@
     overflow: hidden;
     display: flex;
     align-items: center;
-    height: 2.5rem;
+    height: 2rem;
   }
   .back {
     padding: 0;
