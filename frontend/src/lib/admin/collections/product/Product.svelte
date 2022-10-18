@@ -225,8 +225,6 @@
   <ProductPricing bind:product={item} />
   <ProductStorage bind:product={item} />
   <ProductGallery bind:gallery={item.gallery} />
-{:else}
-  Podano błędny kod produktu
 {/if}
 
 <style>

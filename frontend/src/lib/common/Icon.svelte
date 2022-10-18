@@ -98,20 +98,17 @@
   };
   const defaultColor = colors.dark;
 
+  export let color = null;
   export let light = false;
   export let dark = false;
   export let strokeWidth = 0.3;
-  export let stroke = null;
-  export let fill = null;
-  $: color = light ? colors.light : dark ? colors.dark : defaultColor;
-  $: strokeColor = stroke ?? color;
-  $: fillColor = fill ?? color;
+  $: chosenColor = color ? color : light ? colors.light : dark ? colors.dark : defaultColor;
 
   export let width = 20;
   export let height = 20;
 </script>
 
-<svg viewBox="0 0 {width} {height}" stroke-width={strokeWidth} stroke={strokeColor} fill={fillColor}>
+<svg viewBox="0 0 {width} {height}" stroke-width={strokeWidth} stroke={chosenColor} fill={chosenColor}>
   <use href="/icons/{source}/{icon}.svg#svg" />
 </svg>
 

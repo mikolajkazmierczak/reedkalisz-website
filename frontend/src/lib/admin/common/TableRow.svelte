@@ -29,6 +29,10 @@
     if (expanded) expandedItems = expandedItems.filter(id => id !== item.id);
     else if (expandable) expandedItems = [...expandedItems, item.id];
   }
+
+  function handleCheckbox(value) {
+    value = !value;
+  }
 </script>
 
 {#if headRow}
@@ -151,8 +155,7 @@
         class:center={checkbox}
         class:blame
         on:click={() => {
-          if (checkbox) value = !value;
-          else if (row.href) goto(row.href, { replace: true, noscroll: true });
+          if (row.href) goto(row.href, { replace: true, noscroll: true });
         }}
         on:mouseenter={e => {
           const table = e.target.parentNode.parentNode;
@@ -173,7 +176,11 @@
       >
         <div>
           {#if checkbox}
-            <Input type="checkbox" {value} />
+            {#if value}
+              <Icon name="ok" color={'var(--primary)'} strokeWidth="1" />
+            {:else}
+              <Icon name="close" color={'var(--accent)'} />
+            {/if}
           {:else if blame}
             <Blame {...value} />
           {:else}

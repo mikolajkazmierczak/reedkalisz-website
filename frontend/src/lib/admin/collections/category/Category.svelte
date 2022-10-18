@@ -153,8 +153,6 @@
       </div>
     </div>
   </section>
-{:else}
-  Podano błędny kod kategorii
 {/if}
 
 <style>

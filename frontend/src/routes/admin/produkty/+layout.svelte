@@ -4,6 +4,7 @@
   import api from '$lib/api';
   import { makeTree } from '$lib/utils';
   import { updateGlobal, categories } from '$lib/admin/global';
+  import editing from '$lib/admin/editing';
 
   import { search as fields } from '$lib/fields/products';
   import Table from '$lib/admin/common/Table.svelte';
@@ -13,6 +14,8 @@
 
   let categoriesTree;
   let selectedCategory = null;
+
+  const fieldsToIgnore = ['date_updated', 'date_created', 'user_updated', 'user_created'];
 
   $: if (categoriesTree) readProducts(selectedCategory);
 
