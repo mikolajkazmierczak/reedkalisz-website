@@ -1,10 +1,13 @@
 <script>
-  import { makeTree, treeRefreshMetaAndParent } from '$lib/utils';
-  import { updateGlobal, categories } from '$lib/admin/global';
+  import { goto } from '$app/navigation';
+  import { makeTree } from '$lib/utils';
+  import { page } from '$lib/admin/stores';
 
-  import { defaults } from '$lib/fields/categories';
+  import { updateGlobal, categories } from '$lib/admin/global';
   import Table from '$lib/admin/common/Table.svelte';
   import Button from '$lib/admin/input/Button.svelte';
+
+  $page = { title: 'Kategorie', icon: 'categories' };
 
   let categoriesTree;
 
@@ -14,18 +17,12 @@
   }
 
   read();
-
-  function pushItem() {
-    categoriesTree.push(defaults());
-    treeRefreshMetaAndParent(categoriesTree);
-    categoriesTree = categoriesTree;
-  }
 </script>
 
 {#if categoriesTree}
   <div class="wrapper">
     <div class="actions">
-      <Button on:click={pushItem} icon="add">Dodaj</Button>
+      <Button on:click={() => goto('/admin/kategorie/+')} icon="add">Dodaj</Button>
     </div>
 
     <Table

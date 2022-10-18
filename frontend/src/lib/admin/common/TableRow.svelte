@@ -4,7 +4,6 @@
   import { treeMoveItemToPath, treeGetItemAtPath } from '$lib/utils';
 
   import Icon from '$lib/common/Icon.svelte';
-  import Input from '$lib/admin/input/Input.svelte';
   import Blame from '$lib/admin/common/Blame.svelte';
 
   export let items = null;
@@ -30,8 +29,40 @@
     else if (expandable) expandedItems = [...expandedItems, item.id];
   }
 
-  function handleCheckbox(value) {
-    value = !value;
+  $: canLeft = meta?.depth != 0;
+  $: canRight = !(meta?.isFirst || (!maxDepth === 0 && meta?.depth === maxDepth));
+  $: canUp = !meta?.isFirst;
+  $: canDown = !meta?.isLast;
+
+  function moveLeft() {
+    if (canLeft) {
+      const newPath = meta.path.slice(0, -1);
+      newPath[newPath.length - 1]++;
+      items = treeMoveItemToPath(items, item, newPath);
+    }
+  }
+  function moveRight() {
+    if (canRight) {
+      const prevPath = [...meta.path];
+      prevPath[prevPath.length - 1]--;
+      const prev = treeGetItemAtPath(items, prevPath);
+      const newPath = [...prevPath, prev.children.length];
+      items = treeMoveItemToPath(items, item, newPath);
+    }
+  }
+  function moveUp() {
+    if (canUp) {
+      const newPath = [...meta.path];
+      newPath[newPath.length - 1]--;
+      items = treeMoveItemToPath(items, item, newPath);
+    }
+  }
+  function moveDown() {
+    if (canDown) {
+      const newPath = [...meta.path];
+      newPath[newPath.length - 1]++;
+      items = treeMoveItemToPath(items, item, newPath);
+    }
   }
 </script>
 
@@ -65,7 +96,9 @@
         }}
       >
         <div>
-          {#if icon}<div class="icon"><div><Icon name={icon} dark /></div></div>{/if}
+          {#if icon}
+            <div class="icon"><div><Icon name={icon} dark /></div></div>
+          {/if}
           {#if label}{label}{/if}
         </div>
       </div>
@@ -92,58 +125,16 @@
     {/if}
 
     {#if order}
-      <div
-        class="value value--item value--order"
-        disabled={meta.depth == 0}
-        on:click={() => {
-          if (meta.depth != 0) {
-            const newPath = meta.path.slice(0, -1);
-            newPath[newPath.length - 1]++;
-            items = treeMoveItemToPath(items, item, newPath);
-          }
-        }}
-      >
+      <div class="value value--item value--order" disabled={!canLeft} on:click={moveLeft}>
         <div><div class="icon"><div><Icon name="arrow_left" dark /></div></div></div>
       </div>
-      <div
-        class="value value--item value--order"
-        disabled={meta.isFirst || (!maxDepth === 0 && meta.depth === maxDepth)}
-        on:click={() => {
-          if (!(meta.isFirst || (!maxDepth === 0 && meta.depth === maxDepth))) {
-            const prevPath = [...meta.path];
-            prevPath[prevPath.length - 1]--;
-            const prev = treeGetItemAtPath(items, prevPath);
-            const newPath = [...prevPath, prev.children.length];
-            items = treeMoveItemToPath(items, item, newPath);
-          }
-        }}
-      >
+      <div class="value value--item value--order" disabled={!canRight} on:click={moveRight}>
         <div><div class="icon"><div><Icon name="arrow_right" dark /></div></div></div>
       </div>
-      <div
-        class="value value--item value--order"
-        disabled={meta.isFirst}
-        on:click={() => {
-          if (!meta.isFirst) {
-            const newPath = [...meta.path];
-            newPath[newPath.length - 1]--;
-            items = treeMoveItemToPath(items, item, newPath);
-          }
-        }}
-      >
+      <div class="value value--item value--order" disabled={!canUp} on:click={moveUp}>
         <div><div class="icon"><div><Icon name="arrow_up" dark /></div></div></div>
       </div>
-      <div
-        class="value value--item value--order"
-        disabled={meta.isLast}
-        on:click={() => {
-          if (!meta.isLast) {
-            const newPath = [...meta.path];
-            newPath[newPath.length - 1]++;
-            items = treeMoveItemToPath(items, item, newPath);
-          }
-        }}
-      >
+      <div class="value value--item value--order" disabled={!canDown} on:click={moveDown}>
         <div><div class="icon"><div><Icon name="arrow_down" dark /></div></div></div>
       </div>
     {/if}
@@ -282,26 +273,10 @@
   .value--hierarchy > div.border-left {
     border-left: var(--border-light);
   }
-  /* .value--hierarchy:hover > div.border-left {
-    border-left: none;
-  } */
-  /* .value--hierarchy > div.dragging {
-    padding: 0;
-    width: 100%;
-    background-color: var(--primary-white);
-  }
-  .row--item:hover > .value--hierarchy > .dragging {
-    background-color: var(--primary);
-  } */
   .value--order > div {
     justify-content: center;
   }
   .value--order[disabled='true'] .icon {
     display: none;
-  }
-
-  .editor {
-    padding: 1rem;
-    background-color: var(--primary-white);
   }
 </style>

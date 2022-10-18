@@ -20,6 +20,7 @@ io.on('connection', socket => {
     console.log(`   - reason: ${reason}`);
   });
   socket.on('changes', data => {
-    socket.broadcast.emit('changes', data);
+    // socket.broadcast.emit('changes', data);
+    socket.emit('changes', data);
   });
 });

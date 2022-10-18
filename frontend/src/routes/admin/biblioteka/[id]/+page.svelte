@@ -13,7 +13,7 @@
 
   $: $page = {
     title: file?.title,
-    path: [{ href: '/biblioteka', name: 'Biblioteka plików' }]
+    icon: 'library'
   };
   $: $edited = false;
 
