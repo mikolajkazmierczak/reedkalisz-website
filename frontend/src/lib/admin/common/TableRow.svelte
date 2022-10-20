@@ -3,6 +3,7 @@
   import { slide } from 'svelte/transition';
   import { treeGetItemAtPath, treeMoveItemToPath } from '$lib/utils';
 
+  import api from '$lib/api';
   import Icon from '$lib/common/Icon.svelte';
   import Blame from '$lib/admin/common/Blame.svelte';
 
@@ -21,6 +22,8 @@
   $: meta = item?._meta; // depth, index, path, isFirst, isLast
   $: children = item?.children;
 
+  export let collection = null;
+
   export let expandedItems = null;
   $: expandable = children?.length;
   $: expanded = expandedItems?.includes(item.id);
@@ -34,11 +37,51 @@
   $: canUp = !meta?.isFirst;
   $: canDown = !meta?.isLast;
 
+  async function saveAfterMove(oldPath, newPath) {
+    // when going left
+    // - item.parent
+    // - item.index
+    // - each item index from whole tree that changed
+    // when going right
+    // - item.parent
+    // - item.index
+    // - each item index from whole tree that changed
+    // when going up
+    // - item.index
+    // - each item index from whole tree that changed
+    // when going down
+    // - item.index
+    // - each item index from whole tree that changed
+
+    const { parent, index } = item;
+    await api.items(collection).updateOne(item.id, { parent, index });
+    const oldParentPath = oldPath.slice(0, -1);
+    const oldParent = treeGetItemAtPath(items, oldParentPath);
+    const oldIndex = oldPath[oldPath.length - 1];
+    for (let child of oldParent.children) {
+      // update all children that start from oldIndex and including it
+      if (child.index >= oldIndex) {
+        await api.items(collection).updateOne(child.id, { index: child.index });
+      }
+    }
+    const newParentPath = newPath.slice(0, -1);
+    const newParent = treeGetItemAtPath(items, newParentPath);
+    console.log(newParent);
+    for (let child of newParent.children) {
+      // update all children that start from current index
+      if (child.index > item.index) {
+        await api.items(collection).updateOne(child.id, { index: child.index });
+      }
+    }
+  }
+
   function moveLeft() {
     if (canLeft) {
+      const oldPath = meta.path;
       const newPath = meta.path.slice(0, -1);
       newPath[newPath.length - 1]++;
       items = treeMoveItemToPath(items, item, newPath);
+      saveAfterMove(oldPath, newPath);
     }
   }
   function moveRight() {
@@ -195,6 +238,7 @@
       {widths}
       bind:item={child}
       {mapper}
+      {collection}
     />
   {/each}
 {/if}

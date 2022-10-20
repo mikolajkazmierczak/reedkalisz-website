@@ -3,10 +3,10 @@ import { get } from 'svelte/store';
 import { io } from 'socket.io-client';
 import { me } from '$lib/auth';
 
-// export const baseUrl = 'http://localhost:999';
+export const baseUrl = 'http://localhost:999';
 // export const baseUrl = 'http://192.168.1.10:999';
 // export const baseUrl = 'http://formixhome.ddns.net:999';
-export const baseUrl = 'http://produktpolski.ddns.net:999';
+// export const baseUrl = 'http://produktpolski.ddns.net:999';
 
 class Socket {
   constructor(url) {
@@ -32,18 +32,21 @@ class Socket {
     this.socket.emit('changes', data);
   }
 
-  checkMatches(data, collection, ids) {
-    // check if any ids from `ids` array are in `data.ids` array
-    console.log('data.ids', data.ids);
-    console.log('ids', ids);
-    if (!Array.isArray(ids)) ids = [ids];
-    const matchingIds = data.ids.filter(id => ids.includes(id));
-    console.log('matchingIds', matchingIds);
-    const matches = data.collection === collection && matchingIds.length;
+  checkMatch(data, collection, ids = null) {
+    // check if:
+    // - collection matches
+    // - optionally check if any ids from `ids` array are in `data.ids` array
+    // return:
+    // - match [boolean]
+    // - ids [null OR array] - empty array when ids was passed and nothing matched
+    // - me [boolean] - whether the user was current user
+    if (ids && !Array.isArray(ids)) ids = [ids];
+    const matchingIds = ids ? data.ids.filter(id => ids.includes(id)) : null;
+    const match = data.collection === collection && (ids === null || matchingIds);
     return {
-      matches,
+      match,
       me: get(me).id == data.user,
-      ids: matchingIds.length ? matchingIds : null
+      ids: matchingIds
     };
   }
 }

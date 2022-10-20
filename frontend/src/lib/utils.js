@@ -101,22 +101,23 @@ export function bytesToReadable(bytes) {
 
 export function makeTree(items, inplace = false, _root = true, _parent = null, _depth = 0, _path = []) {
   // Convert a flat array of items into a tree structure and add metadata (_meta property).
-  const getPrev = () => (index > 0 ? tree[tree.length - 1] : null);
   if (!inplace && _root) items = JSON.parse(JSON.stringify(items));
   const tree = [];
-  let index = 0;
   for (const item of items) {
     if (item.parent == _parent) {
-      const prev = getPrev();
-      const path = [..._path, index];
+      const path = [..._path, item.index];
       tree.push({
         ...item,
-        _meta: { depth: _depth, index, path, isFirst: index === 0, isLast: true },
+        _meta: { depth: _depth, path, isFirst: false, isLast: false },
         children: makeTree(items, inplace, false, item.id, _depth + 1, path)
       });
-      if (prev) prev._meta.isLast = false;
-      index++;
     }
+  }
+  // sort children by their indexes
+  tree.sort((a, b) => a.index - b.index);
+  if (tree.length > 0) {
+    tree[0]._meta.isFirst = true;
+    tree[tree.length - 1]._meta.isLast = true;
   }
   return tree;
 }
@@ -141,8 +142,9 @@ export function treeRefreshMetaAndParent(tree, _parent = null, _depth = 0, _path
   let index = 0;
   for (const item of tree) {
     const path = [..._path, index];
-    item._meta = { depth: _depth, index, path, isFirst: index === 0, isLast: true };
+    item._meta = { depth: _depth, path, isFirst: index === 0, isLast: true };
     item.parent = _parent;
+    item.index = index;
     if (item.children) {
       treeRefreshMetaAndParent(item.children, item.id, _depth + 1, path, item);
     }

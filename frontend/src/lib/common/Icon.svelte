@@ -108,9 +108,11 @@
   export let height = 20;
 </script>
 
-<svg viewBox="0 0 {width} {height}" stroke-width={strokeWidth} stroke={chosenColor} fill={chosenColor}>
-  <use href="/icons/{source}/{icon}.svg#svg" />
-</svg>
+{#if icon}
+  <svg viewBox="0 0 {width} {height}" stroke-width={strokeWidth} stroke={chosenColor} fill={chosenColor}>
+    <use href="/icons/{source}/{icon}.svg#svg" />
+  </svg>
+{/if}
 
 <style>
   svg {

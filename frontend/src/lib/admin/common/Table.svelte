@@ -9,6 +9,7 @@
 
   $: hierarchy = items.some(item => item.children); // has children
   export let order = false;
+  export let collection = null;
   let expandedItems = [];
 
   $: itemsFlat = hierarchy ? treeFlatten(items) : items;
@@ -38,9 +39,20 @@
 
 <div class="table-wrapper">
   <div class="table">
-    <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} />
-    {#each items as item (item)}
-      <TableRow bind:items bind:expandedItems {head} {hierarchy} {order} {maxDepth} {widths} bind:item {mapper} />
+    <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} {collection} />
+    {#each items as item (item.id)}
+      <TableRow
+        bind:items
+        bind:expandedItems
+        {head}
+        {hierarchy}
+        {order}
+        {maxDepth}
+        {widths}
+        bind:item
+        {mapper}
+        {collection}
+      />
     {/each}
   </div>
 </div>

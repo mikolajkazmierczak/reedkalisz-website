@@ -63,9 +63,8 @@
   });
 
   async function listener(data) {
-    const { fits, me } = socket.checkFit(data, 'categories', item.id);
-    if (fits && !me) {
-      // WIP
+    const { match, me } = socket.checkMatch(data, 'categories', item.id);
+    if (match && !me) {
       alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
     }
   }

@@ -11,8 +11,8 @@ export const read = [
   'seo_description',
   'description',
   'img',
-  'children',
-  'parent'
+  'parent',
+  'index'
 ];
 export const search = [...read];
 export const show = [...read];
@@ -32,8 +32,8 @@ export const defaults = () => ({
   seo_description: '',
   description: '',
   img: null,
-  children: [],
-  parent: null
+  parent: null,
+  index: null
 });
 
 export default { search, show, read, edit, defaults };

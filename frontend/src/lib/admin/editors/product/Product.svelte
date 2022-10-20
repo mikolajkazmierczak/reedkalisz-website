@@ -85,8 +85,8 @@
   });
 
   async function listener(data) {
-    const { matches, me } = socket.checkMatches(data, 'products', item.id);
-    if (matches && !me) {
+    const { match, me } = socket.checkMatch(data, 'products', item.id);
+    if (match && !me) {
       alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
     }
   }

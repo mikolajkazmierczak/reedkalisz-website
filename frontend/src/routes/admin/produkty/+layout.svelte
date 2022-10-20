@@ -1,13 +1,13 @@
 <script>
   import { goto } from '$app/navigation';
   import { onDestroy } from 'svelte';
-  import { makeTree } from '$lib/utils';
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
   import { page } from '$lib/admin/stores';
-  import { updateGlobal, categories } from '$lib/admin/global';
+  import { makeTree } from '$lib/utils';
 
+  import { updateGlobal, categories } from '$lib/admin/global';
   import { search as fields } from '$lib/fields/products';
   import Table from '$lib/admin/common/Table.svelte';
   import Category from '$lib/admin/editors/product/Category.svelte';
@@ -19,19 +19,22 @@
   let selectedCategory = null;
 
   let products;
-  let productsOriginal;
 
   async function readProducts(category = null) {
+    products = []; // clear to indicate loading
     if (categoriesTree) {
       const filter = category ? { categories: { category: { _eq: category } } } : {};
       products = (await api.items('products').readByQuery({ fields, limit: 100, page: 1, filter })).data;
-      productsOriginal = JSON.parse(JSON.stringify(products));
     }
   }
 
-  async function read() {
+  async function readCategories() {
     await updateGlobal(categories);
     categoriesTree = makeTree($categories);
+  }
+
+  async function read() {
+    await readCategories();
     await readProducts();
   }
 
@@ -39,26 +42,12 @@
 
   read();
 
-  async function readUpdated(ids, items, itemsOriginal) {
-    const updatedItems = (await api.items('products').readMany(ids, { fields })).data;
-    console.log('updatedItems', updatedItems);
-    const deletedItemsIds = ids.filter(id => !updatedItems.find(item => item.id == id));
-    console.log('deletedItemsIds', deletedItemsIds);
-    items = items.map(item => {
-      return updatedItems.find(u => u.id == item.id) ?? item;
-    });
-    items = items.filter(item => !deletedItemsIds.includes(item.id));
-    console.log(items);
-    itemsOriginal = JSON.parse(JSON.stringify(items));
-    return [items, itemsOriginal];
-  }
-
   async function listener(data) {
     const itemIds = products.map(item => item.id);
-    const { matches, ids } = socket.checkMatches(data, 'products', itemIds);
-    if (matches) {
-      [products, productsOriginal] = await readUpdated(ids, products, productsOriginal);
-    }
+    const matchProducts = socket.checkMatch(data, 'products', itemIds);
+    if (matchProducts.match) readProducts();
+    const matchCategories = socket.checkMatch(data, 'categories');
+    if (matchCategories.match) readCategories();
   }
   socket.onChanges(listener);
   onDestroy(() => socket.offChanges(listener));

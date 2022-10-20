@@ -1,7 +1,10 @@
 <script>
   import { goto } from '$app/navigation';
-  import { makeTree } from '$lib/utils';
+  import { onDestroy } from 'svelte';
+
+  import socket from '$lib/admin/heimdall';
   import { page } from '$lib/admin/stores';
+  import { makeTree } from '$lib/utils';
 
   import { updateGlobal, categories } from '$lib/admin/global';
   import Table from '$lib/admin/common/Table.svelte';
@@ -17,6 +20,13 @@
   }
 
   read();
+
+  async function listener(data) {
+    const { match } = socket.checkMatch(data, 'categories');
+    if (match) read();
+  }
+  socket.onChanges(listener);
+  onDestroy(() => socket.offChanges(listener));
 </script>
 
 {#if categoriesTree}
@@ -45,6 +55,7 @@
         ]
       })}
       order
+      collection="categories"
     />
   </div>
 {/if}
