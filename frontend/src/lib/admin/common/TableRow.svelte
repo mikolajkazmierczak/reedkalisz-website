@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   import { slide } from 'svelte/transition';
-  import { treeMoveItemToPath, treeGetItemAtPath } from '$lib/utils';
+  import { treeGetItemAtPath, treeMoveItemToPath } from '$lib/utils';
 
   import Icon from '$lib/common/Icon.svelte';
   import Blame from '$lib/admin/common/Blame.svelte';
