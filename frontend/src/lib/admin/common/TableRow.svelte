@@ -37,6 +37,11 @@
   $: canUp = !meta?.isFirst;
   $: canDown = !meta?.isLast;
 
+  function getChildren(parent) {
+    if (Array.isArray(parent)) return parent;
+    return parent.children;
+  }
+
   async function saveAfterMove(oldPath, newPath) {
     // when going left
     // - item.parent
@@ -54,23 +59,28 @@
     // - each item index from whole tree that changed
 
     const { parent, index } = item;
+    console.log(parent, index);
     await api.items(collection).updateOne(item.id, { parent, index });
+
     const oldParentPath = oldPath.slice(0, -1);
     const oldParent = treeGetItemAtPath(items, oldParentPath);
-    const oldIndex = oldPath[oldPath.length - 1];
-    for (let child of oldParent.children) {
-      // update all children that start from oldIndex and including it
-      if (child.index >= oldIndex) {
-        await api.items(collection).updateOne(child.id, { index: child.index });
+    const oldChildren = getChildren(oldParent);
+    const oldItemIndex = oldPath[oldPath.length - 1];
+    for (let child of oldChildren) {
+      // `>=` is important - the moved items position has been filled
+      if (child.index >= oldItemIndex) {
+        api.items(collection).updateOne(child.id, { index: child.index });
       }
     }
+
     const newParentPath = newPath.slice(0, -1);
     const newParent = treeGetItemAtPath(items, newParentPath);
-    console.log(newParent);
-    for (let child of newParent.children) {
-      // update all children that start from current index
-      if (child.index > item.index) {
-        await api.items(collection).updateOne(child.id, { index: child.index });
+    const newChildren = getChildren(newParent);
+    const newItemIndex = item.index;
+    for (let child of newChildren) {
+      // `>` is important - the moved does not need an update
+      if (child.index > newItemIndex) {
+        api.items(collection).updateOne(child.id, { index: child.index });
       }
     }
   }
