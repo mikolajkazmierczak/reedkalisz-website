@@ -218,11 +218,9 @@ export function treePushItemAtPath(tree, path, item) {
 
 export function treeMoveItemToPath(tree, item, newPath) {
   // Move item to newPath.
-  console.log('tree', tree, 'item', item, 'newPath', newPath);
   const oldPath = item._meta.path;
   const removedItem = treeRemoveItemAtPath(tree, oldPath);
   treePushItemAtPath(tree, newPath, removedItem);
   treeRefreshMetaAndParent(tree);
-  console.log('after treeMoveItemToPath');
   return tree;
 }

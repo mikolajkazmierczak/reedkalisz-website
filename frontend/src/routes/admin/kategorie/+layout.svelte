@@ -36,6 +36,7 @@
     </div>
 
     <Table
+      rootPathname="/admin/kategorie"
       collection="categories"
       bind:items={categoriesTree}
       head={[

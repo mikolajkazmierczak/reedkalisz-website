@@ -20,7 +20,6 @@
   let selectedCategory = null;
   afterNavigate(navigation => {
     const searchParams = getSearchParams(['c']); // category
-    console.log('hello', searchParams, navigation.from.url.href, navigation.to.url.href);
     if (searchParams.c != null) selectedCategory = searchParams.c;
     setSearchParams({ c: selectedCategory }, navigation, '/admin/produkty');
   });
@@ -43,7 +42,7 @@
 
   async function read() {
     await readCategories();
-    await readProducts();
+    await readProducts(selectedCategory);
   }
 
   $: readProducts(selectedCategory);
@@ -53,7 +52,7 @@
   async function listener(data) {
     const itemIds = products.map(item => item.id);
     const matchProducts = socket.checkMatch(data, 'products', itemIds);
-    if (matchProducts.match) readProducts();
+    if (matchProducts.match) readProducts(selectedCategory);
     const matchCategories = socket.checkMatch(data, 'categories');
     if (matchCategories.match) readCategories();
   }

@@ -93,6 +93,7 @@
   });
 
   // set default priceView if unset or the already set no longer exists
+  $: console.log(product);
   $: if (!product.price_view || !$priceViews?.find(p => p.id == product.price_view)) {
     product.price_view = $priceViews?.find(p => p.default)?.id;
   }
