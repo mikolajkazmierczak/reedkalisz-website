@@ -6,7 +6,7 @@
   export let user;
   export let datetime;
 
-  $: userData = $users.find(u => u.id == user);
+  $: userData = $users?.find(u => u.id == user);
 </script>
 
 <div class="wrapper">

@@ -32,10 +32,11 @@
 {#if categoriesTree}
   <div class="wrapper">
     <div class="actions">
-      <Button on:click={() => goto('/admin/kategorie/+')} icon="add">Dodaj</Button>
+      <Button on:click={() => goto(`/admin/kategorie/+?index=${categoriesTree.length}`)} icon="add">Dodaj</Button>
     </div>
 
     <Table
+      collection="categories"
       bind:items={categoriesTree}
       head={[
         { checkbox: true, icon: 'eye' },
@@ -55,7 +56,6 @@
         ]
       })}
       order
-      collection="categories"
     />
   </div>
 {/if}

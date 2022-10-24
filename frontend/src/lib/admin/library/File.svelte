@@ -7,6 +7,8 @@
   export let title;
   export let type;
   export let filesize;
+  export let uploaded_on;
+  export let modified_on;
 
   export let marked = false;
 
@@ -22,7 +24,7 @@
         <Icon name="img" dark />
       {:else}
         <img
-          src="{baseUrl}/assets/{id}?key=thumbnail"
+          src="{baseUrl}/assets/{id}#{modified_on ? modified_on : uploaded_on}?key=thumbnail"
           alt=""
           on:error={() => (imgError = true)}
           on:load={() => (loading = false)}

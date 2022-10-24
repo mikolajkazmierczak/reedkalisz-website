@@ -5,7 +5,7 @@
   import socket from '$lib/admin/heimdall';
   import { edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
-  import { diff } from '$lib/utils';
+  import { diff, getSearchParams } from '$lib/utils';
   import { updateGlobal, users, categories } from '$lib/admin/global';
   import { edit as fields, defaults } from '$lib/fields/categories';
 
@@ -17,12 +17,15 @@
   import Blame from '$lib/admin/common/Blame.svelte';
   import Picker from '$lib/admin/library/Picker.svelte';
 
+  const searchParams = getSearchParams(['parent', 'index']);
+
   const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
   export let slug;
 
   let item;
   let itemOriginal;
+  $: hasChildren = $categories?.find(category => category.parent == item?.id);
 
   $save = async () => {
     [item, itemOriginal] = await editing.save(
@@ -43,6 +46,9 @@
 
     if (slug == '+') {
       item = defaults();
+      // add parent and index from search params
+      if (searchParams.parent !== null) item.parent = searchParams.parent;
+      if (searchParams.index !== null) item.index = searchParams.index;
     } else {
       item = (await api.items('categories').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
     }
@@ -95,7 +101,13 @@
 
         <div class="ui-section__col">
           <div class="ui-box">
-            <Button icon="delete" on:click={deleteItem} dangerous>Usuń</Button>
+            <Button icon="delete" on:click={deleteItem} dangerous disabled={hasChildren}>Usuń</Button>
+            {#if hasChildren}
+              <p>
+                Nie można usunąć kategorii, która ma podkategorie.<br />
+                <small>Najpierw usuń lub wysuń wszystkie podkategorie na zewnątrz.</small>
+              </p>
+            {/if}
           </div>
 
           <div class="ui-box ui-box--uneditable">

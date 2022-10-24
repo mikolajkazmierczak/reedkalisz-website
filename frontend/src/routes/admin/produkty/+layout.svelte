@@ -1,11 +1,11 @@
 <script>
-  import { goto } from '$app/navigation';
+  import { goto, afterNavigate } from '$app/navigation';
   import { onDestroy } from 'svelte';
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
   import { page } from '$lib/admin/stores';
-  import { makeTree } from '$lib/utils';
+  import { getSearchParams, setSearchParams, makeTree } from '$lib/utils';
 
   import { updateGlobal, categories } from '$lib/admin/global';
   import { search as fields } from '$lib/fields/products';
@@ -16,7 +16,15 @@
   $page = { title: 'Produkty', icon: 'products' };
 
   let categoriesTree;
+
   let selectedCategory = null;
+  afterNavigate(navigation => {
+    const searchParams = getSearchParams(['c']); // category
+    console.log('hello', searchParams, navigation.from.url.href, navigation.to.url.href);
+    if (searchParams.c != null) selectedCategory = searchParams.c;
+    setSearchParams({ c: selectedCategory }, navigation, '/admin/produkty');
+  });
+  $: setSearchParams({ c: selectedCategory });
 
   let products;
 
@@ -78,6 +86,8 @@
       </div>
 
       <Table
+        rootPathname="/admin/produkty"
+        collection="products"
         items={products}
         head={[
           { checkbox: true, icon: 'eye' },

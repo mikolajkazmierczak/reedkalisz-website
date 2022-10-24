@@ -1,4 +1,7 @@
+import { get } from 'svelte/store';
+import { page } from '$app/stores';
 import { diffJson } from 'diff';
+import { goto } from '$app/navigation';
 
 export const uuid = () => Math.random().toString(36).substring(2);
 
@@ -99,6 +102,37 @@ export function bytesToReadable(bytes) {
   return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
 }
 
+export function getSearchParams(names) {
+  // ['numberParam', 'stringParam'] -> { numberParam: 123, stringParam: 'string' }
+  if (!Array.isArray(names)) names = [names];
+  const searchParams = get(page).url.searchParams;
+  return names.reduce((params, name) => {
+    const param = searchParams.get(name);
+    params[name] = param ? (isNaN(Number(param)) ? param : Number(param)) : null;
+    return params;
+  }, {});
+}
+
+export function setSearchParams(newParams, navigation = null, rootPathname = null) {
+  // { numberParam: 123, stringParam: 'string' } -> ?numberParam=123&stringParam=string
+  if (navigation) {
+    // only set the params if the new url pathname is correct
+    // also check if the current url isn't the same as the new one to prevent an infinite loop
+    const { from, to } = navigation;
+    if (to.url.pathname != rootPathname || from.url.href == to.url.href) {
+      return;
+    }
+  }
+  // create new url
+  const url = get(page).url;
+  for (const [key, value] of Object.entries(newParams)) {
+    if (value == null) url.searchParams.delete(key);
+    else url.searchParams.set(key, value);
+  }
+  // navigate to new url
+  goto(url.toString(), { replaceState: true, noscroll: true });
+}
+
 export function makeTree(items, inplace = false, _root = true, _parent = null, _depth = 0, _path = []) {
   // Convert a flat array of items into a tree structure and add metadata (_meta property).
   if (!inplace && _root) items = JSON.parse(JSON.stringify(items));
@@ -184,9 +218,11 @@ export function treePushItemAtPath(tree, path, item) {
 
 export function treeMoveItemToPath(tree, item, newPath) {
   // Move item to newPath.
+  console.log('tree', tree, 'item', item, 'newPath', newPath);
   const oldPath = item._meta.path;
   const removedItem = treeRemoveItemAtPath(tree, oldPath);
   treePushItemAtPath(tree, newPath, removedItem);
   treeRefreshMetaAndParent(tree);
+  console.log('after treeMoveItemToPath');
   return tree;
 }

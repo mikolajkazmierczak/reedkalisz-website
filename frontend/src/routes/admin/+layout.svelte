@@ -37,8 +37,8 @@
     await readme();
     ready = true;
     // catch all errors
-    window.addEventListener('error', e => ($errors = [...$errors, e.reason.message]));
-    window.addEventListener('unhandledrejection', e => ($errors = [...$errors, e.reason.message]));
+    window.addEventListener('error', e => ($errors = [...$errors, e?.reason?.message]));
+    window.addEventListener('unhandledrejection', e => ($errors = [...$errors, e?.reason?.message]));
   });
 
   socket.onChanges(data => {

@@ -1,6 +1,8 @@
 <script>
   import { goto } from '$app/navigation';
   import { slide } from 'svelte/transition';
+
+  import socket from '$lib/admin/heimdall';
   import { treeGetItemAtPath, treeMoveItemToPath } from '$lib/utils';
 
   import api from '$lib/api';
@@ -27,9 +29,17 @@
   export let expandedItems = null;
   $: expandable = children?.length;
   $: expanded = expandedItems?.includes(item.id);
-  function toggle() {
-    if (expanded) expandedItems = expandedItems.filter(id => id !== item.id);
-    else if (expandable) expandedItems = [...expandedItems, item.id];
+  function expand(item) {
+    expandedItems = [...expandedItems, item.id];
+  }
+  function collapse(item, expanded) {
+    const itemExpanded = expanded || expandedItems.includes(item.id);
+    if (itemExpanded) expandedItems = expandedItems.filter(id => id !== item.id);
+  }
+  function toggle(item) {
+    const itemExpanded = expandedItems.includes(item.id);
+    if (itemExpanded) collapse(item, itemExpanded);
+    else expand(item);
   }
 
   $: canLeft = meta?.depth != 0;
@@ -42,56 +52,46 @@
     return parent.children;
   }
 
-  async function saveAfterMove(oldPath, newPath) {
-    // when going left
-    // - item.parent
-    // - item.index
-    // - each item index from whole tree that changed
-    // when going right
-    // - item.parent
-    // - item.index
-    // - each item index from whole tree that changed
-    // when going up
-    // - item.index
-    // - each item index from whole tree that changed
-    // when going down
-    // - item.index
-    // - each item index from whole tree that changed
+  async function saveAfterMove(newItems, oldPath, newPath) {
+    // as the items have just changed (and the item will get destroyed in the next tick)
+    // we need to retrieve the item directly from the updated items
+    const newItem = treeGetItemAtPath(newItems, newPath);
 
-    const { parent, index } = item;
-    console.log(parent, index);
+    // update the item's parent and index
+    const { parent, index } = newItem;
     await api.items(collection).updateOne(item.id, { parent, index });
 
-    const oldParentPath = oldPath.slice(0, -1);
-    const oldParent = treeGetItemAtPath(items, oldParentPath);
+    // update indexes of old parent's children
+    const oldParent = treeGetItemAtPath(items, oldPath.slice(0, -1));
     const oldChildren = getChildren(oldParent);
     const oldItemIndex = oldPath[oldPath.length - 1];
-    for (let child of oldChildren) {
+    for (const child of oldChildren) {
       // `>=` is important - the moved items position has been filled
       if (child.index >= oldItemIndex) {
         api.items(collection).updateOne(child.id, { index: child.index });
       }
     }
 
-    const newParentPath = newPath.slice(0, -1);
-    const newParent = treeGetItemAtPath(items, newParentPath);
+    // update indexes of new parent's children
+    const newParent = treeGetItemAtPath(newItems, newPath.slice(0, -1));
     const newChildren = getChildren(newParent);
-    const newItemIndex = item.index;
-    for (let child of newChildren) {
+    const newItemIndex = newItem.index;
+    for (const child of newChildren) {
       // `>` is important - the moved does not need an update
       if (child.index > newItemIndex) {
         api.items(collection).updateOne(child.id, { index: child.index });
       }
     }
+
+    socket.emitChanges(collection, item.id, false);
   }
 
   function moveLeft() {
     if (canLeft) {
-      const oldPath = meta.path;
       const newPath = meta.path.slice(0, -1);
       newPath[newPath.length - 1]++;
       items = treeMoveItemToPath(items, item, newPath);
-      saveAfterMove(oldPath, newPath);
+      saveAfterMove(items, meta.path, newPath);
     }
   }
   function moveRight() {
@@ -101,6 +101,8 @@
       const prev = treeGetItemAtPath(items, prevPath);
       const newPath = [...prevPath, prev.children.length];
       items = treeMoveItemToPath(items, item, newPath);
+      saveAfterMove(items, meta.path, newPath);
+      expand(prev);
     }
   }
   function moveUp() {
@@ -108,6 +110,7 @@
       const newPath = [...meta.path];
       newPath[newPath.length - 1]--;
       items = treeMoveItemToPath(items, item, newPath);
+      saveAfterMove(items, meta.path, newPath);
     }
   }
   function moveDown() {
@@ -115,6 +118,7 @@
       const newPath = [...meta.path];
       newPath[newPath.length - 1]++;
       items = treeMoveItemToPath(items, item, newPath);
+      saveAfterMove(items, meta.path, newPath);
     }
   }
 </script>
@@ -127,17 +131,22 @@
       </div>
     {/if}
     {#if order}
-      <div class="value value--head">
+      <div class="value value--head value--center">
         <div><div class="icon"><div><Icon name="arrow_left" dark /></div></div></div>
       </div>
-      <div class="value value--head">
+      <div class="value value--head value--center">
         <div><div class="icon"><div><Icon name="arrow_right" dark /></div></div></div>
       </div>
-      <div class="value value--head">
+      <div class="value value--head value--center">
         <div><div class="icon"><div><Icon name="arrow_up" dark /></div></div></div>
       </div>
-      <div class="value value--head">
+      <div class="value value--head value--center">
         <div><div class="icon"><div><Icon name="arrow_down" dark /></div></div></div>
+      </div>
+    {/if}
+    {#if hierarchy}
+      <div class="value value--head value--center">
+        <div><div class="icon"><div><Icon name="text_bullet_list_add" dark /></div></div></div>
       </div>
     {/if}
     {#each head as { checkbox, label, icon }}
@@ -165,7 +174,7 @@
       {@const width = ((maxDepth + 1 - meta.depth) / (maxDepth + 1)) * 100}
       <div class="value value--item value--hierarchy" class:expandable>
         <div
-          on:click={toggle}
+          on:click={() => toggle(item)}
           style:margin-left={100 - width + '%'}
           style:width={width + '%'}
           class:border-left={meta.depth != 0}
@@ -176,22 +185,31 @@
         </div>
       </div>
     {/if}
-
     {#if order}
-      <div class="value value--item value--order" disabled={!canLeft} on:click={moveLeft}>
+      <div class="value value--item value--center value--order" disabled={!canLeft} on:click={moveLeft}>
         <div><div class="icon"><div><Icon name="arrow_left" dark /></div></div></div>
       </div>
-      <div class="value value--item value--order" disabled={!canRight} on:click={moveRight}>
+      <div class="value value--item value--center value--order" disabled={!canRight} on:click={moveRight}>
         <div><div class="icon"><div><Icon name="arrow_right" dark /></div></div></div>
       </div>
-      <div class="value value--item value--order" disabled={!canUp} on:click={moveUp}>
+      <div class="value value--item value--center value--order" disabled={!canUp} on:click={moveUp}>
         <div><div class="icon"><div><Icon name="arrow_up" dark /></div></div></div>
       </div>
-      <div class="value value--item value--order" disabled={!canDown} on:click={moveDown}>
+      <div class="value value--item value--center value--order" disabled={!canDown} on:click={moveDown}>
         <div><div class="icon"><div><Icon name="arrow_down" dark /></div></div></div>
       </div>
     {/if}
-
+    {#if hierarchy}
+      <div
+        class="value value--item value--center"
+        on:click={() => {
+          goto(`/admin/kategorie/+?parent=${item.id}&index=${item.children.length}`);
+          expand(item);
+        }}
+      >
+        <div><div class="icon"><div><Icon name="add" dark /></div></div></div>
+      </div>
+    {/if}
     {#each row.values as value, i}
       {@const { checkbox, blame } = head[i]}
       <div
@@ -199,7 +217,7 @@
         class:center={checkbox}
         class:blame
         on:click={() => {
-          if (row.href) goto(row.href, { replace: true, noscroll: true });
+          if (row.href) goto(row.href, { noscroll: true });
         }}
         on:mouseenter={e => {
           const table = e.target.parentNode.parentNode;
@@ -314,7 +332,7 @@
   .value > div .icon > div {
     height: 55%;
   }
-  .value.center > div {
+  .value--center > div {
     justify-content: center;
   }
 
@@ -326,9 +344,6 @@
   }
   .value--hierarchy > div.border-left {
     border-left: var(--border-light);
-  }
-  .value--order > div {
-    justify-content: center;
   }
   .value--order[disabled='true'] .icon {
     display: none;

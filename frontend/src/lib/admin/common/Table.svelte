@@ -1,15 +1,29 @@
 <script>
+  import { afterNavigate } from '$app/navigation';
+
   import TableRow from '$lib/admin/common/TableRow.svelte';
   import Icon from '$lib/common/Icon.svelte';
-  import { treeFlatten } from '$lib/utils';
+  import { setSearchParams, getSearchParams, treeFlatten } from '$lib/utils';
 
+  export let rootPathname;
+
+  let selectedPage = 1;
+  let selectedSearch = null;
+  afterNavigate(navigation => {
+    const searchParams = getSearchParams(['p', 'q']); // page, search
+    if (searchParams.p != null) selectedPage = searchParams.p;
+    if (searchParams.q != null) selectedSearch = searchParams.q;
+    setSearchParams({ p: selectedPage, s: selectedSearch }, navigation, rootPathname);
+  });
+  $: setSearchParams({ p: selectedPage, s: selectedSearch });
+
+  export let collection = null;
   export let items;
   export let head;
   export let mapper;
 
   $: hierarchy = items.some(item => item.children); // has children
   export let order = false;
-  export let collection = null;
   let expandedItems = [];
 
   $: itemsFlat = hierarchy ? treeFlatten(items) : items;
@@ -20,8 +34,8 @@
   function getWidths(head, hierarchy, order, maxDepth) {
     let widths = [];
     if (hierarchy) widths.push(smallestColumn + maxDepth * (smallestColumn / 2) + 'rem');
-    if (order)
-      widths.push(smallestColumn + 'rem', smallestColumn + 'rem', smallestColumn + 'rem', smallestColumn + 'rem');
+    if (order) for (let i = 0; i < 4; i++) widths.push(smallestColumn + 'rem');
+    if (hierarchy) widths.push(smallestColumn + 'rem');
     widths.push(
       ...head.map(h => {
         if (h.width) widths.push(h.width);
@@ -62,6 +76,7 @@
     class="prev"
     on:click={() => {
       // TODO: dispatch event to change data
+      selectedPage = Math.max(1, selectedPage - 1);
     }}
   >
     <div class="icon">
@@ -72,6 +87,7 @@
     class="next"
     on:click={() => {
       // TODO: dispatch event to change data
+      selectedPage = selectedPage + 1;
     }}
   >
     <div class="icon">

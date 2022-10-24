@@ -1,7 +1,7 @@
 export const search = [];
 export const show = [];
 
-export const read = ['id', 'title', 'type', 'filesize'];
+export const read = ['id', 'title', 'type', 'filesize', 'uploaded_on', 'modified_on'];
 export const edit = [
   ...read,
   'uploaded_by',

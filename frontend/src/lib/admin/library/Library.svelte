@@ -79,7 +79,13 @@
   $: if (selected && files) markSelected(selected);
   $: marked = files?.find(f => f.marked);
 
-  async function listener(data) {}
+  async function listener(data) {
+    const { match } = socket.checkMatch(data, 'files');
+    if (match) {
+      read();
+      console.log('files updated');
+    }
+  }
   socket.onChanges(listener);
   onDestroy(() => socket.offChanges(listener));
 </script>

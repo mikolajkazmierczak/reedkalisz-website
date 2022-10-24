@@ -29,7 +29,7 @@ async function save(collection, item, itemOriginal, fields, fieldsToIgnore = [],
   socket.emitChanges(collection, item.id);
 
   // reload (if needed) while replacing history
-  if (reloadPath) goto(reloadPath, { replace: true, noscroll: true });
+  if (reloadPath) goto(reloadPath, { replaceState: true, noscroll: true });
 
   return [item, itemOriginal];
 }
@@ -41,13 +41,13 @@ async function del(collection, id, reloadPath = null, message = null) {
       socket.emitChanges(collection, id);
     }
 
-    if (reloadPath) goto(reloadPath, { replace: true, noscroll: true });
+    if (reloadPath) goto(reloadPath, { replaceState: true, noscroll: true });
   }
 }
 
 async function cancel(item, itemOriginal, reloadPath) {
   if (item.id == '+') {
-    if (reloadPath) goto(reloadPath, { replace: true, noscroll: true });
+    if (reloadPath) goto(reloadPath, { replaceState: true, noscroll: true });
   } else {
     item = JSON.parse(JSON.stringify(itemOriginal));
   }

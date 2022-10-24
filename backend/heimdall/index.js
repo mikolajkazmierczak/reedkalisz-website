@@ -21,6 +21,6 @@ io.on('connection', socket => {
   });
   socket.on('changes', data => {
     socket.broadcast.emit('changes', data);
-    socket.emit('changes', data);
+    if (data.selfBroadcast) socket.emit('changes', data);
   });
 });

@@ -1,12 +1,12 @@
 <script>
   import { onDestroy } from 'svelte';
-  import { page as pageStore } from '$app/stores';
+  import { page } from '$app/stores';
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
   import { edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
-  import { diff, makeTree, treeFlatten } from '$lib/utils';
+  import { diff, getSearchParams, makeTree, treeFlatten } from '$lib/utils';
 
   import slugify from 'slugify';
   import { marked } from 'marked';
@@ -21,9 +21,7 @@
   import ProductStorage from '$lib/admin/editors/product/ProductStorage.svelte';
   import ProductGallery from '$lib/admin/editors/product/ProductGallery.svelte';
 
-  const searchParams = {
-    c: Number($pageStore.url.searchParams.get('c'))
-  };
+  const searchParams = getSearchParams(['category']);
 
   const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
@@ -54,7 +52,7 @@
     if (slug == '+') {
       item = defaults();
       // add category from search params
-      if (searchParams.c) item.categories = [...item.categories, { category: searchParams.c }];
+      if (searchParams.category !== null) item.categories = [...item.categories, { category: searchParams.category }];
     } else {
       item = (await api.items('products').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
     }

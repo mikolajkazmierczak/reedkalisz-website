@@ -1,6 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   import api, { baseUrl } from '$lib/api';
+  import socket from '$lib/admin/heimdall';
   import { filetypeToReadable, bytesToReadable } from '$lib/utils';
 
   import { edit as fields } from '$lib/fields/files';
@@ -13,16 +14,18 @@
   export let id;
 
   let file;
+  $: uploaded_on = file?.uploaded_on;
+  $: modified_on = file?.modified_on;
 
   async function read() {
-    isImg = false; // needed to reset the img preview
     file = await api.files.readOne(id, { fields });
   }
 
   async function handleDelete() {
     if (confirm('Napewno?')) {
       await api.files.deleteOne(id);
-      goto('/admin/biblioteka', { replace: true });
+      socket.emitChanges('files', id);
+      goto('/admin/biblioteka', { replaceState: true, noscroll: true });
     }
   }
 
@@ -37,7 +40,8 @@
     <section class="ui-section__row">
       <div class="ui-section__col ui-box ui-box--uneditable">
         <div>
-          <b>ID:</b> <a href={`${baseUrl}/assets/${id}`} target="_blank">{id}</a>
+          <b>ID:</b>
+          <a href="{baseUrl}/assets/{id}" target="_blank">{id}</a>
         </div>
         <div>
           <b>Plik:</b>
@@ -52,7 +56,7 @@
         </div>
         <div>
           <b>Nazwa przy pobraniu:</b> <br />
-          <a href={`${baseUrl}/assets/${id}?download`}>{file.filename_download}</a> <br />
+          <a href="{baseUrl}/assets/{id}?download">{file.filename_download}</a> <br />
         </div>
         <br />
 
@@ -81,7 +85,11 @@
 
     <div class="file">
       {#if isImg}
-        <img src={`${baseUrl}/assets/${file.id}`} alt="" on:error={() => (imgError = true)} />
+        <img
+          src="{baseUrl}/assets/{file.id}#{modified_on ? modified_on : uploaded_on}"
+          alt=""
+          on:error={() => (imgError = true)}
+        />
         {#if imgError}
           <div class="error">Nie można wyświetlić obrazka</div>
         {/if}
