@@ -55,6 +55,7 @@
       if (searchParams.category !== null) item.categories = [...item.categories, { category: searchParams.category }];
     } else {
       item = (await api.items('products').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
+      console.log('item', JSON.parse(JSON.stringify(item)));
     }
     itemOriginal = item ? JSON.parse(JSON.stringify(item)) : null;
   }

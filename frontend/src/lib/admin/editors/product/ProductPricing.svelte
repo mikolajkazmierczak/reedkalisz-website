@@ -92,10 +92,9 @@
     return a.company.localeCompare(b.company) || a.code.localeCompare(b.code) || a.type.localeCompare(b.type);
   });
 
-  // set default priceView if unset or the already set no longer exists
-  $: console.log(product);
-  $: if (!product.price_view || !$priceViews?.find(p => p.id == product.price_view)) {
-    product.price_view = $priceViews?.find(p => p.default)?.id;
+  // set default priceView if: unset OR the already set doesn't exist
+  $: if ($priceViews && (product.price_view === null || !$priceViews.some(p => p.id == product.price_view))) {
+    product.price_view = $priceViews.find(p => p.default).id;
   }
 
   $: priceView = $priceViews?.find(p => p.id == product.price_view);
