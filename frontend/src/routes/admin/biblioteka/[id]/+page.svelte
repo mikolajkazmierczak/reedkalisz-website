@@ -1,8 +1,8 @@
 <script>
-  import Library from '$lib/admin/editors/library/Library.svelte';
+  import File from '$lib/admin/editors/file/File.svelte';
 
   export let data;
   let { id } = data;
 </script>
 
-<Library {id} />
+<File {id} />

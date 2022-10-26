@@ -4,6 +4,8 @@ import { diffJson } from 'diff';
 import { goto } from '$app/navigation';
 
 export const uuid = () => Math.random().toString(36).substring(2);
+export const range = (start = 0, stop, step = 1) =>
+  Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
 function filtersToRegex(filters) {
   // Individual filter formats: a / a.b / *.a / a.*.b (where * means any level of nesting)

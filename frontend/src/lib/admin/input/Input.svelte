@@ -6,10 +6,10 @@
   export let type = 'text';
   export let value = null;
   export let placeholder = null;
-  export let edited = false;
   export let disabled = false;
   export let error = null;
   export let borderless = false;
+  export let borderRadius = '0';
 
   // number
   export let min = -Infinity;
@@ -36,34 +36,70 @@
   {/if}
 
   {#if type == 'text'}
-    <input {id} type="text" class:error class:edited class:disabled class:borderless {placeholder} bind:value />
-  {:else if type == 'textarea'}
-    <textarea
+    <input
       {id}
-      class:error
-      class:edited
-      class:disabled
-      class:borderless
-      class:resize
-      {placeholder}
-      {rows}
+      type="text"
       bind:value
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
     />
+  {:else if type == 'textarea'}
+    <textarea {id} bind:value {placeholder} {disabled} class:error class:borderless {rows} class:resize />
   {:else if type == 'email'}
-    <input {id} type="email" class:error class:edited class:disabled class:borderless {placeholder} bind:value />
+    <input
+      {id}
+      type="email"
+      bind:value
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
+    />
   {:else if type == 'password'}
-    <input {id} type="password" class:error class:edited class:disabled class:borderless {placeholder} bind:value />
+    <input
+      {id}
+      type="password"
+      bind:value
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
+    />
   {:else if type == 'date'}
-    <input {id} type="date" class:error class:edited class:disabled class:borderless {placeholder} bind:value />
+    <input
+      {id}
+      type="date"
+      bind:value
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
+    />
   {:else if type == 'time'}
-    <input {id} type="time" class:error class:edited class:disabled class:borderless {placeholder} {step} bind:value />
+    <input
+      {id}
+      type="time"
+      bind:value
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
+      {step}
+    />
   {:else if type == 'checkbox'}
-    <div class="checkbox" class:error class:edited class:disabled on:click={() => (value = !value)}>
-      <input {id} bind:checked={value} type="checkbox" />
+    <div class="checkbox" class:error on:click={() => (value = !value)}>
+      <input {id} type="checkbox" bind:checked={value} {disabled} />
       {#if $$slots.default}<label for={id} on:click|preventDefault><slot /></label>{/if}
     </div>
   {:else if type == 'select'}
-    <select {id} class:error class:edited class:disabled class:borderless {placeholder} bind:value>
+    <select {id} bind:value {placeholder} {disabled} class:error class:borderless style:border-radius={borderRadius}>
       {#each options as option}
         <option value={option.id}>{option.text}</option>
       {/each}
@@ -75,16 +111,16 @@
         <input
           {id}
           type="number"
-          class:error
-          class:edited
-          class:disabled
-          class:borderless
-          class:center={buttons}
+          bind:value
           {placeholder}
+          {disabled}
+          class:error
+          class:borderless
+          style:border-radius={borderRadius}
+          class:center={buttons}
           {min}
           {max}
           {step}
-          bind:value
         />
         {#if error}<span class="error-info">{error}</span>{/if}
       </div>
@@ -107,9 +143,6 @@
   textarea,
   select,
   .checkbox {
-    --edit: solid 1px var(--primary);
-    border-radius: 0;
-    border: none;
     border: solid 1px var(--accent);
     padding: 0.25rem 0.5rem;
     width: 100%;
@@ -117,12 +150,15 @@
     font-size: 0.95rem;
     background-color: var(--light);
   }
+  [disabled] {
+    cursor: not-allowed;
+  }
 
   input:focus,
   textarea:focus,
   select:focus {
     outline: none;
-    border-bottom: var(--edit);
+    border-bottom: solid 1px var(--primary);
   }
   input.center {
     text-align: center;
@@ -186,9 +222,6 @@
     color: var(--main);
   }
 
-  .edited {
-    border: var(--edit);
-  }
   .borderless {
     border: none;
   }

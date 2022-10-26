@@ -1,6 +1,5 @@
 <script>
   import { onDestroy } from 'svelte';
-  import { page } from '$app/stores';
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
@@ -55,7 +54,6 @@
       if (searchParams.category !== null) item.categories = [...item.categories, { category: searchParams.category }];
     } else {
       item = (await api.items('products').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
-      console.log('item', JSON.parse(JSON.stringify(item)));
     }
     itemOriginal = item ? JSON.parse(JSON.stringify(item)) : null;
   }

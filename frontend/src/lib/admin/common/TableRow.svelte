@@ -2,10 +2,10 @@
   import { goto } from '$app/navigation';
   import { slide } from 'svelte/transition';
 
+  import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
   import { treeGetItemAtPath, treeMoveItemToPath } from '$lib/utils';
 
-  import api from '$lib/api';
   import Icon from '$lib/common/Icon.svelte';
   import Blame from '$lib/admin/common/Blame.svelte';
 
@@ -47,12 +47,12 @@
   $: canUp = !meta?.isFirst;
   $: canDown = !meta?.isLast;
 
-  function getChildren(parent) {
-    if (Array.isArray(parent)) return parent;
-    return parent.children;
-  }
-
   async function saveAfterMove(newItems, oldPath, newPath) {
+    const getChildren = parent => {
+      if (Array.isArray(parent)) return parent;
+      return parent.children;
+    };
+
     // as the items have just changed (and the item will get destroyed in the next tick)
     // we need to retrieve the item directly from the updated items
     const newItem = treeGetItemAtPath(newItems, newPath);
@@ -169,7 +169,7 @@
 {/if}
 
 {#if item}
-  <div class="row row--item" style:grid-template-columns={widths} transition:slide={{ duration: 200 }}>
+  <div class="row row--item" style:grid-template-columns={widths} transition:slide={{ duration: order ? 200 : 0 }}>
     {#if hierarchy}
       {@const width = ((maxDepth + 1 - meta.depth) / (maxDepth + 1)) * 100}
       <div class="value value--item value--hierarchy" class:expandable>

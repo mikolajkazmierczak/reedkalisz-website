@@ -9,29 +9,34 @@
 
   import { updateGlobal, categories } from '$lib/admin/global';
   import { search as fields } from '$lib/fields/products';
-  import Table from '$lib/admin/common/Table.svelte';
   import Category from '$lib/admin/editors/product/Category.svelte';
   import Button from '$lib/admin/input/Button.svelte';
+  import Table from '$lib/admin/common/Table.svelte';
+  import Search from '$lib/admin/common/Search.svelte';
 
   $page = { title: 'Produkty', icon: 'products' };
 
   let categoriesTree;
 
-  let selectedCategory = null;
+  let category = null;
   afterNavigate(navigation => {
     const searchParams = getSearchParams(['c']); // category
-    if (searchParams.c != null) selectedCategory = searchParams.c;
-    setSearchParams({ c: selectedCategory }, navigation, '/admin/produkty');
+    if (searchParams.c != null) category = searchParams.c;
+    setSearchParams({ c: category }, navigation, '/admin/produkty');
   });
-  $: setSearchParams({ c: selectedCategory });
+  $: setSearchParams({ c: category });
+
+  let selectedLimit;
+  let selectedPage;
+  let selectedQuery;
 
   let products;
 
-  async function readProducts(category = null) {
-    products = []; // clear to indicate loading
+  async function readProducts(category = null, limit = 25, page = 1) {
+    // if (products) products.data = []; // clear to indicate loading
     if (categoriesTree) {
       const filter = category ? { categories: { category: { _eq: category } } } : {};
-      products = (await api.items('products').readByQuery({ fields, limit: 100, page: 1, filter })).data;
+      products = await api.items('products').readByQuery({ fields, filter, limit, page, meta: '*' });
     }
   }
 
@@ -42,17 +47,17 @@
 
   async function read() {
     await readCategories();
-    await readProducts(selectedCategory);
+    await readProducts(category, selectedLimit, selectedPage);
   }
 
-  $: readProducts(selectedCategory);
+  $: readProducts(category, selectedLimit, selectedPage);
 
   read();
 
   async function listener(data) {
-    const itemIds = products.map(item => item.id);
+    const itemIds = products.data.map(item => item.id);
     const matchProducts = socket.checkMatch(data, 'products', itemIds);
-    if (matchProducts.match) readProducts(selectedCategory);
+    if (matchProducts.match) readProducts(category, selectedLimit, selectedPage);
     const matchCategories = socket.checkMatch(data, 'categories');
     if (matchCategories.match) readCategories();
   }
@@ -66,9 +71,9 @@
       <div class="top">
         <h3 class="title">Kategorie</h3>
       </div>
-      <Category id={null} name={'Wszystkie'} enabled children={[]} depth={0} bind:selected={selectedCategory} />
+      <Category id={null} name={'Wszystkie'} enabled children={[]} depth={0} bind:selected={category} />
       {#each categoriesTree as { id, name, enabled, children }, i}
-        <Category {id} {name} {enabled} {children} depth={i + 1} bind:selected={selectedCategory} />
+        <Category {id} {name} {enabled} {children} depth={i + 1} bind:selected={category} />
       {/each}
     </div>
   {/if}
@@ -76,18 +81,15 @@
   {#if products}
     <div class="products">
       <div class="actions">
-        <Button
-          on:click={() => goto(`/admin/produkty/+${selectedCategory ? `?c=${selectedCategory}` : ''}`)}
-          icon="add"
-        >
-          Dodaj
-        </Button>
+        <Button on:click={() => goto(`/admin/produkty/+${category ? `?c=${category}` : ''}`)} icon="add">Dodaj</Button>
+        <Search query={selectedQuery} />
       </div>
 
       <Table
         rootPathname="/admin/produkty"
         collection="products"
-        items={products}
+        items={products.data}
+        itemsCount={products.meta.filter_count}
         head={[
           { checkbox: true, icon: 'eye' },
           { checkbox: true, icon: 'new' },
@@ -111,6 +113,9 @@
             { user: $.user_updated, datetime: $.date_updated }
           ]
         })}
+        bind:limit={selectedLimit}
+        bind:page={selectedPage}
+        bind:query={selectedQuery}
       />
     </div>
   {/if}
@@ -143,7 +148,11 @@
   .products {
     overflow-x: auto;
   }
-  .products .actions {
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
     padding: 0.5rem;
     margin-bottom: 1rem;
     border-radius: var(--border-radius);

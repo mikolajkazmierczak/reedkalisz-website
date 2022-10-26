@@ -5,11 +5,11 @@
   import { filetypeToReadable, bytesToReadable } from '$lib/utils';
 
   import { edit as fields } from '$lib/fields/files';
+  import Upload from '$lib/admin/library/Upload.svelte';
   import Editor from '$lib/admin/editors/Editor.svelte';
   import Button from '$lib/admin/input/Button.svelte';
   import Blame from '$lib/admin/common/Blame.svelte';
   import Icon from '$lib/common/Icon.svelte';
-  import Upload from '$lib/admin/library/Upload.svelte';
 
   export let id;
 

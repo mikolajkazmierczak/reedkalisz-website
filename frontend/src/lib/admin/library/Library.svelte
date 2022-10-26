@@ -1,31 +1,49 @@
 <script>
-  import { goto } from '$app/navigation';
+  import { goto, afterNavigate } from '$app/navigation';
   import { onDestroy } from 'svelte';
   import { createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { page } from '$app/stores';
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
+  import { getSearchParams, setSearchParams } from '$lib/utils';
 
   import { read as fields } from '$lib/fields/files';
   import Button from '$lib/admin/input/Button.svelte';
 
+  import Filters from '$lib/admin/common/Filters.svelte';
   import Upload from '$lib/admin/library/Upload.svelte';
   import File from '$lib/admin/library/File.svelte';
-  import Filters from '$lib/admin/common/Filters.svelte';
+  import Pagination from '$lib/admin/common/Pagination.svelte';
 
   const dispatch = createEventDispatcher();
 
   export let picker = false;
   export let selected = null;
 
+  const rootPathname = '/admin/biblioteka';
+  let selectedLimit = 25;
+  let selectedPage = 1;
+  let selectedQuery = null;
+  afterNavigate(navigation => {
+    const searchParams = getSearchParams(['p', 'q']); // page, query
+    if (searchParams.p != null) selectedPage = searchParams.p;
+    if (searchParams.q != null) selectedQuery = searchParams.q;
+    setSearchParams({ p: selectedPage, s: selectedQuery }, navigation, rootPathname);
+  });
+  $: if (!picker) setSearchParams({ p: selectedPage, s: selectedQuery });
+
   let files;
+  let filesMeta;
 
   let filterUse = null;
   let filterType = null;
 
-  async function read() {
-    files = (await api.files.readByQuery({ fields, sort: '-uploaded_on', limit: 50 })).data;
+  async function read(limit = 25, page = 1) {
+    const res = await api.files.readByQuery({ fields, sort: '-uploaded_on', limit, page, meta: '*' });
+    files = res.data;
+    filesMeta = res.meta;
   }
 
   function markSelected(id) {
@@ -69,22 +87,19 @@
     if (ids.length) {
       if (confirm(`Czy na pewno chcesz usunąć ${ids.length} plików?`)) {
         await api.files.deleteMany(ids);
-        read();
+        read(selectedLimit, selectedPage);
       }
     }
   }
 
-  read();
+  $: read(selectedLimit, selectedPage);
 
   $: if (selected && files) markSelected(selected);
   $: marked = files?.find(f => f.marked);
 
   async function listener(data) {
     const { match } = socket.checkMatch(data, 'files');
-    if (match) {
-      read();
-      console.log('files updated');
-    }
+    if (match) read(selectedLimit, selectedPage);
   }
   socket.onChanges(listener);
   onDestroy(() => socket.offChanges(listener));
@@ -146,6 +161,8 @@
     {/each}
   </div>
 {/if}
+
+<Pagination bind:limit={selectedLimit} bind:page={selectedPage} total={filesMeta?.filter_count} />
 
 <style>
   .actions {

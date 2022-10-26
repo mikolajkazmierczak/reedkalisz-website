@@ -13,6 +13,7 @@
   export let disabled = false;
 
   export let icon = null;
+  export let borderRadius = 'var(--border-radius)';
 
   $: hoverColor = dangerous ? 'var(--main)' : secondary ? 'var(--accent-light)' : 'var(--primary-light)';
 </script>
@@ -24,6 +25,7 @@
   class:square
   class:edited
   {disabled}
+  style:border-radius={borderRadius}
 >
   {#if !disabled}
     <HoverCircle color={hoverColor} />
@@ -43,7 +45,6 @@
     cursor: pointer;
     overflow: hidden;
     position: relative;
-    border-radius: var(--border-radius);
     border: none;
     padding: 0;
     height: 2rem;

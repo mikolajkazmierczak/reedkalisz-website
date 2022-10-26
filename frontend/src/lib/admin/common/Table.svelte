@@ -2,23 +2,25 @@
   import { afterNavigate } from '$app/navigation';
 
   import TableRow from '$lib/admin/common/TableRow.svelte';
-  import Icon from '$lib/common/Icon.svelte';
+  import Pagination from '$lib/admin/common/Pagination.svelte';
   import { setSearchParams, getSearchParams, treeFlatten } from '$lib/utils';
 
-  export let rootPathname;
+  export let limit;
 
-  let selectedPage = 1;
-  let selectedSearch = null;
+  export let rootPathname;
+  export let page = 1;
+  export let query = null;
   afterNavigate(navigation => {
-    const searchParams = getSearchParams(['p', 'q']); // page, search
-    if (searchParams.p != null) selectedPage = searchParams.p;
-    if (searchParams.q != null) selectedSearch = searchParams.q;
-    setSearchParams({ p: selectedPage, s: selectedSearch }, navigation, rootPathname);
+    const searchParams = getSearchParams(['p', 'q']); // page, query
+    if (searchParams.p != null) page = searchParams.p;
+    if (searchParams.q != null) query = searchParams.q;
+    setSearchParams({ p: page, s: query }, navigation, rootPathname);
   });
-  $: setSearchParams({ p: selectedPage, s: selectedSearch });
+  $: setSearchParams({ p: page, s: query });
 
   export let collection = null;
   export let items;
+  export let itemsCount;
   export let head;
   export let mapper;
 
@@ -54,7 +56,7 @@
 <div class="table-wrapper">
   <div class="table">
     <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} {collection} />
-    {#each items as item (item.id)}
+    {#each items as item (item)}
       <TableRow
         bind:items
         bind:expandedItems
@@ -71,30 +73,9 @@
   </div>
 </div>
 
-<div class="pagination">
-  <div
-    class="prev"
-    on:click={() => {
-      // TODO: dispatch event to change data
-      selectedPage = Math.max(1, selectedPage - 1);
-    }}
-  >
-    <div class="icon">
-      <Icon name="arrow_left" dark />
-    </div>
-  </div>
-  <div
-    class="next"
-    on:click={() => {
-      // TODO: dispatch event to change data
-      selectedPage = selectedPage + 1;
-    }}
-  >
-    <div class="icon">
-      <Icon name="arrow_right" dark />
-    </div>
-  </div>
-</div>
+{#if !hierarchy}
+  <Pagination bind:limit bind:page total={itemsCount} />
+{/if}
 
 <style>
   .table-wrapper {
@@ -104,19 +85,5 @@
   }
   .table {
     overflow-x: auto;
-  }
-
-  .pagination {
-    align-self: stretch;
-    display: flex;
-    border-radius: var(--border-radius);
-    border: var(--border-light);
-    margin-top: 1rem;
-    padding: 0.5rem;
-    height: 2.5rem;
-    background-color: var(--light);
-  }
-  .pagination .icon {
-    height: 100%;
   }
 </style>
