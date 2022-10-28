@@ -25,23 +25,37 @@ export const collections = [
   { collection: 'colors', store: colors, fields: fields.colors.read }
 ];
 
-export async function updateGlobal(store, ids = []) {
+export async function updateGlobal(store, ids = null, options = { filter: null, search: null }) {
   // update a global store with new items from the api
-  if (!Array.isArray(ids)) ids = [ids];
   const collection = collections.find(c => c.store === store);
-  if (ids.length) {
+
+  const params = { fields: collection.fields };
+  if (options.filter) params.filter = options.filter;
+  if (options.search) params.search = options.search;
+
+  if (ids) {
     // only update specified ids
-    const updated = (await api.items(collection.collection).readMany(ids)).data;
+    const updated = (await api.items(collection.collection).readMany(ids, params)).data;
     store.update(items => {
+      let needsSorting = false;
       for (const u of updated) {
         const i = items.findIndex(item => item.id === u.id);
-        if (i > -1) items[i] = u;
+        if (i > -1) {
+          // update existing item
+          items[i] = u;
+        } else {
+          // add new item
+          items.push(u);
+          needsSorting = true;
+        }
       }
+      if (needsSorting) items.sort((a, b) => a.id - b.id);
       return items;
     });
   } else {
     // update all items
-    const items = (await api.items(collection.collection).readByQuery({ limit: -1, fields: collection.fields })).data;
+    if (params.search === null) params.limit = -1;
+    const items = (await api.items(collection.collection).readByQuery(params)).data;
     store.set(items);
   }
 }

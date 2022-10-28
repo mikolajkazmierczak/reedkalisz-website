@@ -2,6 +2,8 @@
   import { uuid } from '$lib/utils';
   import Button from '$lib/admin/input/Button.svelte';
 
+  export let input;
+
   // common
   export let type = 'text';
   export let value = null;
@@ -40,6 +42,7 @@
       {id}
       type="text"
       bind:value
+      bind:this={input}
       {placeholder}
       {disabled}
       class:error
@@ -53,6 +56,7 @@
       {id}
       type="email"
       bind:value
+      bind:this={input}
       {placeholder}
       {disabled}
       class:error
@@ -64,6 +68,7 @@
       {id}
       type="password"
       bind:value
+      bind:this={input}
       {placeholder}
       {disabled}
       class:error
@@ -75,6 +80,7 @@
       {id}
       type="date"
       bind:value
+      bind:this={input}
       {placeholder}
       {disabled}
       class:error
@@ -86,6 +92,7 @@
       {id}
       type="time"
       bind:value
+      bind:this={input}
       {placeholder}
       {disabled}
       class:error
@@ -94,12 +101,21 @@
       {step}
     />
   {:else if type == 'checkbox'}
-    <div class="checkbox" class:error on:click={() => (value = !value)}>
-      <input {id} type="checkbox" bind:checked={value} {disabled} />
-      {#if $$slots.default}<label for={id} on:click|preventDefault><slot /></label>{/if}
+    <div class="checkbox" class:error on:click={() => (value = !value)} on:keydown={() => {}}>
+      <input {id} type="checkbox" bind:checked={value} bind:this={input} {disabled} />
+      {#if $$slots.default}<label for={id} on:click|preventDefault on:keydown={() => {}}><slot /></label>{/if}
     </div>
   {:else if type == 'select'}
-    <select {id} bind:value {placeholder} {disabled} class:error class:borderless style:border-radius={borderRadius}>
+    <select
+      {id}
+      bind:value
+      bind:this={input}
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
+    >
       {#each options as option}
         <option value={option.id}>{option.text}</option>
       {/each}
@@ -112,6 +128,7 @@
           {id}
           type="number"
           bind:value
+          bind:this={input}
           {placeholder}
           {disabled}
           class:error

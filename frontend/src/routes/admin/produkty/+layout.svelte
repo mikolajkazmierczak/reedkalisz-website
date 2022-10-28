@@ -16,8 +16,6 @@
 
   $page = { title: 'Produkty', icon: 'products' };
 
-  let categoriesTree;
-
   let category = null;
   afterNavigate(navigation => {
     const searchParams = getSearchParams(['c']); // category
@@ -30,13 +28,18 @@
   let selectedPage;
   let selectedQuery;
 
+  $: if (category != null) {
+    selectedPage = 1;
+  }
+
+  let categoriesTree;
   let products;
 
-  async function readProducts(category = null, limit = 25, page = 1) {
+  async function readProducts(category = null, limit = 25, page = 1, query = null) {
     // if (products) products.data = []; // clear to indicate loading
     if (categoriesTree) {
       const filter = category ? { categories: { category: { _eq: category } } } : {};
-      products = await api.items('products').readByQuery({ fields, filter, limit, page, meta: '*' });
+      products = await api.items('products').readByQuery({ fields, filter, limit, page, search: query, meta: '*' });
     }
   }
 
@@ -47,17 +50,17 @@
 
   async function read() {
     await readCategories();
-    await readProducts(category, selectedLimit, selectedPage);
+    await readProducts(category, selectedLimit, selectedPage, selectedQuery);
   }
 
-  $: readProducts(category, selectedLimit, selectedPage);
+  $: readProducts(category, selectedLimit, selectedPage, selectedQuery);
 
   read();
 
   async function listener(data) {
     const itemIds = products.data.map(item => item.id);
     const matchProducts = socket.checkMatch(data, 'products', itemIds);
-    if (matchProducts.match) readProducts(category, selectedLimit, selectedPage);
+    if (matchProducts.match) readProducts(category, selectedLimit, selectedPage, selectedQuery);
     const matchCategories = socket.checkMatch(data, 'categories');
     if (matchCategories.match) readCategories();
   }
@@ -82,7 +85,7 @@
     <div class="products">
       <div class="actions">
         <Button on:click={() => goto(`/admin/produkty/+${category ? `?c=${category}` : ''}`)} icon="add">Dodaj</Button>
-        <Search query={selectedQuery} />
+        <Search bind:query={selectedQuery} />
       </div>
 
       <Table

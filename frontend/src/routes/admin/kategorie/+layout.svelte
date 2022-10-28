@@ -4,22 +4,26 @@
 
   import socket from '$lib/admin/heimdall';
   import { page } from '$lib/admin/stores';
-  import { makeTree } from '$lib/utils';
+  import { makeTree, treeFlatten } from '$lib/utils';
 
   import { updateGlobal, categories } from '$lib/admin/global';
   import Table from '$lib/admin/common/Table.svelte';
   import Button from '$lib/admin/input/Button.svelte';
+  import Search from '$lib/admin/common/Search.svelte';
 
   $page = { title: 'Kategorie', icon: 'categories' };
 
-  let categoriesTree;
-
-  async function read() {
-    await updateGlobal(categories);
-    categoriesTree = makeTree($categories);
+  let selectedQuery;
+  async function read(query = null) {
+    await updateGlobal(categories, null, { search: query });
+    const tree = makeTree($categories);
+    items = query === null ? tree : treeFlatten(tree);
+    console.log(items);
   }
 
-  read();
+  let items;
+
+  $: read(selectedQuery);
 
   async function listener(data) {
     const { match } = socket.checkMatch(data, 'categories');
@@ -29,16 +33,17 @@
   onDestroy(() => socket.offChanges(listener));
 </script>
 
-{#if categoriesTree}
+{#if items}
   <div class="wrapper">
     <div class="actions">
-      <Button on:click={() => goto(`/admin/kategorie/+?index=${categoriesTree.length}`)} icon="add">Dodaj</Button>
+      <Button on:click={() => goto(`/admin/kategorie/+?index=${items.length}`)} icon="add">Dodaj</Button>
+      <Search bind:query={selectedQuery} />
     </div>
 
     <Table
       rootPathname="/admin/kategorie"
       collection="categories"
-      bind:items={categoriesTree}
+      bind:items
       head={[
         { checkbox: true, icon: 'eye' },
         { id: true, label: 'ID' },
@@ -56,7 +61,8 @@
           { user: $.user_updated, datetime: $.date_updated }
         ]
       })}
-      order
+      order={!selectedQuery}
+      bind:query={selectedQuery}
     />
   </div>
 {/if}
@@ -68,6 +74,10 @@
     overflow-x: auto;
   }
   .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
     padding: 0.5rem;
     margin-bottom: 1rem;
     border-radius: var(--border-radius);

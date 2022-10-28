@@ -14,59 +14,49 @@
   }
 
   $: pagesCount = Math.ceil(total / limit);
+  const prev = () => (page = Math.max(1, page - 1));
+  const next = () => (page = Math.min(page + 1, pagesCount || 1));
 </script>
 
 <div class="pagination">
   <div class="buttons">
-    <div class="button prev" class:active={page == 1} on:click={() => (page = Math.max(1, page - 1))}>
-      <div class="icon">
-        <Icon name="arrow_left" dark />
-      </div>
-    </div>
+    <button class="arrow" class:active={page == 1} on:click={prev}>
+      <div class="icon"><Icon name="arrow_left" dark /></div>
+    </button>
 
     {#if pagesCount <= 11}
       <!-- all template -->
       {#each range(1, pagesCount) as p}
-        <div role="button" class="button" class:active={page === p} on:click={() => (page = p)}>{p}</div>
+        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
       {/each}
     {:else if page <= 6}
       <!-- left template -->
       {#each range(1, 9) as p}
-        <div role="button" class="button" class:active={page === p} on:click={() => (page = p)}>{p}</div>
+        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
       {/each}
-      <div class="button more">...</div>
-      <div role="button" class="button" class:active={page === pagesCount} on:click={() => (page = pagesCount)}>
-        {pagesCount}
-      </div>
+      <div class="more">...</div>
+      <button class:active={page === pagesCount} on:click={() => (page = pagesCount)}>{pagesCount}</button>
     {:else if page > pagesCount - 6}
       <!-- right template -->
-      <div role="button" class="button" class:active={page === 1} on:click={() => (page = 1)}>1</div>
-      <div class="button more">...</div>
+      <button class:active={page === 1} on:click={() => (page = 1)}>1</button>
+      <button class="more">...</button>
       {#each range(pagesCount - 8, pagesCount) as p}
-        <div role="button" class="button" class:active={page === p} on:click={() => (page = p)}>{p}</div>
+        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
       {/each}
     {:else}
       <!-- middle template -->
-      <div role="button" class="button" class:active={page === 1} on:click={() => (page = 1)}>1</div>
-      <div class="button more">...</div>
+      <button class:active={page === 1} on:click={() => (page = 1)}>1</button>
+      <button class="more">...</button>
       {#each range(page - 3, page + 3) as p}
-        <div role="button" class="button" class:active={page === p} on:click={() => (page = p)}>{p}</div>
+        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
       {/each}
-      <div class="button more">...</div>
-      <div role="button" class="button" class:active={page === pagesCount} on:click={() => (page = pagesCount)}>
-        {pagesCount}
-      </div>
+      <button class="more">...</button>
+      <button class:active={page === pagesCount} on:click={() => (page = pagesCount)}>{pagesCount}</button>
     {/if}
 
-    <div
-      class="button next"
-      class:active={page == pagesCount}
-      on:click={() => (page = Math.min(page + 1, pagesCount || 1))}
-    >
-      <div class="icon">
-        <Icon name="arrow_right" dark />
-      </div>
-    </div>
+    <button class="arrow" class:active={page == pagesCount || pagesCount == 0} on:click={next}>
+      <div class="icon"><Icon name="arrow_right" dark /></div>
+    </button>
   </div>
 
   <div class="limit">
@@ -92,7 +82,8 @@
     display: flex;
     gap: 0.25rem;
   }
-  .button {
+  button,
+  .more {
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -102,16 +93,20 @@
     padding: 0.35rem 0.75rem;
     width: 2.5rem;
     height: 2rem;
+    background-color: transparent;
+    transition: background-color 0.1s ease;
   }
-  .button:hover {
+  button:hover {
     background-color: var(--accent-light);
   }
-  .button.active {
+  button.active {
     background-color: var(--primary-white);
   }
-  .prev,
-  .next {
+  .arrow {
     width: 3rem;
+  }
+  .arrow.active {
+    background-color: var(--accent-white);
   }
   .more {
     cursor: default;

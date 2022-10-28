@@ -14,9 +14,9 @@
     const searchParams = getSearchParams(['p', 'q']); // page, query
     if (searchParams.p != null) page = searchParams.p;
     if (searchParams.q != null) query = searchParams.q;
-    setSearchParams({ p: page, s: query }, navigation, rootPathname);
+    setSearchParams({ p: page, q: query }, navigation, rootPathname);
   });
-  $: setSearchParams({ p: page, s: query });
+  $: setSearchParams({ p: page, q: query });
 
   export let collection = null;
   export let items;
@@ -25,6 +25,7 @@
   export let mapper;
 
   $: hierarchy = items.some(item => item.children); // has children
+  $: console.log('hierarchy', hierarchy);
   export let order = false;
   let expandedItems = [];
 
