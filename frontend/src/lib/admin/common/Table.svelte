@@ -25,7 +25,6 @@
   export let mapper;
 
   $: hierarchy = items.some(item => item.children); // has children
-  $: console.log('hierarchy', hierarchy);
   export let order = false;
   let expandedItems = [];
 
@@ -57,24 +56,31 @@
 <div class="table-wrapper">
   <div class="table">
     <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} {collection} />
-    {#each items as item (item)}
-      <TableRow
-        bind:items
-        bind:expandedItems
-        {head}
-        {hierarchy}
-        {order}
-        {maxDepth}
-        {widths}
-        bind:item
-        {mapper}
-        {collection}
-      />
-    {/each}
+    {#if items.length}
+      {#each items as item (item)}
+        <TableRow
+          bind:items
+          bind:expandedItems
+          {head}
+          {hierarchy}
+          {order}
+          {maxDepth}
+          {widths}
+          bind:item
+          {mapper}
+          {collection}
+        />
+      {/each}
+    {:else}
+      <div class="empty">
+        Brak elementów o podanych parametrach
+        <img src="https://api.unsplash.com/search/photos?query=empty" alt="" />
+      </div>
+    {/if}
   </div>
 </div>
 
-{#if !hierarchy}
+{#if !hierarchy && limit != -1}
   <Pagination bind:limit bind:page total={itemsCount} />
 {/if}
 
@@ -86,5 +92,11 @@
   }
   .table {
     overflow-x: auto;
+  }
+
+  .empty {
+    padding: 1rem;
+    width: 100%;
+    background-color: var(--accent-white);
   }
 </style>

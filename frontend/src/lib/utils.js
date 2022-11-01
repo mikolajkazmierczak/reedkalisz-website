@@ -75,10 +75,10 @@ function diffToHtml(diff) {
 
 export function diff(item, itemOriginal, fieldsToIgnore) {
   return new Promise(async resolve => {
-    if (!item) return resolve({ diff: null, parts: null, html: null });
-    const itemCopy = JSON.parse(JSON.stringify(item));
+    if (!item) return resolve({ diff: null, changed: null, html: null });
+    const itemCopy = item ? JSON.parse(JSON.stringify(item)) : null;
     await deleteFields(itemCopy, fieldsToIgnore);
-    const itemOriginalCopy = JSON.parse(JSON.stringify(itemOriginal));
+    const itemOriginalCopy = itemOriginal ? JSON.parse(JSON.stringify(itemOriginal)) : null;
     await deleteFields(itemOriginalCopy, fieldsToIgnore);
     const diff = diffJson(itemOriginalCopy, itemCopy);
     return resolve({

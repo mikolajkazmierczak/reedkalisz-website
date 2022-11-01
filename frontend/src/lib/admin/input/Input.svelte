@@ -28,8 +28,23 @@
   // select
   export let options = [];
 
+  // list
+  export let list = [];
+
   // token (for explicit labelling)
   const id = `input-${uuid()}`;
+
+  $: if (type == 'list') {
+    try {
+      const values = value.split(';').map(v => Number(v));
+      if (values.some(v => isNaN(v))) throw new Error();
+      if (values.some(v => v === 0)) throw new Error();
+      list = values;
+      error = null;
+    } catch (e) {
+      error = `Nieprawidłowa lista`;
+    }
+  }
 </script>
 
 <div class="wrapper">
@@ -120,6 +135,18 @@
         <option value={option.id}>{option.text}</option>
       {/each}
     </select>
+  {:else if type == 'list'}
+    <input
+      {id}
+      type="text"
+      bind:value
+      bind:this={input}
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
+    />
   {:else if type == 'number'}
     <div class="number-wrapper" class:buttons>
       {#if buttons}<Button onclick={minus} disabled={value <= min}>&nbsp;-&nbsp;</Button>{/if}

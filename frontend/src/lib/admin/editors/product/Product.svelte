@@ -20,7 +20,7 @@
   import ProductStorage from '$lib/admin/editors/product/ProductStorage.svelte';
   import ProductGallery from '$lib/admin/editors/product/ProductGallery.svelte';
 
-  const searchParams = getSearchParams(['category']);
+  const searchParams = getSearchParams(['c']);
 
   const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
@@ -51,7 +51,7 @@
     if (slug == '+') {
       item = defaults();
       // add category from search params
-      if (searchParams.category !== null) item.categories = [...item.categories, { category: searchParams.category }];
+      if (searchParams.c !== null) item.categories = [...item.categories, { category: searchParams.c }];
     } else {
       item = (await api.items('products').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
     }
@@ -176,13 +176,13 @@
           </div>
         </div>
 
-        <div class="ui-section__col">
+        <!-- <div class="ui-section__col">
           <div class="diff">
             EDITED: {$edited}
             <h3 class="ui-h3">PRODUCT</h3>
             <pre>{@html itemDiff}</pre>
           </div>
-        </div>
+        </div> -->
       </div>
     </section>
 

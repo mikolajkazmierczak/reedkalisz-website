@@ -28,7 +28,8 @@
   let selectedPage;
   let selectedQuery;
 
-  $: if (category != null) {
+  $: if (category != null || selectedLimit != null) {
+    // reset page on category or limit change
     selectedPage = 1;
   }
 
@@ -70,19 +71,19 @@
 
 <div class="wrapper">
   {#if categoriesTree}
-    <div class="categories">
-      <div class="top">
+    <sidebar>
+      <div>
         <h3 class="title">Kategorie</h3>
+        <Category id={null} name={'Wszystkie'} enabled children={[]} depth={0} bind:selected={category} />
+        {#each categoriesTree as { id, name, enabled, children }, i}
+          <Category {id} {name} {enabled} {children} depth={i + 1} bind:selected={category} />
+        {/each}
       </div>
-      <Category id={null} name={'Wszystkie'} enabled children={[]} depth={0} bind:selected={category} />
-      {#each categoriesTree as { id, name, enabled, children }, i}
-        <Category {id} {name} {enabled} {children} depth={i + 1} bind:selected={category} />
-      {/each}
-    </div>
+    </sidebar>
   {/if}
 
   {#if products}
-    <div class="products">
+    <div class="items">
       <div class="actions">
         <Button on:click={() => goto(`/admin/produkty/+${category ? `?c=${category}` : ''}`)} icon="add">Dodaj</Button>
         <Search bind:query={selectedQuery} />
@@ -133,22 +134,21 @@
     gap: 1rem;
   }
 
-  .categories {
-    padding: 1rem;
+  sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem 1rem;
     min-width: 350px;
     border-radius: var(--border-radius);
     border: var(--border-light);
     background-color: var(--light);
   }
-  .categories .top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+  sidebar .title {
     margin-bottom: 0.5rem;
-    padding-bottom: 0.25rem;
   }
 
-  .products {
+  .items {
     overflow-x: auto;
   }
   .actions {

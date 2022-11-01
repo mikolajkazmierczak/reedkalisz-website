@@ -2,11 +2,13 @@
   import { goto } from '$app/navigation';
   import { onDestroy } from 'svelte';
 
+  import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
   import { page } from '$lib/admin/stores';
   import { makeTree, treeFlatten } from '$lib/utils';
 
   import { updateGlobal, categories } from '$lib/admin/global';
+  import { search as fields } from '$lib/fields/categories';
   import Table from '$lib/admin/common/Table.svelte';
   import Button from '$lib/admin/input/Button.svelte';
   import Search from '$lib/admin/common/Search.svelte';
@@ -15,10 +17,15 @@
 
   let selectedQuery;
   async function read(query = null) {
-    await updateGlobal(categories, null, { search: query });
+    await updateGlobal(categories);
     const tree = makeTree($categories);
-    items = query === null ? tree : treeFlatten(tree);
-    console.log(items);
+    if (query) {
+      const flat = treeFlatten(tree);
+      const queried = (await api.items('categories').readByQuery({ fields, limit: -1, search: query })).data;
+      items = flat.filter(category => queried.some(c => c.id === category.id));
+    } else {
+      items = tree;
+    }
   }
 
   let items;
@@ -62,6 +69,7 @@
         ]
       })}
       order={!selectedQuery}
+      limit={-1}
       bind:query={selectedQuery}
     />
   </div>

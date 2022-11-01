@@ -1,40 +1,62 @@
 <script>
-  import { diff } from '$lib/utils';
-  import { page, edited } from '$lib/admin/stores';
-  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '$lib/admin/global';
+  import { page } from '$lib/admin/stores';
 
-  import Table from '$lib/admin/common/Table.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
+  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '$lib/admin/global';
+  import PriceViews from './PriceViews.svelte';
+  import GlobalMargins from './GlobalMargins.svelte';
+  import Labelings from './Labelings.svelte';
 
   $page = { title: 'Kalkulacje', icon: 'calculator' };
 
-  const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
-
-  let companiesOriginal;
-  let labelingsOriginal;
-  let priceViewsOriginal;
-  let globalMarginsOriginal;
-
   async function read() {
+    await updateGlobal(globalMargins);
+    await updateGlobal(priceViews);
     await updateGlobal(companies);
     await updateGlobal(labelings);
-    await updateGlobal(priceViews);
-    await updateGlobal(globalMargins);
   }
 
   read();
-
-  // $: diff(categoriesTree, categoriesTreeOriginal, fieldsToIgnore).then(({ changed }) => ($edited = changed));
 </script>
 
-{#if $companies && $labelings}
-  {#each $companies as company}
-    {@const items = $labelings.filter(l => l.company === company.id)}
-    <h2>{company.name}</h2>
-    {#each items as item}
-      {item.name} {item.code} {item.type} <br />
-    {/each}
-  {/each}
-{/if}
+<div class="wrapper">
+  {#if $globalMargins && $priceViews}
+    <sidebar>
+      <div>
+        <h3 class="title">Globalne marże</h3>
+        <GlobalMargins data={$globalMargins} />
+      </div>
+      <div>
+        <h3 class="title">Widoki</h3>
+        <PriceViews items={$priceViews} />
+      </div>
+    </sidebar>
+  {/if}
+
+  {#if $companies && $labelings}
+    <Labelings companies={$companies} labelings={$labelings} />
+  {/if}
+</div>
 
 <slot />
+
+<style>
+  .wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+  }
+
+  sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.5rem 1rem;
+    min-width: 350px;
+    border-radius: var(--border-radius);
+    border: var(--border-light);
+    background-color: var(--light);
+  }
+  sidebar .title {
+    margin-bottom: 0.5rem;
+  }
+</style>

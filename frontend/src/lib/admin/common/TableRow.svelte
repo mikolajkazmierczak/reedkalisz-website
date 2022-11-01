@@ -150,13 +150,7 @@
       </div>
     {/if}
     {#each head as { checkbox, label, icon }}
-      <div
-        class="value value--head"
-        class:center={checkbox}
-        on:click={() => {
-          // TODO: change sorting
-        }}
-      >
+      <div class="value value--head" class:center={checkbox}>
         <div>
           {#if icon}
             <div class="icon"><div><Icon name={icon} dark /></div></div>
@@ -254,7 +248,7 @@
   </div>
 {/if}
 
-{#if !headRow && expanded}
+{#if !headRow && hierarchy && expanded}
   {#each children as child (child)}
     <svelte:self
       bind:items

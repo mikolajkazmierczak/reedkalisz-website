@@ -20,7 +20,7 @@ export const collections = [
   { collection: 'companies', store: companies, fields: fields.companies.read },
   { collection: 'labelings', store: labelings, fields: fields.labelings.read },
   { collection: 'price_views', store: priceViews, fields: fields.price_views.read },
-  { collection: 'global_margins', store: globalMargins, fields: null },
+  { collection: 'global_margins', store: globalMargins, fields: null, singleton: true },
   { collection: 'categories', store: categories, fields: fields.categories.read },
   { collection: 'colors', store: colors, fields: fields.colors.read }
 ];
@@ -33,7 +33,11 @@ export async function updateGlobal(store, ids = null, options = { filter: null, 
   if (options.filter) params.filter = options.filter;
   if (options.search) params.search = options.search;
 
-  if (ids) {
+  if (collection?.singleton) {
+    // get singleton
+    const item = await api.singleton(collection.collection).read();
+    store.set(item);
+  } else if (ids) {
     // only update specified ids
     const updated = (await api.items(collection.collection).readMany(ids, params)).data;
     store.update(items => {

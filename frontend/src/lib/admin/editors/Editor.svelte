@@ -29,8 +29,10 @@
   }
 
   async function handleCancel() {
-    $cancel();
-    $edited = false;
+    if (confirm('Na pewno chcesz cofnąć zmiany?')) {
+      $cancel();
+      $edited = false;
+    }
   }
 
   async function handleSave() {
