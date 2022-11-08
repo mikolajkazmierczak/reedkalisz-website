@@ -7,6 +7,7 @@
   const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
   export let items;
+  $: console.log(items);
   let itemsOriginal = JSON.parse(JSON.stringify(items));
   let edited = false;
 
@@ -42,7 +43,7 @@
         <div class="actions">
           <Button icon="delete" dangerous square on:click={() => remove(i)} />
           {#if !item.default}
-            <Button icon="star" square on:click={i => setDefault(i)} />
+            <Button icon="star" square on:click={() => setDefault(i)} />
           {/if}
         </div>
       </div>

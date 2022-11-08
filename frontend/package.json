@@ -14,7 +14,7 @@
     "preview": "vite preview --port 5000 --host"
   },
   "devDependencies": {
-    "@directus/sdk": "^9.6.0",
+    "@directus/sdk": "^10.1.5",
     "@sveltejs/adapter-node": "next",
     "@sveltejs/kit": "next",
     "diff": "^5.1.0",

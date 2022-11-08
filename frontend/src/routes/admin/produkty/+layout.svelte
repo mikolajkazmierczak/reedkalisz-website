@@ -16,6 +16,8 @@
 
   $page = { title: 'Produkty', icon: 'products' };
 
+  // TODO: this could use a rework, it loads products twice - the reactivity should be revisited
+
   let category = null;
   afterNavigate(navigation => {
     const searchParams = getSearchParams(['c']); // category
@@ -28,8 +30,8 @@
   let selectedPage;
   let selectedQuery;
 
-  $: if (category != null || selectedLimit != null) {
-    // reset page on category or limit change
+  $: if (category != null) {
+    // reset page on category change
     selectedPage = 1;
   }
 
@@ -49,14 +51,16 @@
     categoriesTree = makeTree($categories);
   }
 
+  let afterFirstRead = false;
   async function read() {
     await readCategories();
     await readProducts(category, selectedLimit, selectedPage, selectedQuery);
+    afterFirstRead = true;
   }
 
-  $: readProducts(category, selectedLimit, selectedPage, selectedQuery);
-
   read();
+
+  $: if (afterFirstRead) readProducts(category, selectedLimit, selectedPage, selectedQuery);
 
   async function listener(data) {
     const itemIds = products.data.map(item => item.id);

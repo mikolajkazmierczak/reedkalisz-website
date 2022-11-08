@@ -18,6 +18,11 @@
   });
   $: setSearchParams({ p: page, q: query });
 
+  $: if (limit != null && page == null) {
+    // reset page on limit change
+    page = 1;
+  }
+
   export let collection = null;
   export let items;
   export let itemsCount;
@@ -72,10 +77,7 @@
         />
       {/each}
     {:else}
-      <div class="empty">
-        Brak elementów o podanych parametrach
-        <img src="https://api.unsplash.com/search/photos?query=empty" alt="" />
-      </div>
+      <div class="empty">Brak elementów o podanych parametrach</div>
     {/if}
   </div>
 </div>
