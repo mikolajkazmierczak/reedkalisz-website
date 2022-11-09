@@ -135,6 +135,14 @@ export function setSearchParams(newParams, navigation = null, rootPathname = nul
   goto(url.toString(), { replaceState: true, noscroll: true });
 }
 
+export function reuseIDs(oldItems, newItems) {
+  // use oldItems ids to assign as many ids in newItems as possible
+  // this maximizes reusability instead of creating new objects
+  oldItems.forEach((oldItem, i) => {
+    if (newItems?.[i]) newItems[i].id = oldItem.id;
+  });
+}
+
 export function makeTree(items, inplace = false, _root = true, _parent = null, _depth = 0, _path = []) {
   // Convert a flat array of items into a tree structure and add metadata (_meta property).
   if (!inplace && _root) items = JSON.parse(JSON.stringify(items));

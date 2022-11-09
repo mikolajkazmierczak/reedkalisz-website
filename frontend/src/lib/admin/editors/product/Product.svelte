@@ -176,13 +176,13 @@
           </div>
         </div>
 
-        <!-- <div class="ui-section__col">
+        <div class="ui-section__col">
           <div class="diff">
             EDITED: {$edited}
             <h3 class="ui-h3">PRODUCT</h3>
             <pre>{@html itemDiff}</pre>
           </div>
-        </div> -->
+        </div>
       </div>
     </section>
 

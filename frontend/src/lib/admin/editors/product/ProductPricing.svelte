@@ -1,17 +1,19 @@
 <script>
+  import { reuseIDs } from '$lib/utils';
   import { calculateLabeling } from '$lib/admin/calculations';
   import Input from '$lib/admin/input/Input.svelte';
   import Button from '$lib/admin/input/Button.svelte';
 
-  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '$lib/admin/global';
+  import { updateGlobal, companies, globalMargins, priceViews, labelings } from '$lib/admin/global';
   import ProductPricingTable from './ProductPricingTable.svelte';
 
   export let product;
 
   async function read() {
-    await updateGlobal(labelings);
-    await updateGlobal(priceViews);
+    // info: $companies are loaded in parent component
     await updateGlobal(globalMargins);
+    await updateGlobal(priceViews);
+    await updateGlobal(labelings);
   }
 
   function checkDuplicate(id) {
@@ -36,14 +38,6 @@
   function removeLabeling(i) {
     product.labelings.splice(i, 1);
     product.labelings = product.labelings;
-  }
-
-  function reuseIDs(oldPrices, newPrices) {
-    // use oldPrices ids to assign as many ids in newPrices as possible
-    // this maximizes reusability instead of creating new objects
-    oldPrices.forEach((oldPrice, i) => {
-      if (newPrices?.[i]) newPrices[i].id = oldPrice.id;
-    });
   }
 
   function updateLabelingsPrices(productLabelings) {

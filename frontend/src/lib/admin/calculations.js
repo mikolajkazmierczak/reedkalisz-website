@@ -1,3 +1,9 @@
+import { get } from 'svelte/store';
+import api from '$lib/api';
+import { reuseIDs } from '$lib/utils';
+import { calculate as productFields } from '$lib/fields/products';
+import { globalMargins, priceViews, labelings } from '$lib/admin/global';
+
 function fraction(percent) {
   // convert percentage to fraction
   // e.g. 25% -> 1.25; 0% -> 1
@@ -107,5 +113,47 @@ export function calculateLabeling(amounts, global, labeling, product, productLab
     prices: amounts.map(amount => pricePerAmount(amount, price)),
     // if the sale amount is blacklisted, push an empty pricePerAmount
     pricesSale: amounts.map(amount => pricePerAmount(amount, amountsSale.includes(amount) ? price_sale : null))
+  };
+}
+
+export async function recalculateProducts(filter, newPriceView = null) {
+  const globalMarginsStore = get(globalMargins);
+  const priceViewsStore = get(priceViews);
+  const labelingsStore = get(labelings);
+
+  const products = (await api.items('products').readByQuery({ fields: productFields, filter })).data;
+  console.log(products);
+
+  // calculate new prices for each product labeling
+  for (const product of products) {
+    if (newPriceView !== null) product.price_view = newPriceView;
+    const priceView = priceViewsStore.find(pv => pv.id == product.price_view);
+    for (const labeling of product.labelings) {
+      const data = calculateLabeling(
+        priceView.amounts,
+        globalMarginsStore,
+        labelingsStore.find(l => l.id == labeling.labeling),
+        product,
+        labeling
+      );
+      data.prices.forEach(p => (p.enabled = labeling.enabled));
+      data.pricesSale.forEach(p => (p.enabled = product.sale ? labeling.enabled : false));
+      reuseIDs(labeling.prices, data.prices);
+      reuseIDs(labeling.prices_sale, data.pricesSale);
+      labeling.prices = data.prices;
+      labeling.prices_sale = data.pricesSale;
+    }
+  }
+  // save products
+  for (const product of products) {
+    const labelings = product.labelings.map(({ id, prices, prices_sale }) => ({ id, prices, prices_sale }));
+    const updates = { labelings };
+    if (newPriceView !== null) updates.price_view = newPriceView;
+    await api.items('products').updateOne(product.id, updates);
+  }
+
+  return {
+    products,
+    ids: products.map(p => p.id)
   };
 }

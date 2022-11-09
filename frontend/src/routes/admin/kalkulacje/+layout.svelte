@@ -23,17 +23,17 @@
     <sidebar>
       <div>
         <h3 class="title">Globalne marże</h3>
-        <GlobalMargins data={$globalMargins} />
+        <GlobalMargins bind:data={$globalMargins} />
       </div>
       <div>
         <h3 class="title">Widoki</h3>
-        <PriceViews items={$priceViews} />
+        <PriceViews bind:items={$priceViews} />
       </div>
     </sidebar>
   {/if}
 
   {#if $companies && $labelings}
-    <Labelings companies={$companies} labelings={$labelings} />
+    <Labelings bind:companies={$companies} bind:labelings={$labelings} />
   {/if}
 </div>
 

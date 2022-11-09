@@ -13,7 +13,6 @@ export const search = [
   'categories'
 ];
 export const show = [];
-
 export const read = [];
 export const edit = [
   'id',
@@ -86,6 +85,29 @@ export const edit = [
   'gallery.img',
   'recommendations.id',
   'recommendations.recommendation'
+];
+
+export const calculate = [
+  'id',
+  'price_view',
+  'sale',
+  'labelings.id',
+  'labelings.enabled',
+  'labelings.global_margin',
+  'labelings.margin',
+  'labelings.minimum',
+  'labelings.labeling',
+  'labelings.prices.id',
+  'labelings.prices_sale.id',
+  'price',
+  'price_sale',
+  'price_sale_blacklist',
+  'global_full_margin',
+  'full_margin',
+  'full_minimum',
+  'global_product_margin',
+  'product_margin',
+  'product_minimum'
 ];
 
 export const defaults = () => ({

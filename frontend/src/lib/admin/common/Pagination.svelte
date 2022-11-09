@@ -3,7 +3,7 @@
   import Input from '$lib/admin/input/Input.svelte';
   import Icon from '$lib/common/Icon.svelte';
 
-  export let limit = 5;
+  export let limit = 25;
   export let page;
   export let total;
 
