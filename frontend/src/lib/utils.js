@@ -234,3 +234,13 @@ export function treeMoveItemToPath(tree, item, newPath) {
   treeRefreshMetaAndParent(tree);
   return tree;
 }
+
+export function moveItem(items, i, d) {
+  // Move item in array.
+  // i = index of item to move
+  // d = -1 or 1 (direction "up" or "down")
+  const j = i + d;
+  if (j < 0 || j >= items.length) return items;
+  [items[j], items[i]] = [items[i], items[j]];
+  return items.map((item, i) => ({ ...item, index: i })); // restart indexes
+}

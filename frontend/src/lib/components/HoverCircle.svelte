@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
 
   export let show = false;
-  export let color = 'var(--primary-0)';
+  export let color = 'var(--primary-light)';
 
   let visible = false;
 

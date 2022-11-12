@@ -107,7 +107,7 @@
 </script>
 
 <div class="wrapper">
-  <table class="ui-table">
+  <table class="ui-table ui-table--dark">
     <tr>
       <th>Ilość</th>
       <th>Cena</th>

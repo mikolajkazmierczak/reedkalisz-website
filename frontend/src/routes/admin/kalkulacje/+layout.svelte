@@ -32,9 +32,17 @@
     </sidebar>
   {/if}
 
-  {#if $companies && $labelings}
-    <Labelings bind:companies={$companies} bind:labelings={$labelings} />
-  {/if}
+  <div class="labelings">
+    {#if $companies && $labelings}
+      {#each $companies as company}
+        {@const items = $labelings.filter(l => l.company === company.id)}
+        <div class="company">
+          <h2>{company.name}</h2>
+          <Labelings {company} {items} />
+        </div>
+      {/each}
+    {/if}
+  </div>
 </div>
 
 <slot />
@@ -57,6 +65,17 @@
     background-color: var(--light);
   }
   sidebar .title {
+    margin-bottom: 0.5rem;
+  }
+
+  .labelings {
+    overflow-x: auto;
+    width: 100%;
+  }
+  .company {
+    margin-bottom: 2rem;
+  }
+  .company h2 {
     margin-bottom: 0.5rem;
   }
 </style>

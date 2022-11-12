@@ -1,6 +1,6 @@
 <script>
-  import { reuseIDs } from '$lib/utils';
-  import { calculateLabeling } from '$lib/admin/calculations';
+  import { reuseIDs, moveItem } from '$lib/utils';
+  import { calculatePrices } from '$lib/admin/calculations';
   import Input from '$lib/admin/input/Input.svelte';
   import Button from '$lib/admin/input/Button.svelte';
 
@@ -8,6 +8,7 @@
   import ProductPricingTable from './ProductPricingTable.svelte';
 
   export let product;
+  export let productOriginal;
 
   async function read() {
     // info: $companies are loaded in parent component
@@ -23,6 +24,7 @@
   }
 
   function pushLabeling() {
+    if ($labelings.length == 0) throw new Error('Brak znakowań w bazie danych');
     const labeling = $labelings.find(l => l.company.id == product.company && l.default) ?? $labelings[0];
     product.labelings.push({
       enabled: true,
@@ -39,13 +41,16 @@
     product.labelings.splice(i, 1);
     product.labelings = product.labelings;
   }
+  function moveLabeling(i, d) {
+    product.labelings = moveItem(product.labelings, i, d);
+  }
 
   function updateLabelingsPrices(productLabelings) {
     if (product && $labelings && $priceViews && $globalMargins) {
       productLabelings.forEach(labeling => {
         // check if labeling is set
         if (labeling.labeling) {
-          const data = calculateLabeling(
+          const data = calculatePrices(
             priceView.amounts,
             $globalMargins,
             $labelings.find(l => l.id == labeling.labeling),
@@ -76,14 +81,9 @@
   read();
 
   $: $labelings?.sort((a, b) => {
-    const props = x => ({
-      company: $companies.find(c => c.id == x.company)?.name ?? '-',
-      code: x.code ?? '-',
-      type: x.type ?? '-'
-    });
-    a = props(a);
-    b = props(b);
-    return a.company.localeCompare(b.company) || a.code.localeCompare(b.code) || a.type.localeCompare(b.type);
+    // labelings are sorted by the user with the exception of the company
+    const company = x => $companies.find(c => c.id == x.company)?.name ?? '-';
+    return company(a).localeCompare(company(b));
   });
 
   // set default priceView if: unset OR the already set doesn't exist
@@ -128,14 +128,23 @@
 
         <div class="ui-box">
           {#if labelingsEnabled}
-            <Input type="number" bind:value={product.price}>Cena</Input>
+            <Input type="number" bind:value={product.price} api>Cena</Input>
 
             {#if product.sale}
               <div class="ui-box ui-box--optional">
                 <h3 class="ui-h3">Promocja</h3>
                 <div class="ui-pair">
                   <Input type="number" bind:value={product.price_sale}>Cena</Input>
-                  <Input bind:value={product.price_sale_blacklist} placeholder={'np. 500;1000;'}>Wykluczenia</Input>
+                  <Input
+                    type="list"
+                    placeholder="np. 500;1000"
+                    bind:value={product.price_sale_blacklist}
+                    listDisallowString
+                    listDisallowNegative
+                    listDisallowZero
+                  >
+                    Wykluczenia
+                  </Input>
                 </div>
               </div>
             {/if}
@@ -188,9 +197,15 @@
                 class:ui-box--uneditable={!labeling.enabled}
                 class:warning={checkDuplicate(labeling.labeling)}
               >
-                <div class="ui-pair">
+                <div class="ui-pair actions">
                   <Input type="checkbox" bind:value={labeling.enabled}>Włączone</Input>
-                  <Button icon="delete" on:click={() => removeLabeling(i)} dangerous>Usuń</Button>
+                  <div>
+                    {#if !i == 0} <Button icon="arrow_left" on:click={() => moveLabeling(i, -1)} square /> {/if}
+                    {#if i < product.labelings.length - 1}
+                      <Button icon="arrow_right" on:click={() => moveLabeling(i, 1)} square />
+                    {/if}
+                    <Button icon="delete" on:click={() => removeLabeling(i)} dangerous />
+                  </div>
                 </div>
                 {#if checkDuplicate(labeling.labeling)}
                   <h4 class="ui-h4" style:color="var(--main)">DUPLIKAT</h4>
@@ -200,7 +215,7 @@
                   bind:value={labeling.labeling}
                   options={$labelings.map(({ id, company, code, type, name }) => {
                     company = $companies.find(c => c.id == company);
-                    return { id, text: `${company.name} ${code ?? '-'} ${type ?? '-'} ${name ?? ''}` };
+                    return { id, text: `${company.name} ${code || '-'} ${type || '-'} ${name || '-'}` };
                   })}
                 />
 
@@ -237,11 +252,16 @@
 {/if}
 
 <style>
+  .warning {
+    --border: 2px solid var(--main);
+  }
+
   .labelings {
     grid-column: 2 / span 3;
   }
-
-  .warning {
-    --border: 2px solid var(--main);
+  .actions div {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 </style>

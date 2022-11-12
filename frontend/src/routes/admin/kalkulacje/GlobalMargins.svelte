@@ -18,26 +18,27 @@
   let saving = false;
 
   async function save() {
-    if (!saving) {
-      saving = true;
-      // UPDATE all PRODUCTS that both:
-      // - have either global_full_margin or global_product_margin set to true
-      // - have any labelings set
-      const { ids } = await recalculateProducts({
-        _and: [
-          { _or: [{ global_full_margin: { _eq: true } }, { global_product_margin: { _eq: true } }] },
-          { 'count(labelings)': { _neq: 0 } }
-        ]
-      });
-      // UPDATE GLOBAL MARGINS
-      const { full_margin, full_minimum, product_margin, product_minimum } = data;
-      const updates = { full_margin, full_minimum, product_margin, product_minimum };
-      data = await api.singleton('global_margins').update(updates);
-      dataOriginal = JSON.parse(JSON.stringify(data));
-      socket.emitChanges('products', ids);
-      socket.emitChanges('global_margins', 1);
-      saving = false;
-    }
+    if (saving) return; // prevent double click
+    saving = true;
+
+    // UPDATE GLOBAL MARGINS
+    const { full_margin, full_minimum, product_margin, product_minimum } = data;
+    const updates = { full_margin, full_minimum, product_margin, product_minimum };
+    data = await api.singleton('global_margins').update(updates);
+    dataOriginal = JSON.parse(JSON.stringify(data));
+    socket.emitChanges('global_margins', 1);
+
+    // UPDATE all PRODUCTS that both:
+    // - have either global_full_margin or global_product_margin set to true
+    // - have any labelings set
+    await recalculateProducts({
+      _and: [
+        { _or: [{ global_full_margin: { _eq: true } }, { global_product_margin: { _eq: true } }] },
+        { 'count(labelings)': { _neq: 0 } }
+      ]
+    });
+
+    saving = false;
   }
   async function cancel() {
     data = JSON.parse(JSON.stringify(dataOriginal));

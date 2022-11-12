@@ -71,7 +71,8 @@
   async function listener(data) {
     const { match, me } = socket.checkMatch(data, 'categories', item.id);
     if (match && !me) {
-      alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
+      // alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
+      console.log('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.', data);
     }
   }
   socket.onChanges(listener);

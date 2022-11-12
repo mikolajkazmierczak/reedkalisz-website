@@ -5,7 +5,7 @@
   import socket from '$lib/admin/heimdall';
   import { edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
-  import { diff, getSearchParams, makeTree, treeFlatten } from '$lib/utils';
+  import { diff, getSearchParams, makeTree, treeFlatten, moveItem } from '$lib/utils';
 
   import slugify from 'slugify';
   import { marked } from 'marked';
@@ -16,9 +16,10 @@
 
   import { updateGlobal, users, companies, categories } from '$lib/admin/global';
   import { edit as fields, defaults } from '$lib/fields/products';
-  import ProductPricing from '$lib/admin/editors/product/ProductPricing.svelte';
-  import ProductStorage from '$lib/admin/editors/product/ProductStorage.svelte';
-  import ProductGallery from '$lib/admin/editors/product/ProductGallery.svelte';
+  import ProductPricing from './ProductPricing.svelte';
+  import ProductStorage from './ProductStorage.svelte';
+  import ProductGallery from './ProductGallery.svelte';
+  import ProductRecommendations from './ProductRecommendations.svelte';
 
   const searchParams = getSearchParams(['c']);
 
@@ -63,12 +64,16 @@
   }
 
   function pushCategory() {
-    item.categories.push({ category: $categories[0].id });
+    item.categories.push({ category: $categories[0].id, index: item.categories.length });
     item = item;
   }
   function removeCategory(i) {
     item.categories.splice(i, 1);
+    item.categories = item.categories.map((c, i) => ({ ...c, index: i })); // update indexes
     item = item;
+  }
+  function moveCategory(i, d) {
+    item.categories = moveItem(item.categories, i, d);
   }
 
   read();
@@ -111,15 +116,24 @@
             {#each item.categories as { category }, i}
               <div class="ui-list">
                 {#await makeTree($categories) then tree}
-                  <Input
-                    type="select"
-                    bind:value={category}
-                    options={treeFlatten(tree).map(({ id, name, _meta }) => {
-                      const path = _meta.path.map(p => p + 1).join('.');
-                      return { id, text: `${path} ${name}` };
-                    })}
-                  />
+                  <div class="category" class:main={i == 0}>
+                    <Input
+                      type="select"
+                      bind:value={category}
+                      options={treeFlatten(tree).map(({ id, name, _meta }) => {
+                        const path = _meta.path.map(p => p + 1).join('.');
+                        return { id, text: `${path} ${name}` };
+                      })}
+                    />
+                  </div>
                 {/await}
+                <Button icon="arrow_up" on:click={() => moveCategory(i, -1)} square disabled={i == 0} />
+                <Button
+                  icon="arrow_down"
+                  on:click={() => moveCategory(i, 1)}
+                  square
+                  disabled={i == item.categories.length - 1}
+                />
                 <Button icon="delete" on:click={() => removeCategory(i)} dangerous square />
               </div>
             {/each}
@@ -209,9 +223,10 @@
       </div>
     </section>
 
-    <ProductPricing bind:product={item} />
+    <ProductPricing bind:product={item} productOriginal={itemOriginal} />
     <ProductStorage bind:product={item} />
     <ProductGallery bind:gallery={item.gallery} />
+    <ProductRecommendations bind:product={item} />
   {/if}
 </Editor>
 
@@ -222,5 +237,8 @@
     padding: 1rem;
     max-height: 500px;
     overflow-wrap: break-word;
+  }
+  .category.main {
+    outline: var(--outline-dashed);
   }
 </style>

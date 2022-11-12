@@ -26,7 +26,8 @@
         socket.emitChanges('files', fileData.id);
       } else {
         const filesData = (await api.files.createMany(form)).data;
-        const filesIds = filesData.map(f => f.id);
+        const filesArray = Array.isArray(filesData) ? filesData : [filesData];
+        const filesIds = filesArray.map(f => f.id);
         socket.emitChanges('files', filesIds);
       }
       dispatch('upload');

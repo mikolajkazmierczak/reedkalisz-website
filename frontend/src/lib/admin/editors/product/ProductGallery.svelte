@@ -1,4 +1,5 @@
 <script>
+  import { moveItem } from '$lib/utils';
   import Input from '$lib/admin/input/Input.svelte';
   import Button from '$lib/admin/input/Button.svelte';
   import Picker from '$lib/admin/library/Picker.svelte';
@@ -17,6 +18,9 @@
     gallery.splice(i, 1);
     gallery = gallery;
   }
+  function moveImg(i, d) {
+    gallery = moveItem(gallery, i, d);
+  }
 
   function setMain() {
     gallery.forEach(g => (g.main = false));
@@ -33,7 +37,13 @@
   <div class="imgs ui-section__row">
     {#each gallery as img, i (img)}
       <div class="ui-box ui-box--element" class:ui-box--uneditable={!img.enabled} class:main={i == 0}>
-        <Button icon="delete" on:click={() => removeImg(i)} dangerous>Usuń</Button>
+        <div class="actions">
+          <div>
+            {#if !i == 0} <Button icon="arrow_left" on:click={() => moveImg(i, -1)} square /> {/if}
+            {#if i < gallery.length - 1} <Button icon="arrow_right" on:click={() => moveImg(i, 1)} square /> {/if}
+          </div>
+          <Button icon="delete" on:click={() => removeImg(i)} dangerous />
+        </div>
         <Picker bind:selected={img.img} />
         {#if !img.main}
           <Input type="checkbox" bind:value={img.enabled}>Włączone</Input>
@@ -52,6 +62,15 @@
   }
 
   .main {
-    outline: 2px dashed var(--primary);
+    outline: var(--outline-dashed);
+  }
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .actions div {
+    display: flex;
+    gap: 0.5rem;
   }
 </style>

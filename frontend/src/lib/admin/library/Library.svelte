@@ -3,7 +3,6 @@
   import { onDestroy } from 'svelte';
   import { createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { page } from '$app/stores';
 
   import api from '$lib/api';
   import socket from '$lib/admin/heimdall';
@@ -78,7 +77,7 @@
       }
       files = files;
     } else {
-      goto(`/admin/biblioteka/${file.id}`);
+      goto(`/admin/biblioteka/${file.id}`, { noscroll: true });
     }
   }
 
@@ -152,7 +151,7 @@
   </div>
 {/if}
 
-<Upload on:upload={read} />
+<Upload on:upload={() => read(selectedLimit, selectedPage)} />
 
 {#if files}
   <div class="files">

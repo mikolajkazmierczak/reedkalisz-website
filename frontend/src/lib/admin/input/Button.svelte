@@ -51,7 +51,7 @@
     background-color: var(--primary);
   }
   button.square {
-    width: 2rem;
+    aspect-ratio: 1 / 1;
   }
   .dangerous {
     background-color: var(--primary-dark);

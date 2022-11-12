@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import api from '$lib/api';
+import socket from '$lib/admin/heimdall';
 import { reuseIDs } from '$lib/utils';
 import { calculate as productFields } from '$lib/fields/products';
 import { globalMargins, priceViews, labelings } from '$lib/admin/global';
@@ -67,7 +68,7 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   return round(fullPrice / amount);
 }
 
-export function calculateLabeling(amounts, global, labeling, product, productLabeling) {
+export function calculatePrices(amounts, global, labeling, product, productLabeling) {
   // amounts: [number]
   // global: global_margin object
   // labeling: labeling object
@@ -102,55 +103,90 @@ export function calculateLabeling(amounts, global, labeling, product, productLab
     };
   };
   const { price, price_sale, price_sale_blacklist } = product;
-  const blacklist = price_sale_blacklist
-    ? price_sale_blacklist
-        .split(';')
-        .map(p => Number(p))
-        .filter(a => a)
-    : null; // filter NaN (trailing `;`)
-  const amountsSale = blacklist ? amounts.filter(a => !blacklist.includes(a)) : amounts;
+  const blacklist = price_sale_blacklist ?? [];
   return {
     prices: amounts.map(amount => pricePerAmount(amount, price)),
-    // if the sale amount is blacklisted, push an empty pricePerAmount
-    pricesSale: amounts.map(amount => pricePerAmount(amount, amountsSale.includes(amount) ? price_sale : null))
+    pricesSale: amounts.map(amount => pricePerAmount(amount, blacklist.includes(amount) ? null : price_sale))
   };
 }
 
-export async function recalculateProducts(filter, newPriceView = null) {
-  const globalMarginsStore = get(globalMargins);
-  const priceViewsStore = get(priceViews);
-  const labelingsStore = get(labelings);
+export function calculateLabelings(amounts, global, labelings, productLabelings) {
+  for (const [i, productLabeling] of Object.entries(productLabelings)) {
+    const data = calculatePrices(
+      amounts,
+      global,
+      labelings.find(l => l.id == productLabeling.labeling),
+      product,
+      productLabeling
+    );
+    data.prices.forEach(p => (p.enabled = productLabeling.enabled));
+    data.pricesSale.forEach(p => (p.enabled = product.sale ? productLabeling.enabled : false));
+    reuseIDs(productLabeling.prices, data.prices);
+    reuseIDs(productLabeling.prices_sale, data.pricesSale);
+    productLabeling.index = i;
+    productLabeling.prices = data.prices;
+    productLabeling.prices_sale = data.pricesSale;
+  }
+  return productLabelings;
+}
+
+async function recalculateProduct(amounts, global, labelings, productLabelings, swapLabelings = {}) {
+  // Recalculates prices, pricesSale and prices for all labelings.
+  // Updates state (enabled) of each pricePerAmount.
+  // Then updates the product in the database.
+  // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
+
+  for (const [oldID, newID] of swapLabelings.entries()) {
+    const i = productLabelings.findIndex(l => l.labeling === oldID);
+    if (newID === null) {
+      productLabelings.splice(i, 1);
+    } else productLabelings[i].labeling = newID;
+  }
+
+  calculateLabelings(amounts, global, labelings, productLabelings);
+
+  // TODO: update customPrices and customPricesSale
+
+  const updates = {
+    price_view: options.newPriceView ?? product.price_view,
+    labelings: productLabelings.map(({ id, index, labeling, prices, prices_sale }) => {
+      return { id, index, labeling, prices, prices_sale };
+    })
+  };
+  await api.items('products').updateOne(product.id, updates);
+}
+
+export async function recalculateProducts(filter, options = { newPriceView: null, swapLabelings: {} }) {
+  // Uses `recalculateProduct()` to update all products that match the filter.
+  // A new price view can be set, and labelings can be swapped or deleted.
+  // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
+
+  const stores = {
+    globalMargins: get(globalMargins),
+    priceViews: get(priceViews),
+    labelings: get(labelings)
+  };
 
   const products = (await api.items('products').readByQuery({ fields: productFields, filter })).data;
   console.log(products);
 
-  // calculate new prices for each product labeling
-  for (const product of products) {
-    if (newPriceView !== null) product.price_view = newPriceView;
-    const priceView = priceViewsStore.find(pv => pv.id == product.price_view);
-    for (const labeling of product.labelings) {
-      const data = calculateLabeling(
+  // recalculate each product concurrently
+  await Promise.all(
+    products.map(product => {
+      if (options.newPriceView !== null) product.price_view = options.newPriceView;
+      const priceView = stores.priceViews.find(pv => pv.id == product.price_view);
+      return recalculateProduct(
         priceView.amounts,
-        globalMarginsStore,
-        labelingsStore.find(l => l.id == labeling.labeling),
-        product,
-        labeling
+        stores.globalMargins,
+        stores.labelings,
+        product.labelings,
+        options.swapLabelings
       );
-      data.prices.forEach(p => (p.enabled = labeling.enabled));
-      data.pricesSale.forEach(p => (p.enabled = product.sale ? labeling.enabled : false));
-      reuseIDs(labeling.prices, data.prices);
-      reuseIDs(labeling.prices_sale, data.pricesSale);
-      labeling.prices = data.prices;
-      labeling.prices_sale = data.pricesSale;
-    }
-  }
-  // save products
-  for (const product of products) {
-    const labelings = product.labelings.map(({ id, prices, prices_sale }) => ({ id, prices, prices_sale }));
-    const updates = { labelings };
-    if (newPriceView !== null) updates.price_view = newPriceView;
-    await api.items('products').updateOne(product.id, updates);
-  }
+    })
+  );
+
+  const ids = products.map(p => p.id);
+  socket.emitChanges('products', ids);
 
   return {
     products,

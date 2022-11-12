@@ -20,7 +20,10 @@
   --border-radius: 0.5rem;
   --border: solid 1px var(--primary);
   --border-focus: solid 1px var(--main);
+  --border-thick: solid 2px var(--primary);
   --border-light: solid 1px rgba(0, 0, 0, 0.1);
+  --border-heavy: solid 3px rgba(0, 0, 0, 0.1);
+  --outline-dashed: dashed 2px var(--primary);
   --shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
 }
 
@@ -48,9 +51,12 @@
 }
 
 .ui-list {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
+  align-items: flex-start;
   gap: 0.5rem;
+}
+.ui-list > :first-child {
+  flex-basis: 100%;
 }
 
 .ui-h2 {
@@ -92,10 +98,29 @@
 }
 
 .ui-table {
-  border-collapse: collapse;
-  border: var(--border);
+  --brdr: var(--border-light);
+  overflow: hidden;
+  border-spacing: 0;
+  border-radius: var(--border-radius);
+  border: var(--brdr);
   width: 100%;
 }
+.ui-table--dark {
+  --brdr: var(--border);
+}
+.ui-table th,
+.ui-table td {
+  border-right: var(--brdr);
+  border-bottom: var(--brdr);
+}
+.ui-table th:last-child,
+.ui-table td:last-child {
+  border-right: none;
+}
+.ui-table tr:last-child td {
+  border-bottom: none;
+}
+
 .ui-table tr {
   background-color: var(--light);
 }
@@ -104,8 +129,8 @@
 }
 .ui-table th,
 .ui-table td {
-  border: var(--border-light);
-  border-style: inset;
+  border-right: var(--border-light);
+  border-bottom: var(--border-light);
   padding: 0 0.5rem;
   height: 2rem;
   text-align: left;

@@ -43,8 +43,9 @@
   }
 </script>
 
-<div class="wrapper" on:click|self={handleExit} in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
-  <div class="box" in:fly={{ x: 100, duration: 400 }} out:fly={{ x: 50, duration: 100 }}>
+<div class="wrapper" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
+  <div class="outside" on:click|self={handleExit} />
+  <div class="container" in:fly={{ x: 100, duration: 400 }} out:fly={{ x: 50, duration: 100 }}>
     <div class="bar">
       <div class="actions">
         {#if $edited}
@@ -55,12 +56,12 @@
             </div>
           </div>
         {:else}
-          <a class="button back" href={back}>
+          <div class="button back" role="button" on:click={handleExit}>
             <HoverCircle color={'var(--accent-light)'} />
             <div class="icon" in:spin>
               <Icon name="arrow_left" dark />
             </div>
-          </a>
+          </div>
         {/if}
 
         <div class="save-wrapper" class:visible={$edited}>
@@ -123,7 +124,16 @@
     background-color: rgba(0, 0, 0, 0.2);
   }
 
-  .box {
+  .outside {
+    z-index: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .container {
+    z-index: 1;
     position: absolute;
     top: 0;
     right: 0;

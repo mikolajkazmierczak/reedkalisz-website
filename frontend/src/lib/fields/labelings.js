@@ -1,5 +1,6 @@
 export const read = [
   'id',
+  'index',
   'user_created',
   'date_created',
   'user_updated',
@@ -25,6 +26,7 @@ export const edit = [...read];
 
 export const defaults = () => ({
   id: '+',
+  index: null,
   user_created: null,
   date_created: null,
   user_updated: null,
@@ -35,11 +37,11 @@ export const defaults = () => ({
   code: '',
   type: '',
   prices: [],
-  prepress: 0,
-  transport: 0,
-  transport_threshold: 0,
-  margin: 0,
-  minimum: 0
+  prepress: null,
+  transport: null,
+  transport_threshold: null,
+  margin: null,
+  minimum: null
 });
 
 export default { search, show, read, edit, defaults };

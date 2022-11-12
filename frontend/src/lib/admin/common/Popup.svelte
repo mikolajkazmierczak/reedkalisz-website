@@ -7,13 +7,19 @@
 
   export let title;
   export let opened;
+  export let maxWidth = '500px';
+
+  function close() {
+    opened = false;
+    dispatch('close');
+  }
 </script>
 
 {#if opened}
-  <div class="wrapper" transition:fade={{ duration: 200 }}>
-    <div class="content" transition:fly={{ duration: 300 }}>
+  <div class="wrapper" transition:fade={{ duration: 200 }} on:click|self={close}>
+    <div class="content" transition:fly={{ duration: 300 }} style:max-width={maxWidth}>
       <div class="close">
-        <Button icon="close" on:click={() => (opened = false)} square />
+        <Button icon="close" on:click={close} square />
       </div>
       <h3>{title}</h3>
       <slot />
