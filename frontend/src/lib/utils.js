@@ -135,11 +135,19 @@ export function setSearchParams(newParams, navigation = null, rootPathname = nul
   goto(url.toString(), { replaceState: true, noscroll: true });
 }
 
-export function reuseIDs(oldItems, newItems) {
-  // use oldItems ids to assign as many ids in newItems as possible
-  // this maximizes reusability instead of creating new objects
-  oldItems.forEach((oldItem, i) => {
-    if (newItems?.[i]) newItems[i].id = oldItem.id;
+export function reuseIDs(items, reusableIDs = []) {
+  // Use both `items` and `oldItems` ids to reassign as many ids in items as possible.
+  // This maximizes reusability instead of creating new objects.
+  // e.g.: 2 _ 1 3 ; 3 1 _ 2  (items ; reusableIDs)
+  //       1 2 3 _
+  //             ^ delete previous ids if there were not enough new ones to avoid duplication
+  const oldIds = items.map(item => item.id);
+  const newIds = reusableIDs.concat(oldIds).filter(id => id);
+  const ids = newIds.filter((id, i, self) => self.indexOf(id) === i); // remove duplicates
+  ids.sort((a, b) => a - b);
+  items.forEach((item, i) => {
+    if (ids[i]) item.id = ids[i];
+    else delete item.id;
   });
 }
 

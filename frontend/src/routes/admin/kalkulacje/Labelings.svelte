@@ -26,6 +26,16 @@
   // `default` property is handled separately
   const fieldsToIgnore = ['default', 'user_created', 'date_created', 'user_updated', 'date_updated'];
 
+  function save() {
+    if (saving) return;
+    saving = true;
+    saving = false;
+  }
+  function cancel() {
+    items = JSON.parse(JSON.stringify(itemsOriginal));
+    edited = false;
+  }
+
   function newLabeling() {
     const data = defaults();
     data.company = company.id;

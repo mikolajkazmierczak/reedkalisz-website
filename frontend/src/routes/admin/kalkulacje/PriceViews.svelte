@@ -14,7 +14,7 @@
 <div class="wrapper">
   <div class="items">
     {#each items as item (item)}
-      <PriceView bind:items {item} />
+      <PriceView bind:items bind:item />
     {/each}
   </div>
 

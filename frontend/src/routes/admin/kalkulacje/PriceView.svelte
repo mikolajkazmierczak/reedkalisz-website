@@ -1,4 +1,5 @@
 <script>
+  import { beforeNavigate } from '$app/navigation';
   import { slide } from 'svelte/transition';
 
   import api from '$lib/api';
@@ -16,38 +17,48 @@
   export let items;
   export let item;
   let itemOriginal = JSON.parse(JSON.stringify(item));
-  let itemDiff;
 
   let edited = false;
   let saving = false;
   let deleting = false;
+  let deletingSaving = false; // prevent double click
 
   let swapID = null; // id of the price view that is being swapped with the one being deleted
 
   let inputError;
 
+  beforeNavigate(navigation => {
+    if (edited) {
+      const prompt = `Zmiana widoku "${item.name} ${item.amounts}" nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
+      if (confirm(prompt)) {
+        cancel();
+      } else navigation.cancel();
+    }
+  });
+
   async function save() {
-    // if (saving) return; // prevent double click
-    // saving = true;
-    // const { name, amounts } = item;
-    // if (item.id === '+') {
-    //   const res = await api.items('price_views').createOne({ name, amounts, default: false });
-    //   item.id = res.id;
-    // } else {
-    //   await api.items('price_views').updateOne(item.id, { name, amounts });
-    //   // UPDATE AFFECTED PRODUCTS
-    //   const amountsChanged = JSON.stringify(amounts) !== JSON.stringify(itemOriginal.amounts);
-    //   if (amountsChanged) {
-    //     const filter = { price_view: { _eq: item.id } };
-    //     await recalculateProducts(filter);
-    //   }
-    // }
-    // socket.emitChanges('price_views', item.id);
-    // itemOriginal = JSON.parse(JSON.stringify(item));
-    // saving = false;
+    if (saving) return; // prevent double click
+    saving = true;
+    const { name, amounts } = item;
+    if (item.id === '+') {
+      const res = await api.items('price_views').createOne({ name, amounts, default: false });
+      item.id = res.id;
+    } else {
+      await api.items('price_views').updateOne(item.id, { name, amounts });
+      // UPDATE AFFECTED PRODUCTS
+      const amountsChanged = JSON.stringify(amounts) !== JSON.stringify(itemOriginal.amounts);
+      if (amountsChanged) {
+        const filter = { price_view: { _eq: item.id } };
+        await recalculateProducts(filter);
+      }
+    }
+    socket.emitChanges('price_views', item.id);
+    itemOriginal = JSON.parse(JSON.stringify(item));
+    saving = false;
   }
   function cancel() {
     item = JSON.parse(JSON.stringify(itemOriginal));
+    edited = false;
   }
 
   async function setDefault() {
@@ -75,6 +86,8 @@
     deleting = false;
   }
   async function remove() {
+    deletingSaving = true;
+
     // set new default if needed
     const wasDefault = item.default;
     if (wasDefault) {
@@ -95,14 +108,13 @@
     socket.emitChanges('price_views', ids);
 
     items = items.filter(i => i.id !== item.id);
+
+    deletingSaving = false;
     removeFinish();
   }
 
   $: correct = !inputError && item.name && item.amounts.length;
-  $: diff(item, itemOriginal, fieldsToIgnore).then(({ changed, html }) => {
-    edited = changed;
-    itemDiff = html;
-  });
+  $: diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (edited = changed));
 </script>
 
 <div class="ui-list">
@@ -140,10 +152,6 @@
   </div>
 </div>
 
-<pre style="max-width:100px">
-  {@html itemDiff}
-</pre>
-
 <Popup
   title="Jesteś pewny, że chcesz usunąć ten widok?"
   maxWidth={'300px'}
@@ -163,7 +171,7 @@
   <div class="ui-pair popup-actions">
     <Button on:click={removeFinish}>Anuluj</Button>
     <Button on:click={remove} dangerous>
-      {#if deleting} Usuwanie... {:else} Usuń {/if}
+      {#if deletingSaving} Usuwanie... {:else} Usuń {/if}
     </Button>
   </div>
 </Popup>

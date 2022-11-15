@@ -1,4 +1,5 @@
 <script>
+  import { beforeNavigate } from '$app/navigation';
   import { slide } from 'svelte/transition';
 
   import api from '$lib/api';
@@ -16,6 +17,15 @@
   let edited = false;
 
   let saving = false;
+
+  beforeNavigate(navigation => {
+    if (edited) {
+      const prompt = `Zmiany w marżach nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
+      if (confirm(prompt)) {
+        cancel();
+      } else navigation.cancel();
+    }
+  });
 
   async function save() {
     if (saving) return; // prevent double click
@@ -42,6 +52,7 @@
   }
   async function cancel() {
     data = JSON.parse(JSON.stringify(dataOriginal));
+    edited = false;
   }
 
   $: diff(data, dataOriginal, fieldsToIgnore).then(({ changed }) => (edited = changed));
@@ -66,7 +77,7 @@
   </div>
 
   {#if edited}
-    <div class="ui-pair" style:margin-top="1rem" transition:slide={{ duration: 200 }}>
+    <div class="ui-pair edit" transition:slide={{ duration: 200 }}>
       <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
       <Button icon="ok" on:click={save}>
         {#if saving}Zapisuję...{:else}Zapisz{/if}
@@ -77,7 +88,14 @@
 
 <style>
   .margins {
-    gap: 2rem;
-    max-width: 35ch;
+    gap: 0.5rem;
+  }
+  .margins > div {
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    border: var(--border-light);
+  }
+  .edit {
+    margin-top: 0.5rem;
   }
 </style>

@@ -63,3 +63,5 @@ export async function updateGlobal(store, ids = null, options = { filter: null, 
     store.set(items);
   }
 }
+
+export default { updateGlobal, users, companies, labelings, priceViews, globalMargins, categories, colors };

@@ -1,11 +1,14 @@
 <script>
-  import { reuseIDs, moveItem } from '$lib/utils';
-  import { calculatePrices } from '$lib/admin/calculations';
+  import { moveItem } from '$lib/utils';
+  import { recalculateLabelings, toggleCustomPrices } from '$lib/admin/calculations';
+  import { repairPrices, cleanupPrices } from '$lib/admin/calculationsPrices';
   import Input from '$lib/admin/input/Input.svelte';
   import Button from '$lib/admin/input/Button.svelte';
 
   import { updateGlobal, companies, globalMargins, priceViews, labelings } from '$lib/admin/global';
   import ProductPricingTable from './ProductPricingTable.svelte';
+  import ProductPricingMargins from './ProductPricingMargins.svelte';
+  import { tick } from 'svelte';
 
   export let product;
   export let productOriginal;
@@ -17,7 +20,7 @@
     await updateGlobal(labelings);
   }
 
-  function checkDuplicate(id) {
+  function checkDuplicateLabeling(id) {
     if (!id) return false;
     const owners = product.labelings.filter(l => l.labeling == id);
     return owners.length > 1;
@@ -27,6 +30,7 @@
     if ($labelings.length == 0) throw new Error('Brak znakowań w bazie danych');
     const labeling = $labelings.find(l => l.company.id == product.company && l.default) ?? $labelings[0];
     product.labelings.push({
+      index: product.labelings.length,
       enabled: true,
       labeling: labeling.id,
       prices: [],
@@ -45,68 +49,57 @@
     product.labelings = moveItem(product.labelings, i, d);
   }
 
-  function updateLabelingsPrices(productLabelings) {
-    if (product && $labelings && $priceViews && $globalMargins) {
-      productLabelings.forEach(labeling => {
-        // check if labeling is set
-        if (labeling.labeling) {
-          const data = calculatePrices(
-            priceView.amounts,
-            $globalMargins,
-            $labelings.find(l => l.id == labeling.labeling),
-            product,
-            labeling
-          );
-          data.prices.forEach(p => (p.enabled = labeling.enabled));
-          data.pricesSale.forEach(p => (p.enabled = product.sale ? labeling.enabled : false));
-          reuseIDs(labeling.prices, data.prices);
-          reuseIDs(labeling.prices_sale, data.pricesSale);
-          labeling.prices = data.prices;
-          labeling.prices_sale = data.pricesSale;
-        }
-      });
-      product.labelings = product.labelings;
-    }
-  }
-
-  function disablePrices(prices) {
-    prices.forEach(p => (p.enabled = false));
-    prices = prices;
-  }
-  function enablePrices(prices) {
-    prices.forEach(p => (p.enabled = true));
-    prices = prices;
-  }
-
   read();
 
+  // PRICE VIEW
+  function selectDefaultPriceView() {
+    product.price_view = $priceViews.find(p => p.default).id;
+  }
+  $: priceViewData = $priceViews?.find(p => p.id == product.price_view);
+  $: if ($priceViews && !priceViewData) selectDefaultPriceView(); // if unset or the already set doesn't exist
+
+  // LABELINGS
+  function updateLabelingsPrices() {
+    if ($globalMargins && $priceViews && $labelings && product)
+      recalculateLabelings(priceViewData.amounts, $globalMargins, $labelings, product, productLabelingsReusable);
+  }
   $: $labelings?.sort((a, b) => {
     // labelings are sorted by the user with the exception of the company
     const company = x => $companies.find(c => c.id == x.company)?.name ?? '-';
     return company(a).localeCompare(company(b));
   });
+  $: productLabelingsReusable = productOriginal.labelings.map(({ prices, prices_sale }) => {
+    const pricesIDs = prices.map(p => p.id);
+    const pricesSaleIDs = prices_sale.map(p => p.id);
+    return { pricesIDs, pricesSaleIDs };
+  });
+  $: someLabelingsEnabled = product.labelings.some(l => l.enabled);
+  $: if (product.labelings.length) updateLabelingsPrices();
 
-  // set default priceView if: unset OR the already set doesn't exist
-  $: if ($priceViews && (product.price_view === null || !$priceViews.some(p => p.id == product.price_view))) {
-    product.price_view = $priceViews.find(p => p.default).id;
+  // CUSTOM PRICES
+  function cleanupCustomPrices() {
+    [product.custom_prices, product.custom_prices_sale] = cleanupPrices(
+      priceViewData.amounts,
+      product.custom_prices,
+      product.custom_prices_sale,
+      customPricesReusable
+    );
   }
-
-  $: priceView = $priceViews?.find(p => p.id == product.price_view);
-  $: labelingsEnabled = product.labelings.some(l => l.enabled);
-
-  $: updateLabelingsPrices(product.labelings);
-
-  $: if (labelingsEnabled) {
-    disablePrices(product.custom_prices);
-    disablePrices(product.custom_prices_sale);
-  } else {
-    enablePrices(product.custom_prices);
-    if (product.sale) {
-      enablePrices(product.custom_prices_sale);
-    } else {
-      disablePrices(product.custom_prices_sale);
-    }
-  }
+  $: customPricesReusable = {
+    prices1: productOriginal.custom_prices.map(({ id, amount, price }) => ({ id, amount, price })),
+    prices2: productOriginal.custom_prices_sale.map(({ id, amount, price }) => ({ id, amount, price }))
+  };
+  // repair (only once) and clean prices
+  [product.custom_prices, product.custom_prices_sale] = repairPrices(product.custom_prices, product.custom_prices_sale);
+  $: if (priceViewData?.amounts) cleanupCustomPrices();
+  // toggle state (enabled/disabled)
+  $: toggleCustomPrices(
+    product.custom_prices,
+    product.custom_prices_sale,
+    product.show_price,
+    product.sale,
+    someLabelingsEnabled
+  );
 </script>
 
 {#if product && $labelings && $priceViews && $globalMargins}
@@ -115,6 +108,8 @@
     <div class="ui-section__row">
       <div class="ui-section__col">
         <div class="ui-box">
+          <Input type="checkbox" bind:value={product.show_price}>Pokaż cenę</Input>
+          <Input type="checkbox" bind:value={product.sale}>Promocja</Input>
           <Input
             type="select"
             bind:value={product.price_view}
@@ -122,68 +117,60 @@
           >
             Widok
           </Input>
-          <Input type="checkbox" bind:value={product.show_price}>Pokaż cenę</Input>
-          <Input type="checkbox" bind:value={product.sale}>Promocja</Input>
         </div>
 
-        <div class="ui-box">
-          {#if labelingsEnabled}
-            <Input type="number" bind:value={product.price} api>Cena</Input>
+        {#if product.show_price}
+          {#if someLabelingsEnabled}
+            <div class="ui-box">
+              <Input type="number" min={0} step={0.01} bind:value={product.price} api>Cena</Input>
 
-            {#if product.sale}
-              <div class="ui-box ui-box--optional">
-                <h3 class="ui-h3">Promocja</h3>
-                <div class="ui-pair">
-                  <Input type="number" bind:value={product.price_sale}>Cena</Input>
-                  <Input
-                    type="list"
-                    placeholder="np. 500;1000"
-                    bind:value={product.price_sale_blacklist}
-                    listDisallowString
-                    listDisallowNegative
-                    listDisallowZero
-                  >
-                    Wykluczenia
-                  </Input>
+              {#if product.sale}
+                <div class="ui-box ui-box--optional">
+                  <h3 class="ui-h3">Promocja</h3>
+                  <div class="ui-pair">
+                    <Input type="number" min={0} step={0.01} bind:value={product.price_sale}>Cena</Input>
+                    <Input
+                      type="list"
+                      placeholder="np. 500;1000"
+                      bind:value={product.price_sale_blacklist}
+                      listDisallowString
+                      listDisallowNegative
+                      listDisallowZero
+                    >
+                      Wykluczenia
+                    </Input>
+                  </div>
                 </div>
-              </div>
-            {/if}
+              {/if}
 
-            <Input type="checkbox" bind:value={product.global_full_margin}>
-              Odgórna marża <b>na całość</b> ({$globalMargins.full_margin}%, <small>min</small>
-              {$globalMargins.full_minimum}zł)
-            </Input>
-            {#if !product.global_full_margin}
-              <div class="ui-box ui-box--optional">
-                <div class="ui-pair">
-                  <Input type="number" bind:value={product.full_margin}>Marża <small>%</small></Input>
-                  <Input type="number" bind:value={product.full_minimum}>Minimum <small>zł</small></Input>
-                </div>
-              </div>
-            {/if}
-
-            <Input type="checkbox" bind:value={product.global_product_margin}>
-              Odgórna marża <b>na produkt</b> ({$globalMargins.product_margin}%, <small>min</small>
-              {$globalMargins.product_minimum}zł)
-            </Input>
-            {#if !product.global_product_margin}
-              <div class="ui-box ui-box--optional">
-                <div class="ui-pair">
-                  <Input type="number" bind:value={product.product_margin}>Marża <small>%</small></Input>
-                  <Input type="number" bind:value={product.product_minimum}>Minimum <small>zł</small></Input>
-                </div>
-              </div>
-            {/if}
+              <ProductPricingMargins
+                text="na całość"
+                globalMargin={$globalMargins.full_margin}
+                globalMinimum={$globalMargins.full_minimum}
+                bind:globalEnabled={product.global_full_margin}
+                bind:margin={product.full_margin}
+                bind:minimum={product.full_minimum}
+              />
+              <ProductPricingMargins
+                text="na produkt"
+                globalMargin={$globalMargins.product_margin}
+                globalMinimum={$globalMargins.product_minimum}
+                bind:globalEnabled={product.global_product_margin}
+                bind:margin={product.product_margin}
+                bind:minimum={product.product_minimum}
+              />
+            </div>
           {:else}
-            <ProductPricingTable
-              bind:prices={product.custom_prices}
-              bind:pricesSale={product.custom_prices_sale}
-              fixedAmountsArray={priceView.amounts}
-              sale={product.sale}
-            />
-            <Input type="checkbox" bind:value={product.custom_prices_with_labeling}>Ceny ze znakowaniem</Input>
+            <div class="ui-box">
+              <ProductPricingTable
+                bind:prices={product.custom_prices}
+                bind:pricesSale={product.custom_prices_sale}
+                sale={product.sale}
+              />
+              <Input type="checkbox" bind:value={product.custom_prices_with_labeling}>Ceny ze znakowaniem</Input>
+            </div>
           {/if}
-        </div>
+        {/if}
       </div>
 
       <div class="ui-section__col labelings">
@@ -192,23 +179,26 @@
           <div class="ui-section__row">
             {#each product.labelings as labeling, i (labeling)}
               {@const chosenLabeling = $labelings.find(l => l.id == labeling.labeling)}
+              {@const duplicateLabeling = checkDuplicateLabeling(labeling.labeling)}
               <div
                 class="ui-box ui-box--element"
                 class:ui-box--uneditable={!labeling.enabled}
-                class:warning={checkDuplicate(labeling.labeling)}
+                class:warning={duplicateLabeling}
               >
                 <div class="ui-pair actions">
                   <Input type="checkbox" bind:value={labeling.enabled}>Włączone</Input>
                   <div>
-                    {#if !i == 0} <Button icon="arrow_left" on:click={() => moveLabeling(i, -1)} square /> {/if}
+                    {#if !i == 0}
+                      <Button icon="arrow_left" on:click={() => moveLabeling(i, -1)} square />
+                    {/if}
                     {#if i < product.labelings.length - 1}
                       <Button icon="arrow_right" on:click={() => moveLabeling(i, 1)} square />
                     {/if}
                     <Button icon="delete" on:click={() => removeLabeling(i)} dangerous />
                   </div>
                 </div>
-                {#if checkDuplicate(labeling.labeling)}
-                  <h4 class="ui-h4" style:color="var(--main)">DUPLIKAT</h4>
+                {#if duplicateLabeling}
+                  <h4 class="ui-h4" style:color="var(--main-4)">DUPLIKAT</h4>
                 {/if}
                 <Input
                   type="select"
@@ -221,24 +211,19 @@
 
                 {#if chosenLabeling && labeling.enabled}
                   <ProductPricingTable
-                    bind:prices={labeling.prices}
-                    bind:pricesSale={labeling.prices_sale}
-                    fixedAmountsArray={priceView.amounts}
+                    prices={labeling.prices}
+                    pricesSale={labeling.prices_sale}
                     sale={product.sale}
-                    fixedPrices
+                    fixed
                   />
-                  <Input type="checkbox" bind:value={labeling.global_margin}>
-                    Odgórna marża <b>na znakowanie</b> ({chosenLabeling.margin ?? 0}%, <small>min</small>
-                    {chosenLabeling.minimum ?? 0}zł)
-                  </Input>
-                  {#if !labeling.global_margin}
-                    <div class="ui-box ui-box--optional">
-                      <div class="ui-pair">
-                        <Input type="number" bind:value={labeling.margin}>Marża <small>%</small></Input>
-                        <Input type="number" bind:value={labeling.minimum}>Minimum <small>zł</small></Input>
-                      </div>
-                    </div>
-                  {/if}
+                  <ProductPricingMargins
+                    text="na znakowanie"
+                    globalMargin={chosenLabeling.margin}
+                    globalMinimum={chosenLabeling.minimum}
+                    bind:globalEnabled={labeling.global_margin}
+                    bind:margin={labeling.margin}
+                    bind:minimum={labeling.minimum}
+                  />
                 {/if}
               </div>
             {/each}
@@ -248,12 +233,25 @@
         </div>
       </div>
     </div>
+
+    <pre style="display:flex;">
+      <pre>{JSON.stringify(product.custom_prices, null, 2)}</pre>
+      <pre>{JSON.stringify(product.custom_prices_sale, null, 2)}</pre>
+      {#each product.labelings as labeling}
+        <pre>{JSON.stringify(labeling.prices, null, 2)}</pre>
+        <pre>{JSON.stringify(
+            labeling.prices_sale,
+            null,
+            2
+          )}</pre>
+      {/each}
+    </pre>
   </section>
 {/if}
 
 <style>
   .warning {
-    --border: 2px solid var(--main);
+    --border: 2px solid var(--main-3);
   }
 
   .labelings {

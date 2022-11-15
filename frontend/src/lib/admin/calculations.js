@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import api from '$lib/api';
 import socket from '$lib/admin/heimdall';
 import { reuseIDs } from '$lib/utils';
+import { repairPrices, cleanupPrices } from '$lib/admin/calculationsPrices';
 import { calculate as productFields } from '$lib/fields/products';
 import { globalMargins, priceViews, labelings } from '$lib/admin/global';
 
@@ -35,6 +36,7 @@ function sanitize(data) {
 }
 
 function getRangePrice(amount, pricesPerAmount) {
+  pricesPerAmount.sort((a, b) => a.amount - b.amount);
   let price = 0;
   for (let range of pricesPerAmount) {
     if (range.amount <= amount) price = range.price;
@@ -68,6 +70,25 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   return round(fullPrice / amount);
 }
 
+export async function toggleCustomPrices(prices, pricesSale, showPrice, sale, someLabelingsEnabled) {
+  const disable = prices => prices.forEach(p => (p.enabled = false));
+  const enable = prices => prices.forEach(p => (p.enabled = true));
+  if (!showPrice || someLabelingsEnabled) {
+    disable(prices);
+    disable(pricesSale);
+  } else {
+    enable(prices);
+    if (sale) enable(pricesSale);
+    else disable(pricesSale);
+  }
+}
+
+async function updateCustomPrices(amounts, product, someLabelingsEnabled) {
+  [product.prices, product.prices_sale] = repairPrices(product.prices, product.prices_sale);
+  [product.prices, product.prices_sale] = cleanupPrices(amounts, product.prices, product.prices_sale);
+  toggleCustomPrices(prices, pricesSale, product.show_price, product.sale, someLabelingsEnabled);
+}
+
 export function calculatePrices(amounts, global, labeling, product, productLabeling) {
   // amounts: [number]
   // global: global_margin object
@@ -75,6 +96,7 @@ export function calculatePrices(amounts, global, labeling, product, productLabel
   // product: product object
   // productLabeling: product_labeling object
   // returns { prices: [{amount,price}], pricesSale: [{amount,price}] }  <- lengths of prices and pricesSale are equal
+
   const pricePerAmount = (amount, price) => {
     if (!price) return { amount, price: null };
     return {
@@ -102,6 +124,7 @@ export function calculatePrices(amounts, global, labeling, product, productLabel
       )
     };
   };
+
   const { price, price_sale, price_sale_blacklist } = product;
   const blacklist = price_sale_blacklist ?? [];
   return {
@@ -110,46 +133,72 @@ export function calculatePrices(amounts, global, labeling, product, productLabel
   };
 }
 
-export function calculateLabelings(amounts, global, labelings, productLabelings) {
-  for (const [i, productLabeling] of Object.entries(productLabelings)) {
-    const data = calculatePrices(
-      amounts,
-      global,
-      labelings.find(l => l.id == productLabeling.labeling),
-      product,
-      productLabeling
-    );
-    data.prices.forEach(p => (p.enabled = productLabeling.enabled));
-    data.pricesSale.forEach(p => (p.enabled = product.sale ? productLabeling.enabled : false));
-    reuseIDs(productLabeling.prices, data.prices);
-    reuseIDs(productLabeling.prices_sale, data.pricesSale);
-    productLabeling.index = i;
-    productLabeling.prices = data.prices;
-    productLabeling.prices_sale = data.pricesSale;
+export function recalculateLabelings(amounts, global, labelings, product, productLabelingsReusable = null) {
+  // Recalculates labelings prices and pricesSale.
+  //   Toggles state (enabled) of each pricePerAmount appropriately.
+  // `productLabelingsReusable`: { id => { pricesIDs: [int], pricesSaleIDs: [int] }, ... } - reusable prices ids
+
+  let r = 0; // reusable index
+  for (const productLabeling of product.labelings) {
+    const labeling = labelings.find(l => l.id == productLabeling.labeling);
+    const calculated = calculatePrices(amounts, global, labeling, product, productLabeling);
+
+    // enable or disable prices (to hide them from a public user)
+    const pricesEnabled = productLabeling.enabled && product.show_price;
+    const pricesSaleEnabled = productLabeling.enabled && product.show_price && product.sale;
+    calculated.prices.forEach(p => (p.enabled = pricesEnabled));
+    calculated.pricesSale.forEach(p => (p.enabled = pricesSaleEnabled));
+
+    // ONLY REALLY RELEVANT FOR THE ADMIN PANEL
+    // TODO: This should first try to use price ids from the labeling of the same id (if it exists) and only later
+    // TODO: use the rest available for new labelings. It will avoid unncessary moving around of the pricePerAmounts
+    // TODO: between labelings. Not a big deal, but it would be nice since unnecesary database shenanigans is the only
+    // TODO: reason why this whole "reusable system" even exists in the first place.
+    const reusable = productLabelingsReusable[r++];
+    if (reusable) {
+      // reuse pricePerAmount IDs to avoid the db removing old items and creating new ones
+      reuseIDs(calculated.prices, reusable.pricesIDs);
+      reuseIDs(calculated.pricesSale, reusable.pricesSaleIDs);
+    }
+
+    // update prices
+    productLabeling.prices = calculated.prices;
+    productLabeling.prices_sale = calculated.pricesSale;
   }
-  return productLabelings;
+
+  // update indexes
+  product.labelings.forEach((l, i) => (l.index = i));
+
+  return product.labelings;
 }
 
-async function recalculateProduct(amounts, global, labelings, productLabelings, swapLabelings = {}) {
-  // Recalculates prices, pricesSale and prices for all labelings.
-  // Updates state (enabled) of each pricePerAmount.
-  // Then updates the product in the database.
-  // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
+async function recalculateProduct(amounts, global, labelings, product, swapLabelings = {}) {
+  // Swaps and/or deletes labelings (updates indexes).
+  // Recalculates customPrices, customPricesSale and each labelings prices and pricesSale.
+  //   Toggles state (enabled) of each pricePerAmount appropriately.
+  // Updates the product in the database.
+  //
+  // swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
 
   for (const [oldID, newID] of swapLabelings.entries()) {
-    const i = productLabelings.findIndex(l => l.labeling === oldID);
+    const i = product.labelings.findIndex(l => l.labeling === oldID);
     if (newID === null) {
-      productLabelings.splice(i, 1);
-    } else productLabelings[i].labeling = newID;
+      product.labelings.splice(i, 1);
+    } else {
+      product.labelings[i].labeling = newID;
+    }
   }
+  // indexes are not updated here, they are updated in recalculateLabelings()
 
-  calculateLabelings(amounts, global, labelings, productLabelings);
-
-  // TODO: update customPrices and customPricesSale
+  recalculateLabelings(amounts, global, labelings, product);
+  const someLabelingsEnabled = product.labelings.some(l => l.enabled);
+  updateCustomPrices(amounts, product, someLabelingsEnabled);
 
   const updates = {
-    price_view: options.newPriceView ?? product.price_view,
-    labelings: productLabelings.map(({ id, index, labeling, prices, prices_sale }) => {
+    price_view: product.price_view, // already updated in recalculateProducts()
+    prices: product.prices,
+    prices_sale: product.prices_sale,
+    labelings: product.labelings.map(({ id, index, labeling, prices, prices_sale }) => {
       return { id, index, labeling, prices, prices_sale };
     })
   };
@@ -158,7 +207,8 @@ async function recalculateProduct(amounts, global, labelings, productLabelings, 
 
 export async function recalculateProducts(filter, options = { newPriceView: null, swapLabelings: {} }) {
   // Uses `recalculateProduct()` to update all products that match the filter.
-  // A new price view can be set, and labelings can be swapped or deleted.
+  // A new priceView can be set, and labelings can be swapped or deleted.
+  //
   // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
 
   const stores = {
@@ -179,7 +229,7 @@ export async function recalculateProducts(filter, options = { newPriceView: null
         priceView.amounts,
         stores.globalMargins,
         stores.labelings,
-        product.labelings,
+        product,
         options.swapLabelings
       );
     })

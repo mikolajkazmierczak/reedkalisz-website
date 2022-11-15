@@ -3,12 +3,12 @@
   import { filetypeToReadable, bytesToReadable } from '$lib/utils';
   import Icon from '$lib/common/Icon.svelte';
 
-  export let id;
-  export let title;
-  export let type;
-  export let filesize;
-  export let uploaded_on;
-  export let modified_on;
+  export let id = null;
+  export let title = null;
+  export let type = null;
+  export let filesize = null;
+  export let uploaded_on = null;
+  export let modified_on = null;
 
   export let marked = false;
 
@@ -56,13 +56,10 @@
   }
   .wrapper:hover {
     padding: 0.5rem;
-    /* background-color: var(--accent); */
     background-color: rgba(0, 0, 0, 0.2);
   }
   .wrapper.marked {
     padding: 0.5rem;
-    /* background-color: var(--accent-dark); */
-    /* background-color: rgba(0, 0, 0, 0.2); */
     border: solid 2px var(--primary);
   }
 

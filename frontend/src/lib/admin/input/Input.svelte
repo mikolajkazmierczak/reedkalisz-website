@@ -3,7 +3,7 @@
   import Icon from '$lib/common/Icon.svelte';
   import Button from '$lib/admin/input/Button.svelte';
 
-  export let input;
+  export let input = null;
 
   // common
   export let type = 'text';
@@ -185,11 +185,11 @@
       </div>
       <div class="list-items">
         {#if Array.isArray(value)}
-          {#each value as v}
+          {#each value as v, i}
             <button
               class="list-items__item"
               on:click={() => {
-                value = value.filter(vv => vv !== v);
+                value.splice(i, 1);
                 list = value.join(';');
               }}
             >
@@ -333,9 +333,12 @@
   .list-items {
     display: flex;
     flex-wrap: wrap;
+    position: relative;
+    left: 1px;
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     padding-top: 0.25rem;
     padding-left: 0.25rem;
+    width: calc(100% - 2px);
     background-color: rgba(255, 255, 255, 0.5);
   }
   .list-items__item {

@@ -6,16 +6,7 @@
   import socket from '$lib/admin/heimdall';
   import { me, readme } from '$lib/auth';
   import { errors, edited } from '$lib/admin/stores';
-  import {
-    updateGlobal,
-    users,
-    companies,
-    labelings,
-    priceViews,
-    globalMargins,
-    categories,
-    colors
-  } from '$lib/admin/global';
+  import global from '$lib/admin/global';
 
   import Error from '$lib/admin/Error.svelte';
   import Login from '$lib/admin/Login.svelte';
@@ -27,13 +18,11 @@
     if ($edited) {
       if (confirm('Zmiany nie zostały zapisane. Czy na pewno chcesz opuścić stronę?')) {
         $edited = false;
-      } else {
-        navigation.cancel();
-      }
+      } else navigation.cancel();
     }
   });
 
-  $: if ($me) updateGlobal(users);
+  $: if ($me) global.updateGlobal(global.users);
 
   let ready = false;
   onMount(async () => {
@@ -45,13 +34,13 @@
   });
 
   async function listener(data) {
-    if (data.collection == 'directus_users') await updateGlobal(users);
-    else if (data.collection == 'companies') await updateGlobal(companies);
-    else if (data.collection == 'labelings') await updateGlobal(labelings);
-    else if (data.collection == 'price_views') await updateGlobal(priceViews);
-    else if (data.collection == 'global_margins') await updateGlobal(globalMargins);
-    else if (data.collection == 'categories') await updateGlobal(categories);
-    else if (data.collection == 'colors') await updateGlobal(colors);
+    if (data.collection == 'directus_users') await global.updateGlobal(global.users);
+    else if (data.collection == 'companies') await global.updateGlobal(global.companies);
+    else if (data.collection == 'labelings') await global.updateGlobal(global.labelings);
+    else if (data.collection == 'price_views') await global.updateGlobal(global.priceViews);
+    else if (data.collection == 'global_margins') await global.updateGlobal(global.globalMargins);
+    else if (data.collection == 'categories') await global.updateGlobal(global.categories);
+    else if (data.collection == 'colors') await global.updateGlobal(global.colors);
   }
   socket.onChanges(listener);
   onDestroy(() => {

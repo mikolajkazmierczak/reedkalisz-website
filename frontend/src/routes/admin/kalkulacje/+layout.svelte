@@ -59,7 +59,7 @@
     flex-direction: column;
     gap: 2rem;
     padding: 1.5rem 1rem;
-    min-width: 350px;
+    width: 40ch;
     border-radius: var(--border-radius);
     border: var(--border-light);
     background-color: var(--light);
