@@ -25,7 +25,7 @@
     if (confirm('Napewno?')) {
       await api.files.deleteOne(id);
       socket.emitChanges('files', id);
-      goto('/admin/biblioteka', { replaceState: true, noscroll: true });
+      goto('/admin/biblioteka', { replaceState: true, noScroll: true });
     }
   }
 

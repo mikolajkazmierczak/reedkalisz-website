@@ -132,7 +132,7 @@ export function setSearchParams(newParams, navigation = null, rootPathname = nul
     else url.searchParams.set(key, value);
   }
   // navigate to new url
-  goto(url.toString(), { replaceState: true, noscroll: true });
+  goto(url.toString(), { replaceState: true, noScroll: true });
 }
 
 export function reuseIDs(items, reusableIDs = []) {

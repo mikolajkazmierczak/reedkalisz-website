@@ -211,7 +211,7 @@
         class:center={checkbox}
         class:blame
         on:click={() => {
-          if (row.href) goto(row.href, { noscroll: true });
+          if (row.href) goto(row.href, { noScroll: true });
         }}
         on:mouseenter={e => {
           const table = e.target.parentNode.parentNode;

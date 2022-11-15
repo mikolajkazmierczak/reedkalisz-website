@@ -68,10 +68,10 @@
     const company = x => $companies.find(c => c.id == x.company)?.name ?? '-';
     return company(a).localeCompare(company(b));
   });
-  $: productLabelingsReusable = productOriginal.labelings.map(({ prices, prices_sale }) => {
+  $: productLabelingsReusable = productOriginal.labelings.map(({ id, prices, prices_sale }) => {
     const pricesIDs = prices.map(p => p.id);
     const pricesSaleIDs = prices_sale.map(p => p.id);
-    return { pricesIDs, pricesSaleIDs };
+    return { id, pricesIDs, pricesSaleIDs };
   });
   $: someLabelingsEnabled = product.labelings.some(l => l.enabled);
   $: if (product.labelings.length) updateLabelingsPrices();

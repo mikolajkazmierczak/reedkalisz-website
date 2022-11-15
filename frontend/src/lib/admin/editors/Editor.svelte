@@ -25,7 +25,7 @@
 
   function handleExit() {
     // nagivate back
-    if (back) goto(back, { noscroll: true });
+    if (back) goto(back, { noScroll: true });
   }
 
   async function handleCancel() {

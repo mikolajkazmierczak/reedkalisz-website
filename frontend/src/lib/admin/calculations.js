@@ -70,9 +70,12 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   return round(fullPrice / amount);
 }
 
+function togglePrices(prices, state) {
+  prices.forEach(p => (p.enabled = state));
+}
 export async function toggleCustomPrices(prices, pricesSale, showPrice, sale, someLabelingsEnabled) {
-  const disable = prices => prices.forEach(p => (p.enabled = false));
-  const enable = prices => prices.forEach(p => (p.enabled = true));
+  const disable = prices => togglePrices(prices, false);
+  const enable = prices => togglePrices(prices, true);
   if (!showPrice || someLabelingsEnabled) {
     disable(prices);
     disable(pricesSale);
@@ -136,18 +139,18 @@ export function calculatePrices(amounts, global, labeling, product, productLabel
 export function recalculateLabelings(amounts, global, labelings, product, productLabelingsReusable = null) {
   // Recalculates labelings prices and pricesSale.
   //   Toggles state (enabled) of each pricePerAmount appropriately.
-  // `productLabelingsReusable`: { id => { pricesIDs: [int], pricesSaleIDs: [int] }, ... } - reusable prices ids
+  // `productLabelingsReusable`: [{ id: int, pricesIDs: [int], pricesSaleIDs: [int] }, ... } - reusable prices ids
 
-  let r = 0; // reusable index
+  let r = 0;
   for (const productLabeling of product.labelings) {
     const labeling = labelings.find(l => l.id == productLabeling.labeling);
     const calculated = calculatePrices(amounts, global, labeling, product, productLabeling);
 
-    // enable or disable prices (to hide them from a public user)
-    const pricesEnabled = productLabeling.enabled && product.show_price;
-    const pricesSaleEnabled = productLabeling.enabled && product.show_price && product.sale;
-    calculated.prices.forEach(p => (p.enabled = pricesEnabled));
-    calculated.pricesSale.forEach(p => (p.enabled = pricesSaleEnabled));
+    // enable or disable prices (visibility for a public user)
+    const pricesState = productLabeling.enabled && product.show_price;
+    const pricesSaleState = productLabeling.enabled && product.show_price && product.sale;
+    togglePrices(calculated.prices, pricesState);
+    togglePrices(calculated.pricesSale, pricesSaleState);
 
     // ONLY REALLY RELEVANT FOR THE ADMIN PANEL
     // TODO: This should first try to use price ids from the labeling of the same id (if it exists) and only later
@@ -155,6 +158,7 @@ export function recalculateLabelings(amounts, global, labelings, product, produc
     // TODO: between labelings. Not a big deal, but it would be nice since unnecesary database shenanigans is the only
     // TODO: reason why this whole "reusable system" even exists in the first place.
     const reusable = productLabelingsReusable[r++];
+    console.log(reusable);
     if (reusable) {
       // reuse pricePerAmount IDs to avoid the db removing old items and creating new ones
       reuseIDs(calculated.prices, reusable.pricesIDs);

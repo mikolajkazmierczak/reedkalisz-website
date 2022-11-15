@@ -46,8 +46,8 @@
     } else {
       await api.items('price_views').updateOne(item.id, { name, amounts });
       // UPDATE AFFECTED PRODUCTS
-      const amountsChanged = JSON.stringify(amounts) !== JSON.stringify(itemOriginal.amounts);
-      if (amountsChanged) {
+      const didAmountsChange = JSON.stringify(amounts) !== JSON.stringify(itemOriginal.amounts);
+      if (didAmountsChange) {
         const filter = { price_view: { _eq: item.id } };
         await recalculateProducts(filter);
       }

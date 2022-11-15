@@ -26,9 +26,18 @@
   // `default` property is handled separately
   const fieldsToIgnore = ['default', 'user_created', 'date_created', 'user_updated', 'date_updated'];
 
-  function save() {
+  async function save() {
     if (saving) return;
     saving = true;
+    for (const [i, item] of items.entries()) {
+      if (itemsEdited[i]) {
+        const data = JSON.parse(JSON.stringify(item));
+        delete data.id;
+        for (const field of fieldsToIgnore) delete data[field];
+        await api.items('labelings').updateOne(item.id, data);
+        // UPDATE AFFECTED PRODUCTS
+      }
+    }
     saving = false;
   }
   function cancel() {

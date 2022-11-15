@@ -77,7 +77,7 @@
       }
       files = files;
     } else {
-      goto(`/admin/biblioteka/${file.id}`, { noscroll: true });
+      goto(`/admin/biblioteka/${file.id}`, { noScroll: true });
     }
   }
 
