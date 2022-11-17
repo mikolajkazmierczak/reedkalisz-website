@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   import api, { baseUrl } from '$lib/api';
-  import socket from '$lib/admin/heimdall';
+  import socket from '$lib/heimdall';
   import { filetypeToReadable, bytesToReadable } from '$lib/utils';
 
   import { edit as fields } from '$lib/fields/files';

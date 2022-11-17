@@ -1,5 +1,5 @@
 <script>
-  import socket from '$lib/admin/heimdall';
+  import socket from '$lib/heimdall';
   import { createEventDispatcher } from 'svelte';
   import api from '$lib/api';
   import Icon from '$lib/common/Icon.svelte';

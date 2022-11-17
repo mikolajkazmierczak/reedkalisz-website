@@ -5,7 +5,7 @@
   import { slide } from 'svelte/transition';
 
   import api from '$lib/api';
-  import socket from '$lib/admin/heimdall';
+  import socket from '$lib/heimdall';
   import { getSearchParams, setSearchParams } from '$lib/utils';
 
   import { read as fields } from '$lib/fields/files';

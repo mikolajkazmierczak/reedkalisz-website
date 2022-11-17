@@ -1,7 +1,7 @@
 import { goto } from '$app/navigation';
 
 import api from '$lib/api';
-import socket from '$lib/admin/heimdall';
+import socket from '$lib/heimdall';
 import { edited } from '$lib/admin/stores';
 import { deleteFields } from '$lib/utils';
 

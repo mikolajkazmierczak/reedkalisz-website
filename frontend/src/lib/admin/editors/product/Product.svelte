@@ -2,7 +2,7 @@
   import { onDestroy } from 'svelte';
 
   import api from '$lib/api';
-  import socket from '$lib/admin/heimdall';
+  import socket from '$lib/heimdall';
   import { edited, save, cancel } from '$lib/admin/stores';
   import editing from '$lib/admin/editing';
   import { diff, getSearchParams, makeTree, treeFlatten, moveItem } from '$lib/utils';

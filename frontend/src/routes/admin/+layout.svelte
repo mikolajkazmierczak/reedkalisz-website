@@ -3,7 +3,7 @@
   import { onDestroy, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
-  import socket from '$lib/admin/heimdall';
+  import socket from '$lib/heimdall';
   import { me, readme } from '$lib/auth';
   import { errors, edited } from '$lib/admin/stores';
   import global from '$lib/admin/global';

@@ -3,7 +3,7 @@
   import { slide } from 'svelte/transition';
 
   import api from '$lib/api';
-  import socket from '$lib/admin/heimdall';
+  import socket from '$lib/heimdall';
   import { diff } from '$lib/utils';
 
   import { recalculateProducts } from '$lib/admin/calculations';

@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import api from '$lib/api';
-import socket from '$lib/admin/heimdall';
+import socket from '$lib/heimdall';
 import { reuseIDs } from '$lib/utils';
 import { repairPrices, cleanupPrices } from '$lib/admin/calculationsPrices';
 import { calculate as productFields } from '$lib/fields/products';

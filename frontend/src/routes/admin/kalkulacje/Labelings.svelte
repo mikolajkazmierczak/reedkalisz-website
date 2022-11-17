@@ -2,8 +2,8 @@
   import { slide } from 'svelte/transition';
 
   import api from '$lib/api';
-  import socket from '$lib/admin/heimdall';
-  import { diff, moveItem } from '$lib/utils';
+  import socket from '$lib/heimdall';
+  import { diff, moveItem, reuseIDs } from '$lib/utils';
   import { recalculateProducts } from '$lib/admin/calculations';
 
   import { read as fields, defaults } from '$lib/fields/labelings';
@@ -12,6 +12,7 @@
   import Button from '$lib/admin/input/Button.svelte';
   import HoverCircle from '$lib/components/HoverCircle.svelte';
   import Popup from '$lib/admin/common/Popup.svelte';
+  import { each } from 'svelte/internal';
 
   export let company;
   export let items;
@@ -30,17 +31,27 @@
   // `default` and `index` properties are handled separately
   const fieldsToIgnore = ['default', 'index', 'user_created', 'date_created', 'user_updated', 'date_updated'];
 
-  async function save() {
-    if (saving) return;
-    saving = true;
+  function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
+  async function save() {
     const ids = [];
     for (const [i, item] of items.entries()) {
       if (itemsEdited[i]) {
+        await timeout(1000);
+
         const data = JSON.parse(JSON.stringify(item));
         delete data.id;
         for (const field of fieldsToIgnore) delete data[field];
+
+        // sort amounts
         data.prices.sort((a, b) => a.amount - b.amount); // sort prices by amounts
+        reuseIDs(
+          data.prices,
+          data.prices.map(p => p.id)
+        );
+
         await api.items('labelings').updateOne(item.id, data);
         ids.push(item.id);
 
@@ -52,10 +63,41 @@
         itemsOriginal[i] = JSON.parse(JSON.stringify(items[i]));
       }
     }
-    socket.emitChanges('labelings', ids);
-    items = items;
-    itemsOriginal = itemsOriginal;
+    return ids;
+  }
+  async function saveStart() {
+    if (saving) return;
+    saving = true;
 
+    // check if there are duplicate amounts, ask the user if he wants to continue, only keep the first occurences
+    const amountsCopy = [];
+    const amountsDuplicates = [];
+    const amountsDuplicatesIndexes = [];
+    for (const [i, a] of amounts.entries()) {
+      if (amountsCopy.includes(a)) {
+        amountsDuplicates.push(a);
+        amountsDuplicatesIndexes.push(i);
+      } else amountsCopy.push(a);
+    }
+
+    let continueSaving = true;
+    if (amountsDuplicates.length) {
+      let prompt = `W nakładach powtarzają się kwoty: "${amountsDuplicates.join(', ')}".`;
+      prompt += ` Jeśli kontynuujesz zostaną zachowane tylko pierwsze wystąpienia.`;
+      if (confirm(prompt)) {
+        // only keep first occurences
+        for (const item of items) {
+          item.prices = item.prices.filter((_, i) => !amountsDuplicatesIndexes.includes(i));
+        }
+      } else continueSaving = false;
+    }
+
+    if (continueSaving) {
+      const ids = await save();
+      socket.emitChanges('labelings', ids);
+      // items = items;
+      // itemsOriginal = itemsOriginal;
+    }
     saving = false;
   }
   function cancel() {
@@ -70,15 +112,15 @@
     for (const amount of amounts) {
       data.prices.push({ amount, price: null });
     }
+    if (amounts.length == 0) {
+      data.prices.push({ amount: 1, price: null }); // lumpsum is mandatory
+    }
     delete data.id;
     return data;
   }
   async function addLabeling() {
     // save to api immediately to get id
     const data = newLabeling();
-    if (items.length == 0) {
-      data.prices.push({ amount: 1, price: null }); // lumpsum is mandatory
-    }
     const item = await api.items('labelings').createOne(data, { fields });
     socket.emitChanges('labelings', item.id);
     items = [...items, item];
@@ -163,18 +205,16 @@
     removeFinish();
   }
 
-  function pushAmount() {
-    const i = amounts.length - 1;
-    const amount = amounts[i] + 1;
+  function pushAmount(i) {
+    if (i === undefined) i = amounts.length;
     for (const item of items) {
-      item.prices.push({ amount, price: null });
+      item.prices.splice(i, 0, { amount: null, price: null });
     }
     items = items;
-    amounts.push(amount);
+    amounts.splice(i, 0, null);
     amounts = amounts;
   }
-  function removeAmount() {
-    const i = amounts.length - 1;
+  function removeAmount(i) {
     for (const item of items) {
       item.prices.splice(i, 1);
     }
@@ -182,6 +222,20 @@
     amounts.splice(i, 1);
     amounts = amounts;
   }
+  function moveAmount(i, d) {
+    // d = 1 or -1
+    // switch amounts places
+    [amounts[i], amounts[i + d]] = [amounts[i + d], amounts[i]];
+    amounts = amounts;
+    // switch prices places
+    for (const item of items) {
+      const temp = item.prices[i];
+      item.prices[i] = item.prices[i + d];
+      item.prices[i + d] = temp;
+    }
+    items = items;
+  }
+
   function updatePricesFromAmounts(amounts) {
     for (const [i, amount] of amounts.entries()) {
       for (const item of items) {
@@ -189,6 +243,11 @@
       }
     }
     items = items;
+  }
+  function updateAmountsFromPrices(items) {
+    if (JSON.stringify(items) === JSON.stringify(itemsOriginal)) {
+      amounts = items.length ? items[0].prices.map(p => p.amount) : [];
+    }
   }
 
   function checkDiff(items) {
@@ -200,13 +259,11 @@
       });
     }
   }
+
   let amounts = [];
-  function updateAmounts() {
-    // TODO: doesn't work when items are deleted
-    amounts = items.length ? items[0].prices.map(p => p.amount) : [];
-  }
-  $: if (itemsOriginal) updateAmounts();
   $: updatePricesFromAmounts(amounts);
+  $: updateAmountsFromPrices(items);
+
   $: checkDiff(items);
 </script>
 
@@ -274,16 +331,28 @@
           MIN <span class="info">🛈</span>
         </th>
 
-        {#each amounts as amount}
-          {#if amount == 1}
-            <th width="80" class="amount fixed"><small>Ryczałt</small></th>
-          {:else}
-            <th width="80" class="amount">
+        {#each amounts as amount, i}
+          {@const firstLumpsumIndex = amounts.map((a, i) => (a == 1 ? i : null)).filter(i => i !== null)[0]}
+          <th width="80" class="amount" class:fixed={i == firstLumpsumIndex}>
+            <div class="amount-actions">
+              {#if !i == 0}
+                <Button icon="arrow_left" on:click={() => moveAmount(i, -1)} square />
+              {/if}
+              {#if i < amounts.length - 1}
+                <Button icon="arrow_right" on:click={() => moveAmount(i, 1)} square />
+              {/if}
+              <Button icon="delete" on:click={() => removeAmount(i)} square dangerous />
+              <Button icon="add" on:click={() => pushAmount(i + 1)} square />
+            </div>
+            {#if i == firstLumpsumIndex}
+              <small>Ryczałt</small>
+            {:else}
               <Input type="number" borderless min={0} step={1} bind:value={amount} />
-            </th>
-          {/if}
+            {/if}
+          </th>
         {/each}
-        <th width="30" rowspan={items.length} class="action action-amount action-amount-add">
+
+        <th width="30" rowspan={items.length + 1} class="action action-amount-push">
           <button on:click={pushAmount}>
             <HoverCircle />
             <div class="icon"><Icon name="add" light /></div>
@@ -361,12 +430,12 @@
             </td>
           {/each}
 
-          <td class="action action-amount action-amount-remove">
+          <!-- <td class="action action-amount action-amount-remove">
             <button on:click={removeAmount}>
               <HoverCircle color={'var(--main)'} />
               <div class="icon"><Icon name="delete" light /></div>
             </button>
-          </td>
+          </td> -->
         </tr>
       {/each}
     </table>
@@ -379,10 +448,15 @@
       <Button icon="close" dangerous on:click={() => confirm('Jesteś pewny? Utracisz wszystkie postępy!') && cancel()}>
         Anuluj
       </Button>
-      <Button icon="ok" on:click={save}>
+      <Button icon="ok" on:click={saveStart}>
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
     </div>
+    {#each itemsEdited as value, i}
+      {#if value == true}
+        <small>{items[i].code ?? '-'} {items[i].type ?? '-'} {items[i].name ?? '-'}</small>
+      {/if}
+    {/each}
   {:else}
     <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }}>
       <Button icon="add" on:click={addLabeling}>Dodaj</Button>
@@ -437,18 +511,33 @@
     border: none;
     background-color: var(--light);
   }
-  .action-amount {
+  .action-amount-push {
     border: none;
     padding: 0;
   }
-  .action-amount button {
+  .action-amount-push button {
     background-color: var(--primary);
   }
-  .action-amount-remove {
-    border-top: var(--border-light);
+
+  .amount {
+    position: relative;
   }
-  .action-amount-remove button {
-    background-color: var(--primary-dark);
+  .amount-actions {
+    z-index: 1;
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+    display: none;
+    justify-content: center;
+    gap: 0.25rem;
+    border-radius: var(--border-radius);
+    border: var(--border-light);
+    padding: 0.25rem;
+    background-color: var(--primary-white);
+  }
+  .amount:hover .amount-actions {
+    display: flex;
   }
 
   .edit-actions {

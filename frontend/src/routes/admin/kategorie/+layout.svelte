@@ -3,7 +3,7 @@
   import { onDestroy } from 'svelte';
 
   import api from '$lib/api';
-  import socket from '$lib/admin/heimdall';
+  import socket from '$lib/heimdall';
   import { page } from '$lib/admin/stores';
   import { makeTree, treeFlatten } from '$lib/utils';
 
