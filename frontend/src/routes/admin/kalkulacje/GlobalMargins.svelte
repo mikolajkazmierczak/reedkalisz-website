@@ -59,19 +59,32 @@
 </script>
 
 <div class="wrapper">
-  <div class="ui-pair margins">
+  <div class="margins">
     <div>
       <h4>Na całość</h4>
       <div class="ui-pair">
-        <Input type="number" bind:value={data.full_margin}>Marża</Input>
-        <Input type="number" bind:value={data.full_minimum}>Minimum</Input>
+        <div class="input">
+          <Input type="number" bind:value={data.full_margin}>Marża</Input>
+          <small>%</small>
+        </div>
+        <div class="input">
+          <Input type="number" bind:value={data.full_minimum}>Minimum</Input>
+          <small>zł</small>
+        </div>
       </div>
     </div>
+    <div class="bar" />
     <div>
       <h4>Na produkt</h4>
       <div class="ui-pair">
-        <Input type="number" bind:value={data.product_margin}>Marża</Input>
-        <Input type="number" bind:value={data.product_minimum}>Minimum</Input>
+        <div class="input">
+          <Input type="number" bind:value={data.product_margin}>Marża</Input>
+          <small>%</small>
+        </div>
+        <div class="input">
+          <Input type="number" bind:value={data.product_minimum}>Minimum</Input>
+          <small>zł</small>
+        </div>
       </div>
     </div>
   </div>
@@ -88,12 +101,24 @@
 
 <style>
   .margins {
-    gap: 0.5rem;
+    display: flex;
+    gap: 1rem;
+    height: 100%;
   }
-  .margins > div {
-    padding: 0.5rem;
-    border-radius: var(--border-radius);
-    border: var(--border-light);
+  .margins .input {
+    position: relative;
+  }
+  .margins .input small {
+    pointer-events: none;
+    position: absolute;
+    bottom: 0.45rem;
+    right: 0.45rem;
+    opacity: 0.5;
+  }
+  .bar {
+    width: 1px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
   }
   .edit {
     margin-top: 0.5rem;

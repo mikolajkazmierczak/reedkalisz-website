@@ -73,6 +73,11 @@
       bind:query={selectedQuery}
     />
   </div>
+
+  <small style="color:red;display:block;margin-top:0.5rem;margin-left:0.5rem;">
+    Edycja hierarchii chwilowo niedostępna
+  </small>
+  <b><small style="color:red;display:block;margin-top:0.25rem;margin-left:0.5rem;"> Nowa w drodze </small></b>
 {/if}
 
 <slot />

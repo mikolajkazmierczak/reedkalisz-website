@@ -25,7 +25,7 @@
 
   export let collection = null;
   export let items;
-  export let itemsCount;
+  export let itemsCount = null;
   export let head;
   export let mapper;
 
@@ -36,23 +36,34 @@
   $: itemsFlat = hierarchy ? treeFlatten(items) : items;
   $: maxDepth = hierarchy ? itemsFlat.reduce((max, item) => Math.max(max, item._meta.path.length), 0) - 1 : 0;
 
-  const smallestColumn = 2.25;
+  const smallestCellWidth = 2.25;
+  const hierarchyCellWidth = smallestCellWidth * 0.8;
 
   function getWidths(head, hierarchy, order, maxDepth) {
     let widths = [];
-    if (hierarchy) widths.push(smallestColumn + maxDepth * (smallestColumn / 2) + 'rem');
-    if (order) for (let i = 0; i < 4; i++) widths.push(smallestColumn + 'rem');
-    if (hierarchy) widths.push(smallestColumn + 'rem');
+    if (order) widths.push(smallestCellWidth + 'rem');
+    if (hierarchy) widths.push(hierarchyCellWidth * (maxDepth + 1) + 'rem');
     widths.push(
       ...head.map(h => {
         if (h.width) widths.push(h.width);
-        if (h.checkbox) return smallestColumn + 'rem';
+        if (h.checkbox) return smallestCellWidth + 'rem';
         if (h.id) return '4rem';
         if (h.blame) return 'minmax(20ch, 1fr)';
         return 'minmax(15ch, 1fr)';
       })
     );
     return widths.join(' ');
+  }
+
+  let showDropzonesItemID = null; // id
+  function drop() {
+    showDropzonesItemID = null;
+  }
+  function dragend() {
+    showDropzonesItemID = null;
+  }
+  function dragenter(e) {
+    showDropzonesItemID = e.detail.id;
   }
 
   $: widths = getWidths(head, hierarchy, order, maxDepth);
@@ -74,6 +85,10 @@
           bind:item
           {mapper}
           {collection}
+          {showDropzonesItemID}
+          on:drop={drop}
+          on:dragend={dragend}
+          on:dragenterItem={dragenter}
         />
       {/each}
     {:else}

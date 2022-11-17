@@ -12,6 +12,7 @@
   export let edited = false;
   export let disabled = false;
 
+  export let width = 'auto';
   export let icon = null;
   export let borderRadius = 'var(--border-radius)';
 
@@ -26,6 +27,7 @@
   class:edited
   {disabled}
   style:border-radius={borderRadius}
+  style:width
 >
   {#if !disabled}
     <HoverCircle color={hoverColor} />

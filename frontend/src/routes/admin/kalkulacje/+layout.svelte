@@ -15,18 +15,20 @@
     await updateGlobal(labelings);
   }
 
+  $: $companies?.sort((a, b) => a.name.localeCompare(b.name));
+
   read();
 </script>
 
 <div class="wrapper">
   {#if $globalMargins && $priceViews}
     <sidebar>
-      <div>
-        <h3 class="title">Globalne marże</h3>
+      <div class="ui-box">
+        <h3 class="ui-h3 title">Globalne marże</h3>
         <GlobalMargins bind:data={$globalMargins} />
       </div>
-      <div>
-        <h3 class="title">Widoki</h3>
+      <div class="ui-box">
+        <h3 class="ui-h3 title">Widoki</h3>
         <PriceViews bind:items={$priceViews} />
       </div>
     </sidebar>
@@ -37,7 +39,7 @@
       {#each $companies as company}
         {@const items = $labelings.filter(l => l.company === company.id)}
         <div class="company">
-          <h2>{company.name}</h2>
+          <h1>{company.name}</h1>
           <Labelings {company} {items} />
         </div>
       {/each}
@@ -51,21 +53,14 @@
   .wrapper {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
   }
 
   sidebar {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding: 1.5rem 1rem;
+    gap: 1.5rem;
     width: 40ch;
-    border-radius: var(--border-radius);
-    border: var(--border-light);
-    background-color: var(--light);
-  }
-  sidebar .title {
-    margin-bottom: 0.5rem;
   }
 
   .labelings {
@@ -75,7 +70,7 @@
   .company {
     margin-bottom: 2rem;
   }
-  .company h2 {
+  .company h1 {
     margin-bottom: 0.5rem;
   }
 </style>

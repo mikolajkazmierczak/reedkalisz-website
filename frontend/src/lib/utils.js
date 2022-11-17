@@ -230,17 +230,22 @@ export function treePushItemAtPath(tree, path, item) {
   // Insert item at path.
   const parent = tree[path[0]];
   if (path.length === 1) {
-    tree.splice(path[0], 0, item);
+    tree.splice(path[0], 0, item); // if path[0] is bigger then the array, it will still be added at the end
   } else treePushItemAtPath(parent.children, path.slice(1), item);
 }
 
-export function treeMoveItemToPath(tree, item, newPath) {
-  // Move item to newPath.
-  const oldPath = item._meta.path;
+export function treeMoveItemToPath(tree, oldPath, newPath) {
+  // Move item at oldPath to newPath.
   const removedItem = treeRemoveItemAtPath(tree, oldPath);
+  // fix newPath after removing an item
+  const i = oldPath.length - 1;
+  if (newPath[i] > oldPath[i]) {
+    newPath[i]--;
+  } else {
+    oldPath[i]++;
+  }
   treePushItemAtPath(tree, newPath, removedItem);
   treeRefreshMetaAndParent(tree);
-  return tree;
 }
 
 export function moveItem(items, i, d) {

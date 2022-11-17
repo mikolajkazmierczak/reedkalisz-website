@@ -72,9 +72,9 @@ export function repairPrices(prices1, prices2) {
 }
 
 export function cleanupPrices(amounts, prices1, prices2, pricesReusable = null) {
-  // `pricesOriginalReusable`: {
-  //   prices:     { id: int, amount: int, price: int }, ... },
-  //   pricesSale: { id: int, amount: int, price: int }, ... }
+  // `pricesReusable`: {
+  //   prices1: { id: int, amount: int, price: int }, ... },
+  //   prices2: { id: int, amount: int, price: int }, ... }
   // }
   pushMissing(amounts, prices1);
   pushMissing(amounts, prices2);

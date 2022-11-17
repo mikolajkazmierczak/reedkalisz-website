@@ -234,7 +234,7 @@
       </div>
     </div>
 
-    <pre style="display:flex;">
+    <!-- <pre style="display:flex;">
       <pre>{JSON.stringify(product.custom_prices, null, 2)}</pre>
       <pre>{JSON.stringify(product.custom_prices_sale, null, 2)}</pre>
       {#each product.labelings as labeling}
@@ -245,7 +245,7 @@
             2
           )}</pre>
       {/each}
-    </pre>
+    </pre> -->
   </section>
 {/if}
 

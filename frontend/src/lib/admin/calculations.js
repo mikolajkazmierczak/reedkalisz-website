@@ -35,14 +35,14 @@ function sanitize(data) {
   return data;
 }
 
-function getRangePrice(amount, pricesPerAmount) {
+function matchLabelingPriceRange(amount, pricesPerAmount) {
   pricesPerAmount.sort((a, b) => a.amount - b.amount);
-  let price = 0;
+  let matchingRange = null;
   for (let range of pricesPerAmount) {
-    if (range.amount <= amount) price = range.price;
-    else if (range.amount > amount) return price;
+    if (range.price && range.amount <= amount) matchingRange = range; // price must be defined
+    else break;
   }
-  return price;
+  return { price: matchingRange.price, isLumpsum: matchingRange.amount == 1 };
 }
 
 function formula(amount, product, labeling, full, prepress, extra, transport, transportThreshold) {
@@ -58,14 +58,14 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   const productPrice = amount * product.price;
   const productPriceWithMargin = Math.max(productPrice * fraction(product.margin), productPrice + product.minimum);
 
-  const rangePrice = getRangePrice(amount, labeling.prices);
-  const labelingPrice = amount * rangePrice + prepress;
+  const range = matchLabelingPriceRange(amount, labeling.prices);
+  const labelingPrice = (range.isLumpsum ? range.price : amount * range.price) + prepress;
   const labelingPriceWithMargin = Math.max(labelingPrice * fraction(labeling.margin), labelingPrice + labeling.minimum);
 
   const price = productPriceWithMargin + labelingPriceWithMargin;
   const singlePrice = Math.max(price * fraction(full.margin), price + full.minimum);
 
-  const transportPrice = transportThreshold < product.price * amount ? transport : 0; // TODO: this should be revisited
+  const transportPrice = product.price * amount > transportThreshold ? 0 : 20; // TODO: this should be revisited
   const fullPrice = singlePrice + extra + transportPrice;
   return round(fullPrice / amount);
 }
@@ -73,7 +73,8 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
 function togglePrices(prices, state) {
   prices.forEach(p => (p.enabled = state));
 }
-export async function toggleCustomPrices(prices, pricesSale, showPrice, sale, someLabelingsEnabled) {
+
+export function toggleCustomPrices(prices, pricesSale, showPrice, sale, someLabelingsEnabled) {
   const disable = prices => togglePrices(prices, false);
   const enable = prices => togglePrices(prices, true);
   if (!showPrice || someLabelingsEnabled) {
@@ -86,10 +87,25 @@ export async function toggleCustomPrices(prices, pricesSale, showPrice, sale, so
   }
 }
 
-async function updateCustomPrices(amounts, product, someLabelingsEnabled) {
-  [product.prices, product.prices_sale] = repairPrices(product.prices, product.prices_sale);
-  [product.prices, product.prices_sale] = cleanupPrices(amounts, product.prices, product.prices_sale);
-  toggleCustomPrices(prices, pricesSale, product.show_price, product.sale, someLabelingsEnabled);
+function updateCustomPrices(amounts, product, someLabelingsEnabled) {
+  const customPricesReusable = {
+    prices1: [...product.custom_prices],
+    prices2: [...product.custom_prices_sale]
+  };
+  [product.custom_prices, product.custom_prices_sale] = repairPrices(product.custom_prices, product.custom_prices_sale);
+  [product.custom_prices, product.custom_prices_sale] = cleanupPrices(
+    amounts,
+    product.custom_prices,
+    product.custom_prices_sale,
+    customPricesReusable
+  );
+  toggleCustomPrices(
+    product.custom_prices,
+    product.custom_prices_sale,
+    product.show_price,
+    product.sale,
+    someLabelingsEnabled
+  );
 }
 
 export function calculatePrices(amounts, global, labeling, product, productLabeling) {
@@ -157,12 +173,13 @@ export function recalculateLabelings(amounts, global, labelings, product, produc
     // TODO: use the rest available for new labelings. It will avoid unncessary moving around of the pricePerAmounts
     // TODO: between labelings. Not a big deal, but it would be nice since unnecesary database shenanigans is the only
     // TODO: reason why this whole "reusable system" even exists in the first place.
-    const reusable = productLabelingsReusable[r++];
-    console.log(reusable);
-    if (reusable) {
-      // reuse pricePerAmount IDs to avoid the db removing old items and creating new ones
-      reuseIDs(calculated.prices, reusable.pricesIDs);
-      reuseIDs(calculated.pricesSale, reusable.pricesSaleIDs);
+    if (productLabelingsReusable) {
+      const reusable = productLabelingsReusable[r++];
+      if (reusable) {
+        // reuse pricePerAmount IDs to avoid the db removing old items and creating new ones
+        reuseIDs(calculated.prices, reusable.pricesIDs);
+        reuseIDs(calculated.pricesSale, reusable.pricesSaleIDs);
+      }
     }
 
     // update prices
@@ -176,20 +193,22 @@ export function recalculateLabelings(amounts, global, labelings, product, produc
   return product.labelings;
 }
 
-async function recalculateProduct(amounts, global, labelings, product, swapLabelings = {}) {
+async function recalculateProduct(amounts, global, labelings, product, swapLabelings = null) {
   // Swaps and/or deletes labelings (updates indexes).
   // Recalculates customPrices, customPricesSale and each labelings prices and pricesSale.
   //   Toggles state (enabled) of each pricePerAmount appropriately.
   // Updates the product in the database.
   //
-  // swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
+  // swapLabelings: { oldID => newID, ... }  <-- newID can be null to remove the labeling
 
-  for (const [oldID, newID] of swapLabelings.entries()) {
-    const i = product.labelings.findIndex(l => l.labeling === oldID);
-    if (newID === null) {
-      product.labelings.splice(i, 1);
-    } else {
-      product.labelings[i].labeling = newID;
+  if (swapLabelings) {
+    for (const [oldID, newID] of swapLabelings) {
+      const i = product.labelings.findIndex(l => l.labeling === oldID);
+      if (newID === null) {
+        product.labelings.splice(i, 1);
+      } else {
+        product.labelings[i].labeling = newID;
+      }
     }
   }
   // indexes are not updated here, they are updated in recalculateLabelings()
@@ -200,8 +219,8 @@ async function recalculateProduct(amounts, global, labelings, product, swapLabel
 
   const updates = {
     price_view: product.price_view, // already updated in recalculateProducts()
-    prices: product.prices,
-    prices_sale: product.prices_sale,
+    custom_prices: product.custom_prices,
+    custom_prices_sale: product.custom_prices_sale,
     labelings: product.labelings.map(({ id, index, labeling, prices, prices_sale }) => {
       return { id, index, labeling, prices, prices_sale };
     })
@@ -209,7 +228,7 @@ async function recalculateProduct(amounts, global, labelings, product, swapLabel
   await api.items('products').updateOne(product.id, updates);
 }
 
-export async function recalculateProducts(filter, options = { newPriceView: null, swapLabelings: {} }) {
+export async function recalculateProducts(filter, options = { newPriceView: null, swapLabelings: null }) {
   // Uses `recalculateProduct()` to update all products that match the filter.
   // A new priceView can be set, and labelings can be swapped or deleted.
   //
@@ -227,7 +246,7 @@ export async function recalculateProducts(filter, options = { newPriceView: null
   // recalculate each product concurrently
   await Promise.all(
     products.map(product => {
-      if (options.newPriceView !== null) product.price_view = options.newPriceView;
+      if (options.newPriceView != null) product.price_view = options.newPriceView;
       const priceView = stores.priceViews.find(pv => pv.id == product.price_view);
       return recalculateProduct(
         priceView.amounts,

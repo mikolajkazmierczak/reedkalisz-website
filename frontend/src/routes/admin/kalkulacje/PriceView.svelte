@@ -36,10 +36,18 @@
     }
   });
 
+  async function updateProducts(swapID = null) {
+    const filter = { price_view: { _eq: item.id } };
+    if (swapID) await recalculateProducts(filter, { newPriceView: swapID });
+    else await recalculateProducts(filter);
+  }
+
   async function save() {
     if (saving) return; // prevent double click
     saving = true;
+
     const { name, amounts } = item;
+    amounts.sort((a, b) => a - b);
     if (item.id === '+') {
       const res = await api.items('price_views').createOne({ name, amounts, default: false });
       item.id = res.id;
@@ -47,13 +55,11 @@
       await api.items('price_views').updateOne(item.id, { name, amounts });
       // UPDATE AFFECTED PRODUCTS
       const didAmountsChange = JSON.stringify(amounts) !== JSON.stringify(itemOriginal.amounts);
-      if (didAmountsChange) {
-        const filter = { price_view: { _eq: item.id } };
-        await recalculateProducts(filter);
-      }
+      if (didAmountsChange) await updateProducts();
     }
     socket.emitChanges('price_views', item.id);
     itemOriginal = JSON.parse(JSON.stringify(item));
+
     saving = false;
   }
   function cancel() {
@@ -99,8 +105,7 @@
 
     // UPDATE AFFECTED PRODUCTS
     // first update products because some price view MUST always be set in the product editor (after refresh)
-    const filter = { price_view: { _eq: item.id } };
-    await recalculateProducts(filter, { newPriceView: swapID });
+    await updateProducts(swapID);
 
     // UPDATE PRICE VIEWS
     await api.items('price_views').deleteOne(item.id);
