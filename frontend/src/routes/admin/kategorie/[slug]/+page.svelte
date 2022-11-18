@@ -1,5 +1,5 @@
 <script>
-  import Category from '$lib/admin/editors/category/Category.svelte';
+  import Category from '@/editors/category/Category.svelte';
 
   export let data;
   let { slug } = data;

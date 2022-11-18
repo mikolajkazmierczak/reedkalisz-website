@@ -4,17 +4,17 @@
   import { createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
 
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { getSearchParams, setSearchParams } from '$lib/utils';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { getSearchParams, setSearchParams } from '$/utils';
 
-  import { read as fields } from '$lib/fields/files';
-  import Button from '$lib/admin/input/Button.svelte';
+  import { read as fields } from '$/fields/files';
+  import Button from '@c/Button.svelte';
 
-  import Filters from '$lib/admin/common/Filters.svelte';
-  import Upload from '$lib/admin/library/Upload.svelte';
-  import File from '$lib/admin/library/File.svelte';
-  import Pagination from '$lib/admin/common/Pagination.svelte';
+  import Filters from '@c/Filters.svelte';
+  import Upload from '@c/library/Upload.svelte';
+  import File from '@c/library/File.svelte';
+  import Pagination from '@c/Pagination.svelte';
 
   const dispatch = createEventDispatcher();
 

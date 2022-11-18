@@ -2,14 +2,14 @@
   import { beforeNavigate } from '$app/navigation';
   import { slide } from 'svelte/transition';
 
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { diff } from '$lib/utils';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { diff } from '$/utils';
 
-  import { recalculateProducts } from '$lib/admin/calculations';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Popup from '$lib/admin/common/Popup.svelte';
+  import { recalculateProducts } from '@/calculations';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import Popup from '@c/Popup.svelte';
 
   // `default` property is handled separately
   const fieldsToIgnore = ['default', 'user_created', 'date_created', 'user_updated', 'date_updated'];

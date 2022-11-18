@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
-import api from '$lib/api';
-import fields from '$lib/fields';
+import api from '$/api';
+import fields from '$/fields';
 
 // global arrays of items from their respective collections:
 // - global because they are needed on many pages in the app, so redownlading them every time is pointless

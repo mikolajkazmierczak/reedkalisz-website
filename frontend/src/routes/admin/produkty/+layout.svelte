@@ -2,17 +2,17 @@
   import { goto, afterNavigate } from '$app/navigation';
   import { onDestroy } from 'svelte';
 
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { page } from '$lib/admin/stores';
-  import { getSearchParams, setSearchParams, makeTree } from '$lib/utils';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { page } from '@/stores';
+  import { getSearchParams, setSearchParams, makeTree } from '$/utils';
 
-  import { updateGlobal, categories } from '$lib/admin/global';
-  import { search as fields } from '$lib/fields/products';
-  import Category from '$lib/admin/editors/product/Category.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Table from '$lib/admin/common/Table.svelte';
-  import Search from '$lib/admin/common/Search.svelte';
+  import { updateGlobal, categories } from '@/global';
+  import { search as fields } from '$/fields/products';
+  import Category from '@/editors/product/Category.svelte';
+  import Button from '@c/Button.svelte';
+  import Table from '@c/Table.svelte';
+  import Search from '@c/Search.svelte';
 
   $page = { title: 'Produkty', icon: 'products' };
 
@@ -89,7 +89,14 @@
   {#if products}
     <div class="items">
       <div class="actions">
-        <Button on:click={() => goto(`/admin/produkty/+${category ? `?c=${category}` : ''}`)} icon="add">Dodaj</Button>
+        <div>
+          <Button on:click={() => goto(`/admin/produkty/+`)} icon="add">Dodaj</Button>
+          {#if category}
+            <Button on:click={() => goto(`/admin/produkty/+?c=${category}`)} icon="add">
+              <span>Dodaj w <small>{$categories.find(c => c.id == category).name}</small></span>
+            </Button>
+          {/if}
+        </div>
         <Search bind:query={selectedQuery} />
       </div>
 
@@ -165,5 +172,16 @@
     border-radius: var(--border-radius);
     border: var(--border-light);
     background-color: var(--light);
+  }
+  .actions > div {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .actions span {
+    white-space: nowrap;
+    color: var(--light);
+  }
+  .actions small {
+    color: var(--light);
   }
 </style>

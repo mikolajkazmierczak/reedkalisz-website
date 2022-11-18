@@ -1,6 +1,6 @@
 <script>
-  import { me, logout } from '$lib/auth';
-  import Button from '$lib/components/Button.svelte';
+  import { me, logout } from '$/auth';
+  import Button from '#c/Button.svelte';
 </script>
 
 <div class="user">

@@ -2,16 +2,16 @@
   import { goto } from '$app/navigation';
   import { onDestroy } from 'svelte';
 
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { page } from '$lib/admin/stores';
-  import { makeTree, treeFlatten } from '$lib/utils';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { page } from '@/stores';
+  import { makeTree, treeFlatten } from '$/utils';
 
-  import { updateGlobal, categories } from '$lib/admin/global';
-  import { search as fields } from '$lib/fields/categories';
-  import Table from '$lib/admin/common/Table.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Search from '$lib/admin/common/Search.svelte';
+  import { updateGlobal, categories } from '@/global';
+  import { search as fields } from '$/fields/categories';
+  import Table from '@c/Table.svelte';
+  import Button from '@c/Button.svelte';
+  import Search from '@c/Search.svelte';
 
   $page = { title: 'Kategorie', icon: 'categories' };
 
@@ -73,11 +73,6 @@
       bind:query={selectedQuery}
     />
   </div>
-
-  <small style="color:red;display:block;margin-top:0.5rem;margin-left:0.5rem;">
-    Edycja hierarchii chwilowo niedostępna
-  </small>
-  <b><small style="color:red;display:block;margin-top:0.25rem;margin-left:0.5rem;"> Nowa w drodze </small></b>
 {/if}
 
 <slot />

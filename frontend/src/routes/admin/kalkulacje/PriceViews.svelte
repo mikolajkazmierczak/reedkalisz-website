@@ -1,6 +1,6 @@
 <script>
-  import { defaults } from '$lib/fields/price_views';
-  import Button from '$lib/admin/input/Button.svelte';
+  import { defaults } from '$/fields/price_views';
+  import Button from '@c/Button.svelte';
   import PriceView from './PriceView.svelte';
 
   export let items;

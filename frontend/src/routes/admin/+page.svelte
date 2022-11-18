@@ -1,6 +1,6 @@
 <script>
-  import { page } from '$lib/admin/stores';
-  import Icon from '$lib/common/Icon.svelte';
+  import { page } from '@/stores';
+  import Icon from '$c/Icon.svelte';
 
   $page = { title: 'Dashboard', icon: 'dashboard' };
 

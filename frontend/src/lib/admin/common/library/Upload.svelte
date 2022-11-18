@@ -1,8 +1,8 @@
 <script>
-  import socket from '$lib/heimdall';
+  import socket from '$/heimdall';
   import { createEventDispatcher } from 'svelte';
-  import api from '$lib/api';
-  import Icon from '$lib/common/Icon.svelte';
+  import api from '$/api';
+  import Icon from '$c/Icon.svelte';
 
   const dispatch = createEventDispatcher();
 

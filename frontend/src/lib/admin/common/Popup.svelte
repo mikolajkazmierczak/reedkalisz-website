@@ -1,7 +1,7 @@
 <script>
   import { fade, fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
-  import Button from '$lib/admin/input/Button.svelte';
+  import Button from '@c/Button.svelte';
 
   const dispatch = createEventDispatcher();
 

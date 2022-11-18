@@ -1,7 +1,7 @@
 <script>
   import { fly } from 'svelte/transition';
-  import { page } from '$lib/admin/stores';
-  import Icon from '$lib/common/Icon.svelte';
+  import { page } from '@/stores';
+  import Icon from '$c/Icon.svelte';
 
   $: title = $page?.title;
   $: icon = $page?.icon;

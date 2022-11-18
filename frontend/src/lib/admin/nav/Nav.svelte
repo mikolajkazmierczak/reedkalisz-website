@@ -1,14 +1,14 @@
 <script>
   import { page } from '$app/stores';
-  import { baseUrl } from '$lib/api';
-  import { auth, me, logout } from '$lib/auth';
+  import { baseUrl } from '$/api';
+  import { auth, me, logout } from '$/auth';
   import { fly } from 'svelte/transition';
   import { spring } from 'svelte/motion';
-  import HoverCircle from '$lib/components/HoverCircle.svelte';
-  import User from '$lib/admin/nav/User.svelte';
-  import Notifications from '$lib/admin/nav/Notifications.svelte';
-  import Loader from '$lib/components/Loader.svelte';
-  import Icon from '$lib/common/Icon.svelte';
+  import HoverCircle from '$c/HoverCircle.svelte';
+  import User from '@/nav/User.svelte';
+  import Notifications from '@/nav/Notifications.svelte';
+  import Loader from '$c/Loader.svelte';
+  import Icon from '$c/Icon.svelte';
 
   const buttons = [
     { href: '/', icon: 'dashboard', name: 'Aktywność' },

@@ -3,16 +3,16 @@
   import { onDestroy, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
-  import socket from '$lib/heimdall';
-  import { me, readme } from '$lib/auth';
-  import { errors, edited } from '$lib/admin/stores';
-  import global from '$lib/admin/global';
+  import socket from '$/heimdall';
+  import { me, readme } from '$/auth';
+  import { errors, edited } from '@/stores';
+  import global from '@/global';
 
-  import Error from '$lib/admin/Error.svelte';
-  import Login from '$lib/admin/Login.svelte';
-  import Nav from '$lib/admin/nav/Nav.svelte';
-  import Header from '$lib/admin/Header.svelte';
-  import Loader from '$lib/components/Loader.svelte';
+  import Error from '@/Error.svelte';
+  import Login from '@/Login.svelte';
+  import Nav from '@/nav/Nav.svelte';
+  import Header from '@/Header.svelte';
+  import Loader from '$c/Loader.svelte';
 
   beforeNavigate(navigation => {
     if ($edited) {

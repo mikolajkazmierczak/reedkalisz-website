@@ -1,24 +1,22 @@
 <script>
   import { slide } from 'svelte/transition';
 
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { diff, moveItem, reuseIDs } from '$lib/utils';
-  import { recalculateProducts } from '$lib/admin/calculations';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { diff, moveItem, reuseIDs } from '$/utils';
+  import { recalculateProducts } from '@/calculations';
 
-  import { read as fields, defaults } from '$lib/fields/labelings';
-  import Icon from '$lib/common/Icon.svelte';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import HoverCircle from '$lib/components/HoverCircle.svelte';
-  import Popup from '$lib/admin/common/Popup.svelte';
-  import { each } from 'svelte/internal';
+  import { read as fields, defaults } from '$/fields/labelings';
+  import Icon from '$c/Icon.svelte';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import HoverCircle from '$c/HoverCircle.svelte';
+  import Popup from '@c/Popup.svelte';
 
   export let company;
   export let items;
   let itemsOriginal = JSON.parse(JSON.stringify(items));
   $: itemsEdited = itemsOriginal.map(() => false);
-  $: itemsHTML = itemsOriginal.map(() => '');
 
   $: edited = itemsEdited.some(e => e);
   let saving = false;
@@ -31,44 +29,39 @@
   // `default` and `index` properties are handled separately
   const fieldsToIgnore = ['default', 'index', 'user_created', 'date_created', 'user_updated', 'date_updated'];
 
-  function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
   async function save() {
-    const ids = [];
+    const updatedIDs = [];
+    const updatedItems = new Map();
     for (const [i, item] of items.entries()) {
       if (itemsEdited[i]) {
-        await timeout(1000);
-
         const data = JSON.parse(JSON.stringify(item));
+        // cleanup update data
         delete data.id;
         for (const field of fieldsToIgnore) delete data[field];
-
-        // sort amounts
+        for (const price of data.prices) price.enabled = false;
+        // sort amounts and ids
         data.prices.sort((a, b) => a.amount - b.amount); // sort prices by amounts
-        reuseIDs(
-          data.prices,
-          data.prices.map(p => p.id)
-        );
+        const reusableIDs = data.prices.map(p => p.id);
+        reuseIDs(data.prices, reusableIDs);
 
-        await api.items('labelings').updateOne(item.id, data);
-        ids.push(item.id);
+        // UPDATE LABELING
+        const updatedItem = await api.items('labelings').updateOne(item.id, data, { fields });
+        updatedIDs.push(updatedItem.id);
+        updatedItems.set(i, updatedItem);
 
         // UPDATE AFFECTED PRODUCTS
         const filter = { labelings: { labeling: { _eq: item.id } } };
         await recalculateProducts(filter);
 
-        items[i] = await api.items('labelings').readOne(item.id, { fields });
-        itemsOriginal[i] = JSON.parse(JSON.stringify(items[i]));
+        itemsEdited[i] = false;
       }
     }
-    return ids;
+    // refresh items
+    for (const [i, item] of newItems) items[i] = item;
+    itemsOriginal = JSON.parse(JSON.stringify(items));
+    socket.emitChanges('labelings', updatedIDs);
   }
-  async function saveStart() {
-    if (saving) return;
-    saving = true;
-
+  function tryRemoveDuplicateAmounts() {
     // check if there are duplicate amounts, ask the user if he wants to continue, only keep the first occurences
     const amountsCopy = [];
     const amountsDuplicates = [];
@@ -79,25 +72,30 @@
         amountsDuplicatesIndexes.push(i);
       } else amountsCopy.push(a);
     }
-
-    let continueSaving = true;
     if (amountsDuplicates.length) {
       let prompt = `W nakładach powtarzają się kwoty: "${amountsDuplicates.join(', ')}".`;
       prompt += ` Jeśli kontynuujesz zostaną zachowane tylko pierwsze wystąpienia.`;
       if (confirm(prompt)) {
         // only keep first occurences
-        for (const item of items) {
-          item.prices = item.prices.filter((_, i) => !amountsDuplicatesIndexes.includes(i));
-        }
-      } else continueSaving = false;
-    }
-
-    if (continueSaving) {
-      const ids = await save();
-      socket.emitChanges('labelings', ids);
-      // items = items;
-      // itemsOriginal = itemsOriginal;
-    }
+        for (const item of items) item.prices = item.prices.filter((_, i) => !amountsDuplicatesIndexes.includes(i));
+      } else return false;
+    } else return true;
+  }
+  function tryRemoveEmptyAmounts() {
+    // check if there are columns without amounts
+    if (items.some(item => item.prices.some(p => !p.amount))) {
+      if (confirm('Niektóre kolumny nie mają ustalonych nakładów. Jeśli kontynuujesz zostaną usunięte.')) {
+        for (const item of items) item.prices = item.prices.filter(p => p.amount);
+      } else return false;
+    } else return true;
+  }
+  async function saveStart() {
+    if (saving) return;
+    saving = true;
+    let continueSaving = true;
+    continueSaving = tryRemoveEmptyAmounts();
+    continueSaving = tryRemoveDuplicateAmounts();
+    if (continueSaving) await save();
     saving = false;
   }
   function cancel() {
@@ -206,7 +204,7 @@
   }
 
   function pushAmount(i) {
-    if (i === undefined) i = amounts.length;
+    if (i == undefined) i = amounts.length;
     for (const item of items) {
       item.prices.splice(i, 0, { amount: null, price: null });
     }
@@ -215,12 +213,14 @@
     amounts = amounts;
   }
   function removeAmount(i) {
-    for (const item of items) {
-      item.prices.splice(i, 1);
+    if (confirm(`Czy na pewno chcesz usunąć tą kolumnę?`)) {
+      for (const item of items) {
+        item.prices.splice(i, 1);
+      }
+      items = items;
+      amounts.splice(i, 1);
+      amounts = amounts;
     }
-    items = items;
-    amounts.splice(i, 1);
-    amounts = amounts;
   }
   function moveAmount(i, d) {
     // d = 1 or -1
@@ -245,18 +245,14 @@
     items = items;
   }
   function updateAmountsFromPrices(items) {
-    if (JSON.stringify(items) === JSON.stringify(itemsOriginal)) {
+    if (JSON.stringify(items) === JSON.stringify(itemsOriginal))
       amounts = items.length ? items[0].prices.map(p => p.amount) : [];
-    }
   }
 
   function checkDiff(items) {
     for (const [i, itemOriginal] of itemsOriginal.entries()) {
       const item = items.find(i => i.id == itemOriginal.id);
-      diff(item, itemOriginal, fieldsToIgnore).then(({ changed, html }) => {
-        itemsEdited[i] = changed;
-        itemsHTML[i] = html;
-      });
+      diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (itemsEdited[i] = changed));
     }
   }
 
@@ -353,7 +349,7 @@
         {/each}
 
         <th width="30" rowspan={items.length + 1} class="action action-amount-push">
-          <button on:click={pushAmount}>
+          <button on:click={() => pushAmount()}>
             <HoverCircle />
             <div class="icon"><Icon name="add" light /></div>
           </button>
@@ -430,12 +426,12 @@
             </td>
           {/each}
 
-          <!-- <td class="action action-amount action-amount-remove">
+          <td class="action action-amount action-amount-remove">
             <button on:click={removeAmount}>
               <HoverCircle color={'var(--main)'} />
               <div class="icon"><Icon name="delete" light /></div>
             </button>
-          </td> -->
+          </td>
         </tr>
       {/each}
     </table>
@@ -462,12 +458,6 @@
       <Button icon="add" on:click={addLabeling}>Dodaj</Button>
     </div>
   {/if}
-</div>
-
-<div style="display:flex;">
-  {#each itemsHTML as html}
-    <pre>{@html html}</pre>
-  {/each}
 </div>
 
 <style>

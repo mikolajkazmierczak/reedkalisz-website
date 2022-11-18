@@ -1,7 +1,7 @@
 <script>
-  import { baseUrl } from '$lib/api';
-  import { filetypeToReadable, bytesToReadable } from '$lib/utils';
-  import Icon from '$lib/common/Icon.svelte';
+  import { baseUrl } from '$/api';
+  import { filetypeToReadable, bytesToReadable } from '$/utils';
+  import Icon from '$c/Icon.svelte';
 
   export let id = null;
   export let title = null;

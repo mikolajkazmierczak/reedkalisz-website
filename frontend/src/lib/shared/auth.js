@@ -1,5 +1,5 @@
-import api from '$lib/api';
-import { errors } from '$lib/admin/stores';
+import api from '$/api';
+import { errors } from '@/stores';
 import { writable } from 'svelte/store';
 
 export const auth = writable(false);

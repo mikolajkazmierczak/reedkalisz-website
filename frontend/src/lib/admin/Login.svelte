@@ -1,10 +1,10 @@
 <script>
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Loader from '$lib/components/Loader.svelte';
-  import { auth, me, login } from '$lib/auth';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import Loader from '$c/Loader.svelte';
+  import { auth, me, login } from '$/auth';
   import { fade, fly } from 'svelte/transition';
-  import Icon from '$lib/common/Icon.svelte';
+  import Icon from '$c/Icon.svelte';
 
   let email;
   let password;

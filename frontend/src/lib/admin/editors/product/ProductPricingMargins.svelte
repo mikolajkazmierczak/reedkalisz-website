@@ -6,7 +6,7 @@
   export let margin;
   export let minimum;
 
-  import Input from '$lib/admin/input/Input.svelte';
+  import Input from '@c/Input.svelte';
 </script>
 
 <Input type="checkbox" bind:value={globalEnabled}>

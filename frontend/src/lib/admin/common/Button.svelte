@@ -1,6 +1,6 @@
 <script>
-  import HoverCircle from '$lib/components/HoverCircle.svelte';
-  import Icon from '$lib/common/Icon.svelte';
+  import HoverCircle from '$c/HoverCircle.svelte';
+  import Icon from '$c/Icon.svelte';
 
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();

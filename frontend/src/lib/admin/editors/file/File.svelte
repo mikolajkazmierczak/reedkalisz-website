@@ -1,15 +1,15 @@
 <script>
   import { goto } from '$app/navigation';
-  import api, { baseUrl } from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { filetypeToReadable, bytesToReadable } from '$lib/utils';
+  import api, { baseUrl } from '$/api';
+  import socket from '$/heimdall';
+  import { filetypeToReadable, bytesToReadable } from '$/utils';
 
-  import { edit as fields } from '$lib/fields/files';
-  import Upload from '$lib/admin/library/Upload.svelte';
-  import Editor from '$lib/admin/editors/Editor.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Blame from '$lib/admin/common/Blame.svelte';
-  import Icon from '$lib/common/Icon.svelte';
+  import { edit as fields } from '$/fields/files';
+  import Upload from '@c/library/Upload.svelte';
+  import Editor from '@/editors/Editor.svelte';
+  import Button from '@c/Button.svelte';
+  import Blame from '@c/Blame.svelte';
+  import Icon from '$c/Icon.svelte';
 
   export let id;
 

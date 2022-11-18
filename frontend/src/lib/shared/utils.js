@@ -78,6 +78,7 @@ export function diff(item, itemOriginal, fieldsToIgnore) {
     if (!item) return resolve({ diff: null, changed: null, html: null });
     const itemCopy = item ? JSON.parse(JSON.stringify(item)) : null;
     await deleteFields(itemCopy, fieldsToIgnore);
+    console.log('itemCopy', itemCopy);
     const itemOriginalCopy = itemOriginal ? JSON.parse(JSON.stringify(itemOriginal)) : null;
     await deleteFields(itemOriginalCopy, fieldsToIgnore);
     const diff = diffJson(itemOriginalCopy, itemCopy);
@@ -236,14 +237,24 @@ export function treePushItemAtPath(tree, path, item) {
 
 export function treeMoveItemToPath(tree, oldPath, newPath) {
   // Move item at oldPath to newPath.
-  const removedItem = treeRemoveItemAtPath(tree, oldPath);
-  // fix newPath after removing an item
-  const i = oldPath.length - 1;
-  if (newPath[i] > oldPath[i]) {
-    newPath[i]--;
-  } else {
-    oldPath[i]++;
+
+  function fixNewPathAfterRemove(oldPath, newPath) {
+    // Fix paths after removing an item. An element will be removed, so the children of it's parent will shift by 1.
+    // Check if removing the item at oldPath will affect the newPath and fix it if necessary.
+    // The way to this is to check if all of the parent elements of both paths up to the last element of oldPath match.
+    // e.g. old: 1== 1   |old: 1!= 1   |old: 1 0!= 1 |old: 1 0== 1
+    //      new: 1== 2 1 |new: 0!= 2 1 |new: 1 2!= 1 |new: 1 0== 2
+    //      out: 1   1 1 |out: 0   2 1 |out: 1 2   1 |out: 1 0   1
+    // IMPORTANT: The oldPath will NOT be modified.
+    const i = oldPath.length - 1;
+    const affected = oldPath.slice(0, i).join() === newPath.slice(0, i).join();
+    if (affected && newPath[i] > oldPath[i]) {
+      newPath[i]--;
+    }
   }
+
+  const removedItem = treeRemoveItemAtPath(tree, oldPath);
+  fixNewPathAfterRemove(oldPath, newPath);
   treePushItemAtPath(tree, newPath, removedItem);
   treeRefreshMetaAndParent(tree);
 }

@@ -1,6 +1,6 @@
 <script>
-  import { page } from '$lib/admin/stores';
-  import WIP from '$lib/components/WIP.svelte';
+  import { page } from '@/stores';
+  import WIP from '@/WIP.svelte';
 
   $page = { title: 'Fragmenty', icon: 'fragments' };
 </script>

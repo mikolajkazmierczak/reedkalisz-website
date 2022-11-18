@@ -1,5 +1,5 @@
 <script>
-  import Input from '$lib/admin/input/Input.svelte';
+  import Input from '@c/Input.svelte';
 
   export let prices;
   export let pricesSale;

@@ -3,9 +3,9 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
-  import { me, readme } from '$lib/auth';
-  import User from '$lib/components/User.svelte';
-  import Button from '$lib/components/Button.svelte';
+  import { me, readme } from '$/auth';
+  import User from '#c/User.svelte';
+  import Button from '#c/Button.svelte';
 
   const menu = [
     { href: '/', title: 'Strona główna' },

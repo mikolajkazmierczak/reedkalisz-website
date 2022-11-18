@@ -1,10 +1,10 @@
 import { get } from 'svelte/store';
-import api from '$lib/api';
-import socket from '$lib/heimdall';
-import { reuseIDs } from '$lib/utils';
-import { repairPrices, cleanupPrices } from '$lib/admin/calculationsPrices';
-import { calculate as productFields } from '$lib/fields/products';
-import { globalMargins, priceViews, labelings } from '$lib/admin/global';
+import api from '$/api';
+import socket from '$/heimdall';
+import { reuseIDs } from '$/utils';
+import { repairPrices, cleanupPrices } from '@/calculationsPrices';
+import { calculate as productFields } from '$/fields/products';
+import { globalMargins, priceViews, labelings } from '@/global';
 
 function fraction(percent) {
   // convert percentage to fraction
@@ -42,6 +42,7 @@ function matchLabelingPriceRange(amount, pricesPerAmount) {
     if (range.price && range.amount <= amount) matchingRange = range; // price must be defined
     else break;
   }
+  if (matchingRange === null) return { price: 0, isLumpsum: false };
   return { price: matchingRange.price, isLumpsum: matchingRange.amount == 1 };
 }
 
@@ -128,7 +129,9 @@ export function calculatePrices(amounts, global, labeling, product, productLabel
           minimum: product.global_product_margin ? global.product_minimum : product.product_minimum
         },
         {
-          prices: labeling.prices.filter(p => p.enabled).map(p => ({ amount: p.amount, price: p.price })),
+          // TODO: possibility to turn off labeling amounts? would need a different property though
+          // prices: labeling.prices.filter(p => p.enabled).map(p => ({ amount: p.amount, price: p.price })),
+          prices: labeling.prices.map(p => ({ amount: p.amount, price: p.price })),
           margin: productLabeling.global_margin ? labeling.margin : productLabeling.margin,
           minimum: productLabeling.global_margin ? labeling.minimum : productLabeling.minimum
         },
@@ -241,7 +244,7 @@ export async function recalculateProducts(filter, options = { newPriceView: null
   };
 
   const products = (await api.items('products').readByQuery({ fields: productFields, filter })).data;
-  console.log(products);
+  console.log('affected:', products);
 
   // recalculate each product concurrently
   await Promise.all(

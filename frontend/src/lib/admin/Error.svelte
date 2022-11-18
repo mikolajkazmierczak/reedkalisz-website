@@ -1,7 +1,7 @@
 <script>
   import { fly } from 'svelte/transition';
-  import { errors } from '$lib/admin/stores';
-  import Icon from '$lib/common/Icon.svelte';
+  import { errors } from '@/stores';
+  import Icon from '$c/Icon.svelte';
 
   function hide() {
     show = false;

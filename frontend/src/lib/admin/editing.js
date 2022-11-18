@@ -1,9 +1,9 @@
 import { goto } from '$app/navigation';
 
-import api from '$lib/api';
-import socket from '$lib/heimdall';
-import { edited } from '$lib/admin/stores';
-import { deleteFields } from '$lib/utils';
+import api from '$/api';
+import socket from '$/heimdall';
+import { edited } from '@/stores';
+import { deleteFields } from '$/utils';
 
 async function save(collection, item, itemOriginal, fields, fieldsToIgnore = [], reloadPath = null) {
   // get data and cleanup
@@ -18,7 +18,6 @@ async function save(collection, item, itemOriginal, fields, fieldsToIgnore = [],
   } else {
     await api.items(collection).updateOne(item.id, itemData);
   }
-
   // read item again beacuse nested fields may have been added (with their ids)
   item = await api.items(collection).readOne(item.id, { fields });
 

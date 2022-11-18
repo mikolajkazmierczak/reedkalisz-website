@@ -1,8 +1,8 @@
 <script>
   import { fly } from 'svelte/transition';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Icon from '$lib/common/Icon.svelte';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import Icon from '$c/Icon.svelte';
 
   export let query;
   let value;

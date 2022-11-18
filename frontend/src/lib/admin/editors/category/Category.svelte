@@ -1,21 +1,21 @@
 <script>
   import { onDestroy } from 'svelte';
 
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { edited, save, cancel } from '$lib/admin/stores';
-  import editing from '$lib/admin/editing';
-  import { diff, getSearchParams } from '$lib/utils';
-  import { updateGlobal, users, categories } from '$lib/admin/global';
-  import { edit as fields, defaults } from '$lib/fields/categories';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { edited, save, cancel } from '@/stores';
+  import editing from '@/editing';
+  import { diff, getSearchParams } from '$/utils';
+  import { updateGlobal, users, categories } from '@/global';
+  import { edit as fields, defaults } from '$/fields/categories';
 
   import slugify from 'slugify';
   import { marked } from 'marked';
-  import Editor from '$lib/admin/editors/Editor.svelte';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Blame from '$lib/admin/common/Blame.svelte';
-  import Picker from '$lib/admin/library/Picker.svelte';
+  import Editor from '@/editors/Editor.svelte';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import Blame from '@c/Blame.svelte';
+  import Picker from '@c/library/Picker.svelte';
 
   const searchParams = getSearchParams(['parent', 'index']);
 

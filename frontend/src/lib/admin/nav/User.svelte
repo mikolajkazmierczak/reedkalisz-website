@@ -1,5 +1,5 @@
 <script>
-  import { me, logout } from '$lib/auth';
+  import { me, logout } from '$/auth';
   import { fly } from 'svelte/transition';
 
   export let show = false;

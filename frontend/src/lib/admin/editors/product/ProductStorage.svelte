@@ -1,10 +1,10 @@
 <script>
-  import api from '$lib/api';
-  import { moveItem } from '$lib/utils';
-  import Icon from '$lib/common/Icon.svelte';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Picker from '$lib/admin/library/Picker.svelte';
+  import api from '$/api';
+  import { moveItem } from '$/utils';
+  import Icon from '$c/Icon.svelte';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import Picker from '@c/library/Picker.svelte';
 
   export let product;
 

@@ -1,7 +1,7 @@
 <script>
-  import { uuid } from '$lib/utils';
-  import Icon from '$lib/common/Icon.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
+  import { uuid } from '$/utils';
+  import Icon from '$c/Icon.svelte';
+  import Button from '@c/Button.svelte';
 
   export let input = null;
 

@@ -1,7 +1,7 @@
 <script>
-  import { page } from '$lib/admin/stores';
+  import { page } from '@/stores';
 
-  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '$lib/admin/global';
+  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '@/global';
   import PriceViews from './PriceViews.svelte';
   import GlobalMargins from './GlobalMargins.svelte';
   import Labelings from './Labelings.svelte';

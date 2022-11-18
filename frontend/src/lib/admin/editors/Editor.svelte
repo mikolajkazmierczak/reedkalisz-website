@@ -3,9 +3,9 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
 
-  import { edited, save, cancel } from '$lib/admin/stores';
-  import Icon from '$lib/common/Icon.svelte';
-  import HoverCircle from '$lib/components/HoverCircle.svelte';
+  import { edited, save, cancel } from '@/stores';
+  import Icon from '$c/Icon.svelte';
+  import HoverCircle from '$c/HoverCircle.svelte';
 
   function spin(node, { duration }) {
     return {

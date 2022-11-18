@@ -1,7 +1,7 @@
 <script>
-  import { range } from '$lib/utils';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Icon from '$lib/common/Icon.svelte';
+  import { range } from '$/utils';
+  import Input from '@c/Input.svelte';
+  import Icon from '$c/Icon.svelte';
 
   export let limit = 25;
   export let page;

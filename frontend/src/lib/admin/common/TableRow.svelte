@@ -3,12 +3,12 @@
   import { slide } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
 
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { treeGetItemAtPath, treeMoveItemToPath } from '$lib/utils';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { treeGetItemAtPath, treeMoveItemToPath } from '$/utils';
 
-  import Icon from '$lib/common/Icon.svelte';
-  import Blame from '$lib/admin/common/Blame.svelte';
+  import Icon from '$c/Icon.svelte';
+  import Blame from '@c/Blame.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -48,77 +48,49 @@
     if (collapsed) expand(item);
   }
 
-  // function moveLeft() {
-  //   if (canLeft) {
-  //     const newPath = meta.path.slice(0, -1);
-  //     newPath[newPath.length - 1]++;
-  //     items = treeMoveItemToPath(items, item, newPath);
-  //     saveAfterMove(items, meta.path, newPath);
-  //   }
-  // }
-  // function moveRight() {
-  //   if (canRight) {
-  //     const prevPath = [...meta.path];
-  //     prevPath[prevPath.length - 1]--;
-  //     const prev = treeGetItemAtPath(items, prevPath);
-  //     const newPath = [...prevPath, prev.children.length];
-  //     items = treeMoveItemToPath(items, item, newPath);
-  //     saveAfterMove(items, meta.path, newPath);
-  //     expand(prev);
-  //   }
-  // }
-  // function moveUp() {
-  //   if (canUp) {
-  //     const newPath = [...meta.path];
-  //     newPath[newPath.length - 1]--;
-  //     items = treeMoveItemToPath(items, item, newPath);
-  //     saveAfterMove(items, meta.path, newPath);
-  //   }
-  // }
-  // function moveDown() {
-  //   if (canDown) {
-  //     const newPath = [...meta.path];
-  //     newPath[newPath.length - 1]++;
-  //     items = treeMoveItemToPath(items, item, newPath);
-  //     saveAfterMove(items, meta.path, newPath);
-  //   }
-  // }
-
   async function saveAfterMove(newItems, oldPath, newPath) {
-    const getChildren = parent => {
-      if (Array.isArray(parent)) return parent;
-      return parent.children;
-    };
+    function getItemsToUpdate(newItems, path, startIndex) {
+      const item = treeGetItemAtPath(newItems, path);
+      console.log('item', item);
+      const children = item.children ?? item; // root edge case
+      console.log('item?.children', item?.children);
+      console.log('children', children);
+      const indexes = children.filter(c => c.index >= startIndex).map(c => c.index);
+      console.log('indexes', indexes);
+      return { children, indexes };
+    }
 
     // as the items have just changed (and the item will get destroyed in the next tick)
     // we need to retrieve the item directly from the updated items
-    const newItem = treeGetItemAtPath(newItems, newPath);
+    const movedItem = treeGetItemAtPath(newItems, newPath);
 
-    // update the item's parent and index
-    const { parent, index } = newItem;
-    await api.items(collection).updateOne(item.id, { parent, index });
+    // update the new item's parent and index
+    const { parent, index } = movedItem;
+    await api.items(collection).updateOne(movedItem.id, { parent, index });
 
-    // update indexes of old parent's children
-    const oldParent = treeGetItemAtPath(items, oldPath.slice(0, -1));
-    const oldChildren = getChildren(oldParent);
-    const oldItemIndex = oldPath[oldPath.length - 1];
-    await Promise.all(
-      oldChildren
-        .filter(child => child.index >= oldItemIndex) // `>=` is important - the moved items position has been filled
-        .map(child => api.items(collection).updateOne(child.id, { index: child.index }))
-    );
+    // update indexes of both parent's children
+    const newParentPath = newPath.slice(0, -1);
+    const oldParentPath = oldPath.slice(0, -1);
+    const newIndex = newPath[newPath.length - 1];
+    const oldIndex = oldPath[oldPath.length - 1];
+    const sameParent = newParentPath.join('') == oldParentPath.join('');
+    if (sameParent) {
+      if (newIndex == oldIndex) return;
+      const startIndex = newIndex > oldIndex ? oldIndex : newIndex + 1;
+      // get indexes of parent's children and update them
+      const { children, indexes } = getItemsToUpdate(newItems, newParentPath, startIndex);
+      await Promise.all(indexes.map(i => api.items(collection).updateOne(children[i].id, { index: i })));
+    } else {
+      // get indexes of new parent's children, old parent's children and update both
+      const { children: newChildren, indexes: newIndexes } = getItemsToUpdate(newItems, newParentPath, newIndex + 1);
+      const { children: oldChildren, indexes: oldIndexes } = getItemsToUpdate(newItems, oldParentPath, oldIndex);
+      await Promise.all([
+        ...newIndexes.map(i => api.items(collection).updateOne(newChildren[i].id, { index: i })),
+        ...oldIndexes.map(i => api.items(collection).updateOne(oldChildren[i].id, { index: i }))
+      ]);
+    }
 
-    // update indexes of new parent's children
-    const newParent = treeGetItemAtPath(newItems, newPath.slice(0, -1));
-    const newChildren = getChildren(newParent);
-    const newItemIndex = newItem.index;
-    await Promise.all(
-      newChildren
-        .filter(child => child.index > newItemIndex) // `>` is important - the moved item does not need an update
-        .map(child => api.items(collection).updateOne(child.id, { index: child.index }))
-    );
-
-    socket.emitChanges(collection, item.id, false);
+    socket.emitChanges(collection, movedItem.id, false); // TODO: emit changes for all updated items
   }
 
   let dragging = false;
@@ -164,6 +136,11 @@
     showDropzones = false;
     dispatch('drop');
     const oldPath = e.dataTransfer.getData('path').split(',').map(Number);
+
+    // if this element is the last child of its parent (and not the root list), we need to collapse it
+    const parent = treeGetItemAtPath(items, oldPath.slice(0, -1));
+    if (!Array.isArray(parent) && parent.children.length == 1) tryCollapse(parent);
+
     let newPath;
     if (type === 'P') {
       newPath = meta.path.slice(0, -1);
@@ -176,22 +153,10 @@
     if (type === 'C') {
       newPath = [...meta.path, 0];
     }
-    console.log('itemPath before', JSON.stringify(meta.path));
-    console.log('oldPath before', JSON.stringify(oldPath));
-    console.log('newPath before', JSON.stringify(newPath));
     treeMoveItemToPath(items, oldPath, newPath);
     items = items;
-    console.log('itemPath after', JSON.stringify(meta.path));
-    console.log('oldPath after', JSON.stringify(oldPath));
-    console.log('newPath after', JSON.stringify(newPath));
 
-    // collapse the parent of the moved item if there are no more children in it
-    const parent = treeGetItemAtPath(items, oldPath.slice(0, -1));
-    if (parent && parent.children.length === 0) {
-      tryCollapse(parent);
-    }
-    // saveAfterMove(items, newOldPath, newNewPath);
-    // if (type === 'C') expand(item);
+    saveAfterMove(items, oldPath, newPath);
   }
   function dropBubble() {
     dispatch('drop');
@@ -316,7 +281,6 @@
 {/if}
 
 {#if showDropzones && !dragging}
-  {@const hierarchyColumnWidth = hierarchyCellWidth * (maxDepth + 1)}
   {@const blankSpan = meta.depth - (showDropzoneParent ? 1 : 0) + (showDropzoneSibling ? 0 : 1)}
   {@const childSpan = maxDepth + 1 - blankSpan - (showDropzoneParent ? 1 : 0) - (showDropzoneSibling ? 1 : 0)}
   {@const blankWidth = blankSpan * hierarchyCellWidth}

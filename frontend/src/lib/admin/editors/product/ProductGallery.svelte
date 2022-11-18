@@ -1,8 +1,8 @@
 <script>
-  import { moveItem } from '$lib/utils';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Picker from '$lib/admin/library/Picker.svelte';
+  import { moveItem } from '$/utils';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import Picker from '@c/library/Picker.svelte';
 
   export let gallery;
 

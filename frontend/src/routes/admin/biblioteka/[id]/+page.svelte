@@ -1,5 +1,5 @@
 <script>
-  import File from '$lib/admin/editors/file/File.svelte';
+  import File from '@/editors/file/File.svelte';
 
   export let data;
   let { id } = data;

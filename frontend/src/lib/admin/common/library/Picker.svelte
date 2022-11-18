@@ -2,10 +2,10 @@
   import { fly, fade } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
 
-  import api from '$lib/api';
-  import { read as fields } from '$lib/fields/files';
-  import File from '$lib/admin/library/File.svelte';
-  import Library from '$lib/admin/library/Library.svelte';
+  import api from '$/api';
+  import { read as fields } from '$/fields/files';
+  import File from '@c/library/File.svelte';
+  import Library from '@c/library/Library.svelte';
 
   const dispatch = createEventDispatcher();
 

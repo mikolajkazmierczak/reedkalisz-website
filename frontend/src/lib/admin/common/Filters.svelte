@@ -1,6 +1,6 @@
 <script>
-  import Filter from '$lib/admin/common/Filter.svelte';
-  import Icon from '$lib/common/Icon.svelte';
+  import Filter from '@c/Filter.svelte';
+  import Icon from '$c/Icon.svelte';
 
   // import { createEventDispatcher } from 'svelte';
   // const dispatch = createEventDispatcher();

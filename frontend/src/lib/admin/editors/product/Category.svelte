@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition';
-  import Icon from '$lib/common/Icon.svelte';
+  import Icon from '$c/Icon.svelte';
 
   export let depth;
 

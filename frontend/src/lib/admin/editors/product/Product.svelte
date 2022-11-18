@@ -1,21 +1,20 @@
 <script>
   import { onDestroy } from 'svelte';
-
-  import api from '$lib/api';
-  import socket from '$lib/heimdall';
-  import { edited, save, cancel } from '$lib/admin/stores';
-  import editing from '$lib/admin/editing';
-  import { diff, getSearchParams, makeTree, treeFlatten, moveItem } from '$lib/utils';
-
   import slugify from 'slugify';
   import { marked } from 'marked';
-  import Editor from '$lib/admin/editors/Editor.svelte';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
-  import Blame from '$lib/admin/common/Blame.svelte';
 
-  import { updateGlobal, users, companies, categories } from '$lib/admin/global';
-  import { edit as fields, defaults } from '$lib/fields/products';
+  import api from '$/api';
+  import socket from '$/heimdall';
+  import { diff, getSearchParams, makeTree, treeFlatten, moveItem } from '$/utils';
+  import { edit as fields, defaults } from '$/fields/products';
+
+  import editing from '@/editing';
+  import { edited, save, cancel } from '@/stores';
+  import { updateGlobal, users, companies, categories } from '@/global';
+  import Editor from '@/editors/Editor.svelte';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
+  import Blame from '@c/Blame.svelte';
   import ProductPricing from './ProductPricing.svelte';
   import ProductStorage from './ProductStorage.svelte';
   import ProductGallery from './ProductGallery.svelte';
@@ -31,15 +30,24 @@
   let itemOriginal;
   let itemDiff;
 
+  let fieldErrors = { code: null };
+
   $save = async () => {
-    [item, itemOriginal] = await editing.save(
-      'products',
-      item,
-      itemOriginal,
-      fields,
-      fieldsToIgnore,
-      item.slug != slug ? '/admin/produkty/' + item.slug : null
-    );
+    try {
+      [item, itemOriginal] = await editing.save(
+        'products',
+        item,
+        itemOriginal,
+        fields,
+        fieldsToIgnore,
+        item.slug != slug ? '/admin/produkty/' + item.slug : null
+      );
+      fieldErrors = { code: null };
+    } catch (e) {
+      if (e.message == 'Field "code" has to be unique.') {
+        fieldErrors.code = 'Kod musi być unikalny.';
+      } else throw e;
+    }
   };
   $cancel = async () => {
     [item, itemOriginal] = await editing.cancel(item, itemOriginal, '/admin/produkty');
@@ -109,7 +117,7 @@
               <Input type="checkbox" bind:value={item.new}>Nowość</Input>
             </div>
             <Input bind:value={item.name} error={item.name == '+' ? 'Nazwa zarezerwowana' : false}>Nazwa</Input>
-            <Input bind:value={item.code}>Kod</Input>
+            <Input bind:value={item.code} error={fieldErrors.code}>Kod</Input>
           </div>
           <div class="ui-box">
             <h3 class="ui-h3">Kategorie</h3>
@@ -231,13 +239,13 @@
 </Editor>
 
 <style>
-  .diff {
+  /* .diff {
     overflow-y: scroll;
     border: var(--border);
     padding: 1rem;
     max-height: 500px;
     overflow-wrap: break-word;
-  }
+  } */
   .category.main {
     outline: var(--outline-dashed);
   }

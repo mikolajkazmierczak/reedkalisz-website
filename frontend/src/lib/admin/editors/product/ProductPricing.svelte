@@ -1,11 +1,11 @@
 <script>
-  import { moveItem } from '$lib/utils';
-  import { recalculateLabelings, toggleCustomPrices } from '$lib/admin/calculations';
-  import { repairPrices, cleanupPrices } from '$lib/admin/calculationsPrices';
-  import Input from '$lib/admin/input/Input.svelte';
-  import Button from '$lib/admin/input/Button.svelte';
+  import { moveItem } from '$/utils';
+  import { recalculateLabelings, toggleCustomPrices } from '@/calculations';
+  import { repairPrices, cleanupPrices } from '@/calculationsPrices';
+  import Input from '@c/Input.svelte';
+  import Button from '@c/Button.svelte';
 
-  import { updateGlobal, companies, globalMargins, priceViews, labelings } from '$lib/admin/global';
+  import { updateGlobal, companies, globalMargins, priceViews, labelings } from '@/global';
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
   import { tick } from 'svelte';

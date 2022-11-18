@@ -1,9 +1,9 @@
 <script>
   import { afterNavigate } from '$app/navigation';
 
-  import TableRow from '$lib/admin/common/TableRow.svelte';
-  import Pagination from '$lib/admin/common/Pagination.svelte';
-  import { setSearchParams, getSearchParams, treeFlatten } from '$lib/utils';
+  import { setSearchParams, getSearchParams, treeFlatten, diff } from '$/utils';
+  import TableRow from '@c/TableRow.svelte';
+  import Pagination from '@c/Pagination.svelte';
 
   export let limit;
 

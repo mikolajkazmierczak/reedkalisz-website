@@ -1,4 +1,4 @@
-import { reuseIDs } from '$lib/utils';
+import { reuseIDs } from '$/utils';
 
 function pushPrice(prices, { amount = null, price = null }) {
   prices.push({ amount, price });
