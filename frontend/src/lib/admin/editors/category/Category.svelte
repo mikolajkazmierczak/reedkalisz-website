@@ -72,8 +72,6 @@
 >
   {#if item}
     <section class="ui-section">
-      <h2 class="ui-h2">Główne</h2>
-
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">

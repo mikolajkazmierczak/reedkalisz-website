@@ -54,8 +54,8 @@
         { checkbox: true, icon: 'eye' },
         { id: true, label: 'ID' },
         { label: 'Nazwa' },
-        { blame: true, label: 'Dodano' },
-        { blame: true, label: 'Zaktualizowano' }
+        { blame: true, label: 'Utworzenie' },
+        { blame: true, label: 'Aktualizacja' }
       ]}
       mapper={$ => ({
         href: '/admin/kategorie/' + $.slug,

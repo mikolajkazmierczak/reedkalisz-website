@@ -7,9 +7,13 @@ import { default as generateSlug } from 'slugify';
 export const range = (start = 0, stop, step = 1) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
-export const slugify = (text, textOriginal = null, slugOriginal = null) => {
+export const slugify = (parts, partsOriginal = null, slugOriginal = null) => {
+  if (!Arrays.isArray(parts)) parts = [parts];
+  if (!Arrays.isArray(partsOriginal)) partsOriginal = [partsOriginal];
+  const text = parts.join('-');
+  const textOriginal = partsOriginal.join('-');
   if (textOriginal && text == textOriginal) return slugOriginal;
-  return generateSlug(text, { lower: true, strict: true }) + '-' + nanoid(6);
+  return generateSlug(text, { lower: true, strict: true }) + '-' + nanoid(8);
 };
 
 export const deep = {

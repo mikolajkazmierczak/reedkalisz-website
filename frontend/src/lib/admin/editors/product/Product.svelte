@@ -75,11 +75,7 @@
   read();
 
   $: if (item)
-    item.slug = slugify(
-      item?.code + '-' + item?.name,
-      itemOriginal?.code + '-' + itemOriginal?.name,
-      itemOriginal?.slug
-    );
+    item.slug = slugify([item?.code, item?.name], [itemOriginal?.code, itemOriginal?.name], itemOriginal?.slug);
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed, html }) => {
@@ -105,8 +101,6 @@
 >
   {#if item}
     <section class="ui-section">
-      <h2 class="ui-h2">Główne</h2>
-
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">
@@ -114,7 +108,7 @@
               <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
               <Input type="checkbox" bind:value={item.new}>Nowość</Input>
             </div>
-            <Input bind:value={item.name} error={item.name == '+' ? 'Nazwa zarezerwowana' : false}>Nazwa</Input>
+            <Input bind:value={item.name}>Nazwa</Input>
             <Input bind:value={item.code} error={errors.code}>Kod</Input>
           </div>
           <div class="ui-box">
@@ -175,9 +169,13 @@
           </div>
 
           <div class="ui-box ui-box--uneditable">
-            <h3 class="ui-h3">Bezpośredni link</h3>
-            <a href="/produkty/{item.slug}">/produkty/{item.slug}</a>
-            <h3 class="ui-h3">Dodano</h3>
+            <h3 class="ui-h3">Link do strony</h3>
+            {#if item.date_created}
+              <a href="/produkty/{item.slug}">/produkty/{item.slug}</a>
+            {:else}
+              /produkty/{item.slug || '...'}
+            {/if}
+            <h3 class="ui-h3">Utworzenie</h3>
             <p>
               {#if $users && item.date_created}
                 <Blame user={item.user_created} datetime={item.date_created} />
@@ -185,7 +183,7 @@
                 Tu będziesz ty
               {/if}
             </p>
-            <h3 class="ui-h3">Zaktualizowano</h3>
+            <h3 class="ui-h3">Aktualizacja</h3>
             <p>
               {#if $users && item.date_updated}
                 <Blame user={item.user_updated} datetime={item.date_updated} />
