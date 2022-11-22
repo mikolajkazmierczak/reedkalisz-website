@@ -23,8 +23,7 @@
       upload: 'upload',
       // table
       hierarchy: 'list-ui-alt',
-      order: 'TBD',
-      drag: 'TBD',
+      drag: 'drag',
       eye: 'eye',
       new: 'exclamation-circle',
       sale: 'percentage',

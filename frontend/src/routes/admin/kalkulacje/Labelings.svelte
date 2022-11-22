@@ -2,8 +2,8 @@
   import { slide } from 'svelte/transition';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { diff, moveItem, reuseIDs } from '$/utils';
+  import heimdall from '$/heimdall';
+  import { deep, diff, moveItem, reuseIDs } from '$/utils';
   import { recalculateProducts } from '@/calculations';
 
   import { read as fields, defaults } from '$/fields/labelings';
@@ -15,10 +15,10 @@
 
   export let company;
   export let items;
-  let itemsOriginal = JSON.parse(JSON.stringify(items));
-  $: itemsEdited = itemsOriginal.map(() => false);
+  let itemsOriginal = deep.copy(items);
+  $: unsavedItems = itemsOriginal.map(() => false);
 
-  $: edited = itemsEdited.some(e => e);
+  $: unsaved = unsavedItems.some(e => e);
   let saving = false;
   let deleting = false;
   let deletingSaving = false; // prevent double click
@@ -33,8 +33,8 @@
     const updatedIDs = [];
     const updatedItems = new Map();
     for (const [i, item] of items.entries()) {
-      if (itemsEdited[i]) {
-        const data = JSON.parse(JSON.stringify(item));
+      if (unsavedItems[i]) {
+        const data = deep.copy(item);
         // cleanup update data
         delete data.id;
         for (const field of fieldsToIgnore) delete data[field];
@@ -53,13 +53,13 @@
         const filter = { labelings: { labeling: { _eq: item.id } } };
         await recalculateProducts(filter);
 
-        itemsEdited[i] = false;
+        unsavedItems[i] = false;
       }
     }
     // refresh items
     for (const [i, item] of newItems) items[i] = item;
-    itemsOriginal = JSON.parse(JSON.stringify(items));
-    socket.emitChanges('labelings', updatedIDs);
+    itemsOriginal = deep.copy(items);
+    heimdall.emit('labelings', updatedIDs);
   }
   function tryRemoveDuplicateAmounts() {
     // check if there are duplicate amounts, ask the user if he wants to continue, only keep the first occurences
@@ -99,8 +99,8 @@
     saving = false;
   }
   function cancel() {
-    items = JSON.parse(JSON.stringify(itemsOriginal));
-    edited = false;
+    items = deep.copy(itemsOriginal);
+    unsaved = false;
   }
 
   function newLabeling() {
@@ -111,6 +111,7 @@
       data.prices.push({ amount, price: null });
     }
     if (amounts.length == 0) {
+      data.default = true;
       data.prices.push({ amount: 1, price: null }); // lumpsum is mandatory
     }
     delete data.id;
@@ -120,9 +121,9 @@
     // save to api immediately to get id
     const data = newLabeling();
     const item = await api.items('labelings').createOne(data, { fields });
-    socket.emitChanges('labelings', item.id);
+    heimdall.emit('labelings', item.id);
     items = [...items, item];
-    itemsOriginal = [...itemsOriginal, JSON.parse(JSON.stringify(item))];
+    itemsOriginal = [...itemsOriginal, deep.copy(item)];
   }
 
   async function setDefault(i) {
@@ -132,7 +133,7 @@
     oldDefault.default = false;
     await api.items('labelings').updateOne(item.id, { default: true });
     await api.items('labelings').updateOne(oldDefault.id, { default: false });
-    socket.emitChanges('labelings', [item.id, oldDefault.id]);
+    heimdall.emit('labelings', [item.id, oldDefault.id]);
     items = items;
   }
 
@@ -147,8 +148,8 @@
       ids.push(item.id);
     }
 
-    socket.emitChanges('labelings', ids);
-    itemsOriginal = JSON.parse(JSON.stringify(items));
+    heimdall.emit('labelings', ids);
+    itemsOriginal = deep.copy(items);
   }
 
   function removeStart(i) {
@@ -194,7 +195,7 @@
     }
     // add ids from items with updated indexes
     updatedIDs.push(items.filter(i => i.index >= item.index).map(i => i.id));
-    socket.emitChanges('labelings', updatedIDs);
+    heimdall.emit('labelings', updatedIDs);
 
     items = items.filter(i => i.id !== item.id);
     itemsOriginal = itemsOriginal.filter(i => i.id !== item.id);
@@ -245,14 +246,15 @@
     items = items;
   }
   function updateAmountsFromPrices(items) {
-    if (JSON.stringify(items) === JSON.stringify(itemsOriginal))
+    if (deep.same(items, itemsOriginal)) {
       amounts = items.length ? items[0].prices.map(p => p.amount) : [];
+    }
   }
 
   function checkDiff(items) {
     for (const [i, itemOriginal] of itemsOriginal.entries()) {
       const item = items.find(i => i.id == itemOriginal.id);
-      diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (itemsEdited[i] = changed));
+      diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (unsavedItems[i] = changed));
     }
   }
 
@@ -439,7 +441,7 @@
 {/if}
 
 <div class="edit-actions">
-  {#if edited}
+  {#if unsaved}
     <div class="ui-pair" in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }}>
       <Button icon="close" dangerous on:click={() => confirm('Jesteś pewny? Utracisz wszystkie postępy!') && cancel()}>
         Anuluj
@@ -448,7 +450,7 @@
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
     </div>
-    {#each itemsEdited as value, i}
+    {#each unsavedItems as value, i}
       {#if value == true}
         <small>{items[i].code ?? '-'} {items[i].type ?? '-'} {items[i].name ?? '-'}</small>
       {/if}

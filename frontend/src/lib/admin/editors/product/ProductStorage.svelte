@@ -1,7 +1,6 @@
 <script>
   import api from '$/api';
   import { moveItem } from '$/utils';
-  import Icon from '$c/Icon.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Picker from '@c/library/Picker.svelte';

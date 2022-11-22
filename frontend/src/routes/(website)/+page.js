@@ -5,7 +5,7 @@ export async function load() {
     const colors = await api.items('colors').readByQuery({ limit: -1 });
     return { colors: colors.data };
   } catch (err) {
-    console.log('error');
+    console.error('error');
     return { colors: null };
   }
 }

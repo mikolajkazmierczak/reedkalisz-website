@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   import api, { baseUrl } from '$/api';
-  import socket from '$/heimdall';
+  import heimdall from '$/heimdall';
   import { filetypeToReadable, bytesToReadable } from '$/utils';
 
   import { edit as fields } from '$/fields/files';
@@ -24,7 +24,7 @@
   async function handleDelete() {
     if (confirm('Napewno?')) {
       await api.files.deleteOne(id);
-      socket.emitChanges('files', id);
+      heimdall.emit('files', id);
       goto('/admin/biblioteka', { replaceState: true, noScroll: true });
     }
   }
@@ -35,13 +35,13 @@
   $: imgError = false;
 </script>
 
-<Editor back="/admin/biblioteka" icon="library" title={id}>
+<Editor root="/admin/biblioteka" icon="library" title={id}>
   {#if file}
     <section class="ui-section__row">
       <div class="ui-section__col ui-box ui-box--uneditable">
         <div>
           <b>ID:</b>
-          <a href="{baseUrl}/assets/{id}" target="_blank">{id}</a>
+          <a href="{baseUrl}/assets/{id}" target="_blank" rel="noreferrer">{id}</a>
         </div>
         <div>
           <b>Plik:</b>

@@ -1,5 +1,5 @@
 <script>
-  import socket from '$/heimdall';
+  import heimdall from '$/heimdall';
   import { createEventDispatcher } from 'svelte';
   import api from '$/api';
   import Icon from '$c/Icon.svelte';
@@ -23,12 +23,12 @@
       }
       if (update) {
         const fileData = await api.files.updateOne(update, form);
-        socket.emitChanges('files', fileData.id);
+        heimdall.emit('files', fileData.id);
       } else {
         const filesData = (await api.files.createMany(form)).data;
         const filesArray = Array.isArray(filesData) ? filesData : [filesData];
         const filesIds = filesArray.map(f => f.id);
-        socket.emitChanges('files', filesIds);
+        heimdall.emit('files', filesIds);
       }
       dispatch('upload');
     }

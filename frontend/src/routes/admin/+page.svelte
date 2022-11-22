@@ -1,8 +1,8 @@
 <script>
-  import { page } from '@/stores';
+  import { header } from '@/stores';
   import Icon from '$c/Icon.svelte';
 
-  $page = { title: 'Dashboard', icon: 'dashboard' };
+  $header = { title: 'Dashboard', icon: 'dashboard' };
 
   const buttons = [
     {

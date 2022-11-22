@@ -1,90 +1,45 @@
 <script>
-  import { goto, afterNavigate } from '$app/navigation';
-  import { onDestroy } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { fade } from 'svelte/transition';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { page } from '@/stores';
-  import { getSearchParams, setSearchParams, makeTree } from '$/utils';
+  import heimdall from '$/heimdall';
+  import { header } from '@/stores';
+  import { searchparams, SearchParamsManager } from '$/searchparams';
 
-  import { updateGlobal, categories } from '@/global';
+  import { categories } from '@/globals';
   import { search as fields } from '$/fields/products';
-  import Category from '@/editors/product/Category.svelte';
   import Button from '@c/Button.svelte';
   import Table from '@c/Table.svelte';
   import Search from '@c/Search.svelte';
+  import Categories from './Categories.svelte';
 
-  $page = { title: 'Produkty', icon: 'products' };
+  $header = { title: 'Produkty', icon: 'products' };
 
-  // TODO: this could use a rework, it loads products twice - the reactivity should be revisited
+  const searchParams = new SearchParamsManager('/admin/produkty');
+  $: [limit, page, query, category] = $searchparams.get(searchParams.pathname).values();
 
-  let category = null;
-  afterNavigate(navigation => {
-    const searchParams = getSearchParams(['c']); // category
-    if (searchParams.c != null) category = searchParams.c;
-    setSearchParams({ c: category }, navigation, '/admin/produkty');
-  });
-  $: setSearchParams({ c: category });
+  // reset page when category changes
+  $: category || searchParams.set({ p: 1 });
 
-  let selectedLimit;
-  let selectedPage;
-  let selectedQuery;
-
-  $: if (category != null) {
-    // reset page on category change
-    selectedPage = 1;
-  }
-
-  let categoriesTree;
   let products;
 
-  async function readProducts(category = null, limit = 25, page = 1, query = null) {
-    // if (products) products.data = []; // clear to indicate loading
-    if (categoriesTree) {
-      const filter = category ? { categories: { category: { _eq: category } } } : {};
-      products = await api.items('products').readByQuery({ fields, filter, limit, page, search: query, meta: '*' });
-    }
+  async function read(limit, page, query, category) {
+    const filter = category ? { categories: { category: { _eq: category } } } : {};
+    products = await api.items('products').readByQuery({ fields, filter, limit, page, search: query, meta: '*' });
+    console.log('read: products');
   }
 
-  async function readCategories() {
-    await updateGlobal(categories);
-    categoriesTree = makeTree($categories);
-  }
+  $: $categories && read(limit, page, query, category);
 
-  let afterFirstRead = false;
-  async function read() {
-    await readCategories();
-    await readProducts(category, selectedLimit, selectedPage, selectedQuery);
-    afterFirstRead = true;
-  }
-
-  read();
-
-  $: if (afterFirstRead) readProducts(category, selectedLimit, selectedPage, selectedQuery);
-
-  async function listener(data) {
+  heimdall.listen(({ match }) => {
     const itemIds = products.data.map(item => item.id);
-    const matchProducts = socket.checkMatch(data, 'products', itemIds);
-    if (matchProducts.match) readProducts(category, selectedLimit, selectedPage, selectedQuery);
-    const matchCategories = socket.checkMatch(data, 'categories');
-    if (matchCategories.match) readCategories();
-  }
-  socket.onChanges(listener);
-  onDestroy(() => socket.offChanges(listener));
+    if (match('products', itemIds)) read(limit, page, query, category);
+  });
 </script>
 
 <div class="wrapper">
-  {#if categoriesTree}
-    <sidebar>
-      <div>
-        <h3 class="title">Kategorie</h3>
-        <Category id={null} name={'Wszystkie'} enabled children={[]} depth={0} bind:selected={category} />
-        {#each categoriesTree as { id, name, enabled, children }, i}
-          <Category {id} {name} {enabled} {children} depth={i + 1} bind:selected={category} />
-        {/each}
-      </div>
-    </sidebar>
-  {/if}
+  <Categories {searchParams} {category} />
 
   {#if products}
     <div class="items">
@@ -92,19 +47,20 @@
         <div>
           <Button on:click={() => goto(`/admin/produkty/+`)} icon="add">Dodaj</Button>
           {#if category}
-            <Button on:click={() => goto(`/admin/produkty/+?c=${category}`)} icon="add">
-              <span>Dodaj w <small>{$categories.find(c => c.id == category).name}</small></span>
-            </Button>
+            <div transition:fade={{ duration: 100 }}>
+              <Button on:click={() => goto(`/admin/produkty/+?c=${category}`)} icon="add">
+                <span>Dodaj w <small>{$categories.find(c => c.id == category).name}</small></span>
+              </Button>
+            </div>
           {/if}
         </div>
-        <Search bind:query={selectedQuery} />
+        <Search {searchParams} {query} />
       </div>
 
       <Table
-        rootPathname="/admin/produkty"
         collection="products"
-        items={products.data}
         itemsCount={products.meta.filter_count}
+        items={products.data}
         head={[
           { checkbox: true, icon: 'eye' },
           { checkbox: true, icon: 'new' },
@@ -128,9 +84,9 @@
             { user: $.user_updated, datetime: $.date_updated }
           ]
         })}
-        bind:limit={selectedLimit}
-        bind:page={selectedPage}
-        bind:query={selectedQuery}
+        {searchParams}
+        {limit}
+        {page}
       />
     </div>
   {/if}
@@ -143,20 +99,6 @@
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 1rem;
-  }
-
-  sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem 1rem;
-    min-width: 350px;
-    border-radius: var(--border-radius);
-    border: var(--border-light);
-    background-color: var(--light);
-  }
-  sidebar .title {
-    margin-bottom: 0.5rem;
   }
 
   .items {

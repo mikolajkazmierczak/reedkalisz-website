@@ -17,7 +17,9 @@
     "@directus/sdk": "^10.1.5",
     "@sveltejs/adapter-node": "next",
     "@sveltejs/kit": "next",
+    "dequal": "^2.0.3",
     "diff": "^5.1.0",
+    "klona": "^2.0.5",
     "marked": "^4.0.18",
     "prettier": "^2.6.2",
     "prettier-plugin-svelte": "^2.7.0",
@@ -29,5 +31,8 @@
   "type": "module",
   "engine": {
     "node": ">=16"
+  },
+  "dependencies": {
+    "nanoid": "^4.0.0"
   }
 }

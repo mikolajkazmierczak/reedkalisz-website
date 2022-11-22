@@ -1,8 +1,8 @@
 <script>
-  import { page } from '@/stores';
+  import { header } from '@/stores';
   import WIP from '@/WIP.svelte';
 
-  $page = { title: 'Kolory', icon: 'colors' };
+  $header = { title: 'Kolory', icon: 'colors' };
 </script>
 
 <WIP />

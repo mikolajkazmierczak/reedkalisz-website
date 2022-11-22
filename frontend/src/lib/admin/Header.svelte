@@ -1,10 +1,10 @@
 <script>
   import { fly } from 'svelte/transition';
-  import { page } from '@/stores';
+  import { header } from '@/stores';
   import Icon from '$c/Icon.svelte';
 
-  $: title = $page?.title;
-  $: icon = $page?.icon;
+  $: title = $header?.title;
+  $: icon = $header?.icon;
 </script>
 
 <header>

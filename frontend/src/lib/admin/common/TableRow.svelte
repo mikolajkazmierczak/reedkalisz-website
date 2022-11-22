@@ -4,7 +4,7 @@
   import { createEventDispatcher } from 'svelte';
 
   import api from '$/api';
-  import socket from '$/heimdall';
+  import heimdall from '$/heimdall';
   import { treeGetItemAtPath, treeMoveItemToPath } from '$/utils';
 
   import Icon from '$c/Icon.svelte';
@@ -15,26 +15,26 @@
   const smallestCellWidth = 2.25;
   const hierarchyCellWidth = smallestCellWidth * 0.8;
 
-  export let items = null;
+  export let collection = null;
   export let headRow = false;
   export let head;
 
-  export let hierarchy = false;
-  export let order = false;
-  export let maxDepth = 0;
-  export let widths;
-
+  export let items = null;
   export let item = null;
   export let mapper = null;
   $: row = item ? mapper(item) : null; // href, values
   $: meta = item?._meta; // depth, index, path, isFirst, isLast
   $: children = item?.children;
 
-  export let collection = null;
+  export let order = false;
+  export let tree = false;
+  export let maxDepth = 0;
+  export let widths;
 
   export let expandedItems = null;
   $: expandable = children?.length;
   $: expanded = expandedItems?.includes(item.id);
+
   function expand(item) {
     expandedItems = [...expandedItems, item.id];
   }
@@ -51,12 +51,8 @@
   async function saveAfterMove(newItems, oldPath, newPath) {
     function getItemsToUpdate(newItems, path, startIndex) {
       const item = treeGetItemAtPath(newItems, path);
-      console.log('item', item);
       const children = item.children ?? item; // root edge case
-      console.log('item?.children', item?.children);
-      console.log('children', children);
       const indexes = children.filter(c => c.index >= startIndex).map(c => c.index);
-      console.log('indexes', indexes);
       return { children, indexes };
     }
 
@@ -90,18 +86,18 @@
       ]);
     }
 
-    socket.emitChanges(collection, movedItem.id, false); // TODO: emit changes for all updated items
+    heimdall.emit(collection, movedItem.id, false); // TODO: emit changes for all updated items
   }
 
-  let dragging = false;
   export let showDropzonesItemID = null;
+  let dragging = false;
+  let dropzoneHoverParent = false;
+  let dropzoneHoverSibling = false;
+  let dropzoneHoverChild = false;
   $: showDropzones = item && showDropzonesItemID === item.id;
   $: showDropzoneParent = meta?.depth != 0 && meta?.isLast;
   $: showDropzoneSibling = !expanded;
   $: showDropzoneChild = true;
-  let dropzoneHoverParent = false;
-  let dropzoneHoverSibling = false;
-  let dropzoneHoverChild = false;
 
   function dragstart(e) {
     dragging = true;
@@ -171,12 +167,12 @@
 
 {#if headRow}
   <div class="row row--head" style:grid-template-columns={widths}>
-    {#if order}
+    {#if tree}
       <div class="value value--head value--center">
         <div><div class="icon"><div><Icon name="text_bullet_list_add" dark /></div></div></div>
       </div>
     {/if}
-    {#if hierarchy}
+    {#if tree || order}
       <div class="value value--head value--center">
         <div><div class="icon"><div><Icon name="hierarchy" dark /></div></div></div>
       </div>
@@ -202,7 +198,7 @@
     transition:slide={{ duration: order ? 200 : 0 }}
     on:dragenter={dragenterItem}
   >
-    {#if order}
+    {#if tree}
       <div
         class="value value--item value--center"
         on:click={() => {
@@ -213,8 +209,8 @@
         <div><div class="icon"><div><Icon name="add" dark /></div></div></div>
       </div>
     {/if}
-    {#if hierarchy}
-      {@const width = ((maxDepth - meta.depth + 1) / (maxDepth + 1)) * 100}
+    {#if tree || order}
+      {@const width = ((maxDepth - (meta.depth ?? 0) + 1) / (maxDepth + 1)) * 100}
       <div class="value value--item value--hierarchy" class:expandable>
         <div
           on:click={() => toggle(item)}
@@ -281,7 +277,7 @@
 {/if}
 
 {#if showDropzones && !dragging}
-  {@const blankSpan = meta.depth - (showDropzoneParent ? 1 : 0) + (showDropzoneSibling ? 0 : 1)}
+  {@const blankSpan = (meta.depth ?? 0) - (showDropzoneParent ? 1 : 0) + (showDropzoneSibling ? 0 : 1)}
   {@const childSpan = maxDepth + 1 - blankSpan - (showDropzoneParent ? 1 : 0) - (showDropzoneSibling ? 1 : 0)}
   {@const blankWidth = blankSpan * hierarchyCellWidth}
   {@const parentWidth = hierarchyCellWidth}
@@ -325,19 +321,19 @@
   </div>
 {/if}
 
-{#if !headRow && hierarchy && expanded}
+{#if !headRow && tree && expanded}
   {#each children as child (child)}
     <svelte:self
-      bind:items
-      bind:expandedItems
+      {collection}
       {head}
-      {hierarchy}
-      {order}
-      {maxDepth}
-      {widths}
+      bind:items
       bind:item={child}
       {mapper}
-      {collection}
+      {order}
+      {tree}
+      {maxDepth}
+      {widths}
+      bind:expandedItems
       {showDropzonesItemID}
       on:drop={dropBubble}
       on:dragend={dragendBubble}
@@ -355,9 +351,6 @@
   }
   .row--head {
     height: 2.5rem;
-  }
-  .row--item.dragging {
-    opacity: 0.5;
   }
 
   .value {
@@ -428,15 +421,13 @@
   .drag {
     cursor: grab;
   }
+  .dragging {
+    opacity: 0.5;
+  }
   .dropzones {
     display: flex;
     height: 2rem;
   }
-  /* .dropzone__blank,
-  .dropzone {
-    display: grid;
-    place-items: center;
-  } */
   .dropzone {
     --border: 1px solid var(--primary-light);
     height: 100%;

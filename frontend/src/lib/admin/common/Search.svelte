@@ -4,22 +4,22 @@
   import Button from '@c/Button.svelte';
   import Icon from '$c/Icon.svelte';
 
+  export let searchParams = null;
   export let query;
-  let value;
 
   let input;
+  $: value = query; // query might be given from above
 
-  function search() {
-    if (!!value) query = value.trim();
-  }
-  function clear() {
-    value = null;
+  function set(q) {
+    searchParams?.set({ q });
+    query = q;
   }
 
   // clear search when value is emptied (either manually or by clicking the clear button)
-  $: if (!value && query) {
-    query = null;
-  }
+  $: if (!value && query) set(null);
+
+  const clear = () => (value = null);
+  const search = () => !!value && set(value.trim());
 </script>
 
 <svelte:window
@@ -78,7 +78,6 @@
     padding: 0.25rem;
     border-radius: var(--border-radius);
     border: solid 1px var(--accent);
-    /* border: none; */
     background-color: transparent;
     transition: background-color 0.1s ease;
   }
@@ -100,7 +99,6 @@
     right: 0.4rem;
     transform: translateY(-50%);
     border-radius: var(--border-radius);
-    /* border: solid 1px var(--primary-light); */
     padding: 0.2rem 0.4rem;
     font-size: 0.75rem;
     color: #000;

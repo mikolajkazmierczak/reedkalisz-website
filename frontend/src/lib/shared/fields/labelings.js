@@ -1,4 +1,4 @@
-export const read = [
+export const search = [
   'id',
   'index',
   'user_created',
@@ -20,9 +20,10 @@ export const read = [
   'margin',
   'minimum'
 ];
-export const search = [...read];
-export const show = [...read];
-export const edit = [...read];
+export const show = [...search];
+
+export const read = [...search];
+export const edit = [...search];
 
 export const defaults = () => ({
   id: '+',

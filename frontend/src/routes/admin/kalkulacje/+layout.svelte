@@ -1,12 +1,12 @@
 <script>
-  import { page } from '@/stores';
+  import { header } from '@/stores';
 
-  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '@/global';
+  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '@/globals';
   import PriceViews from './PriceViews.svelte';
   import GlobalMargins from './GlobalMargins.svelte';
   import Labelings from './Labelings.svelte';
 
-  $page = { title: 'Kalkulacje', icon: 'calculator' };
+  $header = { title: 'Kalkulacje', icon: 'calculator' };
 
   async function read() {
     await updateGlobal(globalMargins);

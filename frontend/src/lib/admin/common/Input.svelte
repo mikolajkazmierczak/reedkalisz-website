@@ -1,5 +1,6 @@
 <script>
-  import { uuid } from '$/utils';
+  import { nanoid } from 'nanoid';
+  import { deep } from '$/utils';
   import Icon from '$c/Icon.svelte';
   import Button from '@c/Button.svelte';
 
@@ -8,7 +9,7 @@
   // common
   export let type = 'text';
   export let value = null;
-  let valueCopy = JSON.parse(JSON.stringify(value)); // allows to check for changes from outside
+  let valueCopy = deep.copy(value); // allows to check for changes from outside
   export let placeholder = null;
   export let disabled = false;
   export let error = null;
@@ -63,10 +64,10 @@
 
   $: if (type == 'list') {
     if (list === undefined && value !== null) list = value.join(';');
-    if (JSON.stringify(value) !== JSON.stringify(valueCopy)) {
+    if (!deep.same(value, valueCopy)) {
       // value changed from outside
       list = value === null ? '' : value.join(';');
-      valueCopy = JSON.parse(JSON.stringify(value));
+      valueCopy = deep.copy(value);
     } else {
       const array = parseList(list);
       if (array) value = array;
@@ -74,7 +75,7 @@
   }
 
   // token (for explicit labelling)
-  const id = `input-${uuid()}`;
+  const id = `input-${nanoid(6)}`;
 </script>
 
 <div class="wrapper">

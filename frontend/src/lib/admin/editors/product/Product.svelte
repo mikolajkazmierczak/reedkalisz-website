@@ -1,16 +1,15 @@
 <script>
-  import { onDestroy } from 'svelte';
-  import slugify from 'slugify';
   import { marked } from 'marked';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { diff, getSearchParams, makeTree, treeFlatten, moveItem } from '$/utils';
+  import heimdall from '$/heimdall';
+  import { SearchParamsManager } from '$/searchparams';
   import { edit as fields, defaults } from '$/fields/products';
+  import { deep, slugify, diff, makeTree, treeFlatten, moveItem } from '$/utils';
 
-  import editing from '@/editing';
-  import { edited, save, cancel } from '@/stores';
-  import { updateGlobal, users, companies, categories } from '@/global';
+  import editing from '@/editors/editing';
+  import { unsaved } from '@/stores';
+  import { updateGlobal, users, companies, categories } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
@@ -20,9 +19,7 @@
   import ProductGallery from './ProductGallery.svelte';
   import ProductRecommendations from './ProductRecommendations.svelte';
 
-  const searchParams = getSearchParams(['c']);
-
-  const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
+  const searchParams = SearchParamsManager.read();
 
   export let slug;
 
@@ -30,28 +27,22 @@
   let itemOriginal;
   let itemDiff;
 
-  let fieldErrors = { code: null };
+  let errors = { code: null };
 
-  $save = async () => {
+  async function save(action) {
     try {
-      [item, itemOriginal] = await editing.save(
-        'products',
-        item,
-        itemOriginal,
-        fields,
-        fieldsToIgnore,
-        item.slug != slug ? '/admin/produkty/' + item.slug : null
-      );
-      fieldErrors = { code: null };
+      await action();
+      errors = { code: null };
     } catch (e) {
       if (e.message == 'Field "code" has to be unique.') {
-        fieldErrors.code = 'Kod musi być unikalny.';
+        errors.code = 'Kod musi być unikalny.';
       } else throw e;
     }
-  };
-  $cancel = async () => {
-    [item, itemOriginal] = await editing.cancel(item, itemOriginal, '/admin/produkty');
-  };
+  }
+
+  function remove() {
+    editing.remove('products', item.id, { root: '/admin/produkty' });
+  }
 
   async function read() {
     await updateGlobal(companies);
@@ -60,15 +51,12 @@
     if (slug == '+') {
       item = defaults();
       // add category from search params
-      if (searchParams.c !== null) item.categories = [...item.categories, { category: searchParams.c }];
+      if (searchParams.c != null) item.categories = [...item.categories, { category: searchParams.c }];
     } else {
-      item = (await api.items('products').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
+      const filter = { slug: { _eq: slug } };
+      item = (await api.items('products').readByQuery({ fields, filter })).data[0];
     }
-    itemOriginal = item ? JSON.parse(JSON.stringify(item)) : null;
-  }
-
-  function deleteProduct() {
-    editing.del('products', item.id, '/admin/produkty', 'Czy na pewno chcesz usunąć produkt?');
+    itemOriginal = item ? deep.copy(item) : null;
   }
 
   function pushCategory() {
@@ -86,25 +74,35 @@
 
   read();
 
-  $: if (item) item.slug = slugify(item?.code + '-' + item?.name, { lower: true, strict: true });
-  $: correctSlug = item && !['+', ''].includes(item.slug);
+  $: if (item)
+    item.slug = slugify(
+      item?.code + '-' + item?.name,
+      itemOriginal?.code + '-' + itemOriginal?.name,
+      itemOriginal?.slug
+    );
 
-  $: diff(item, itemOriginal, fieldsToIgnore).then(({ changed, html }) => {
+  $: correctSlug = item && !['+', ''].includes(item.slug);
+  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed, html }) => {
     itemDiff = html;
-    $edited = correctSlug && changed;
+    $unsaved = correctSlug && changed;
   });
 
-  async function listener(data) {
-    const { match, me } = socket.checkMatch(data, 'products', item.id);
-    if (match && !me) {
+  heimdall.listen(({ match, me }) => {
+    if (match('products', item.id) && !me) {
       alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
     }
-  }
-  socket.onChanges(listener);
-  onDestroy(() => socket.offChanges(listener));
+  });
 </script>
 
-<Editor back="/admin/produkty" icon="products" title={item?.name}>
+<Editor
+  root="/admin/produkty"
+  icon="products"
+  title={item?.name}
+  collection="products"
+  bind:item
+  bind:itemOriginal
+  {save}
+>
   {#if item}
     <section class="ui-section">
       <h2 class="ui-h2">Główne</h2>
@@ -117,7 +115,7 @@
               <Input type="checkbox" bind:value={item.new}>Nowość</Input>
             </div>
             <Input bind:value={item.name} error={item.name == '+' ? 'Nazwa zarezerwowana' : false}>Nazwa</Input>
-            <Input bind:value={item.code} error={fieldErrors.code}>Kod</Input>
+            <Input bind:value={item.code} error={errors.code}>Kod</Input>
           </div>
           <div class="ui-box">
             <h3 class="ui-h3">Kategorie</h3>
@@ -173,7 +171,7 @@
 
         <div class="ui-section__col">
           <div class="ui-box">
-            <Button icon="delete" on:click={deleteProduct} dangerous>Usuń</Button>
+            <Button icon="delete" on:click={remove} dangerous>Usuń</Button>
           </div>
 
           <div class="ui-box ui-box--uneditable">
@@ -200,7 +198,7 @@
 
         <!-- <div class="ui-section__col">
           <div class="diff">
-            EDITED: {$edited}
+            UNSAVED: {$unsaved}
             <h3 class="ui-h3">PRODUCT</h3>
             <pre>{@html itemDiff}</pre>
           </div>

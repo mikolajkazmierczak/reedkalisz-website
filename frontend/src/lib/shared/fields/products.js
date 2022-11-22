@@ -13,6 +13,7 @@ export const search = [
   'categories'
 ];
 export const show = [];
+
 export const read = [];
 export const edit = [
   'id',

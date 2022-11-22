@@ -1,8 +1,8 @@
 <script>
-  import { page } from '@/stores';
+  import { header } from '@/stores';
   import WIP from '@/WIP.svelte';
 
-  $page = { title: 'Fragmenty', icon: 'fragments' };
+  $header = { title: 'Fragmenty', icon: 'fragments' };
 </script>
 
 <WIP />

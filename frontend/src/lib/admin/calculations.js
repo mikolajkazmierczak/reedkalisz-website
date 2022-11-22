@@ -1,10 +1,10 @@
 import { get } from 'svelte/store';
 import api from '$/api';
-import socket from '$/heimdall';
+import heimdall from '$/heimdall';
 import { reuseIDs } from '$/utils';
 import { repairPrices, cleanupPrices } from '@/calculationsPrices';
 import { calculate as productFields } from '$/fields/products';
-import { globalMargins, priceViews, labelings } from '@/global';
+import { globalMargins, priceViews, labelings } from '@/globals';
 
 function fraction(percent) {
   // convert percentage to fraction
@@ -231,7 +231,7 @@ async function recalculateProduct(amounts, global, labelings, product, swapLabel
   await api.items('products').updateOne(product.id, updates);
 }
 
-export async function recalculateProducts(filter, options = { newPriceView: null, swapLabelings: null }) {
+export async function recalculateProducts(filter, { newPriceView = null, swapLabelings = null } = {}) {
   // Uses `recalculateProduct()` to update all products that match the filter.
   // A new priceView can be set, and labelings can be swapped or deleted.
   //
@@ -244,25 +244,18 @@ export async function recalculateProducts(filter, options = { newPriceView: null
   };
 
   const products = (await api.items('products').readByQuery({ fields: productFields, filter })).data;
-  console.log('affected:', products);
 
   // recalculate each product concurrently
   await Promise.all(
     products.map(product => {
-      if (options.newPriceView != null) product.price_view = options.newPriceView;
+      if (newPriceView != null) product.price_view = newPriceView;
       const priceView = stores.priceViews.find(pv => pv.id == product.price_view);
-      return recalculateProduct(
-        priceView.amounts,
-        stores.globalMargins,
-        stores.labelings,
-        product,
-        options.swapLabelings
-      );
+      return recalculateProduct(priceView.amounts, stores.globalMargins, stores.labelings, product, swapLabelings);
     })
   );
 
   const ids = products.map(p => p.id);
-  socket.emitChanges('products', ids);
+  heimdall.emit('products', ids);
 
   return {
     products,

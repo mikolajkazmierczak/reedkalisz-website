@@ -5,7 +5,7 @@ export async function load() {
     const res = await api.items('products').readByQuery({ limit: -1 });
     return { products: res.data };
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return { products: null };
   }
 }

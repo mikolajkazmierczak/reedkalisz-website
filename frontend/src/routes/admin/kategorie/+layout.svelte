@@ -1,22 +1,26 @@
 <script>
   import { goto } from '$app/navigation';
-  import { onDestroy } from 'svelte';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { page } from '@/stores';
+  import heimdall from '$/heimdall';
+  import { header } from '@/stores';
+  import { searchparams, SearchParamsManager } from '$/searchparams';
   import { makeTree, treeFlatten } from '$/utils';
 
-  import { updateGlobal, categories } from '@/global';
+  import { updateGlobal, categories } from '@/globals';
   import { search as fields } from '$/fields/categories';
   import Table from '@c/Table.svelte';
   import Button from '@c/Button.svelte';
   import Search from '@c/Search.svelte';
 
-  $page = { title: 'Kategorie', icon: 'categories' };
+  $header = { title: 'Kategorie', icon: 'categories' };
 
-  let selectedQuery;
-  async function read(query = null) {
+  const searchParams = new SearchParamsManager('/admin/kategorie');
+  $: [query] = $searchparams.get(searchParams.pathname).values();
+
+  let items;
+
+  async function read(query) {
     await updateGlobal(categories);
     const tree = makeTree($categories);
     if (query) {
@@ -28,28 +32,23 @@
     }
   }
 
-  let items;
+  $: read(query);
 
-  $: read(selectedQuery);
-
-  async function listener(data) {
-    const { match } = socket.checkMatch(data, 'categories');
-    if (match) read();
-  }
-  socket.onChanges(listener);
-  onDestroy(() => socket.offChanges(listener));
+  heimdall.listen(({ match }) => {
+    if (match('categories')) read(query);
+  });
 </script>
 
 {#if items}
   <div class="wrapper">
     <div class="actions">
       <Button on:click={() => goto(`/admin/kategorie/+?index=${items.length}`)} icon="add">Dodaj</Button>
-      <Search bind:query={selectedQuery} />
+      <Search {searchParams} {query} />
     </div>
 
     <Table
-      rootPathname="/admin/kategorie"
       collection="categories"
+      itemsCount={-1}
       bind:items
       head={[
         { checkbox: true, icon: 'eye' },
@@ -68,9 +67,7 @@
           { user: $.user_updated, datetime: $.date_updated }
         ]
       })}
-      order={!selectedQuery}
-      limit={-1}
-      bind:query={selectedQuery}
+      order={!query}
     />
   </div>
 {/if}

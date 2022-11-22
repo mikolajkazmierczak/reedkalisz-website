@@ -3,19 +3,30 @@
   import Input from '@c/Input.svelte';
   import Icon from '$c/Icon.svelte';
 
-  export let limit = 25;
+  export let searchParams = null;
+  export let limit;
   export let page;
-  export let total;
+
+  export let count;
+
+  const setLimit = l => {
+    searchParams?.set({ l });
+    limit = l;
+  };
+  const setPage = p => {
+    searchParams?.set({ p });
+    page = p;
+  };
 
   const limits = [1, 5, 25, 50, 100];
   let selectedLimit = limits.findIndex(l => l === limit) ?? 0;
-  $: if (selectedLimit !== null) {
-    limit = limits[selectedLimit];
-  }
+  $: limitValue = limits[selectedLimit];
+  $: limitValue != limit && setLimit(limitValue); // only set if different from the given from above
 
-  $: pagesCount = Math.ceil(total / limit);
-  const prev = () => (page = Math.max(1, page - 1));
-  const next = () => (page = Math.min(page + 1, pagesCount || 1));
+  $: pagesCount = Math.ceil(count / limit);
+  $: page > pagesCount && setPage(1); // reset page on limit change
+  const prev = () => setPage(Math.max(1, page - 1));
+  const next = () => setPage(Math.min(page + 1, pagesCount || 1));
 </script>
 
 <div class="pagination">
@@ -27,31 +38,31 @@
     {#if pagesCount <= 11}
       <!-- all template -->
       {#each range(1, pagesCount) as p}
-        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
+        <button class:active={page === p} on:click={() => setPage(p)}>{p}</button>
       {/each}
     {:else if page <= 6}
       <!-- left template -->
       {#each range(1, 9) as p}
-        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
+        <button class:active={page === p} on:click={() => setPage(p)}>{p}</button>
       {/each}
       <div class="more">...</div>
-      <button class:active={page === pagesCount} on:click={() => (page = pagesCount)}>{pagesCount}</button>
+      <button class:active={page === pagesCount} on:click={() => setPage(pagesCount)}>{pagesCount}</button>
     {:else if page > pagesCount - 6}
       <!-- right template -->
-      <button class:active={page === 1} on:click={() => (page = 1)}>1</button>
+      <button class:active={page === 1} on:click={() => setPage(1)}>1</button>
       <button class="more">...</button>
       {#each range(pagesCount - 8, pagesCount) as p}
-        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
+        <button class:active={page === p} on:click={() => setPage(p)}>{p}</button>
       {/each}
     {:else}
       <!-- middle template -->
-      <button class:active={page === 1} on:click={() => (page = 1)}>1</button>
+      <button class:active={page === 1} on:click={() => setPage(1)}>1</button>
       <button class="more">...</button>
       {#each range(page - 3, page + 3) as p}
-        <button class:active={page === p} on:click={() => (page = p)}>{p}</button>
+        <button class:active={page === p} on:click={() => setPage(p)}>{p}</button>
       {/each}
       <button class="more">...</button>
-      <button class:active={page === pagesCount} on:click={() => (page = pagesCount)}>{pagesCount}</button>
+      <button class:active={page === pagesCount} on:click={() => setPage(pagesCount)}>{pagesCount}</button>
     {/if}
 
     <button class="arrow" class:active={page == pagesCount || pagesCount == 0} on:click={next}>

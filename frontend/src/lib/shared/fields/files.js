@@ -1,17 +1,7 @@
-export const search = [];
-export const show = [];
+export const search = ['id', 'title', 'type', 'filesize', 'filename_download', 'width', 'height'];
+export const show = [...search];
 
-export const read = ['id', 'title', 'type', 'filesize', 'uploaded_on', 'modified_on'];
-export const edit = [
-  ...read,
-  'uploaded_by',
-  'uploaded_on',
-  'modified_by',
-  'modified_on',
-  'filename_disk',
-  'filename_download',
-  'width',
-  'height'
-];
+export const read = [...show, 'uploaded_on', 'modified_on', 'uploaded_by', 'modified_by'];
+export const edit = [...read, 'filename_disk'];
 
 export default { search, show, read, edit };

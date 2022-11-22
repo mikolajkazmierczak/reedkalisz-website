@@ -1,7 +1,8 @@
-export const read = ['id', 'first_name', 'last_name', 'email', 'avatar'];
-export const search = [...read];
-export const show = [...read];
-export const edit = [...read];
+export const search = ['id', 'first_name', 'last_name', 'email', 'avatar'];
+export const show = [...search];
+
+export const read = [...search];
+export const edit = [...search];
 
 export const defaults = () => ({
   id: '+',

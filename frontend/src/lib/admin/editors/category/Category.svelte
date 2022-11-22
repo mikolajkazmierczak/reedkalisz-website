@@ -1,45 +1,29 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { marked } from 'marked';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { edited, save, cancel } from '@/stores';
-  import editing from '@/editing';
-  import { diff, getSearchParams } from '$/utils';
-  import { updateGlobal, users, categories } from '@/global';
+  import heimdall from '$/heimdall';
+  import { SearchParamsManager } from '$/searchparams';
   import { edit as fields, defaults } from '$/fields/categories';
+  import { deep, slugify, diff } from '$/utils';
 
-  import slugify from 'slugify';
-  import { marked } from 'marked';
+  import editing from '@/editors/editing';
+  import { unsaved } from '@/stores';
+  import { updateGlobal, users, categories } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Blame from '@c/Blame.svelte';
   import Picker from '@c/library/Picker.svelte';
 
-  const searchParams = getSearchParams(['parent', 'index']);
-
-  const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
+  const searchParams = SearchParamsManager.read();
 
   export let slug;
 
   let item;
   let itemOriginal;
-  $: hasChildren = $categories?.find(category => category.parent == item?.id);
 
-  $save = async () => {
-    [item, itemOriginal] = await editing.save(
-      'categories',
-      item,
-      itemOriginal,
-      fields,
-      fieldsToIgnore,
-      item.slug != slug ? '/admin/kategorie/' + item.slug : null
-    );
-  };
-  $cancel = async () => {
-    [item, itemOriginal] = await editing.cancel(item, itemOriginal, '/admin/kategorie');
-  };
+  $: hasChildren = $categories?.find(category => category.parent == item?.id);
 
   async function read() {
     await updateGlobal(categories);
@@ -47,39 +31,45 @@
     if (slug == '+') {
       item = defaults();
       // add parent and index from search params
-      if (searchParams.parent !== null) item.parent = searchParams.parent;
-      if (searchParams.index !== null) item.index = searchParams.index;
+      if (searchParams.parent != null) item.parent = searchParams.parent;
+      if (searchParams.index != null) item.index = searchParams.index;
     } else {
-      item = (await api.items('categories').readByQuery({ fields, filter: { slug: { _eq: slug } } })).data[0];
+      const filter = { slug: { _eq: slug } };
+      item = (await api.items('categories').readByQuery({ fields, filter })).data[0];
     }
-    itemOriginal = item ? JSON.parse(JSON.stringify(item)) : null;
+    itemOriginal = item ? deep.copy(item) : null;
   }
 
-  async function deleteItem() {
-    editing.del('categories', item.id, '/admin/kategorie', `Czy na pewno chcesz usunąć kategorię (${item.name})?`);
+  async function remove() {
+    editing.del('categories', item.id, { root: '/admin/kategorie' });
   }
 
   read();
 
-  $: if (item) item.slug = slugify(item?.name, { lower: true, strict: true });
+  $: if (item) item.slug = slugify(item?.name, itemOriginal?.name, itemOriginal?.slug);
   $: correctSlug = item && !['+', ''].includes(item.slug);
 
-  $: diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => {
-    $edited = correctSlug && changed;
+  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed, html }) => {
+    console.log(html);
+    $unsaved = correctSlug && changed;
   });
 
-  async function listener(data) {
-    const { match, me } = socket.checkMatch(data, 'categories', item.id);
-    if (match && !me) {
+  heimdall.listen(({ match, me, data }) => {
+    if (match('categories', item.id) && !me) {
       // alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
       console.log('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.', data);
     }
-  }
-  socket.onChanges(listener);
-  onDestroy(() => socket.offChanges(listener));
+  });
 </script>
 
-<Editor back="/admin/kategorie" icon="categories" title={item?.name}>
+<Editor
+  root="/admin/kategorie"
+  icon="categories"
+  title={item?.name}
+  collection="categories"
+  bind:item
+  bind:itemOriginal
+>
   {#if item}
     <section class="ui-section">
       <h2 class="ui-h2">Główne</h2>
@@ -102,7 +92,7 @@
 
         <div class="ui-section__col">
           <div class="ui-box">
-            <Button icon="delete" on:click={deleteItem} dangerous disabled={hasChildren}>Usuń</Button>
+            <Button icon="delete" on:click={remove} dangerous disabled={hasChildren}>Usuń</Button>
             {#if hasChildren}
               <p>
                 Nie można usunąć kategorii, która ma podkategorie.<br />

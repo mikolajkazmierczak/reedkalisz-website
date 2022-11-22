@@ -1,12 +1,12 @@
 <script>
   import { beforeNavigate } from '$app/navigation';
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
-  import socket from '$/heimdall';
+  import heimdall from '$/heimdall';
   import { me, readme } from '$/auth';
-  import { errors, edited } from '@/stores';
-  import global from '@/global';
+  import { errors, unsaved } from '@/stores';
+  import { updateGlobal, globals } from '@/globals';
 
   import Error from '@/Error.svelte';
   import Login from '@/Login.svelte';
@@ -15,14 +15,12 @@
   import Loader from '$c/Loader.svelte';
 
   beforeNavigate(navigation => {
-    if ($edited) {
+    if ($unsaved) {
       if (confirm('Zmiany nie zostały zapisane. Czy na pewno chcesz opuścić stronę?')) {
-        $edited = false;
+        $unsaved = false;
       } else navigation.cancel();
     }
   });
-
-  $: if ($me) global.updateGlobal(global.users);
 
   let ready = false;
   onMount(async () => {
@@ -33,20 +31,19 @@
     window.addEventListener('unhandledrejection', e => ($errors = [...$errors, e?.reason?.message]));
   });
 
-  async function listener(data) {
-    if (data.collection == 'directus_users') await global.updateGlobal(global.users);
-    else if (data.collection == 'companies') await global.updateGlobal(global.companies);
-    else if (data.collection == 'labelings') await global.updateGlobal(global.labelings);
-    else if (data.collection == 'price_views') await global.updateGlobal(global.priceViews);
-    else if (data.collection == 'global_margins') await global.updateGlobal(global.globalMargins);
-    else if (data.collection == 'categories') await global.updateGlobal(global.categories);
-    else if (data.collection == 'colors') await global.updateGlobal(global.colors);
-  }
-  socket.onChanges(listener);
-  onDestroy(() => {
-    socket.offChanges(listener);
-    socket.close();
-  });
+  $: if ($me) updateGlobal(globals.users);
+
+  heimdall.listen(async ({ data }) => {
+    const { collection, ids, refresh } = data;
+    const options = { ids, refresh };
+    if (collection == 'directus_users') await updateGlobal(globals.users, options);
+    else if (collection == 'companies') await updateGlobal(globals.companies, options);
+    else if (collection == 'labelings') await updateGlobal(globals.labelings, options);
+    else if (collection == 'price_views') await updateGlobal(globals.priceViews, options);
+    else if (collection == 'global_margins') await updateGlobal(globals.globalMargins, options);
+    else if (collection == 'categories') await updateGlobal(globals.categories, options);
+    else if (collection == 'colors') await updateGlobal(globals.colors, options);
+  }, true);
 </script>
 
 <svelte:head>

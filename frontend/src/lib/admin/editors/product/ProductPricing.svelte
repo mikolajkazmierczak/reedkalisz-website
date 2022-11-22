@@ -5,10 +5,9 @@
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
 
-  import { updateGlobal, companies, globalMargins, priceViews, labelings } from '@/global';
+  import { updateGlobal, companies, globalMargins, priceViews, labelings } from '@/globals';
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
-  import { tick } from 'svelte';
 
   export let product;
   export let productOriginal;

@@ -3,9 +3,11 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
 
-  import { edited, save, cancel } from '@/stores';
+  import { unsaved } from '@/stores';
   import Icon from '$c/Icon.svelte';
   import HoverCircle from '$c/HoverCircle.svelte';
+
+  import editing from './editing';
 
   function spin(node, { duration }) {
     return {
@@ -17,30 +19,53 @@
     };
   }
 
-  export let back;
+  export let root;
   export let icon;
   export let title;
 
-  let saving = false;
+  if (root === undefined) throw new Error('Root pathname was not provided to the Editor instance');
+
+  export let collection = null;
+  export let item = null;
+  export let itemOriginal = null;
+
+  // can be provided by parent
+  export let save = async action => await action();
+  export let cancel = async action => await action();
+  export let remove = async action => await action();
+
+  function checkCollection() {
+    if (collection == null) throw new Error('Collection name was not provided to the Editor instance');
+  }
 
   function handleExit() {
     // nagivate back
-    if (back) goto(back, { noScroll: true });
+    goto(root, { noScroll: true });
+  }
+
+  let saving = false;
+  async function handleSave() {
+    saving = true;
+    await save(async ({ fieldsToIgnore = [] } = {}) => {
+      [item, itemOriginal] = await editing.save(collection, item, itemOriginal, { root, fieldsToIgnore });
+    });
+    saving = false;
   }
 
   async function handleCancel() {
-    if (confirm('Na pewno chcesz cofnąć zmiany?')) {
-      $cancel();
-      $edited = false;
-    }
+    await cancel(async ({ prompt = null } = {}) => {
+      [item, itemOriginal] = await editing.cancel(collection, item, itemOriginal, { root, prompt });
+    });
   }
 
-  async function handleSave() {
-    saving = true;
-    await $save();
-    saving = false;
-    $edited = false;
+  async function handleRemove() {
+    checkCollection();
+    await remove(async ({ prompt = null } = {}) => {
+      await editing.remove(collection, item.id, { root, prompt });
+    });
   }
+
+  $: if ($unsaved) checkCollection();
 </script>
 
 <div class="wrapper" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
@@ -48,7 +73,7 @@
   <div class="container" in:fly={{ x: 100, duration: 400 }} out:fly={{ x: 50, duration: 100 }}>
     <div class="bar">
       <div class="actions">
-        {#if $edited}
+        {#if $unsaved}
           <div class="button back" role="button" on:click={handleCancel}>
             <HoverCircle color={'var(--main-3)'} />
             <div class="icon" in:spin>
@@ -64,8 +89,8 @@
           </div>
         {/if}
 
-        <div class="save-wrapper" class:visible={$edited}>
-          {#if $edited}
+        <div class="save-wrapper" class:visible={$unsaved}>
+          {#if $unsaved}
             <div class="button save" role="button" on:click={handleSave}>
               <HoverCircle color={'var(--success)'} />
               {#if !saving}

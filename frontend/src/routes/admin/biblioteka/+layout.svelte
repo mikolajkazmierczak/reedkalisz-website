@@ -1,10 +1,14 @@
 <script>
-  import { page } from '@/stores';
+  import { header } from '@/stores';
+  import { searchparams, SearchParamsManager } from '$/searchparams';
   import Library from '@c/library/Library.svelte';
 
-  $: $page = { title: 'Biblioteka plików', icon: 'library' };
+  $header = { title: 'Biblioteka plików', icon: 'library' };
+
+  const searchParams = new SearchParamsManager('/admin/biblioteka');
+  $: [limit, page, query] = $searchparams.get(searchParams.pathname).values();
 </script>
 
-<Library />
+<Library {searchParams} {limit} {page} {query} />
 
 <slot />

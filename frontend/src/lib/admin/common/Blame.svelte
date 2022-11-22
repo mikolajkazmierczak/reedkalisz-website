@@ -1,7 +1,7 @@
 <script>
   import { baseUrl } from '$/api';
   import { getDatetime } from '$/datetime';
-  import { users } from '@/global';
+  import { users } from '@/globals';
 
   export let user;
   export let datetime;

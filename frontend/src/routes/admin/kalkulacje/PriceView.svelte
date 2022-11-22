@@ -3,8 +3,8 @@
   import { slide } from 'svelte/transition';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { diff } from '$/utils';
+  import heimdall from '$/heimdall';
+  import { deep, diff } from '$/utils';
 
   import { recalculateProducts } from '@/calculations';
   import Input from '@c/Input.svelte';
@@ -16,9 +16,9 @@
 
   export let items;
   export let item;
-  let itemOriginal = JSON.parse(JSON.stringify(item));
+  let itemOriginal = deep.copy(item);
 
-  let edited = false;
+  let unsaved = false;
   let saving = false;
   let deleting = false;
   let deletingSaving = false; // prevent double click
@@ -28,7 +28,7 @@
   let inputError;
 
   beforeNavigate(navigation => {
-    if (edited) {
+    if (unsaved) {
       const prompt = `Zmiana widoku "${item.name} ${item.amounts}" nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
       if (confirm(prompt)) {
         cancel();
@@ -54,17 +54,17 @@
     } else {
       await api.items('price_views').updateOne(item.id, { name, amounts });
       // UPDATE AFFECTED PRODUCTS
-      const didAmountsChange = JSON.stringify(amounts) !== JSON.stringify(itemOriginal.amounts);
+      const didAmountsChange = !deep.same(amounts, itemOriginal.amounts);
       if (didAmountsChange) await updateProducts();
     }
-    socket.emitChanges('price_views', item.id);
-    itemOriginal = JSON.parse(JSON.stringify(item));
+    heimdall.emit('price_views', item.id);
+    itemOriginal = deep.copy(item);
 
     saving = false;
   }
   function cancel() {
-    item = JSON.parse(JSON.stringify(itemOriginal));
-    edited = false;
+    item = deep.copy(itemOriginal);
+    unsaved = false;
   }
 
   async function setDefault() {
@@ -73,7 +73,7 @@
     oldDefault.default = false;
     await api.items('price_views').updateOne(item.id, { default: true });
     await api.items('price_views').updateOne(oldDefault.id, { default: false });
-    socket.emitChanges('price_views', [item.id, oldDefault.id]);
+    heimdall.emit('price_views', [item.id, oldDefault.id]);
     items = items;
   }
 
@@ -110,7 +110,7 @@
     // UPDATE PRICE VIEWS
     await api.items('price_views').deleteOne(item.id);
     const ids = swapID ? [item.id, swapID] : [item.id];
-    socket.emitChanges('price_views', ids);
+    heimdall.emit('price_views', ids);
 
     items = items.filter(i => i.id !== item.id);
 
@@ -119,7 +119,7 @@
   }
 
   $: correct = !inputError && item.name && item.amounts.length;
-  $: diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (edited = changed));
+  $: diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (unsaved = changed));
 </script>
 
 <div class="ui-list">
@@ -137,7 +137,7 @@
       />
     </div>
 
-    {#if edited && correct}
+    {#if unsaved && correct}
       <div class="ui-pair save-actions" transition:slide={{ duration: 200 }}>
         <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
         <Button icon="ok" on:click={save}>

@@ -3,8 +3,8 @@
   import { slide } from 'svelte/transition';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { diff } from '$/utils';
+  import heimdall from '$/heimdall';
+  import { deep, diff } from '$/utils';
   import { recalculateProducts } from '@/calculations';
 
   import Input from '@c/Input.svelte';
@@ -13,13 +13,13 @@
   const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
   export let data;
-  let dataOriginal = JSON.parse(JSON.stringify(data));
-  let edited = false;
+  let dataOriginal = deep.copy(data);
+  let unsaved = false;
 
   let saving = false;
 
   beforeNavigate(navigation => {
-    if (edited) {
+    if (unsaved) {
       const prompt = `Zmiany w marżach nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
       if (confirm(prompt)) {
         cancel();
@@ -35,8 +35,8 @@
     const { full_margin, full_minimum, product_margin, product_minimum } = data;
     const updates = { full_margin, full_minimum, product_margin, product_minimum };
     data = await api.singleton('global_margins').update(updates);
-    dataOriginal = JSON.parse(JSON.stringify(data));
-    socket.emitChanges('global_margins', 1);
+    dataOriginal = deep.copy(data);
+    heimdall.emit('global_margins', 1);
 
     // UPDATE all PRODUCTS that both:
     // - have either global_full_margin or global_product_margin set to true
@@ -51,11 +51,11 @@
     saving = false;
   }
   async function cancel() {
-    data = JSON.parse(JSON.stringify(dataOriginal));
-    edited = false;
+    data = deep.copy(dataOriginal);
+    unsaved = false;
   }
 
-  $: diff(data, dataOriginal, fieldsToIgnore).then(({ changed }) => (edited = changed));
+  $: diff(data, dataOriginal, fieldsToIgnore).then(({ changed }) => (unsaved = changed));
 </script>
 
 <div class="wrapper">
@@ -89,7 +89,7 @@
     </div>
   </div>
 
-  {#if edited}
+  {#if unsaved}
     <div class="ui-pair edit" transition:slide={{ duration: 200 }}>
       <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
       <Button icon="ok" on:click={save}>

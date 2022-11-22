@@ -1,48 +1,32 @@
 <script>
-  import { afterNavigate } from '$app/navigation';
-
-  import { setSearchParams, getSearchParams, treeFlatten, diff } from '$/utils';
+  import { treeFlatten } from '$/utils';
   import TableRow from '@c/TableRow.svelte';
   import Pagination from '@c/Pagination.svelte';
 
-  export let limit;
-
-  export let rootPathname;
-  export let page = 1;
-  export let query = null;
-  afterNavigate(navigation => {
-    const searchParams = getSearchParams(['p', 'q']); // page, query
-    if (searchParams.p != null) page = searchParams.p;
-    if (searchParams.q != null) query = searchParams.q;
-    setSearchParams({ p: page, q: query }, navigation, rootPathname);
-  });
-  $: setSearchParams({ p: page, q: query });
-
-  $: if (limit != null && page == null) {
-    // reset page on limit change
-    page = 1;
-  }
+  export let searchParams = null;
+  export let limit = null;
+  export let page = null;
 
   export let collection = null;
-  export let items;
   export let itemsCount = null;
+  export let items;
   export let head;
   export let mapper;
 
-  $: hierarchy = items.some(item => item.children); // has children
   export let order = false;
-  let expandedItems = [];
 
-  $: itemsFlat = hierarchy ? treeFlatten(items) : items;
-  $: maxDepth = hierarchy ? itemsFlat.reduce((max, item) => Math.max(max, item._meta.path.length), 0) - 1 : 0;
+  $: tree = items.some(item => item.children); // has children
+  $: itemsFlat = tree ? treeFlatten(items) : items;
+  $: maxDepth = tree ? itemsFlat.reduce((max, item) => Math.max(max, item._meta.path.length), 0) - 1 : 0;
+  let expandedItems = [];
 
   const smallestCellWidth = 2.25;
   const hierarchyCellWidth = smallestCellWidth * 0.8;
 
-  function getWidths(head, hierarchy, order, maxDepth) {
+  function getWidths(head, tree, order, maxDepth) {
     let widths = [];
     if (order) widths.push(smallestCellWidth + 'rem');
-    if (hierarchy) widths.push(hierarchyCellWidth * (maxDepth + 1) + 'rem');
+    if (tree) widths.push(hierarchyCellWidth * (maxDepth + 1) + 'rem');
     widths.push(
       ...head.map(h => {
         if (h.width) widths.push(h.width);
@@ -56,39 +40,36 @@
   }
 
   let showDropzonesItemID = null; // id
-  function drop() {
+  function dropzonesHide() {
     showDropzonesItemID = null;
   }
-  function dragend() {
-    showDropzonesItemID = null;
-  }
-  function dragenter(e) {
+  function dropzonesShow(e) {
     showDropzonesItemID = e.detail.id;
   }
 
-  $: widths = getWidths(head, hierarchy, order, maxDepth);
+  $: widths = getWidths(head, tree, order, maxDepth);
 </script>
 
 <div class="table-wrapper">
   <div class="table">
-    <TableRow headRow {head} {hierarchy} {order} {maxDepth} {widths} {collection} />
+    <TableRow headRow {head} {order} {tree} {maxDepth} {widths} {collection} />
     {#if items.length}
       {#each items as item (item)}
         <TableRow
-          bind:items
-          bind:expandedItems
+          {collection}
           {head}
-          {hierarchy}
-          {order}
-          {maxDepth}
-          {widths}
+          bind:items
           bind:item
           {mapper}
-          {collection}
+          {order}
+          {tree}
+          {maxDepth}
+          {widths}
+          bind:expandedItems
           {showDropzonesItemID}
-          on:drop={drop}
-          on:dragend={dragend}
-          on:dragenterItem={dragenter}
+          on:drop={dropzonesHide}
+          on:dragend={dropzonesHide}
+          on:dragenterItem={dropzonesShow}
         />
       {/each}
     {:else}
@@ -97,8 +78,8 @@
   </div>
 </div>
 
-{#if !hierarchy && limit != -1}
-  <Pagination bind:limit bind:page total={itemsCount} />
+{#if itemsCount != -1 && (!tree || !order)}
+  <Pagination {searchParams} bind:limit bind:page count={itemsCount} />
 {/if}
 
 <style>

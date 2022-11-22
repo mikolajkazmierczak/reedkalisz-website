@@ -1,11 +1,21 @@
-import { get } from 'svelte/store';
-import { page } from '$app/stores';
 import { diffJson } from 'diff';
-import { goto } from '$app/navigation';
+import { klona } from 'klona';
+import { dequal } from 'dequal';
+import { nanoid } from 'nanoid';
+import { default as generateSlug } from 'slugify';
 
-export const uuid = () => Math.random().toString(36).substring(2);
 export const range = (start = 0, stop, step = 1) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
+
+export const slugify = (text, textOriginal = null, slugOriginal = null) => {
+  if (textOriginal && text == textOriginal) return slugOriginal;
+  return generateSlug(text, { lower: true, strict: true }) + '-' + nanoid(6);
+};
+
+export const deep = {
+  copy: obj => klona(obj),
+  same: (obj1, obj2) => dequal(obj1, obj2)
+};
 
 function filtersToRegex(filters) {
   // Individual filter formats: a / a.b / *.a / a.*.b (where * means any level of nesting)
@@ -73,14 +83,16 @@ function diffToHtml(diff) {
     .join('');
 }
 
-export function diff(item, itemOriginal, fieldsToIgnore) {
+export function diff(item, itemOriginal, { editorPreset = false, fieldsToIgnore = [] } = {}) {
+  if (editorPreset) fieldsToIgnore.push(...['user_created', 'date_created', 'user_updated', 'date_updated']);
   return new Promise(async resolve => {
     if (!item) return resolve({ diff: null, changed: null, html: null });
-    const itemCopy = item ? JSON.parse(JSON.stringify(item)) : null;
-    await deleteFields(itemCopy, fieldsToIgnore);
-    console.log('itemCopy', itemCopy);
-    const itemOriginalCopy = itemOriginal ? JSON.parse(JSON.stringify(itemOriginal)) : null;
-    await deleteFields(itemOriginalCopy, fieldsToIgnore);
+    const itemCopy = deep.copy(item);
+    const itemOriginalCopy = deep.copy(itemOriginal);
+    if (fieldsToIgnore.length) {
+      await deleteFields(itemCopy, fieldsToIgnore);
+      await deleteFields(itemOriginalCopy, fieldsToIgnore);
+    }
     const diff = diffJson(itemOriginalCopy, itemCopy);
     return resolve({
       diff: diff,
@@ -105,37 +117,6 @@ export function bytesToReadable(bytes) {
   return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
 }
 
-export function getSearchParams(names) {
-  // ['numberParam', 'stringParam'] -> { numberParam: 123, stringParam: 'string' }
-  if (!Array.isArray(names)) names = [names];
-  const searchParams = get(page).url.searchParams;
-  return names.reduce((params, name) => {
-    const param = searchParams.get(name);
-    params[name] = param ? (isNaN(Number(param)) ? param : Number(param)) : null;
-    return params;
-  }, {});
-}
-
-export function setSearchParams(newParams, navigation = null, rootPathname = null) {
-  // { numberParam: 123, stringParam: 'string' } -> ?numberParam=123&stringParam=string
-  if (navigation) {
-    // only set the params if the new url pathname is correct
-    // also check if the current url isn't the same as the new one to prevent an infinite loop
-    const { from, to } = navigation;
-    if (to.url.pathname != rootPathname || from.url.href == to.url.href) {
-      return;
-    }
-  }
-  // create new url
-  const url = get(page).url;
-  for (const [key, value] of Object.entries(newParams)) {
-    if (value == null) url.searchParams.delete(key);
-    else url.searchParams.set(key, value);
-  }
-  // navigate to new url
-  goto(url.toString(), { replaceState: true, noScroll: true });
-}
-
 export function reuseIDs(items, reusableIDs = []) {
   // Use both `items` and `oldItems` ids to reassign as many ids in items as possible.
   // This maximizes reusability instead of creating new objects.
@@ -154,7 +135,7 @@ export function reuseIDs(items, reusableIDs = []) {
 
 export function makeTree(items, inplace = false, _root = true, _parent = null, _depth = 0, _path = []) {
   // Convert a flat array of items into a tree structure and add metadata (_meta property).
-  if (!inplace && _root) items = JSON.parse(JSON.stringify(items));
+  if (!inplace && _root) items = deep.copy(items);
   const tree = [];
   for (const item of items) {
     if (item.parent == _parent) {
@@ -177,7 +158,7 @@ export function makeTree(items, inplace = false, _root = true, _parent = null, _
 
 export function treeFlatten(tree, inplace = false, _root = true) {
   // Convert a tree structure into a flat array of items.
-  if (!inplace && _root) tree = JSON.parse(JSON.stringify(tree));
+  if (!inplace && _root) tree = deep.copy(tree);
   return tree.reduce((acc, item) => {
     const newItem = { ...item };
     delete newItem.children;
@@ -221,7 +202,7 @@ export function treeRemoveItemAtPath(tree, path) {
   const item = tree[path[0]];
   if (path.length === 1) {
     tree.splice(path[0], 1);
-    return JSON.parse(JSON.stringify(item));
+    return deep.copy(item);
   } else {
     return treeRemoveItemAtPath(item.children, path.slice(1));
   }

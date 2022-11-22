@@ -1,48 +1,40 @@
 <script>
-  import { goto, afterNavigate } from '$app/navigation';
-  import { onDestroy } from 'svelte';
+  import { goto } from '$app/navigation';
   import { createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
 
   import api from '$/api';
-  import socket from '$/heimdall';
-  import { getSearchParams, setSearchParams } from '$/utils';
+  import heimdall from '$/heimdall';
 
   import { read as fields } from '$/fields/files';
   import Button from '@c/Button.svelte';
 
-  import Filters from '@c/Filters.svelte';
+  // import Filters from '@c/Filters.svelte';
   import Upload from '@c/library/Upload.svelte';
   import File from '@c/library/File.svelte';
   import Pagination from '@c/Pagination.svelte';
 
   const dispatch = createEventDispatcher();
 
+  export let searchParams = null;
+  export let limit = 25; // default for picker
+  export let page = 1; // default for picker
+  export let query = null;
+
   export let picker = false;
   export let selected = null;
-
-  const rootPathname = '/admin/biblioteka';
-  let selectedLimit = 25;
-  let selectedPage = 1;
-  let selectedQuery = null;
-  afterNavigate(navigation => {
-    const searchParams = getSearchParams(['p', 'q']); // page, query
-    if (searchParams.p != null) selectedPage = searchParams.p;
-    if (searchParams.q != null) selectedQuery = searchParams.q;
-    setSearchParams({ p: selectedPage, s: selectedQuery }, navigation, rootPathname);
-  });
-  $: if (!picker) setSearchParams({ p: selectedPage, s: selectedQuery });
 
   let files;
   let filesMeta;
 
-  let filterUse = null;
-  let filterType = null;
+  // let filterUse = null;
+  // let filterType = null;
 
-  async function read(limit = 25, page = 1) {
-    const res = await api.files.readByQuery({ fields, sort: '-uploaded_on', limit, page, meta: '*' });
+  async function read(limit, page, query) {
+    const res = await api.files.readByQuery({ fields, limit, page, search: query, sort: '-uploaded_on', meta: '*' });
     files = res.data;
     filesMeta = res.meta;
+    console.log('read: files |', files);
   }
 
   function markSelected(id) {
@@ -85,26 +77,23 @@
     const ids = files.filter(f => f.marked).map(f => f.id);
     if (ids.length) {
       if (confirm(`Czy na pewno chcesz usunąć ${ids.length} plików?`)) {
-        await api.files.deleteMany(ids);
-        read(selectedLimit, selectedPage);
+        await api.files.deleteMany(ids); // TODO: heimdall?
+        read(limit, page, query);
       }
     }
   }
 
-  $: read(selectedLimit, selectedPage);
+  $: read(limit, page, query);
 
   $: if (selected && files) markSelected(selected);
   $: marked = files?.find(f => f.marked);
 
-  async function listener(data) {
-    const { match } = socket.checkMatch(data, 'files');
-    if (match) read(selectedLimit, selectedPage);
-  }
-  socket.onChanges(listener);
-  onDestroy(() => socket.offChanges(listener));
+  heimdall.listen(({ match }) => {
+    if (match('files')) read(limit, page, query);
+  });
 </script>
 
-<div class="actions" class:picker>
+<!-- <div class="actions" class:picker>
   <Filters
     title={'Użycie'}
     filters={[
@@ -142,7 +131,7 @@
     ]}
     bind:selected={filterType}
   />
-</div>
+</div> -->
 
 {#if marked && !picker}
   <div class="buttons" transition:slide>
@@ -151,7 +140,7 @@
   </div>
 {/if}
 
-<Upload on:upload={() => read(selectedLimit, selectedPage)} />
+<Upload on:upload={() => read(limit, page)} />
 
 {#if files}
   <div class="files">
@@ -161,10 +150,10 @@
   </div>
 {/if}
 
-<Pagination bind:limit={selectedLimit} bind:page={selectedPage} total={filesMeta?.filter_count} />
+<Pagination {searchParams} bind:limit bind:page count={filesMeta?.filter_count} />
 
 <style>
-  .actions {
+  /* .actions {
     z-index: 1;
     position: sticky;
     top: calc(4rem + 1.5rem);
@@ -181,7 +170,7 @@
   }
   .actions.picker {
     top: 1rem;
-  }
+  } */
 
   .buttons {
     margin-bottom: 1rem;

@@ -1,7 +1,8 @@
-export const read = ['id', 'user_created', 'date_created', 'user_updated', 'date_updated', 'name'];
-export const search = [...read];
-export const show = [...read];
-export const edit = [...read];
+export const search = ['id', 'user_created', 'date_created', 'user_updated', 'date_updated', 'name'];
+export const show = [...search];
+
+export const read = [...search];
+export const edit = [...search];
 
 export const defaults = () => ({
   id: '+',
