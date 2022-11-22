@@ -100,9 +100,13 @@
           </div>
 
           <div class="ui-box ui-box--uneditable">
-            <h3 class="ui-h3">Bezpośredni link</h3>
-            <a href="/kategorie/{item.slug}">/kategorie/{item.slug}</a>
-            <h3 class="ui-h3">Dodano</h3>
+            <h3 class="ui-h3">Link do strony</h3>
+            {#if item.date_created}
+              <a href="/kategorie/{item.slug}">/kategorie/{item.slug}</a>
+            {:else}
+              /kategorie/{item.slug || '...'}
+            {/if}
+            <h3 class="ui-h3">Utworzenie</h3>
             <p>
               {#if $users && item.date_created}
                 <Blame user={item.user_created} datetime={item.date_created} />
@@ -110,7 +114,7 @@
                 Tu będziesz ty
               {/if}
             </p>
-            <h3 class="ui-h3">Zaktualizowano</h3>
+            <h3 class="ui-h3">Aktualizacja</h3>
             <p>
               {#if $users && item.date_updated}
                 <Blame user={item.user_updated} datetime={item.date_updated} />

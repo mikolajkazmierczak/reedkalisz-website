@@ -152,7 +152,7 @@
             <Input
               type="select"
               bind:value={item.company}
-              options={$companies.map(({ id, name }) => ({ id, text: name }))}
+              options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
             >
               Producent
             </Input>

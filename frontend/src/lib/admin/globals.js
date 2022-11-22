@@ -52,7 +52,12 @@ export async function updateGlobal(store, { ids = null, refresh = false, sorting
   if (isPopulated && (!ids || !refresh)) return;
 
   const { name, fields, singleton } = collections.find(c => c.store === store);
-  // console.log('$globals UPDATE:', name, fields, singleton, ids, refresh);
+  console.log('$globals');
+  console.log('| name:', name);
+  console.log('| fields:', fields);
+  console.log('| singleton:', singleton);
+  console.log('| ids:', ids);
+  console.log('| refresh', refresh);
 
   if (ids) {
     // only update specified ids

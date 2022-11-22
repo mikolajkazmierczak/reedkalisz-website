@@ -7,18 +7,18 @@ import { default as generateSlug } from 'slugify';
 export const range = (start = 0, stop, step = 1) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
-export const slugify = (parts, partsOriginal = null, slugOriginal = null) => {
-  if (!Arrays.isArray(parts)) parts = [parts];
-  if (!Arrays.isArray(partsOriginal)) partsOriginal = [partsOriginal];
-  const text = parts.join('-');
-  const textOriginal = partsOriginal.join('-');
-  if (textOriginal && text == textOriginal) return slugOriginal;
-  return generateSlug(text, { lower: true, strict: true }) + '-' + nanoid(8);
-};
-
 export const deep = {
   copy: obj => klona(obj),
   same: (obj1, obj2) => dequal(obj1, obj2)
+};
+
+export const slugify = (parts, partsOriginal = null, slugOriginal = null) => {
+  if (!Array.isArray(parts)) parts = [parts];
+  if (!Array.isArray(partsOriginal)) partsOriginal = [partsOriginal];
+  const text = parts.filter(p => p).join('-');
+  const textOriginal = partsOriginal.filter(p => p).join('-');
+  if (text == textOriginal) return slugOriginal;
+  return generateSlug(text, { lower: true, strict: true }) + '-' + nanoid(8);
 };
 
 function filtersToRegex(filters) {
