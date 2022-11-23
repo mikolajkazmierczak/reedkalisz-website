@@ -55,7 +55,7 @@
     unsaved = false;
   }
 
-  $: diff(data, dataOriginal, fieldsToIgnore).then(({ changed }) => (unsaved = changed));
+  $: diff(data, dataOriginal, { fieldsToIgnore }).then(({ changed }) => (unsaved = changed));
 </script>
 
 <div class="wrapper">

@@ -1,7 +1,7 @@
 <script>
   import { header } from '@/stores';
 
-  import { updateGlobal, companies, labelings, priceViews, globalMargins } from '@/globals';
+  import { globals, companies, labelings, priceViews, globalMargins } from '@/globals';
   import PriceViews from './PriceViews.svelte';
   import GlobalMargins from './GlobalMargins.svelte';
   import Labelings from './Labelings.svelte';
@@ -9,10 +9,10 @@
   $header = { title: 'Kalkulacje', icon: 'calculator' };
 
   async function read() {
-    await updateGlobal(globalMargins);
-    await updateGlobal(priceViews);
-    await updateGlobal(companies);
-    await updateGlobal(labelings);
+    await globals.update(globalMargins);
+    await globals.update(priceViews);
+    await globals.update(companies);
+    await globals.update(labelings);
   }
 
   $: $companies?.sort((a, b) => a.name.localeCompare(b.name));

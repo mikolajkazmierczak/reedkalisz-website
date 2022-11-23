@@ -3,20 +3,20 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { SearchParamsManager } from '$/searchparams';
+  import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '$/fields/categories';
   import { deep, slugify, diff } from '$/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { updateGlobal, users, categories } from '@/globals';
+  import { globals, users, categories } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Blame from '@c/Blame.svelte';
   import Picker from '@c/library/Picker.svelte';
 
-  const searchParams = SearchParamsManager.read();
+  const searchParams = SearchParams.read();
 
   export let slug;
 
@@ -26,8 +26,7 @@
   $: hasChildren = $categories?.find(category => category.parent == item?.id);
 
   async function read() {
-    await updateGlobal(categories);
-
+    await globals.update(categories);
     if (slug == '+') {
       item = defaults();
       // add parent and index from search params
@@ -41,7 +40,7 @@
   }
 
   async function remove() {
-    editing.del('categories', item.id, { root: '/admin/kategorie' });
+    editing.remove('categories', item.id, { root: '/admin/kategorie' });
   }
 
   read();
@@ -49,8 +48,7 @@
   $: if (item) item.slug = slugify(item?.name, itemOriginal?.name, itemOriginal?.slug);
   $: correctSlug = item && !['+', ''].includes(item.slug);
 
-  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed, html }) => {
-    console.log(html);
+  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
     $unsaved = correctSlug && changed;
   });
 

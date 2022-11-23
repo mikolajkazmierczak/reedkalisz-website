@@ -2,12 +2,11 @@
   import { goto } from '$app/navigation';
 
   import api from '$/api';
-  import heimdall from '$/heimdall';
   import { header } from '@/stores';
-  import { searchparams, SearchParamsManager } from '$/searchparams';
-  import { makeTree, treeFlatten } from '$/utils';
+  import { searchparams, SearchParams } from '$/searchparams';
+  import { deep, makeTree, treeFlatten } from '$/utils';
 
-  import { updateGlobal, categories } from '@/globals';
+  import { globals, categories } from '@/globals';
   import { search as fields } from '$/fields/categories';
   import Table from '@c/Table.svelte';
   import Button from '@c/Button.svelte';
@@ -15,13 +14,12 @@
 
   $header = { title: 'Kategorie', icon: 'categories' };
 
-  const searchParams = new SearchParamsManager('/admin/kategorie');
+  const searchParams = new SearchParams('/admin/kategorie');
   $: [query] = $searchparams.get(searchParams.pathname).values();
 
   let items;
 
   async function read(query) {
-    await updateGlobal(categories);
     const tree = makeTree($categories);
     if (query) {
       const flat = treeFlatten(tree);
@@ -32,11 +30,8 @@
     }
   }
 
-  $: read(query);
-
-  heimdall.listen(({ match }) => {
-    if (match('categories')) read(query);
-  });
+  globals.update(categories);
+  $: $categories && read(query);
 </script>
 
 {#if items}

@@ -78,7 +78,8 @@
     if (ids.length) {
       if (confirm(`Czy na pewno chcesz usunąć ${ids.length} plików?`)) {
         await api.files.deleteMany(ids); // TODO: heimdall?
-        read(limit, page, query);
+        heimdall.emit('files', ids);
+        // read(limit, page, query); <- this is not needed, because of heimdall
       }
     }
   }

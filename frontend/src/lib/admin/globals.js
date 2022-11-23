@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
 import api from '$/api';
-import fields from '$/fields';
+import { default as collectionsFields } from '$/fields';
 
 // Global arrays of items from their respective collections:
 // - global because they are needed on many pages in the app, so redownlading them every time is pointless
@@ -15,66 +15,84 @@ export const globalMargins = writable(null); // /produkty/:slug, /kalkulacje
 export const categories = writable(null); // /produkty, /produkty/:slug
 export const colors = writable(null); // /produkty/:slug
 
-export const collections = [
-  { name: 'directus_users', store: users, fields: fields.users.read },
-  { name: 'companies', store: companies, fields: fields.companies.read },
-  { name: 'labelings', store: labelings, fields: fields.labelings.read },
-  { name: 'price_views', store: priceViews, fields: fields.price_views.read },
-  { name: 'global_margins', store: globalMargins, singleton: true },
-  { name: 'categories', store: categories, fields: fields.categories.read },
-  { name: 'colors', store: colors, fields: fields.colors.read }
+const collections = [
+  { collection: 'directus_users', store: users },
+  { collection: 'companies', store: companies },
+  { collection: 'labelings', store: labelings },
+  { collection: 'price_views', store: priceViews },
+  { collection: 'global_margins', store: globalMargins, singleton: true },
+  { collection: 'categories', store: categories },
+  { collection: 'colors', store: colors }
 ];
 
-function updateArray(items, updated, sortingKey) {
-  let needsSorting = false;
-  // update existing items and add new ones
-  for (const item of updated) {
-    const index = items.findIndex(i => i.id == item.id);
-    if (index != -1) {
-      items[index] = item;
-    } else {
-      items.push(item);
-      needsSorting = true;
+async function updateItemsWithIDs(store, collection, ids, sortingKey, fields) {
+  // only update specified ids
+  const updated = (await api.items(collection).readMany(ids, { fields })).data;
+  const deletedIDs = ids.filter(id => !updated.find(item => item.id == id));
+  store.update(items => {
+    let needsSorting = false;
+    // update existing items and add new ones
+    for (const u of updated) {
+      const index = items.findIndex(i => i.id == u.id);
+      if (index != -1) {
+        items[index] = u;
+      } else {
+        items.push(u);
+        needsSorting = true;
+      }
     }
-  }
-  // filter items that were deleted
-  items = items.filter(item => updated.find(u => u.id === item.id));
-  // sort by the given key
-  if (needsSorting) items.sort((a, b) => a[sortingKey] - b[sortingKey]);
-  return items;
+    // filter items that were deleted
+    const itemsLength = items.length;
+    items = items.filter(i => !deletedIDs.includes(i.id));
+    if (items.length != itemsLength) needsSorting = true;
+    // sort by the given key
+    if (needsSorting) items.sort((a, b) => a[sortingKey] - b[sortingKey]);
+    return items;
+  });
 }
 
-export async function updateGlobal(store, { ids = null, refresh = false, sortingKey = 'id' } = {}) {
-  // Read items from the API to a global store (if NOT POPULATED already).
-  // `refresh`: update all items if POPULATED already
-  // `ids`: update selected items if POPULATED already
-  const isPopulated = get(store) != null;
-  if (isPopulated && (!ids || !refresh)) return;
+async function updateAllItems(store, collection, fields) {
+  // update all items
+  const items = (await api.items(collection).readByQuery({ fields, limit: -1 })).data;
+  store.set(items);
+}
 
-  const { name, fields, singleton } = collections.find(c => c.store === store);
-  console.log('$globals');
-  console.log('| name:', name);
-  console.log('| fields:', fields);
-  console.log('| singleton:', singleton);
-  console.log('| ids:', ids);
-  console.log('| refresh', refresh);
+class Globals {
+  constructor() {
+    this.collections = collections.map(c => c.collection);
+    this.stores = collections.map(c => c.store);
+    // this.queue = []; // TODO: queue of the updates requested, to avoid unnecessary multiple updates
+  }
 
-  if (ids) {
-    // only update specified ids
-    const updated = (await api.items(name).readMany(ids, { fields })).data;
-    store.update(items => updateArray(items, updated, sortingKey));
-  } else {
+  update = async (global, { ids = null, refresh = false, sortingKey = 'id' } = {}) => {
+    // Read items from the API to a global store (if NOT POPULATED already).
+    // `global` can be a string (collection) or an object (store)
+    // `ids`: update selected items if POPULATED already
+    // `refresh`: update all items if POPULATED already
+    // `sortingKey`: key to sort the items by after updating (when needed)
+
+    const store = typeof global === 'string' ? collections.find(c => c.collection === global).store : global;
+
+    const isPopulated = get(store) != null;
+    const shouldRead = !isPopulated && !ids && !refresh; // not populated AND neither ids nor refresh given
+    const shouldUpdate = isPopulated && (ids || refresh); // populated AND either ids or refresh given
+    // console.log('$globals update:', global, { ids, refresh, sortingKey }, shouldRead);
+    if (!(shouldRead || shouldUpdate)) return;
+
+    const { collection, singleton } = collections.find(c => c.store === store);
+
+    // console.log('$globals read:', collection, ids, refresh);
     if (singleton) {
-      // read singleton
-      const item = await api.singleton(name).read({ fields });
-      store.set(item);
+      // update singleton
+      store.set(await api.singleton(collection).read());
     } else {
-      // update all items
-      const items = (await api.items(name).readByQuery({ fields, limit: -1 })).data;
-      store.set(items);
+      const fields = collectionsFields[collection].read;
+      if (ids) {
+        updateItemsWithIDs(store, collection, ids, sortingKey, fields);
+      } else await updateAllItems(store, collection, fields);
     }
-  }
+  };
 }
 
-export const globals = { users, companies, labelings, priceViews, globalMargins, categories, colors };
-export default { updateGlobal, globals };
+export const globals = new Globals();
+export default globals;

@@ -146,6 +146,17 @@
       style:border-radius={borderRadius}
       {step}
     />
+  {:else if type == 'color'}
+    <input
+      {id}
+      type="color"
+      bind:value
+      bind:this={input}
+      {disabled}
+      class:error
+      class:borderless
+      style:border-radius={borderRadius}
+    />
   {:else if type == 'checkbox'}
     <div class="checkbox" class:error on:click={() => (value = !value)} on:keydown={() => {}}>
       <input {id} type="checkbox" bind:checked={value} bind:this={input} {disabled} />

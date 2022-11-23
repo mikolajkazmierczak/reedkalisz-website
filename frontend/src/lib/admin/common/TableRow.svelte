@@ -52,13 +52,16 @@
     function getItemsToUpdate(newItems, path, startIndex) {
       const item = treeGetItemAtPath(newItems, path);
       const children = item.children ?? item; // root edge case
-      const indexes = children.filter(c => c.index >= startIndex).map(c => c.index);
-      return { children, indexes };
+      const updated = children.filter(c => c.index >= startIndex);
+      const indexes = updated.map(c => c.index);
+      const ids = updated.map(c => c.id);
+      return { children, indexes, ids };
     }
 
     // as the items have just changed (and the item will get destroyed in the next tick)
     // we need to retrieve the item directly from the updated items
     const movedItem = treeGetItemAtPath(newItems, newPath);
+    const movedItemsIDs = [movedItem.id];
 
     // update the new item's parent and index
     const { parent, index } = movedItem;
@@ -74,19 +77,26 @@
       if (newIndex == oldIndex) return;
       const startIndex = newIndex > oldIndex ? oldIndex : newIndex + 1;
       // get indexes of parent's children and update them
-      const { children, indexes } = getItemsToUpdate(newItems, newParentPath, startIndex);
+      const { children, indexes, ids } = getItemsToUpdate(newItems, newParentPath, startIndex);
       await Promise.all(indexes.map(i => api.items(collection).updateOne(children[i].id, { index: i })));
+      movedItemsIDs.push(...ids);
+      console.log(...ids);
     } else {
       // get indexes of new parent's children, old parent's children and update both
-      const { children: newChildren, indexes: newIndexes } = getItemsToUpdate(newItems, newParentPath, newIndex + 1);
-      const { children: oldChildren, indexes: oldIndexes } = getItemsToUpdate(newItems, oldParentPath, oldIndex);
+      const newChildrenData = getItemsToUpdate(newItems, newParentPath, newIndex + 1);
+      const oldChildrenData = getItemsToUpdate(newItems, oldParentPath, oldIndex);
+      const { children: newChildren, indexes: newIndexes, ids: newIDs } = newChildrenData;
+      const { children: oldChildren, indexes: oldIndexes, ids: oldIDs } = oldChildrenData;
       await Promise.all([
         ...newIndexes.map(i => api.items(collection).updateOne(newChildren[i].id, { index: i })),
         ...oldIndexes.map(i => api.items(collection).updateOne(oldChildren[i].id, { index: i }))
       ]);
+      movedItemsIDs.push(...newIDs, ...oldIDs);
+      console.log(...newIDs, ...oldIDs);
     }
 
-    heimdall.emit(collection, movedItem.id, false); // TODO: emit changes for all updated items
+    console.log('movedItemsIDs', movedItemsIDs);
+    heimdall.emit(collection, movedItemsIDs);
   }
 
   export let showDropzonesItemID = null;
@@ -126,7 +136,7 @@
   function dragendBubble() {
     dispatch('dragend');
   }
-  function drop(e, type) {
+  async function drop(e, type) {
     e.preventDefault();
     dragging = false;
     showDropzones = false;
@@ -152,7 +162,7 @@
     treeMoveItemToPath(items, oldPath, newPath);
     items = items;
 
-    saveAfterMove(items, oldPath, newPath);
+    await saveAfterMove(items, oldPath, newPath);
   }
   function dropBubble() {
     dispatch('drop');
@@ -190,14 +200,9 @@
   </div>
 {/if}
 
+<!-- transition:slide={{ duration: order ? 200 : 0 }} -->
 {#if item}
-  <div
-    class="row row--item"
-    class:dragging
-    style:grid-template-columns={widths}
-    transition:slide={{ duration: order ? 200 : 0 }}
-    on:dragenter={dragenterItem}
-  >
+  <div class="row row--item" class:dragging style:grid-template-columns={widths} on:dragenter={dragenterItem}>
     {#if tree}
       <div
         class="value value--item value--center"
@@ -233,7 +238,7 @@
       </div>
     {/if}
     {#each row.values as value, i}
-      {@const { checkbox, blame } = head[i]}
+      {@const { checkbox, blame, color } = head[i]}
       <div
         class="value value--item"
         class:center={checkbox}
@@ -268,6 +273,7 @@
           {:else if blame}
             <Blame {...value} />
           {:else}
+            {#if color}<div class="color" style:background-color={value} />{/if}
             {value}
           {/if}
         </div>
@@ -416,6 +422,14 @@
   }
   .value--hierarchy > div.border-left {
     border-left: var(--border-light);
+  }
+
+  .color {
+    margin-right: 0.4rem;
+    border-radius: 0.2rem;
+    border: var(--border-light);
+    height: 60%;
+    aspect-ratio: 1 / 1;
   }
 
   .drag {

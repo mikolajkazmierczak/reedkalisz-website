@@ -5,7 +5,7 @@
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
 
-  import { updateGlobal, companies, globalMargins, priceViews, labelings } from '@/globals';
+  import { globals, companies, globalMargins, priceViews, labelings } from '@/globals';
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
 
@@ -14,9 +14,9 @@
 
   async function read() {
     // info: $companies are loaded in parent component
-    await updateGlobal(globalMargins);
-    await updateGlobal(priceViews);
-    await updateGlobal(labelings);
+    await globals.update(globalMargins);
+    await globals.update(priceViews);
+    await globals.update(labelings);
   }
 
   function checkDuplicateLabeling(id) {

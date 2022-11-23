@@ -16,6 +16,7 @@
   export let company;
   export let items;
   let itemsOriginal = deep.copy(items);
+  // let itemsDiff = items.map(() => '');
   $: unsavedItems = itemsOriginal.map(() => false);
 
   $: unsaved = unsavedItems.some(e => e);
@@ -57,7 +58,7 @@
       }
     }
     // refresh items
-    for (const [i, item] of newItems) items[i] = item;
+    for (const [i, item] of updatedItems) items[i] = item;
     itemsOriginal = deep.copy(items);
     heimdall.emit('labelings', updatedIDs);
   }
@@ -254,7 +255,10 @@
   function checkDiff(items) {
     for (const [i, itemOriginal] of itemsOriginal.entries()) {
       const item = items.find(i => i.id == itemOriginal.id);
-      diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (unsavedItems[i] = changed));
+      diff(item, itemOriginal, { fieldsToIgnore }).then(({ changed, html }) => {
+        unsavedItems[i] = changed;
+        // itemsDiff[i] = html;
+      });
     }
   }
 
@@ -462,6 +466,11 @@
   {/if}
 </div>
 
+<!-- <div style="display:flex;">
+  {#each itemsDiff as item}
+    <pre style="width:200px;">{@html item}</pre>
+  {/each}
+</div> -->
 <style>
   .wrapper {
     overflow-x: auto;

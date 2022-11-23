@@ -3,13 +3,13 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { SearchParamsManager } from '$/searchparams';
+  import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '$/fields/products';
   import { deep, slugify, diff, makeTree, treeFlatten, moveItem } from '$/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { updateGlobal, users, companies, categories } from '@/globals';
+  import { globals, users, companies, categories } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
@@ -17,9 +17,9 @@
   import ProductPricing from './ProductPricing.svelte';
   import ProductStorage from './ProductStorage.svelte';
   import ProductGallery from './ProductGallery.svelte';
-  import ProductRecommendations from './ProductRecommendations.svelte';
+  // import ProductRecommendations from './ProductRecommendations.svelte';
 
-  const searchParams = SearchParamsManager.read();
+  const searchParams = SearchParams.read();
 
   export let slug;
 
@@ -45,8 +45,8 @@
   }
 
   async function read() {
-    await updateGlobal(companies);
-    await updateGlobal(categories);
+    await globals.update(companies);
+    await globals.update(categories);
 
     if (slug == '+') {
       item = defaults();
@@ -228,9 +228,9 @@
     </section>
 
     <ProductPricing bind:product={item} productOriginal={itemOriginal} />
-    <ProductStorage bind:product={item} />
     <ProductGallery bind:gallery={item.gallery} />
-    <ProductRecommendations bind:product={item} />
+    <ProductStorage bind:product={item} />
+    <!-- <ProductRecommendations bind:product={item} /> -->
   {/if}
 </Editor>
 

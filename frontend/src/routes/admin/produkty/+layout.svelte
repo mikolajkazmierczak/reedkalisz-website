@@ -5,7 +5,7 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { header } from '@/stores';
-  import { searchparams, SearchParamsManager } from '$/searchparams';
+  import { searchparams, SearchParams } from '$/searchparams';
 
   import { categories } from '@/globals';
   import { search as fields } from '$/fields/products';
@@ -16,7 +16,7 @@
 
   $header = { title: 'Produkty', icon: 'products' };
 
-  const searchParams = new SearchParamsManager('/admin/produkty');
+  const searchParams = new SearchParams('/admin/produkty');
   $: [limit, page, query, category] = $searchparams.get(searchParams.pathname).values();
 
   // reset page when category changes
@@ -27,14 +27,16 @@
   async function read(limit, page, query, category) {
     const filter = category ? { categories: { category: { _eq: category } } } : {};
     products = await api.items('products').readByQuery({ fields, filter, limit, page, search: query, meta: '*' });
-    console.log('read: products');
+    // console.log('read: products');
   }
 
   $: $categories && read(limit, page, query, category);
 
   heimdall.listen(({ match }) => {
-    const itemIds = products.data.map(item => item.id);
-    if (match('products', itemIds)) read(limit, page, query, category);
+    // TODO: this does not work for new products
+    // const itemIds = products.data.map(item => item.id);
+    // if (match('products', itemIds)) read(limit, page, query, category);
+    if (match('products')) read(limit, page, query, category);
   });
 </script>
 

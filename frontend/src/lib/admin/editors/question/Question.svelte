@@ -1,7 +1,7 @@
 <script>
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { edit as fields, defaults } from '$/fields/colors';
+  import { edit as fields, defaults } from '$/fields/questions';
   import { deep, diff } from '$/utils';
 
   import editing from '@/editors/editing';
@@ -11,6 +11,7 @@
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Blame from '@c/Blame.svelte';
+  import Picker from '@c/library/Picker.svelte';
 
   export let id;
 
@@ -18,14 +19,15 @@
   let itemOriginal;
 
   function remove() {
-    editing.remove('colors', id, { root: '/admin/produkty' });
+    editing.remove('questions', id, { root: '/admin/zapytania' });
   }
 
   async function read() {
     if (id == '+') {
       item = defaults();
+      item.spam_chance = 0; // admin user is creating this so...
     } else {
-      item = await api.items('colors').readOne(id, { fields });
+      item = await api.items('questions').readOne(id, { fields });
     }
     itemOriginal = item ? deep.copy(item) : null;
   }
@@ -37,26 +39,29 @@
   });
 
   heimdall.listen(({ match, me }) => {
-    if (match('colors', id) && !me) {
+    if (match('questions', id) && !me) {
       alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
     }
   });
 </script>
 
-<Editor root="/admin/kolory" icon="colors" title={item?.name} collection="colors" bind:item bind:itemOriginal>
+<Editor
+  root="/admin/zapytania"
+  icon="questions"
+  title={item?.name + (item?.name && item?.email ? ' | ' : '') + item?.email}
+  collection="questions"
+  bind:item
+  bind:itemOriginal
+>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">
-            <div class="ui-pair">
-              <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
-            </div>
-            <Input bind:value={item.name}>Nazwa</Input>
-            <div class="ui-pair">
-              <Input bind:value={item.color}>Kolor <small>HEX</small></Input>
-              <Input type="color" bind:value={item.color}>Wybierz</Input>
-            </div>
+            <Input bind:value={item.name}>Imię i nazwisko</Input>
+            <Input bind:value={item.email}>Email</Input>
+            <Input bind:value={item.phone}>Telefon</Input>
+            <Input type="textarea" rows="15" bind:value={item.content}>Treść</Input>
           </div>
         </div>
 
@@ -66,6 +71,14 @@
           </div>
 
           <div class="ui-box ui-box--uneditable">
+            {#if item.from_contact || item.from_product}
+              <h2>Zapytanie z formularza ({item.from_contact ? 'Kontakt' : 'Produkt'})</h2>
+              Szansa na spam:<span style:color={item.spam_chance > 80 ? 'var(--main)' : 'var(--text)'}>
+                {item.spam_chance}%
+              </span>
+            {:else}
+              <h2>Zapytanie wewnętrzne</h2>
+            {/if}
             <h3 class="ui-h3">Utworzenie</h3>
             <p>
               {#if $users && item.date_created}
@@ -83,6 +96,10 @@
               {/if}
             </p>
           </div>
+        </div>
+
+        <div class="ui-section__col">
+          <Picker bind:selected={item.file} />
         </div>
       </div>
     </section>

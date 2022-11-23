@@ -6,7 +6,9 @@ export const searchparams = writable(
   new Map([
     ['/admin/produkty', { values, defaults: { l: 25, p: 1, q: null, c: null } }], // limit, page, query, category
     ['/admin/kategorie', { values, defaults: { q: null } }], // query
-    ['/admin/biblioteka', { values, defaults: { l: 25, p: 1, q: null } }] // limit, page, query
+    ['/admin/biblioteka', { values, defaults: { l: 25, p: 1, q: null } }], // limit, page, query,
+    ['/admin/kolory', { values, defaults: { l: 25, p: 1, q: null } }], // limit, page, query
+    ['/admin/zapytania', { values, defaults: { l: 25, p: 1, q: null } }] // limit, page, query
   ])
 );
 
@@ -29,7 +31,7 @@ function values() {
   }
 }
 
-export class SearchParamsManager {
+export class SearchParams {
   constructor(pathname, refresh = false) {
     this.pathname = pathname;
     this.init(refresh);
@@ -64,7 +66,7 @@ export class SearchParamsManager {
     if (this.pathname != url.pathname) return;
 
     const { defaults, params } = this.get();
-    const newParams = SearchParamsManager.parse(url.search);
+    const newParams = SearchParams.parse(url.search);
 
     // const unsetByDefault = Object.values(defaults).every(v => v == null);
     const unset = Object.keys(newParams).length === 0; // newParams == {}
@@ -149,6 +151,6 @@ export class SearchParamsManager {
 
   static read() {
     const url = get(page).url;
-    return SearchParamsManager.parse(url.search);
+    return SearchParams.parse(url.search);
   }
 }

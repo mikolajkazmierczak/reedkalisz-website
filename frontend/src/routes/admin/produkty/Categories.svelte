@@ -1,7 +1,6 @@
 <script>
-  import heimdall from '$/heimdall';
   import { makeTree } from '$/utils';
-  import { updateGlobal, categories } from '@/globals';
+  import { globals, categories } from '@/globals';
   import Category from './Category.svelte';
 
   export let searchParams = null;
@@ -12,15 +11,11 @@
   let items;
 
   async function read() {
-    await updateGlobal(categories);
     items = makeTree($categories);
   }
 
-  read();
-
-  heimdall.listen(({ match }) => {
-    if (match('categories')) read();
-  });
+  globals.update(categories);
+  $: $categories && read();
 </script>
 
 <sidebar>

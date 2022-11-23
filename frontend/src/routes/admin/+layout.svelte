@@ -5,8 +5,9 @@
 
   import heimdall from '$/heimdall';
   import { me, readme } from '$/auth';
+
+  import globals from '@/globals';
   import { errors, unsaved } from '@/stores';
-  import { updateGlobal, globals } from '@/globals';
 
   import Error from '@/Error.svelte';
   import Login from '@/Login.svelte';
@@ -31,18 +32,13 @@
     window.addEventListener('unhandledrejection', e => ($errors = [...$errors, e?.reason?.message]));
   });
 
-  $: if ($me) updateGlobal(globals.users);
+  $: if ($me) globals.update('directus_users');
 
   heimdall.listen(async ({ data }) => {
     const { collection, ids, refresh } = data;
-    const options = { ids, refresh };
-    if (collection == 'directus_users') await updateGlobal(globals.users, options);
-    else if (collection == 'companies') await updateGlobal(globals.companies, options);
-    else if (collection == 'labelings') await updateGlobal(globals.labelings, options);
-    else if (collection == 'price_views') await updateGlobal(globals.priceViews, options);
-    else if (collection == 'global_margins') await updateGlobal(globals.globalMargins, options);
-    else if (collection == 'categories') await updateGlobal(globals.categories, options);
-    else if (collection == 'colors') await updateGlobal(globals.colors, options);
+    if (globals.collections.includes(collection)) {
+      await globals.update(collection, { ids, refresh });
+    }
   }, true);
 </script>
 

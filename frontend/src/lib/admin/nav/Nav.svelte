@@ -13,9 +13,9 @@
   const buttons = [
     { href: '/', icon: 'dashboard', name: 'Aktywność' },
     { href: '/produkty', icon: 'products', name: 'Produkty' },
+    { href: '/kolory', icon: 'colors', name: 'Kolory' },
     { href: '/kategorie', icon: 'categories', name: 'Kategorie' },
     { href: '/kalkulacje', icon: 'calculator', name: 'Kalkulacje' },
-    { href: '/kolory', icon: 'colors', name: 'Kolory' },
     { href: '/menu', icon: 'menu', name: 'Menu' },
     { href: '/strony', icon: 'pages', name: 'Strony' },
     { href: '/fragmenty', icon: 'fragments', name: 'Fragmenty' },

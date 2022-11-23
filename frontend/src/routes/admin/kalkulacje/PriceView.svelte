@@ -119,7 +119,7 @@
   }
 
   $: correct = !inputError && item.name && item.amounts.length;
-  $: diff(item, itemOriginal, fieldsToIgnore).then(({ changed }) => (unsaved = changed));
+  $: diff(item, itemOriginal, { fieldsToIgnore }).then(({ changed }) => (unsaved = changed));
 </script>
 
 <div class="ui-list">
