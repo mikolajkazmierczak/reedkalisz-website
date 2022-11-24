@@ -29,7 +29,7 @@
 
   beforeNavigate(navigation => {
     if (unsaved) {
-      const prompt = `Zmiana widoku "${item.name} ${item.amounts}" nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
+      const prompt = `Zmiany w widoku "${item.name} (${item.amounts})" nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
       if (confirm(prompt)) {
         cancel();
       } else navigation.cancel();
@@ -111,7 +111,6 @@
     await api.items('price_views').deleteOne(item.id);
     const ids = swapID ? [item.id, swapID] : [item.id];
     heimdall.emit('price_views', ids);
-
     items = items.filter(i => i.id !== item.id);
 
     deletingSaving = false;

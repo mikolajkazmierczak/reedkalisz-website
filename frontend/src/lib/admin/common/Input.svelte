@@ -203,6 +203,7 @@
               on:click={() => {
                 value.splice(i, 1);
                 list = value.join(';');
+                value = value;
               }}
             >
               {v}
@@ -238,7 +239,7 @@
   {/if}
 
   {#if error && type != 'number'}
-    <span class="error-info">{error}</span>
+    <span class="error-info">{@html error}</span>
   {/if}
 
   {#if api}

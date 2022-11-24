@@ -23,12 +23,12 @@
       }
       if (update) {
         const fileData = await api.files.updateOne(update, form);
-        heimdall.emit('files', fileData.id);
+        heimdall.emit('directus_files', fileData.id);
       } else {
         const filesData = (await api.files.createMany(form)).data;
         const filesArray = Array.isArray(filesData) ? filesData : [filesData];
         const filesIds = filesArray.map(f => f.id);
-        heimdall.emit('files', filesIds);
+        heimdall.emit('directus_files', filesIds);
       }
       dispatch('upload');
     }

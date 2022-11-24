@@ -4,11 +4,14 @@ import { get, writable } from 'svelte/store';
 
 export const searchparams = writable(
   new Map([
-    ['/admin/produkty', { values, defaults: { l: 25, p: 1, q: null, c: null } }], // limit, page, query, category
-    ['/admin/kategorie', { values, defaults: { q: null } }], // query
-    ['/admin/biblioteka', { values, defaults: { l: 25, p: 1, q: null } }], // limit, page, query,
-    ['/admin/kolory', { values, defaults: { l: 25, p: 1, q: null } }], // limit, page, query
-    ['/admin/zapytania', { values, defaults: { l: 25, p: 1, q: null } }] // limit, page, query
+    ['/admin/produkty', { values, defaults: { l: 50, p: 1, q: null, c: null } }], // limit, page, query, category
+    ['/admin/kategorie', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/biblioteka', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/kolory', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/strony', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/fragmenty', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/menu', { values, defaults: { l: 50, p: 1, q: null, m: null } }] // limit, page, query, menu
   ])
 );
 
@@ -89,7 +92,7 @@ export class SearchParams {
     // null -> remove param from url
     const url = get(page).url;
     if (this.pathname != url.pathname) return;
-    console.log('writeURL', newParams);
+    // console.log('writeURL', newParams);
 
     for (const [key, value] of Object.entries(newParams)) {
       if (value == null) url.searchParams.delete(key);

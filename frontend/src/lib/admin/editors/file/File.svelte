@@ -4,7 +4,7 @@
   import heimdall from '$/heimdall';
   import { filetypeToReadable, bytesToReadable } from '$/utils';
 
-  import { edit as fields } from '$/fields/files';
+  import { edit as fields } from '$/fields/directus_files';
   import Upload from '@c/library/Upload.svelte';
   import Editor from '@/editors/Editor.svelte';
   import Button from '@c/Button.svelte';
@@ -24,7 +24,7 @@
   async function handleDelete() {
     if (confirm('Napewno?')) {
       await api.files.deleteOne(id);
-      heimdall.emit('files', id);
+      heimdall.emit('directus_files', id);
       goto('/admin/biblioteka', { replaceState: true, noScroll: true });
     }
   }

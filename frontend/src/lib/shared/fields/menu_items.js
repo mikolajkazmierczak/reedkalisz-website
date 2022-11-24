@@ -5,14 +5,16 @@ export const search = [
   'user_updated',
   'date_updated',
   'enabled',
-  'name',
-  'slug',
-  'seo_title',
-  'seo_description',
-  'description',
-  'img',
+  'menu',
+  'folder',
   'parent',
-  'index'
+  'index',
+  'name',
+  'url',
+  'page',
+  'product',
+  'category',
+  'img'
 ];
 export const show = [...search];
 
@@ -26,13 +28,15 @@ export const defaults = () => ({
   user_updated: null,
   date_updated: null,
   enabled: true,
+  menu: null,
+  folder: false,
   parent: null,
   index: null,
   name: '',
-  slug: '',
-  seo_title: '',
-  seo_description: '',
-  description: '',
+  url: '',
+  page: null,
+  product: null,
+  category: null,
   img: null
 });
 

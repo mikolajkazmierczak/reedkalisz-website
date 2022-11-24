@@ -4,7 +4,7 @@
   import api from '$/api';
   import { header } from '@/stores';
   import { searchparams, SearchParams } from '$/searchparams';
-  import { deep, makeTree, treeFlatten } from '$/utils';
+  import { makeTree, treeGetItem } from '$/utils';
 
   import { globals, categories } from '@/globals';
   import { search as fields } from '$/fields/categories';
@@ -15,36 +15,38 @@
   $header = { title: 'Kategorie', icon: 'categories' };
 
   const searchParams = new SearchParams('/admin/kategorie');
-  $: [query] = $searchparams.get(searchParams.pathname).values();
+  $: [limit, page, query] = $searchparams.get(searchParams.pathname).values();
 
   let items;
+  let itemsCount;
+  $: itemsTree = $categories ? makeTree($categories) : [];
 
-  async function read(query) {
-    const tree = makeTree($categories);
+  async function read(limit, page, query) {
     if (query) {
-      const flat = treeFlatten(tree);
-      const queried = (await api.items('categories').readByQuery({ fields, limit: -1, search: query })).data;
-      items = flat.filter(category => queried.some(c => c.id === category.id));
+      const queried = await api.items('categories').readByQuery({ fields, limit, page, search: query, meta: '*' });
+      items = queried.data;
+      itemsCount = queried.meta.filter_count;
     } else {
-      items = tree;
+      items = itemsTree;
+      itemsCount = -1;
     }
   }
 
   globals.update(categories);
-  $: $categories && read(query);
+  $: $categories && read(limit, page, query);
 </script>
 
 {#if items}
   <div class="wrapper">
     <div class="actions">
-      <Button on:click={() => goto(`/admin/kategorie/+?index=${items.length}`)} icon="add">Dodaj</Button>
+      <Button on:click={() => goto(`/admin/kategorie/+?index=${$categories.length}`)} icon="add">Dodaj</Button>
       <Search {searchParams} {query} />
     </div>
 
     <Table
       collection="categories"
-      itemsCount={-1}
-      bind:items
+      {itemsCount}
+      {items}
       head={[
         { checkbox: true, icon: 'eye' },
         { id: true, label: 'ID' },
@@ -52,16 +54,22 @@
         { blame: true, label: 'Utworzenie' },
         { blame: true, label: 'Aktualizacja' }
       ]}
-      mapper={$ => ({
-        href: '/admin/kategorie/' + $.slug,
-        values: [
-          $.enabled,
-          $.id,
-          $._meta.path.map(p => p + 1).join('.') + ' ' + $.name,
-          { user: $.user_created, datetime: $.date_created },
-          { user: $.user_updated, datetime: $.date_updated }
-        ]
-      })}
+      mapper={$ => {
+        const path = treeGetItem(itemsTree, $.id)._meta.path;
+        return {
+          href: '/admin/kategorie/' + $.slug,
+          values: [
+            $.enabled,
+            $.id,
+            path.map(p => p + 1).join('.') + ' ' + $.name,
+            { user: $.user_created, datetime: $.date_created },
+            { user: $.user_updated, datetime: $.date_updated }
+          ]
+        };
+      }}
+      {searchParams}
+      {limit}
+      {page}
       order={!query}
     />
   </div>

@@ -173,9 +173,9 @@ export function recalculateLabelings(amounts, global, labelings, product, produc
 
     // ONLY REALLY RELEVANT FOR THE ADMIN PANEL
     // TODO: This should first try to use price ids from the labeling of the same id (if it exists) and only later
-    // TODO: use the rest available for new labelings. It will avoid unncessary moving around of the pricePerAmounts
-    // TODO: between labelings. Not a big deal, but it would be nice since unnecesary database shenanigans is the only
-    // TODO: reason why this whole "reusable system" even exists in the first place.
+    //       use the rest available for new labelings. It will avoid unncessary moving around of the pricePerAmounts
+    //       between labelings. Not a big deal, but it would be nice since unnecesary database shenanigans is the only
+    //       reason why this whole "reusable system" even exists in the first place.
     if (productLabelingsReusable) {
       const reusable = productLabelingsReusable[r++];
       if (reusable) {
@@ -244,6 +244,7 @@ export async function recalculateProducts(filter, { newPriceView = null, swapLab
   };
 
   const products = (await api.items('products').readByQuery({ fields: productFields, filter })).data;
+  console.log('affected:', products);
 
   // recalculate each product concurrently
   await Promise.all(

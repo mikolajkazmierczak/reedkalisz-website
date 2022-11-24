@@ -54,7 +54,7 @@
 
   async function handleCancel() {
     await cancel(async ({ prompt = null } = {}) => {
-      [item, itemOriginal] = await editing.cancel(collection, item, itemOriginal, { root, prompt });
+      [item, itemOriginal] = await editing.cancel(item, itemOriginal, { root, prompt });
     });
   }
 

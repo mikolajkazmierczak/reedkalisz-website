@@ -61,7 +61,7 @@
             <Input bind:value={item.name}>Imię i nazwisko</Input>
             <Input bind:value={item.email}>Email</Input>
             <Input bind:value={item.phone}>Telefon</Input>
-            <Input type="textarea" rows="15" bind:value={item.content}>Treść</Input>
+            <Input type="textarea" rows="20" bind:value={item.content}>Treść</Input>
           </div>
         </div>
 

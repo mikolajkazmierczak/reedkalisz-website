@@ -69,6 +69,7 @@ async function cancel(item, itemOriginal, { root, prompt = null } = {}) {
       unsaved.set(false);
       gotoRoot(root);
     } else {
+      console.log('cancel', JSON.parse(JSON.stringify(item)), JSON.parse(JSON.stringify(itemOriginal)));
       item = deep.copy(itemOriginal);
     }
   }

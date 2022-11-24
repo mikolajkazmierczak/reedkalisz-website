@@ -4,70 +4,93 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
-  import { edit as fields, defaults } from '$/fields/categories';
+  import { edit as fields, defaults } from '$/fields/menu_items';
   import { deep, slugify, diff } from '$/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { globals, users, categories } from '@/globals';
+  import { globals, users, menus, menu_items } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Blame from '@c/Blame.svelte';
   import Picker from '@c/library/Picker.svelte';
+  import { onDestroy } from 'svelte';
 
   const searchParams = SearchParams.read();
 
-  export let slug;
+  export let id;
 
   let item;
   let itemOriginal;
 
-  $: hasChildren = $categories?.find(category => category.parent == item?.id);
+  let errorInvalidURL = false;
+
+  $: hasChildren = $menu_items?.find(m => m.parent == item?.id);
 
   async function read() {
-    await globals.update(categories);
+    await globals.update(menus);
+    await globals.update(menu_items);
     if (slug == '+') {
       item = defaults();
-      // add parent and index from search params
+      // add parent, index and menu from search params
       if (searchParams.parent != null) item.parent = searchParams.parent;
       if (searchParams.index != null) item.index = searchParams.index;
+      if (searchParams.menu != null) item.menu = searchParams.menu;
     } else {
-      const filter = { slug: { _eq: slug } };
-      item = (await api.items('categories').readByQuery({ fields, filter })).data[0];
+      item = (await api.items('menu_items').readOne(id, { fields })).data;
     }
     itemOriginal = item ? deep.copy(item) : null;
   }
 
   async function remove() {
-    editing.remove('categories', item.id, { root: '/admin/kategorie' });
+    editing.remove('menu_items', item.id, { root: '/admin/menu' });
+  }
+
+  async function parseLink() {
+    try {
+      const pathname = new URL(item.url).pathname;
+      if (pathname.startsWith('/produkty')) {
+        const slug = pathname.split('/').pop();
+        const filter = { slug: { _eq: slug } };
+        const product = (await api.items('products').readByQuery({ filter })).data;
+        startLookupTimeout();
+        item.product = item.link;
+      } else if (item.link.startsWith('/kategorie/')) {
+        categoryURL = item.link;
+      } else {
+        pageURL = item.link;
+      }
+      errorInvalidURL = null;
+    } catch (e) {
+      errorInvalidURL = e.message;
+    }
   }
 
   read();
 
-  $: if (item) item.slug = slugify(item?.name, itemOriginal?.name, itemOriginal?.slug);
-  $: correctSlug = item && !['+', ''].includes(item.slug);
+  // let lookup = true;
+  // let lookupTimeout = null;
+  // function startLookupInterval() {
+  //   clearTimeout(lookupTimeout);
+  //   lookup = false;
+  // }
+  // lookupInterval = setInterval(()=>(lookup=true), 1000);
+  // onDestroy(()=>clearInterval(lookupInterval));
 
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    $unsaved = correctSlug && changed;
+    $unsaved = changed;
   });
 
   heimdall.listen(({ match, me, data }) => {
-    if (match('categories', item.id) && !me) {
+    if (match('menu_items', item.id) && !me) {
       // alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
       console.log('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.', data);
     }
   });
 </script>
 
-<Editor
-  root="/admin/kategorie"
-  icon="categories"
-  title={item?.name}
-  collection="categories"
-  bind:item
-  bind:itemOriginal
->
+<Editor root="/admin/menu" icon="menu" title={item?.name} collection="menu_items" bind:item bind:itemOriginal>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
@@ -75,14 +98,10 @@
           <div class="ui-box">
             <div class="ui-pair">
               <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
+              <Input type="checkbox" bind:value={item.folder}>Folder</Input>
             </div>
             <Input bind:value={item.name}>Nazwa</Input>
-          </div>
-
-          <div class="ui-box">
-            <h3 class="ui-h3">SEO</h3>
-            <Input bind:value={item.seo_title}>Tytuł</Input>
-            <Input type="textarea" bind:value={item.seo_description}>Opis</Input>
+            <Input bind:value={item.url}>Link</Input>
           </div>
         </div>
 
@@ -91,19 +110,13 @@
             <Button icon="delete" on:click={remove} dangerous disabled={hasChildren}>Usuń</Button>
             {#if hasChildren}
               <p>
-                Nie można usunąć kategorii, która ma podkategorie.<br />
-                <small>Najpierw usuń lub wysuń wszystkie podkategorie na zewnątrz.</small>
+                Nie można usunąć elementu menu, który ma podelementy.<br />
+                <small>Najpierw usuń lub wysuń wszystkie podelementy na zewnątrz.</small>
               </p>
             {/if}
           </div>
 
           <div class="ui-box ui-box--uneditable">
-            <h3 class="ui-h3">Link do strony</h3>
-            {#if item.date_created}
-              <a href="/kategorie/{item.slug}">/kategorie/{item.slug}</a>
-            {:else}
-              /kategorie/{item.slug || '...'}
-            {/if}
             <h3 class="ui-h3">Utworzenie</h3>
             <p>
               {#if $users && item.date_created}
@@ -126,30 +139,6 @@
         <div class="ui-section__col">
           <div class="img">
             <Picker bind:selected={item.img} />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="ui-section">
-      <h2 class="ui-h2">Opis</h2>
-
-      <div class="ui-section__row">
-        <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
-          <div class="ui-pair ui-texteditor">
-            <div class="ui-texteditor__draft">
-              <Input
-                type="textarea"
-                bind:value={item.description}
-                rows={15}
-                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..."
-              />
-            </div>
-            <div class="ui-texteditor__render">
-              {#if item.description}
-                {@html marked.parse(item.description)}
-              {/if}
-            </div>
           </div>
         </div>
       </div>

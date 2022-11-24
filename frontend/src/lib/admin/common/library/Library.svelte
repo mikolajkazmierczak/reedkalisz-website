@@ -6,7 +6,7 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
 
-  import { read as fields } from '$/fields/files';
+  import { read as fields } from '$/fields/directus_files';
   import Button from '@c/Button.svelte';
 
   // import Filters from '@c/Filters.svelte';
@@ -24,6 +24,8 @@
   export let picker = false;
   export let selected = null;
 
+  $: console.log(selected);
+
   let files;
   let filesMeta;
 
@@ -34,7 +36,6 @@
     const res = await api.files.readByQuery({ fields, limit, page, search: query, sort: '-uploaded_on', meta: '*' });
     files = res.data;
     filesMeta = res.meta;
-    console.log('read: files |', files);
   }
 
   function markSelected(id) {
@@ -77,84 +78,95 @@
     const ids = files.filter(f => f.marked).map(f => f.id);
     if (ids.length) {
       if (confirm(`Czy na pewno chcesz usunąć ${ids.length} plików?`)) {
-        await api.files.deleteMany(ids); // TODO: heimdall?
-        heimdall.emit('files', ids);
-        // read(limit, page, query); <- this is not needed, because of heimdall
+        await api.files.deleteMany(ids);
+        heimdall.emit('directus_files', ids);
+        // read(limit, page, query); <- not needed because of heimdall
       }
     }
   }
 
   $: read(limit, page, query);
 
-  $: if (selected && files) markSelected(selected);
+  $: if (files) markSelected(selected);
   $: marked = files?.find(f => f.marked);
 
   heimdall.listen(({ match }) => {
-    if (match('files')) read(limit, page, query);
+    if (match('directus_files')) read(limit, page, query);
   });
 </script>
 
-<!-- <div class="actions" class:picker>
-  <Filters
-    title={'Użycie'}
-    filters={[
-      { label: 'Nieużywane', value: null },
-      {
-        label: 'Produkt',
-        value: 'products',
-        children: [
-          { label: 'Magazyn', value: 'products.storage' },
-          { label: 'Galeria', value: 'products.gallery' },
-          { label: 'Opis', value: 'products.description' }
-        ]
-      },
-      { label: 'Kategoria', value: 'categories' },
-      { label: 'Strona', value: 'pages' },
-      { label: 'Fragment', value: 'fragments' },
-      { label: 'Menu', value: 'menus' }
-    ]}
-    bind:selected={filterUse}
-  />
-  <Filters
-    title={'Rozszerzenie'}
-    filters={[
-      {
-        label: 'Obraz',
-        value: 'image',
-        children: [
-          { label: 'JPG', value: 'image/jpeg' },
-          { label: 'PNG', value: 'image/png' },
-          { label: 'WEBP', value: 'image/webp' },
-          { label: 'SVG', value: 'image/svg+xml' }
-        ]
-      },
-      { label: 'Inne', value: null, children: [{ label: 'PDF', value: 'application/pdf' }] }
-    ]}
-    bind:selected={filterType}
-  />
-</div> -->
+<div class="wrapper">
+  <!-- <div class="filters" class:picker>
+    <Filters
+      title={'Użycie'}
+      filters={[
+        { label: 'Nieużywane', value: null },
+        {
+          label: 'Produkt',
+          value: 'products',
+          children: [
+            { label: 'Magazyn', value: 'products.storage' },
+            { label: 'Galeria', value: 'products.gallery' },
+            { label: 'Opis', value: 'products.description' }
+          ]
+        },
+        { label: 'Kategoria', value: 'categories' },
+        { label: 'Strona', value: 'pages' },
+        { label: 'Fragment', value: 'fragments' },
+        { label: 'Menu', value: 'menus' }
+      ]}
+      bind:selected={filterUse}
+    />
+    <Filters
+      title={'Rozszerzenie'}
+      filters={[
+        {
+          label: 'Obraz',
+          value: 'image',
+          children: [
+            { label: 'JPG', value: 'image/jpeg' },
+            { label: 'PNG', value: 'image/png' },
+            { label: 'WEBP', value: 'image/webp' },
+            { label: 'SVG', value: 'image/svg+xml' }
+          ]
+        },
+        { label: 'Inne', value: null, children: [{ label: 'PDF', value: 'application/pdf' }] }
+      ]}
+      bind:selected={filterType}
+    />
+  </div> -->
 
-{#if marked && !picker}
-  <div class="buttons" transition:slide>
-    <Button on:click={unmark}>Anuluj</Button>
-    <Button on:click={handleDelete} dangerous>Usuń</Button>
+  {#if marked && !picker}
+    <div class="buttons" transition:slide>
+      <Button on:click={unmark}>Anuluj</Button>
+      <Button on:click={handleDelete} dangerous>Usuń</Button>
+    </div>
+  {/if}
+
+  <div class="content">
+    {#if picker}
+      <slot name="picker" />
+    {/if}
+
+    <div class="upload" class:picker>
+      <Upload on:upload={() => read(limit, page)} />
+    </div>
+
+    {#if files}
+      {#each files as file (file.id)}
+        {@const data = (({ id, title, type, filesize, uploaded_on, modified_on, marked }) => {
+          return { id, title, type, filesize, uploaded_on, modified_on, marked };
+        })(file)}
+        <File {...data} on:click={e => fileClick(e, file)} />
+      {/each}
+    {/if}
   </div>
-{/if}
 
-<Upload on:upload={() => read(limit, page)} />
-
-{#if files}
-  <div class="files">
-    {#each files as file (file.id)}
-      <File {...file} on:click={e => fileClick(e, file)} />
-    {/each}
-  </div>
-{/if}
-
-<Pagination {searchParams} bind:limit bind:page count={filesMeta?.filter_count} />
+  <Pagination {searchParams} bind:limit bind:page count={filesMeta?.filter_count} />
+</div>
 
 <style>
-  /* .actions {
+  /* .filters {
     z-index: 1;
     position: sticky;
     top: calc(4rem + 1.5rem);
@@ -165,21 +177,33 @@
     gap: 0.5rem;
     border-radius: 0.5rem;
     margin-bottom: 1.5rem;
-    padding: 0.5rem;
     width: 100%;
-    background-color: var(--accent);
   }
-  .actions.picker {
+  .filters.picker {
     top: 1rem;
   } */
 
-  .buttons {
-    margin-bottom: 1rem;
+  .upload {
+    grid-column: start / end;
   }
-  .files {
+  .upload.picker {
+    grid-column: 2 / end;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.5rem;
+    border-radius: var(--border-radius);
+    border: var(--border-light);
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background-color: var(--light);
+  }
+  .content {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    grid-template-columns: [start] repeat(auto-fill, minmax(125px, 1fr)) [end];
+    grid-template-rows: 200px repeat(auto-fill, auto);
     gap: 1rem;
-    margin-top: 1.5rem;
+    /* margin-top: 1.5rem; */
   }
 </style>

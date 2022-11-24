@@ -23,13 +23,20 @@
 <div class="wrapper">
   {#if $globalMargins && $priceViews}
     <sidebar>
+      <div class="ui-box ui-box--uneditable notice">
+        <h3>Zmiany na żywo</h3>
+        <p>
+          <i>Najlepiej nie edytować tego panelu jednocześnie.</i>
+          Zapisywane zmiany są wprowadzane także u pozostałych użytkowników co może powodować nadpisywanie swoich zmian.
+        </p>
+      </div>
       <div class="ui-box">
         <h3 class="ui-h3 title">Globalne marże</h3>
-        <GlobalMargins bind:data={$globalMargins} />
+        <GlobalMargins data={$globalMargins} />
       </div>
       <div class="ui-box">
         <h3 class="ui-h3 title">Widoki</h3>
-        <PriceViews bind:items={$priceViews} />
+        <PriceViews items={$priceViews} />
       </div>
     </sidebar>
   {/if}
@@ -72,5 +79,22 @@
   }
   .company h1 {
     margin-bottom: 0.5rem;
+  }
+
+  @keyframes outline-flash {
+    0% {
+      background-color: var(--accent-white);
+    }
+    50% {
+      background-color: var(--main-1);
+    }
+    100% {
+      background-color: var(--accent-white);
+    }
+  }
+  .notice {
+    gap: 0.25rem;
+    animation-name: outline-flash;
+    animation-duration: 2s;
   }
 </style>

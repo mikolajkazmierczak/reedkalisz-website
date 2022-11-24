@@ -1,4 +1,5 @@
 <script>
+  import { beforeNavigate } from '$app/navigation';
   import { slide } from 'svelte/transition';
 
   import api from '$/api';
@@ -17,9 +18,10 @@
   export let items;
   let itemsOriginal = deep.copy(items);
   // let itemsDiff = items.map(() => '');
-  $: unsavedItems = itemsOriginal.map(() => false);
 
+  let unsavedItems = itemsOriginal.map(() => false);
   $: unsaved = unsavedItems.some(e => e);
+
   let saving = false;
   let deleting = false;
   let deletingSaving = false; // prevent double click
@@ -29,6 +31,15 @@
 
   // `default` and `index` properties are handled separately
   const fieldsToIgnore = ['default', 'index', 'user_created', 'date_created', 'user_updated', 'date_updated'];
+
+  beforeNavigate(navigation => {
+    if (unsaved) {
+      const prompt = `Zmiany w znakowaniach nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
+      if (confirm(prompt)) {
+        cancel();
+      } else navigation.cancel();
+    }
+  });
 
   async function save() {
     const updatedIDs = [];

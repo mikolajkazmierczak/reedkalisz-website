@@ -194,8 +194,19 @@ export function treeRefreshMetaAndParent(tree, _parent = null, _depth = 0, _path
   }
 }
 
+export function treeGetItem(tree, id) {
+  // Find item in a tree with a given id.
+  for (const item of tree) {
+    if (item.id == id) return item;
+    if (item.children) {
+      const found = treeGetItem(item.children, id);
+      if (found) return found;
+    }
+  }
+}
+
 export function treeGetItemAtPath(tree, path) {
-  // Find item with id.
+  // Find item using it's path.
   if (path.length === 0) return tree;
   if (path.length === 1) return tree[path[0]];
   return treeGetItemAtPath(tree[path[0]].children, path.slice(1));

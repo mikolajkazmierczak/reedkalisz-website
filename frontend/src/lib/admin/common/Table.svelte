@@ -31,7 +31,7 @@
       ...head.map(h => {
         if (h.width) widths.push(h.width);
         if (h.checkbox) return smallestCellWidth + 'rem';
-        if (h.id) return '4rem';
+        if (h.id || h.thin) return '4rem';
         if (h.blame) return 'minmax(20ch, 1fr)';
         return 'minmax(15ch, 1fr)';
       })
@@ -78,7 +78,7 @@
   </div>
 </div>
 
-{#if itemsCount != -1 && (!tree || !order)}
+{#if itemsCount != -1}
   <Pagination {searchParams} bind:limit bind:page count={itemsCount} />
 {/if}
 

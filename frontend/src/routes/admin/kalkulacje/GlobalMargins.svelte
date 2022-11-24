@@ -5,8 +5,8 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { deep, diff } from '$/utils';
-  import { recalculateProducts } from '@/calculations';
 
+  import { recalculateProducts } from '@/calculations';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
 
@@ -14,8 +14,8 @@
 
   export let data;
   let dataOriginal = deep.copy(data);
-  let unsaved = false;
 
+  let unsaved = false;
   let saving = false;
 
   beforeNavigate(navigation => {
@@ -36,7 +36,7 @@
     const updates = { full_margin, full_minimum, product_margin, product_minimum };
     data = await api.singleton('global_margins').update(updates);
     dataOriginal = deep.copy(data);
-    heimdall.emit('global_margins', 1);
+    heimdall.emit('global_margins', null, { refresh: true });
 
     // UPDATE all PRODUCTS that both:
     // - have either global_full_margin or global_product_margin set to true
@@ -102,13 +102,13 @@
 <style>
   .margins {
     display: flex;
+    align-items: center;
     gap: 1rem;
-    height: 100%;
   }
-  .margins .input {
+  .input {
     position: relative;
   }
-  .margins .input small {
+  .input small {
     pointer-events: none;
     position: absolute;
     bottom: 0.45rem;
@@ -117,10 +117,10 @@
   }
   .bar {
     width: 1px;
-    height: 100%;
+    height: 4rem;
     background-color: rgba(0, 0, 0, 0.1);
   }
   .edit {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
   }
 </style>

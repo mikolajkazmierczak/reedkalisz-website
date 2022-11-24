@@ -1,5 +1,6 @@
 <script>
   import { defaults } from '$/fields/price_views';
+
   import Button from '@c/Button.svelte';
   import PriceView from './PriceView.svelte';
 

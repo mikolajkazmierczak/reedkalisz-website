@@ -191,7 +191,7 @@
       <div class="value value--head" class:center={checkbox}>
         <div>
           {#if icon}
-            <div class="icon"><div><Icon name={icon} dark /></div></div>
+            <div class="icon" style:margin-right={label ? '0.25rem' : '0'}><div><Icon name={icon} dark /></div></div>
           {/if}
           {#if label}{label}{/if}
         </div>
@@ -200,7 +200,6 @@
   </div>
 {/if}
 
-<!-- transition:slide={{ duration: order ? 200 : 0 }} -->
 {#if item}
   <div class="row row--item" class:dragging style:grid-template-columns={widths} on:dragenter={dragenterItem}>
     {#if tree}

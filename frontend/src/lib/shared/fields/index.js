@@ -1,11 +1,29 @@
-import categories from './categories';
-import colors from './colors';
-import companies from './companies';
-import files from './files';
-import labelings from './labelings';
-import price_views from './price_views';
-import products from './products';
-import questions from './questions';
 import directus_users from './directus_users';
+import directus_files from './directus_files';
+import price_views from './price_views';
+import companies from './companies';
+import labelings from './labelings';
+import products from './products';
+import colors from './colors';
+import categories from './categories';
+import pages from './pages';
+import menus from './menus';
+import menu_items from './menu_items';
+import fragments from './fragments';
+import questions from './questions';
 
-export default { categories, colors, companies, files, labelings, price_views, products, questions, directus_users };
+export default {
+  directus_users,
+  directus_files,
+  price_views,
+  companies,
+  labelings,
+  products,
+  colors,
+  categories,
+  pages,
+  menus,
+  menu_items,
+  fragments,
+  questions
+};

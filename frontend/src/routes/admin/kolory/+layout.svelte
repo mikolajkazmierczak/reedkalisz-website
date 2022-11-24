@@ -6,7 +6,7 @@
   import { searchparams, SearchParams } from '$/searchparams';
 
   import { globals, colors } from '@/globals';
-  import { search as fields } from '$/fields/products';
+  import { search as fields } from '$/fields/colors';
   import Button from '@c/Button.svelte';
   import Table from '@c/Table.svelte';
   import Search from '@c/Search.svelte';
@@ -17,13 +17,17 @@
   $: [limit, page, query] = $searchparams.get(searchParams.pathname).values();
 
   let items;
+  let itemsCount;
 
   async function read(limit, page, query) {
     if (query) {
       const options = { fields, limit, page, search: query, meta: '*' };
-      items = await api.items('colors').readByQuery(options);
+      const res = await api.items('colors').readByQuery(options);
+      items = res.data;
+      itemsCount = res.meta.filter_count;
     } else {
       items = $colors;
+      itemsCount = $colors.length;
     }
   }
 
@@ -40,8 +44,8 @@
 
     <Table
       collection="colors"
-      itemsCount={query ? items.meta.filter_count : items.length}
-      items={query ? items.data : items}
+      {itemsCount}
+      {items}
       head={[
         { checkbox: true, icon: 'eye' },
         { id: true, label: 'ID' },

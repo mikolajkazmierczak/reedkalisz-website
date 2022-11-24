@@ -6,7 +6,7 @@ import { default as collectionsFields } from '$/fields';
 // - global because they are needed on many pages in the app, so redownlading them every time is pointless
 // - first loaded on load of one the pages that need them, then updated when Heimdall detects an update
 // - pages that need a certain store are listed in comments below
-// TODO: update the lists below when new pages are added
+// TODO: update the lists below
 export const users = writable(null); // virtually everywhere
 export const companies = writable(null); // /produkty/:slug, /kalkulacje
 export const labelings = writable(null); // /produkty/:slug, /kalkulacje
@@ -14,6 +14,8 @@ export const priceViews = writable(null); // /produkty/:slug, /kalkulacje
 export const globalMargins = writable(null); // /produkty/:slug, /kalkulacje
 export const categories = writable(null); // /produkty, /produkty/:slug
 export const colors = writable(null); // /produkty/:slug
+export const menus = writable(null);
+export const menuItems = writable(null);
 
 const collections = [
   { collection: 'directus_users', store: users },
@@ -22,7 +24,9 @@ const collections = [
   { collection: 'price_views', store: priceViews },
   { collection: 'global_margins', store: globalMargins, singleton: true },
   { collection: 'categories', store: categories },
-  { collection: 'colors', store: colors }
+  { collection: 'colors', store: colors },
+  { collection: 'menus', store: menus },
+  { collection: 'menu_items', store: menuItems }
 ];
 
 async function updateItemsWithIDs(store, collection, ids, sortingKey, fields) {
