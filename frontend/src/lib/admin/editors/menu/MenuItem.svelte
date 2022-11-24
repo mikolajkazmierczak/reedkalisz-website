@@ -1,21 +1,18 @@
 <script>
-  import { marked } from 'marked';
-
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '$/fields/menu_items';
-  import { deep, slugify, diff } from '$/utils';
+  import { deep, makeTree, treeFlatten, diff } from '$/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { globals, users, menus, menu_items } from '@/globals';
+  import { globals, users, menus, menuItems, categories } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Blame from '@c/Blame.svelte';
   import Picker from '@c/library/Picker.svelte';
-  import { onDestroy } from 'svelte';
 
   const searchParams = SearchParams.read();
 
@@ -26,11 +23,12 @@
 
   let errorInvalidURL = false;
 
-  $: hasChildren = $menu_items?.find(m => m.parent == item?.id);
+  $: hasChildren = $menuItems?.find(m => m.parent == item?.id);
 
   async function read() {
     await globals.update(menus);
-    await globals.update(menu_items);
+    await globals.update(menuItems);
+    await globals.update(categories);
     if (slug == '+') {
       item = defaults();
       // add parent, index and menu from search params
@@ -47,36 +45,40 @@
     editing.remove('menu_items', item.id, { root: '/admin/menu' });
   }
 
-  async function parseLink() {
+  let lookup = false;
+  async function parseURL(url, categories) {
+    if (!lookup) return;
+    console.log('parseURL', url);
     try {
-      const pathname = new URL(item.url).pathname;
+      lookup = true;
+      // reset
+      item.product = null;
+      item.categeory = null;
+      item.page = null;
+      // parse
+      const pathname = new URL(url).pathname;
+      const slug = pathname.split('/').filter(Boolean)[1]; // /products/slug/subpage/... -> slug
+      const options = { fields: ['id', 'name'], filter: { slug: { _eq: slug } } };
       if (pathname.startsWith('/produkty')) {
-        const slug = pathname.split('/').pop();
-        const filter = { slug: { _eq: slug } };
-        const product = (await api.items('products').readByQuery({ filter })).data;
-        startLookupTimeout();
-        item.product = item.link;
-      } else if (item.link.startsWith('/kategorie/')) {
-        categoryURL = item.link;
-      } else {
-        pageURL = item.link;
+        item.product = (await api.items('products').readByQuery(options)).data[0];
+      } else if (item.link.startsWith('/kategorie')) {
+        const c = categories.find(c => c.slug == slug);
+        item.category = { id: c.id, name: c.name, _meta: c._meta }; // get only needed fields
+      } else if (item.link.startsWith('/strony')) {
+        item.page = (await api.items('pages').readByQuery(options)).data[0];
       }
       errorInvalidURL = null;
     } catch (e) {
       errorInvalidURL = e.message;
+    } finally {
+      lookup = false;
     }
   }
 
   read();
 
-  // let lookup = true;
-  // let lookupTimeout = null;
-  // function startLookupInterval() {
-  //   clearTimeout(lookupTimeout);
-  //   lookup = false;
-  // }
-  // lookupInterval = setInterval(()=>(lookup=true), 1000);
-  // onDestroy(()=>clearInterval(lookupInterval));
+  $: categoriesFlattened = treeFlatten(makeTree($categories));
+  $: item.url && $categories && parseURL(item.url, categoriesFlattened);
 
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
     $unsaved = changed;
@@ -100,8 +102,17 @@
               <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
               <Input type="checkbox" bind:value={item.folder}>Folder</Input>
             </div>
-            <Input bind:value={item.name}>Nazwa</Input>
-            <Input bind:value={item.url}>Link</Input>
+            <Input bind:value={item.name}>Tytuł</Input>
+            <Input bind:value={item.url} error={errorInvalidURL}>Link</Input>
+            {#if item.product}
+              Wykryto produkt: {item.product.name}
+            {/if}
+            {#if item.categeory}
+              Wykryto kategorię: {item.category._meta.path.join('.')} {item.category.name}
+            {/if}
+            {#if item.page}
+              Wykryto stronę: {item.page.name}
+            {/if}
           </div>
         </div>
 

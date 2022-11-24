@@ -12,8 +12,14 @@ export const search = [
   'name',
   'url',
   'page',
+  'page.id',
+  'page.name',
   'product',
+  'product.id',
+  'product.name',
   'category',
+  'category.id',
+  'category.name',
   'img'
 ];
 export const show = [...search];

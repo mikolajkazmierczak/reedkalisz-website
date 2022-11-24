@@ -5,7 +5,7 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { treeGetItemAtPath, treeMoveItemToPath } from '$/utils';
+  import { treeGetItemAtPath, treeMoveItemToPath, SearchParams } from '$/utils';
 
   import Icon from '$c/Icon.svelte';
   import Blame from '@c/Blame.svelte';
