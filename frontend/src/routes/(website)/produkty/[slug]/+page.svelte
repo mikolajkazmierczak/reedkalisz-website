@@ -25,30 +25,13 @@
   } = product;
 
   let galleryImgIndex = gallery.length ? 0 : null;
-
-  let isImgFullscreen = false;
-  let fullscreenTop = 0;
-  let fullscreenLeft = 0;
-  function moveImgFullscreen(e) {
-    if (isImgFullscreen) {
-      const { clientX: x, clientY: y } = e;
-      // fullscreenTop = y;
-      fullscreenLeft = x;
-    }
-  }
 </script>
 
 <div class="wrapper">
   <div class="column left">
     <div class="gallery">
       <div class="gallery-img">
-        <img
-          src="{baseUrl}/assets/{gallery[galleryImgIndex].img}"
-          alt=""
-          on:mouseenter={() => (isImgFullscreen = true)}
-          on:mousemove={moveImgFullscreen}
-          on:mouseleave={() => (isImgFullscreen = false)}
-        />
+        <img src="{baseUrl}/assets/{gallery[galleryImgIndex].img}" alt="" />
       </div>
       <div class="gallery-picker">
         {#each gallery as { enabled, img }, i}
@@ -65,7 +48,7 @@
   </div>
 </div>
 
-{#if isImgFullscreen}
+<!-- {#if isImgFullscreen}
   <div class="img-fullscreen" transition:fade={{ duration: 100 }}>
     <img
       src="{baseUrl}/assets/{gallery[galleryImgIndex].img}"
@@ -74,8 +57,7 @@
       style:left={fullscreenLeft + 'px'}
     />
   </div>
-{/if}
-
+{/if} -->
 <style>
   .wrapper {
     display: grid;
@@ -106,24 +88,6 @@
   .gallery-picker img {
     cursor: pointer;
     border: 1px solid rgba(0, 0, 0, 0.1);
-  }
-  .img-fullscreen {
-    z-index: 1;
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: grid;
-    place-items: center;
-    width: 100vw;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .img-fullscreen img {
-    position: absolute;
-    max-width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
 
   h1 {
