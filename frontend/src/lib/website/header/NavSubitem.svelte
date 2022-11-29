@@ -20,9 +20,9 @@
 </div>
 
 <style>
-  /* a {
-    color: var(--light);
-  } */
+  a {
+    text-decoration: none;
+  }
   a:hover {
     cursor: pointer;
     text-decoration: underline;

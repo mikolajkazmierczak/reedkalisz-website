@@ -1,5 +1,6 @@
 <script>
   import { goto } from '$app/navigation';
+  import { fly } from 'svelte/transition';
 
   import Categories from './Categories.svelte';
   import Products from './Products.svelte';

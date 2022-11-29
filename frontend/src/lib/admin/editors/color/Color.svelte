@@ -18,7 +18,7 @@
   let itemOriginal;
 
   function remove() {
-    editing.remove('colors', id, { root: '/admin/produkty' });
+    editing.remove('colors', id, { root: '/admin/kolory' });
   }
 
   async function read() {

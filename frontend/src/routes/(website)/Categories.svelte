@@ -23,7 +23,7 @@
   in:slide={{ duration: 150 }}
   out:slide={{ duration: 150, delay: 150 }}
 >
-  {#each categories as { id, name, slug, img } (id)}
+  {#each categories as { id, name } (id)}
     <button
       data-sveltekit-prefetch
       class:root

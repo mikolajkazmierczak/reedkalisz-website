@@ -88,6 +88,7 @@
   }
   .submenu-content {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     width: 100%;
     max-width: 1200px;

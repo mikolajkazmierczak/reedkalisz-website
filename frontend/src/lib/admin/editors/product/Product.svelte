@@ -171,7 +171,7 @@
           <div class="ui-box ui-box--uneditable">
             <h3 class="ui-h3">Link do strony</h3>
             {#if item.date_created}
-              <a href="/produkty/{item.slug}">/produkty/{item.slug}</a>
+              <a href="/produkty/{item.slug}" rel="external">/produkty/{item.slug}</a>
             {:else}
               /produkty/{item.slug || '...'}
             {/if}

@@ -27,7 +27,7 @@
       itemsCount = res.meta.filter_count;
     } else {
       items = $colors;
-      itemsCount = $colors.length;
+      itemsCount = -1;
     }
   }
 

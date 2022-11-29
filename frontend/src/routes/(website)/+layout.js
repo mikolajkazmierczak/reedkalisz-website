@@ -1,4 +1,5 @@
 import api from '$/api';
+import { nanoid } from 'nanoid';
 import { makeTree, treeGetItem, treeRefreshMetaAndParent } from '$/utils';
 import { menu, categories } from '#/stores';
 
@@ -24,36 +25,53 @@ const menuFields = [
 
 const categoriesFields = ['id', 'enabled', 'parent', 'index', 'name', 'slug', 'img'];
 
-function convertCategoryToMenuItems(category) {
-  // Converts a category and all it's children to a menu item.
-  const mapCategoryToItem = category => ({
+const convertCategoryToMenuItem = category => ({
+  id: nanoid(8), // fake menu item id to make sure nothing breaks
+  enabled: true,
+  folder: false,
+  name: category.name,
+  url: null,
+  page: null,
+  product: null,
+  category: {
     id: category.id,
-    enabled: category.enabled,
-    folder: false,
-    name: category.name,
-    url: `/kategorie/${category.slug}`
-  });
-  const item = mapCategoryToItem(category);
-  if (category.children.length) {
-    item.children = category.children.map(mapCategoryToItem);
+    slug: category.slug,
+    name: category.name
+  },
+  _meta: { embeded: true },
+  children: []
+  // other _meta, parent, index will be asigned later
+});
+
+function embedAllChildren(menuItem, category) {
+  // Pass all children of a category as children of menu item.
+  for (const categoryChild of category.children) {
+    const menuItemChild = convertCategoryToMenuItem(categoryChild);
+    embedAllChildren(menuItemChild, categoryChild);
+    menuItem.children.push(menuItemChild);
   }
 }
 
-function embedCategoriesInMenu(menuTree, categoriesTree) {
+function embedCategories(menuTree, categoriesTree) {
   // Embeds categories in the menu.
-  let embeded = false;
   for (let item of menuTree) {
-    if (item.category) {
-      embeded = true;
+    if (item.category && !item._meta?.embeded) {
       const category = treeGetItem(categoriesTree, item.category.id);
-      if (category) item.category = convertCategoryToMenuItems(category);
+      if (category) embedAllChildren(item, category);
     }
     if (item.children) {
-      const embededInChildren = embedCategoriesInMenu(item.children, categories);
-      embeded = embededInChildren || embeded;
+      embedCategories(item.children, categoriesTree);
     }
   }
-  return embeded;
+}
+
+function someCategoriesEmbeded(menuTree) {
+  // Checks if there are any categories embeded in the menu.
+  for (let item of menuTree) {
+    if (item.category && item._meta?.embeded) return true;
+    if (item.children && someCategoriesEmbeded(item.children)) return true;
+  }
+  return false;
 }
 
 export async function load() {
@@ -64,8 +82,10 @@ export async function load() {
   const categoriesItems = (await api.items('categories').readByQuery({ fields: categoriesFields })).data;
   const categoriesTree = makeTree(categoriesItems.filter(item => item.enabled));
 
-  const wereCategoriesEmbeded = embedCategoriesInMenu(menuTree, categoriesTree);
-  if (wereCategoriesEmbeded) treeRefreshMetaAndParent(menuTree);
+  embedCategories(menuTree, categoriesTree);
+  if (someCategoriesEmbeded(menuTree)) {
+    treeRefreshMetaAndParent(menuTree);
+  }
 
   menu.set(menuTree);
   categories.set(categoriesTree);
