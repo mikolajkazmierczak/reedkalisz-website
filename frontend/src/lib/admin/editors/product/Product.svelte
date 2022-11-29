@@ -235,13 +235,13 @@
 </Editor>
 
 <style>
-  .diff {
+  /* .diff {
     overflow-y: scroll;
     border: var(--border);
     padding: 1rem;
     max-height: 500px;
     overflow-wrap: break-word;
-  }
+  } */
   .category.main {
     outline: var(--outline-dashed);
   }

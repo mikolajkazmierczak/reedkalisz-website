@@ -137,9 +137,8 @@ export function reuseIDs(items, reusableIDs = []) {
   });
 }
 
-export function makeTree(items, inplace = false, _root = true, _parent = null, _depth = 0, _path = []) {
+export function makeTree(items, _parent = null, _depth = 0, _path = []) {
   // Convert a flat array of items into a tree structure and add metadata (_meta property).
-  if (!inplace && _root) items = deep.copy(items);
   const tree = [];
   for (const item of items) {
     if (item.parent == _parent) {
@@ -147,7 +146,7 @@ export function makeTree(items, inplace = false, _root = true, _parent = null, _
       tree.push({
         ...item,
         _meta: { depth: _depth, path, isFirst: false, isLast: false },
-        children: makeTree(items, inplace, false, item.id, _depth + 1, path)
+        children: makeTree(items, item.id, _depth + 1, path)
       });
     }
   }
@@ -160,15 +159,14 @@ export function makeTree(items, inplace = false, _root = true, _parent = null, _
   return tree;
 }
 
-export function treeFlatten(tree, inplace = false, _root = true) {
+export function treeFlatten(tree) {
   // Convert a tree structure into a flat array of items.
-  if (!inplace && _root) tree = deep.copy(tree);
   return tree.reduce((acc, item) => {
     const newItem = { ...item };
     delete newItem.children;
     acc.push(newItem);
     if (item.children) {
-      acc.push(...treeFlatten(item.children, inplace, false));
+      acc.push(...treeFlatten(item.children));
     }
     return acc;
   }, []);
