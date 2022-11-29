@@ -5,7 +5,7 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { treeGetItemAtPath, treeMoveItemToPath, SearchParams } from '$/utils';
+  import { treeGetItem, treeGetItemAtPath, treeMoveItemToPath } from '$/utils';
 
   import Icon from '$c/Icon.svelte';
   import Blame from '@c/Blame.svelte';
@@ -48,43 +48,36 @@
     if (collapsed) expand(item);
   }
 
-  async function saveAfterMove(newItems, oldPath, newPath) {
-    function getItemsToUpdate(newItems, path, startIndex) {
-      const item = treeGetItemAtPath(newItems, path);
-      const children = item.children ?? item; // root edge case
+  async function saveAfterMove(tree, oldItemData, newItemData) {
+    function getItemsToUpdate(tree, parentID, startIndex) {
+      const parent = treeGetItem(tree, parentID);
+      const children = parent.children ?? parent; // root edge case
       const updated = children.filter(c => c.index >= startIndex);
       const indexes = updated.map(c => c.index);
       const ids = updated.map(c => c.id);
       return { children, indexes, ids };
     }
 
-    // as the items have just changed (and the item will get destroyed in the next tick)
-    // we need to retrieve the item directly from the updated items
-    const movedItem = treeGetItemAtPath(newItems, newPath);
-    const movedItemsIDs = [movedItem.id];
+    const { id, parent, index } = newItemData;
+    const movedItemsIDs = [id];
 
     // update the new item's parent and index
-    const { parent, index } = movedItem;
-    await api.items(collection).updateOne(movedItem.id, { parent, index });
+    await api.items(collection).updateOne(id, { parent, index });
 
     // update indexes of both parent's children
-    const newParentPath = newPath.slice(0, -1);
-    const oldParentPath = oldPath.slice(0, -1);
-    const newIndex = newPath[newPath.length - 1];
-    const oldIndex = oldPath[oldPath.length - 1];
-    const sameParent = newParentPath.join('') == oldParentPath.join('');
-    if (sameParent) {
-      if (newIndex == oldIndex) return;
-      const startIndex = newIndex > oldIndex ? oldIndex : newIndex + 1;
+    const oldParent = oldItemData.parent;
+    const oldIndex = oldItemData.index;
+    if (parent == oldParent) {
+      if (index == oldIndex) return;
+      const startIndex = index > oldIndex ? oldIndex : index + 1;
       // get indexes of parent's children and update them
-      const { children, indexes, ids } = getItemsToUpdate(newItems, newParentPath, startIndex);
+      const { children, indexes, ids } = getItemsToUpdate(tree, parent, startIndex);
       await Promise.all(indexes.map(i => api.items(collection).updateOne(children[i].id, { index: i })));
       movedItemsIDs.push(...ids);
-      console.log(...ids);
     } else {
       // get indexes of new parent's children, old parent's children and update both
-      const newChildrenData = getItemsToUpdate(newItems, newParentPath, newIndex + 1);
-      const oldChildrenData = getItemsToUpdate(newItems, oldParentPath, oldIndex);
+      const newChildrenData = getItemsToUpdate(tree, parent, index + 1);
+      const oldChildrenData = getItemsToUpdate(tree, oldParent, oldIndex);
       const { children: newChildren, indexes: newIndexes, ids: newIDs } = newChildrenData;
       const { children: oldChildren, indexes: oldIndexes, ids: oldIDs } = oldChildrenData;
       await Promise.all([
@@ -92,10 +85,8 @@
         ...oldIndexes.map(i => api.items(collection).updateOne(oldChildren[i].id, { index: i }))
       ]);
       movedItemsIDs.push(...newIDs, ...oldIDs);
-      console.log(...newIDs, ...oldIDs);
     }
 
-    console.log('movedItemsIDs', movedItemsIDs);
     heimdall.emit(collection, movedItemsIDs);
   }
 
@@ -159,10 +150,12 @@
     if (type === 'C') {
       newPath = [...meta.path, 0];
     }
-    treeMoveItemToPath(items, oldPath, newPath);
-    items = items;
-
-    await saveAfterMove(items, oldPath, newPath);
+    const data = treeMoveItemToPath(items, oldPath, newPath);
+    if (data) {
+      const { oldItemData, newItemData } = data;
+      await saveAfterMove(items, oldItemData, newItemData);
+      items = items;
+    }
   }
   function dropBubble() {
     dispatch('drop');
@@ -206,7 +199,7 @@
       <div
         class="value value--item value--center"
         on:click={() => {
-          goto(`/admin/kategorie/+?parent=${item.id}&index=${item.children.length}`);
+          goto(row.hrefNew);
           expand(item);
         }}
       >

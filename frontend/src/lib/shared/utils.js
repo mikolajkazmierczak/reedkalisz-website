@@ -204,6 +204,46 @@ export function treeGetItem(tree, id) {
     }
   }
 }
+export function treeRemoveItem(tree, id) {
+  // Remove item in a tree with a given id and return it.
+  for (let i = 0; i < tree.length; i++) {
+    const item = tree[i];
+    if (item.id == id) {
+      tree.splice(i, 1);
+      return item;
+    }
+    if (item.children) {
+      const found = treeRemoveItem(item.children, id);
+      if (found) return found;
+    }
+  }
+}
+
+export function treeMarkToRemove(tree, id) {
+  // Mark item in a tree with a given id to be removed.
+  for (const item of tree) {
+    if (item.id == id) {
+      item._meta.toBeRemoved = true;
+      return;
+    }
+    if (item.children) {
+      treeMarkToRemove(item.children, id);
+    }
+  }
+}
+export function treeRemoveMarked(tree) {
+  // Remove all items in a tree that are marked to be removed.
+  for (let i = 0; i < tree.length; i++) {
+    const item = tree[i];
+    if (item._meta.toBeRemoved) {
+      tree.splice(i, 1);
+      i--;
+    }
+    if (item.children) {
+      treeRemoveMarked(item.children);
+    }
+  }
+}
 
 export function treeGetItemAtPath(tree, path) {
   // Find item using it's path.
@@ -211,18 +251,6 @@ export function treeGetItemAtPath(tree, path) {
   if (path.length === 1) return tree[path[0]];
   return treeGetItemAtPath(tree[path[0]].children, path.slice(1));
 }
-
-export function treeRemoveItemAtPath(tree, path) {
-  // Remove item at path.
-  const item = tree[path[0]];
-  if (path.length === 1) {
-    tree.splice(path[0], 1);
-    return deep.copy(item);
-  } else {
-    return treeRemoveItemAtPath(item.children, path.slice(1));
-  }
-}
-
 export function treePushItemAtPath(tree, path, item) {
   // Insert item at path.
   const parent = tree[path[0]];
@@ -233,26 +261,39 @@ export function treePushItemAtPath(tree, path, item) {
 
 export function treeMoveItemToPath(tree, oldPath, newPath) {
   // Move item at oldPath to newPath.
-
-  function fixNewPathAfterRemove(oldPath, newPath) {
-    // Fix paths after removing an item. An element will be removed, so the children of it's parent will shift by 1.
-    // Check if removing the item at oldPath will affect the newPath and fix it if necessary.
-    // The way to this is to check if all of the parent elements of both paths up to the last element of oldPath match.
-    // e.g. old: 1== 1   |old: 1!= 1   |old: 1 0!= 1 |old: 1 0== 1
-    //      new: 1== 2 1 |new: 0!= 2 1 |new: 1 2!= 1 |new: 1 0== 2
-    //      out: 1   1 1 |out: 0   2 1 |out: 1 2   1 |out: 1 0   1
-    // IMPORTANT: The oldPath will NOT be modified.
-    const i = oldPath.length - 1;
-    const affected = oldPath.slice(0, i).join() === newPath.slice(0, i).join();
-    if (affected && newPath[i] > oldPath[i]) {
-      newPath[i]--;
-    }
-  }
-
-  const removedItem = treeRemoveItemAtPath(tree, oldPath);
-  fixNewPathAfterRemove(oldPath, newPath);
-  treePushItemAtPath(tree, newPath, removedItem);
+  if (oldPath.join() === newPath.join()) return;
+  const getData = item => ({ id: item.id, parent: item.parent, index: item.index });
+  const oldItem = treeGetItemAtPath(tree, oldPath);
+  const oldItemData = getData(oldItem);
+  const newItem = deep.copy(oldItem);
+  treeMarkToRemove(tree, oldItem.id);
+  treePushItemAtPath(tree, newPath, newItem);
+  treeRemoveMarked(tree);
   treeRefreshMetaAndParent(tree);
+  const newItemData = getData(newItem);
+  return { oldItemData, newItemData };
+}
+
+export function treeGetItemIDsFromPath(tree, path) {
+  // Find ids of all items in a path.
+  const ids = [];
+  for (let i = 0; i < path.length; i++) {
+    const item = treeGetItemAtPath(tree, path.slice(0, i + 1));
+    ids.push(item.id);
+  }
+  return ids;
+}
+
+export function treeGetAllChildrenIDs(tree, id) {
+  // Find ids of all children of an item with a given id.
+  const item = treeGetItem(tree, id);
+  if (!item) return [];
+  const ids = [];
+  for (const child of item.children) {
+    ids.push(child.id);
+    ids.push(...treeGetAllChildrenIDs(tree, child.id));
+  }
+  return ids;
 }
 
 export function moveItem(items, i, d) {

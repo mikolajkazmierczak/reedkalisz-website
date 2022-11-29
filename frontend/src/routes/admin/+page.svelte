@@ -51,7 +51,7 @@
 
 <style>
   .section {
-    margin: 2rem 0.5rem;
+    margin: 2rem 2.5rem;
   }
   h2 {
     font-size: 2rem;
@@ -60,7 +60,7 @@
   }
   .buttons {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
   }
   a {
     display: inline-flex;
@@ -69,7 +69,7 @@
     padding: 2rem 1rem;
     text-decoration: none;
     border-radius: var(--border-radius);
-    width: 15ch;
+    width: 20ch;
     color: var(--light);
     background-color: var(--primary);
     transition: background-color 100ms ease;

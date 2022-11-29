@@ -4,15 +4,15 @@ export const search = [
   'date_created',
   'user_updated',
   'date_updated',
+  'parent',
+  'index',
   'enabled',
   'name',
   'slug',
   'seo_title',
   'seo_description',
   'description',
-  'img',
-  'parent',
-  'index'
+  'img'
 ];
 export const show = [...search];
 

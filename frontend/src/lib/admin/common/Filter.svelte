@@ -1,7 +1,4 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
-
   export let label;
   export let value;
 
@@ -10,17 +7,7 @@
 </script>
 
 <div class="wrapper">
-  <div
-    disabled
-    class="filter"
-    class:active={selected === value}
-    on:click={() => {
-      selected = value;
-      dispatch('select', value);
-    }}
-  >
-    {label}
-  </div>
+  <div disabled class="filter" class:active={selected === value} on:click={() => (selected = value)}>{label}</div>
   {#if children}
     {#each children as filter}
       <svelte:self {...filter} bind:selected />
@@ -47,13 +34,13 @@
     padding: 0.2rem 0.75rem;
     transition: background-color 100ms, color 100ms;
     font-size: 0.9em;
-    background-color: var(--accent);
+    background-color: var(--light);
   }
   .filter:hover {
-    background-color: var(--primary-white);
+    background-color: var(--accent-light);
   }
   .filter.active {
-    background-color: var(--primary);
-    color: var(--primary-text);
+    background-color: var(--primary-white);
+    /* color: var(--primary-text); */
   }
 </style>

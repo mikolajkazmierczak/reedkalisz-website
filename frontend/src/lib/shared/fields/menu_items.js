@@ -11,14 +11,14 @@ export const search = [
   'index',
   'name',
   'url',
-  'page',
   'page.id',
+  'page.slug',
   'page.name',
-  'product',
   'product.id',
+  'product.slug',
   'product.name',
-  'category',
   'category.id',
+  'category.slug',
   'category.name',
   'img'
 ];

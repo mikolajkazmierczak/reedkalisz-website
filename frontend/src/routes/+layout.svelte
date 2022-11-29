@@ -1,8 +1,8 @@
 <script>
   import '$/styles/global.css';
-  import '$/styles/ui-admin.css';
+  import Icon from '$c/Icon.svelte';
 
-  let demo = true;
+  let demo = false;
   let unstable = false;
 </script>
 
@@ -10,6 +10,7 @@
 
 {#if demo}
   <div class="demo">
+    <div class="close" on:click={() => (demo = false)}><Icon name="close" color="var(--demo-dark)" /></div>
     <small>Dokumentuj błędy!</small>
     <h1>WERSJA DEMO</h1>
   </div>
@@ -17,6 +18,7 @@
 
 {#if unstable}
   <div class="unstable">
+    <div class="close" on:click={() => (unstable = false)}><Icon name="close" color="var(--main)" /></div>
     <small>Nie korzystaj z serwisu!</small>
     <h1>WYKRYTO NIESTABILNOŚĆ</h1>
   </div>
@@ -64,5 +66,13 @@
   }
   .unstable small {
     font-size: 1rem;
+  }
+
+  .close {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 1em;
   }
 </style>

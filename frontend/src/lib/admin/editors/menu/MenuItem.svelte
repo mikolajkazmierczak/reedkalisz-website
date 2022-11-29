@@ -3,7 +3,7 @@
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '$/fields/menu_items';
-  import { deep, makeTree, treeFlatten, diff } from '$/utils';
+  import { deep, diff, makeTree, treeFlatten } from '$/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
@@ -13,6 +13,7 @@
   import Button from '@c/Button.svelte';
   import Blame from '@c/Blame.svelte';
   import Picker from '@c/library/Picker.svelte';
+  import MenuItemLink from './MenuItemLink.svelte';
 
   const searchParams = SearchParams.read();
 
@@ -21,22 +22,20 @@
   let item;
   let itemOriginal;
 
-  let errorInvalidURL = false;
-
   $: hasChildren = $menuItems?.find(m => m.parent == item?.id);
 
   async function read() {
     await globals.update(menus);
     await globals.update(menuItems);
     await globals.update(categories);
-    if (slug == '+') {
+    if (id == '+') {
       item = defaults();
       // add parent, index and menu from search params
       if (searchParams.parent != null) item.parent = searchParams.parent;
       if (searchParams.index != null) item.index = searchParams.index;
       if (searchParams.menu != null) item.menu = searchParams.menu;
     } else {
-      item = (await api.items('menu_items').readOne(id, { fields })).data;
+      item = await api.items('menu_items').readOne(id, { fields });
     }
     itemOriginal = item ? deep.copy(item) : null;
   }
@@ -45,43 +44,14 @@
     editing.remove('menu_items', item.id, { root: '/admin/menu' });
   }
 
-  let lookup = false;
-  async function parseURL(url, categories) {
-    if (!lookup) return;
-    console.log('parseURL', url);
-    try {
-      lookup = true;
-      // reset
-      item.product = null;
-      item.categeory = null;
-      item.page = null;
-      // parse
-      const pathname = new URL(url).pathname;
-      const slug = pathname.split('/').filter(Boolean)[1]; // /products/slug/subpage/... -> slug
-      const options = { fields: ['id', 'name'], filter: { slug: { _eq: slug } } };
-      if (pathname.startsWith('/produkty')) {
-        item.product = (await api.items('products').readByQuery(options)).data[0];
-      } else if (item.link.startsWith('/kategorie')) {
-        const c = categories.find(c => c.slug == slug);
-        item.category = { id: c.id, name: c.name, _meta: c._meta }; // get only needed fields
-      } else if (item.link.startsWith('/strony')) {
-        item.page = (await api.items('pages').readByQuery(options)).data[0];
-      }
-      errorInvalidURL = null;
-    } catch (e) {
-      errorInvalidURL = e.message;
-    } finally {
-      lookup = false;
-    }
-  }
-
   read();
 
-  $: categoriesFlattened = treeFlatten(makeTree($categories));
-  $: item.url && $categories && parseURL(item.url, categoriesFlattened);
+  $: categoriesTreeFlattened = $categories ? treeFlatten(makeTree($categories)) : null;
 
-  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
+  let itemDiff = '';
+  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed, html }) => {
     $unsaved = changed;
+    itemDiff = html;
   });
 
   heimdall.listen(({ match, me, data }) => {
@@ -103,16 +73,7 @@
               <Input type="checkbox" bind:value={item.folder}>Folder</Input>
             </div>
             <Input bind:value={item.name}>Tytuł</Input>
-            <Input bind:value={item.url} error={errorInvalidURL}>Link</Input>
-            {#if item.product}
-              Wykryto produkt: {item.product.name}
-            {/if}
-            {#if item.categeory}
-              Wykryto kategorię: {item.category._meta.path.join('.')} {item.category.name}
-            {/if}
-            {#if item.page}
-              Wykryto stronę: {item.page.name}
-            {/if}
+            <MenuItemLink bind:item categories={categoriesTreeFlattened} />
           </div>
         </div>
 
@@ -128,6 +89,32 @@
           </div>
 
           <div class="ui-box ui-box--uneditable">
+            <h3 class="ui-h3">Element</h3>
+            {#if item.product}
+              <div class="type">
+                <small>PRODUKT</small>
+                <a href="/produkty/{item.product.slug}">{item.product.name}</a>
+              </div>
+            {:else if item.category}
+              {@const category = categoriesTreeFlattened.find(c => c.id == item.category.id)}
+              {@const categoryLabel = category._meta.path.map(p => p + 1).join('.') + ' ' + category.name}
+              <div class="type">
+                <small>KATEGORIA</small>
+                <a href="/kategorie/{item.category.slug}">{categoryLabel}</a>
+              </div>
+            {:else if item.page}
+              <div class="type">
+                <small>STRONA</small>
+                <a href="/{item.page.slug}">{item.page.name}</a>
+              </div>
+            {:else if item.url}
+              <div class="type">
+                <small>ZEWNĘTRZNY LINK</small>
+                <a href={item.url}>{item.url}</a>
+              </div>
+            {:else}
+              Tu będzie link
+            {/if}
             <h3 class="ui-h3">Utworzenie</h3>
             <p>
               {#if $users && item.date_created}
@@ -154,6 +141,8 @@
         </div>
       </div>
     </section>
+
+    <!-- <pre>{@html itemDiff}</pre> -->
   {/if}
 </Editor>
 
@@ -162,5 +151,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
     gap: 1rem;
+  }
+  .type {
+    display: flex;
+    flex-direction: column;
   }
 </style>

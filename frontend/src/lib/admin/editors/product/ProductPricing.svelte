@@ -1,5 +1,5 @@
 <script>
-  import { moveItem } from '$/utils';
+  import { deep, moveItem } from '$/utils';
   import { recalculateLabelings, toggleCustomPrices } from '@/calculations';
   import { repairPrices, cleanupPrices } from '@/calculationsPrices';
   import Input from '@c/Input.svelte';
@@ -90,7 +90,13 @@
   };
   // repair (only once) and clean prices
   [product.custom_prices, product.custom_prices_sale] = repairPrices(product.custom_prices, product.custom_prices_sale);
-  $: if (priceViewData?.amounts) cleanupCustomPrices();
+  let lastPriceViewAmounts = null;
+  $: if (priceViewData?.amounts) {
+    if (!deep.same(priceViewData, lastPriceViewAmounts)) {
+      lastPriceViewAmounts = deep.copy(priceViewData);
+      cleanupCustomPrices();
+    }
+  }
   // toggle state (enabled/disabled)
   $: toggleCustomPrices(
     product.custom_prices,

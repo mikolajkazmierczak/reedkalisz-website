@@ -34,12 +34,14 @@
 
   globals.update(categories);
   $: $categories && read(limit, page, query);
+  // TODO: it seems like the list doesn't update when sometimes (e.g. when adding new items), why?
+  // $: $categories && console.log('categories', $categories);
 </script>
 
-{#if items}
+{#if $categories}
   <div class="wrapper">
     <div class="actions">
-      <Button on:click={() => goto(`/admin/kategorie/+?index=${$categories.length}`)} icon="add">Dodaj</Button>
+      <Button on:click={() => goto(`/admin/kategorie/+?index=${itemsTree.length}`)} icon="add">Dodaj</Button>
       <Search {searchParams} {query} />
     </div>
 
@@ -55,13 +57,15 @@
         { blame: true, label: 'Aktualizacja' }
       ]}
       mapper={$ => {
-        const path = treeGetItem(itemsTree, $.id)._meta.path;
+        const treeItem = treeGetItem(itemsTree, $.id);
+        const itemLabel = treeItem._meta.path.map(p => p + 1).join('.') + ' ' + $.name;
         return {
           href: '/admin/kategorie/' + $.slug,
+          hrefNew: `/admin/kategorie/+?parent=${$.id}&index=${treeItem.children.length}`,
           values: [
             $.enabled,
             $.id,
-            path.map(p => p + 1).join('.') + ' ' + $.name,
+            itemLabel,
             { user: $.user_created, datetime: $.date_created },
             { user: $.user_updated, datetime: $.date_updated }
           ]

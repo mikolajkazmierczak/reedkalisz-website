@@ -1,42 +1,42 @@
 <script>
+  import '$/styles/ui-website.css';
   import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
 
   import { me, readme } from '$/auth';
-  import User from '#c/User.svelte';
-  import Button from '#c/Button.svelte';
-
-  const menu = [
-    { href: '/', title: 'Strona główna' },
-    { href: '/produkty', title: 'Produkty' }
-  ];
-
-  function gotoAdmin() {
-    goto('/admin');
-  }
+  import Admin from '#/Admin.svelte';
+  import Header from '#/header/Header.svelte';
 
   onMount(readme);
 </script>
 
-<img src="/logo.svg" alt="logo" />
+<svelte:head>
+  <style>
+    body {
+      overflow-y: scroll;
+    }
+  </style>
+</svelte:head>
+
 {#if $me}
-  <User />
+  <Admin />
 {/if}
 
-<nav>
-  <Button on:click={gotoAdmin}>Admin panel</Button>
-  {#each menu as { href, title }}
-    <li><a {href} class:current={href == $page.url.pathname}>{title}</a></li>
-  {/each}
-</nav>
+<Header />
 
-<br />
-<br />
-<slot />
+<main>
+  <div class="content">
+    <slot />
+  </div>
+</main>
 
 <style>
-  a.current {
-    font-weight: bold;
+  main {
+    display: flex;
+    justify-content: center;
+  }
+  .content {
+    width: 100%;
+    max-width: 1200px;
+    padding: 30px 20px;
   }
 </style>

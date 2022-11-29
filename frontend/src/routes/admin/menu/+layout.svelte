@@ -9,17 +9,27 @@
   import { globals, menus, menuItems, categories } from '@/globals';
   import { search as fields } from '$/fields/menu_items';
   import Table from '@c/Table.svelte';
+  import Filters from '@c/Filters.svelte';
   import Button from '@c/Button.svelte';
   import Search from '@c/Search.svelte';
 
-  $header = { title: 'Kategorie', icon: 'categories' };
+  $header = { title: 'Menu', icon: 'menu' };
 
-  const searchParams = new SearchParams('/admin/kategorie');
+  const searchParams = new SearchParams('/admin/menu');
   $: [limit, page, query, menu] = $searchparams.get(searchParams.pathname).values();
+
+  function setMenu(m) {
+    searchParams.set({ m });
+    menu = m;
+  }
+
+  $: selectedMenu = menu;
+  $: if (selectedMenu == null && $menus) selectedMenu = $menus[0].id;
+  $: selectedMenu != menu && setMenu(selectedMenu);
 
   let items;
   let itemsCount;
-  $: itemsTree = $menuItems ? makeTree($menuItems) : [];
+  $: itemsTree = $menus && $menuItems ? makeTree($menuItems.filter(item => item.menu === menu)) : [];
   $: categoriesItemsTree = $categories ? makeTree($categories) : [];
 
   async function read(limit, page, query, menu) {
@@ -31,7 +41,7 @@
       items = queried.data;
       itemsCount = queried.meta.filter_count;
     } else {
-      items = itemsTree.filter(item => item.menu == menu);
+      items = itemsTree;
       itemsCount = -1;
     }
   }
@@ -39,65 +49,68 @@
   globals.update(menus);
   globals.update(menuItems);
   globals.update(categories);
-  $: $menus && $menuItems && read(limit, page, query, menu);
+  $: $menus && $menuItems && $categories && read(limit, page, query, menu);
 </script>
 
-{#if items && $categories}
+{#if $menus && $menuItems && $categories}
   <div class="wrapper">
     <div class="actions">
-      <Button on:click={() => goto(`/admin/menu/+?index=${$menuItems.length}&menu=${menu}`)} icon="add">Dodaj</Button>
+      <div>
+        <Button on:click={() => goto(`/admin/menu/+?index=${itemsTree.length}&menu=${menu}`)} icon="add">Dodaj</Button>
+        <Filters filters={$menus.map(({ id, name }) => ({ label: name, value: id }))} bind:selected={selectedMenu} />
+      </div>
       <Search {searchParams} {query} />
     </div>
 
-    <Table
-      collection="menu_items"
-      {itemsCount}
-      {items}
-      head={[
-        { checkbox: true, icon: 'eye' },
-        { id: true, label: 'ID' },
-        { label: 'Tytuł' },
-        { checkbox: true, icon: 'products' },
-        { checkbox: true, icon: 'categories' },
-        { checkbox: true, icon: 'pages' },
-        { checkbox: true, icon: 'link' },
-        { label: 'Zasób' },
-        { label: 'Link' },
-        { blame: true, label: 'Utworzenie' },
-        { blame: true, label: 'Aktualizacja' }
-      ]}
-      mapper={$ => {
-        const path = treeGetItem(itemsTree, $.id)._meta.path;
-        const categoryPath = $.category ? treeGetItem(categoriesItemsTree, $.category.id)._meta.path : null;
-        const resource = $.product
-          ? $.page.name
-          : $.page
-          ? $.page.name
-          : $.category
-          ? categoryPath.join('.') + ' ' + $.category.name
-          : null;
-        return {
-          href: '/admin/kategorie/' + $.slug,
-          values: [
-            $.enabled,
-            $.id,
-            path.join('.') + ' ' + $.name,
-            !!$.product,
-            !!$.category,
-            !!$.page,
-            !!$.url,
-            resource,
-            $.url,
-            { user: $.user_created, datetime: $.date_created },
-            { user: $.user_updated, datetime: $.date_updated }
-          ]
-        };
-      }}
-      {searchParams}
-      {limit}
-      {page}
-      order={!query}
-    />
+    {#if menu != null}
+      <Table
+        collection="menu_items"
+        {itemsCount}
+        {items}
+        head={[
+          { checkbox: true, icon: 'eye' },
+          { id: true, label: 'ID' },
+          { label: 'Tytuł' },
+          { checkbox: true, icon: 'folder' },
+          { checkbox: true, icon: 'products' },
+          { checkbox: true, icon: 'categories' },
+          { checkbox: true, icon: 'pages' },
+          { label: 'Element' },
+          { blame: true, label: 'Utworzenie' },
+          { blame: true, label: 'Aktualizacja' }
+        ]}
+        mapper={$ => {
+          const getCategoryLabel = () => {
+            const categoryPath = $.category ? treeGetItem(categoriesItemsTree, $.category.id)._meta.path : null;
+            return categoryPath.map(p => p + 1).join('.') + ' ' + $.category.name;
+          };
+          const treeItem = treeGetItem(itemsTree, $.id);
+          // TODO: investigate why is treeItem undefined at first when moving an item from children to parent
+          const itemLabel = treeItem?._meta.path.map(p => p + 1).join('.') + ' ' + $.name;
+          const resource = $.product ? $.product.name : $.page ? $.page.name : $.category ? getCategoryLabel() : $.url;
+          return {
+            href: '/admin/menu/' + $.id,
+            hrefNew: `/admin/menu/+?parent=${$.id}&index=${treeItem?.children.length}&menu=${menu}`,
+            values: [
+              $.enabled,
+              $.id,
+              itemLabel,
+              !!$.folder,
+              !!$.product,
+              !!$.category,
+              !!$.page,
+              resource,
+              { user: $.user_created, datetime: $.date_created },
+              { user: $.user_updated, datetime: $.date_updated }
+            ]
+          };
+        }}
+        {searchParams}
+        {limit}
+        {page}
+        order={!query}
+      />
+    {/if}
   </div>
 {/if}
 
@@ -117,5 +130,10 @@
     border-radius: var(--border-radius);
     border: var(--border-light);
     background-color: var(--light);
+  }
+  .actions > div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 </style>

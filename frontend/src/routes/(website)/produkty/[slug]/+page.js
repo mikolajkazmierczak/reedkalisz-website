@@ -1,8 +1,6 @@
 import api from '$/api';
-import { SearchParams } from '$/searchparams';
-import { treeGetAllChildrenIDs } from '$/utils';
 
-const productsFields = [
+const productFields = [
   'id',
   'name',
   'code',
@@ -10,16 +8,31 @@ const productsFields = [
   'enabled',
   'new',
   'sale',
+  'seo_title',
+  'seo_description',
+  'description',
+
+  'categories.id',
+  'categories.index',
+  'categories.category',
 
   'custom_prices_with_labeling',
   'custom_prices.enabled',
+  'custom_prices.amount',
   'custom_prices.price',
   'custom_prices_sale.enabled',
+  'custom_prices_sale.amount',
   'custom_prices_sale.price',
 
+  'labelings.labeling.company.name',
+  'labelings.labeling.name',
+  'labelings.labeling.code',
+  'labelings.labeling.type',
   'labelings.prices.enabled',
+  'labelings.prices.amount',
   'labelings.prices.price',
   'labelings.prices_sale.enabled',
+  'labelings.prices_sale.amount',
   'labelings.prices_sale.price',
 
   'storage.enabled',
@@ -37,14 +50,13 @@ const productsFields = [
   'storage.img.show_in_gallery',
 
   'gallery.enabled',
+  'gallery.main',
   'gallery.img'
 ];
 
-export async function load({ url, parent }) {
-  const getIDs = () => [category, ...treeGetAllChildrenIDs(categories, category)];
-  const { categories } = await parent();
-  const category = SearchParams.parseSearchToParams(url.search).c;
-  const productsFilter = category ? { categories: { category: { _in: getIDs() } } } : {};
-  const products = (await api.items('products').readByQuery({ filter: productsFilter, fields: productsFields })).data;
-  return { products };
+export async function load({ params }) {
+  const { slug } = params;
+  const productFilter = { slug: { _eq: slug } };
+  const product = (await api.items('products').readByQuery({ filter: productFilter, fields: productFields })).data[0];
+  return { product };
 }

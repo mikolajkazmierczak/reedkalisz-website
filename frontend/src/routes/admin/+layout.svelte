@@ -1,4 +1,6 @@
 <script>
+  import '$/styles/ui-admin.css';
+
   import { beforeNavigate } from '$app/navigation';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';

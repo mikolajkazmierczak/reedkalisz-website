@@ -1,14 +1,15 @@
 <script>
   import { page } from '$app/stores';
-  import { baseUrl } from '$/api';
-  import { auth, me, logout } from '$/auth';
   import { fly } from 'svelte/transition';
-  import { spring } from 'svelte/motion';
-  import HoverCircle from '$c/HoverCircle.svelte';
-  import User from '@/nav/User.svelte';
-  import Notifications from '@/nav/Notifications.svelte';
-  import Loader from '$c/Loader.svelte';
+
+  import { baseUrl } from '$/api';
+  import { me, logout } from '$/auth';
   import Icon from '$c/Icon.svelte';
+  import Loader from '$c/Loader.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
+  import Notifications from '@/nav/Notifications.svelte';
+  import NavButton from './NavButton.svelte';
+  import { goto } from '$app/navigation';
 
   const buttons = [
     { href: '/', icon: 'dashboard', name: 'Aktywność' },
@@ -27,68 +28,44 @@
   $: path = $page.url.pathname.replace('/admin', '/').replace('//', '/');
 
   let showNotifications = false;
-  let showUser = false;
-
   function toggleNotifications() {
-    showUser = false;
     showNotifications = !showNotifications;
-    $auth = false;
-  }
-
-  function toggleUserCard() {
-    showNotifications = false;
-    showUser = !showUser;
   }
 
   let awaitingLogout = false;
   async function handleLogout() {
     awaitingLogout = true;
-    await logout();
+    logout();
     awaitingLogout = false;
   }
-
-  let mouse = spring({ x: 0, y: 0 }, { stiffness: 0.1, damping: 0.5 });
 </script>
 
-<nav transition:fly={{ x: -20, duration: 600 }}>
-  <div class="wrapper">
-    <a data-sveltekit-prefetch class="button tile logo" href="/" rel="external">
-      <img src="/logo.svg" alt="logo" />
-    </a>
-    {#each buttons as { href, icon, name }}
-      <a
-        data-sveltekit-prefetch
-        class="button"
-        href={'/admin' + href}
-        class:current={path == href}
-        on:mousemove={e => ($mouse = { x: e.clientX + 25, y: e.clientY })}
-      >
-        <HoverCircle color={'var(--primary-dark)'} show={path == href} />
-        <div class="tooltip" style="top:{$mouse.y}px; left:{$mouse.x}px;">{name}</div>
-        <div class="icon">
-          <Icon name={icon} light />
-        </div>
+{#if $me}
+  <nav transition:fly={{ x: -20, duration: 600 }}>
+    <div class="buttons">
+      <a data-sveltekit-prefetch href="/" rel="external" class="logo">
+        <img src="/logo.svg" alt="logo" />
       </a>
-    {/each}
-  </div>
-  <div class="wrapper">
-    <button class="button" on:click={toggleNotifications}>
-      <Icon name="notifications" light />
-    </button>
-    <button class="button" on:click={handleLogout}>
-      {#if awaitingLogout}
-        <Loader />
-      {:else}
-        <Icon name="logout" light />
-      {/if}
-    </button>
-    <button class="button tile avatar" on:click={toggleUserCard}>
-      <img src={baseUrl + '/assets/' + $me.avatar} alt="" />
-    </button>
-  </div>
-</nav>
-
-<User show={showUser} />
+      {#each buttons as { href, icon, name }}
+        <NavButton {icon} label={name} on:click={() => goto('/admin' + href)} tick={href == path} />
+      {/each}
+    </div>
+    <div class="buttons">
+      <NavButton round icon="notifications" label="Notyfikacje" on:click={toggleNotifications} />
+      <NavButton round label="Wyloguj" on:click={handleLogout}>
+        {#if awaitingLogout}
+          <Loader />
+        {:else}
+          <Icon name="logout" light />
+        {/if}
+      </NavButton>
+      <div class="avatar">
+        <Tooltip label="{$me.first_name} {$me.last_name}" />
+        <img src="{baseUrl}/assets/{$me.avatar}" alt="" />
+      </div>
+    </div>
+  </nav>
+{/if}
 
 <Notifications show={showNotifications} />
 
@@ -107,67 +84,30 @@
     justify-content: space-between;
     background-color: var(--primary);
   }
-
-  .wrapper {
+  .buttons {
     display: grid;
     row-gap: var(--gap);
     padding: 0.9rem;
     width: 100%;
   }
-  .button {
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    justify-self: center;
-    display: grid;
-    place-items: center;
-    aspect-ratio: 1 / 1;
-    outline: none;
-    border: none;
-    padding: 0.3rem;
-    width: 100%;
-    font: inherit;
-    color: inherit;
-    background-color: rgba(0, 0, 0, 0);
-  }
-  .button img {
-    z-index: 1;
-    position: relative;
-    object-fit: cover;
-    width: 100%;
-  }
-  .button .icon {
-    z-index: 1;
-    display: grid;
-    place-items: center;
-  }
-  .tooltip {
-    pointer-events: none;
-    z-index: 1000;
-    position: fixed;
-    border: var(--border);
-    padding: 0.25rem 0.5rem;
-    background-color: var(--light);
-    transform: scale(0);
-    transform-origin: top left;
-    transition: transform 200ms;
-  }
-  .button:hover .tooltip {
-    transform: scale(1);
-  }
 
-  .tile {
-    padding: 0;
+  .logo,
+  .avatar {
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1 / 1;
   }
   .logo {
     background-color: var(--main);
   }
   .avatar {
+    cursor: help;
     border-radius: 50%;
   }
-  .avatar img {
+  img {
     width: 100%;
-    height: 100%;
     object-fit: cover;
   }
 </style>

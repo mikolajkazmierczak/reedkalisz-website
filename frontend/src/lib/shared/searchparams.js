@@ -69,7 +69,7 @@ export class SearchParams {
     if (this.pathname != url.pathname) return;
 
     const { defaults, params } = this.get();
-    const newParams = SearchParams.parse(url.search);
+    const newParams = SearchParams.parseSearchToParams(url.search);
 
     // const unsetByDefault = Object.values(defaults).every(v => v == null);
     const unset = Object.keys(newParams).length === 0; // newParams == {}
@@ -139,7 +139,7 @@ export class SearchParams {
     return { params, defaults, values };
   }
 
-  static parse(search) {
+  static parseSearchToParams(search) {
     // Parse URL and return an object with the specified search params.
     // `search`: '?number=42&string=excalibur' -> { number: 42, string: 'excalibur' }
     const searchParams = new URLSearchParams(search);
@@ -152,8 +152,18 @@ export class SearchParams {
     return params;
   }
 
+  static parseParamsToSearch(params) {
+    // Parse an object with the specified search params and return a URL.
+    // `params`: { number: 42, string: 'excalibur' } -> '?number=42&string=excalibur'
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value != null) searchParams.set(key, value);
+    }
+    return '?' + searchParams.toString();
+  }
+
   static read() {
     const url = get(page).url;
-    return SearchParams.parse(url.search);
+    return SearchParams.parseSearchToParams(url.search);
   }
 }

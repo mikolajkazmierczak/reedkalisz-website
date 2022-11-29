@@ -1,9 +1,6 @@
 <script>
-  import Filter from '@c/Filter.svelte';
   import Icon from '$c/Icon.svelte';
-
-  // import { createEventDispatcher } from 'svelte';
-  // const dispatch = createEventDispatcher();
+  import Filter from './Filter.svelte';
 
   export let title;
   export let filters;
@@ -12,10 +9,12 @@
 </script>
 
 <div class="filters">
-  <div class="icon" title="Filtrowanie">
-    <Icon name="filter" />
-  </div>
-  {title}
+  {#if title}
+    <div class="icon" title="Filtrowanie">
+      <Icon name="filter" />
+    </div>
+    {title}
+  {/if}
   {#each filters as filter}
     <Filter {...filter} bind:selected />
   {/each}
@@ -26,7 +25,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-left: 0.5rem;
   }
   .icon {
     height: 1.5em;

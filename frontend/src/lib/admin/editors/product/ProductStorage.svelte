@@ -75,8 +75,20 @@
             <Input bind:value={storage.api_color_code}>Kod koloru w API</Input>
           </div>
           <div class="ui-pair">
-            <Input type="select" bind:value={storage.color_first} options={colorsOptions}>Kolor 1</Input>
-            <Input type="select" bind:value={storage.color_second} options={colorsOptions}>Kolor 2</Input>
+            <div>
+              <Input type="select" bind:value={storage.color_first} options={colorsOptions}>Kolor 1</Input>
+              {#if storage.color_first}
+                {@const color = $colors.find(({ id }) => id === storage.color_first).color}
+                <div class="color" style:background-color={color} />
+              {/if}
+            </div>
+            <div>
+              <Input type="select" bind:value={storage.color_second} options={colorsOptions}>Kolor 2</Input>
+              {#if storage.color_second}
+                {@const color = $colors.find(({ id }) => id === storage.color_second).color}
+                <div class="color" style:background-color={color} />
+              {/if}
+            </div>
           </div>
           <Input type="checkbox" bind:value={storage.multicolored}>Wielokolorowe</Input>
 
@@ -158,5 +170,14 @@
     flex-direction: column;
     gap: 0.5rem;
     padding-top: 0.5rem;
+  }
+
+  .color {
+    position: relative;
+    left: 1px;
+    width: calc(100% - 2px);
+    height: 1rem;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border: var(--border-light);
   }
 </style>
