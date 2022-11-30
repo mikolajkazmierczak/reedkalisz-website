@@ -66,7 +66,7 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   const price = productPriceWithMargin + labelingPriceWithMargin;
   const singlePrice = Math.max(price * fraction(full.margin), price + full.minimum);
 
-  const transportPrice = product.price * amount > transportThreshold ? 0 : 20; // TODO: this should be revisited
+  const transportPrice = productPrice > transportThreshold ? 0 : 20; // TODO: this should be revisited
   const fullPrice = singlePrice + extra + transportPrice;
   return round(fullPrice / amount);
 }
