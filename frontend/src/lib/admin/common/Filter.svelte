@@ -41,6 +41,5 @@
   }
   .filter.active {
     background-color: var(--primary-white);
-    /* color: var(--primary-text); */
   }
 </style>

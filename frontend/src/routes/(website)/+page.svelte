@@ -18,6 +18,15 @@
   }
 </script>
 
+<svelte:head>
+  <!-- TODO: those should be fragments (or a singleton? but probably a bad idea) -->
+  <title>Strona główna | REED Kalisz</title>
+  <meta
+    name="description"
+    content="Firma Reed przedstawia gadżety dla firm, takie jak długopisy reklamowe, kalendarze czy kubki. Oferujemy również cyfrowy druk niskonakładowy i grawerowanie laserowe."
+  />
+</svelte:head>
+
 <h1>Gadżety reklamowe</h1>
 
 <Categories categories={$categories.find(c => c.id == 88).children} bind:categoryID />

@@ -55,7 +55,7 @@
 
 {#if $colors}
   <section class="ui-section">
-    <h2 class="ui-h2">Warianty</h2>
+    <h2 class="ui-h2">Kolory</h2>
     <div class="ui-section__row">
       {#each product.storage as storage, i (storage)}
         <div class="ui-box ui-box--element" class:ui-box--uneditable={!storage.enabled}>

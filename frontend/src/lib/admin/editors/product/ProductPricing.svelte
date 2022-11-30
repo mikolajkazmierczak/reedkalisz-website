@@ -202,6 +202,7 @@
                     <Button icon="delete" on:click={() => removeLabeling(i)} dangerous />
                   </div>
                 </div>
+
                 {#if duplicateLabeling}
                   <h4 class="ui-h4" style:color="var(--main-4)">DUPLIKAT</h4>
                 {/if}
@@ -230,6 +231,15 @@
                     bind:minimum={labeling.minimum}
                   />
                 {/if}
+
+                <div class="labeling-field">
+                  <h4>Pole znakowania <small>mm</small></h4>
+                  <div>
+                    <Input type="number" step="1" min="0" bind:value={labeling.labeling_field_x} placeholder="w" />
+                    x
+                    <Input type="number" step="1" min="0" bind:value={labeling.labeling_field_y} placeholder="h" />
+                  </div>
+                </div>
               </div>
             {/each}
 
@@ -266,5 +276,22 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
+  }
+
+  .labeling-field {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .labeling-field div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 50%;
+  }
+  .labeling-field h4 {
+    font-weight: normal;
+    margin-bottom: 0.25rem;
   }
 </style>

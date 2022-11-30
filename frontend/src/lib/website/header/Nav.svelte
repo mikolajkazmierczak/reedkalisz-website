@@ -2,7 +2,7 @@
   import { menu } from '#/stores';
   import NavItem from './NavItem.svelte';
 
-  let openedID = null;
+  export let openedID = null;
 
   function addLinks(items) {
     for (let item of items) {

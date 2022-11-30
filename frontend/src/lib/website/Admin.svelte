@@ -23,13 +23,20 @@
 
 <div class="admin">
   {#if editUrl}
-    <a data-sveltekit-prefetch href={editUrl} rel="external" class="tile" transition:slide={{ duration: 200 }}>
+    <a
+      data-sveltekit-prefetch
+      href={editUrl}
+      rel="noreferrer"
+      target="_blank"
+      class="tile"
+      transition:slide={{ duration: 200 }}
+    >
       <HoverCircle color="var(--main-2)" />
       <Tooltip label="Edytuj" />
       <div class="icon"><Icon name="edit_settings" /></div>
     </a>
   {/if}
-  <a data-sveltekit-prefetch href="/admin" rel="external" class="tile">
+  <a data-sveltekit-prefetch href="/admin" rel="noreferrer" target="_blank" class="tile">
     <HoverCircle color="var(--main-2)" />
     <Tooltip label="Panel admina" />
     <div class="icon"><Icon name="slide_settings" /></div>

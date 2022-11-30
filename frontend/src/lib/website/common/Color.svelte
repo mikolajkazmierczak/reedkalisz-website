@@ -14,9 +14,11 @@
 </script>
 
 <div class="color-wrapper">
-  <Tooltip label="<b>{label}</b><br/>W magazynie: {amount}" />
+  <Tooltip label="<b>{label}</b><br/>Dostępność: {amount || 'Na stanie'}" />
   {#if multicolored}
-    <div class="color multi" />
+    <div class="color multi">
+      <img src="/multicolor.svg" alt="" />
+    </div>
   {:else if bg || fg}
     {#if bg}<div class="color bg" style:background-color={bg.color} />{/if}
     {#if fg}<div class="color fg" style:background-color={fg.color} />{/if}
@@ -44,9 +46,12 @@
     opacity: 0.5;
   }
   .multi {
-    background: rgb(180, 58, 58, 1);
-    background: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);
+    /* background: rgb(180, 58, 58, 1); */
+    /* background: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); */
     transform: rotate(45deg);
+  }
+  .multi img {
+    width: 100%;
   }
   .fg {
     position: absolute;

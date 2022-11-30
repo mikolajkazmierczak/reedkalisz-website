@@ -41,7 +41,7 @@
 </script>
 
 {#if $me}
-  <nav transition:fly={{ x: -20, duration: 600 }}>
+  <nav in:fly={{ x: -20, duration: 600 }}>
     <div class="buttons">
       <a data-sveltekit-prefetch href="/" rel="external" class="logo">
         <img src="/logo.svg" alt="logo" />

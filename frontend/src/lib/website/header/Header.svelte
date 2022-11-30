@@ -1,16 +1,18 @@
 <script>
   import Nav from './Nav.svelte';
   import Search from './Search.svelte';
+
+  let openedID;
 </script>
 
 <div class="wrapper">
   <div class="content">
     <div class="part left">
-      <a class="logo" href="/">
+      <a class="logo" href="/" on:click={() => (openedID = null)}>
         <img src="/logo_white.svg" alt="reed logo" />
       </a>
 
-      <Nav />
+      <Nav bind:openedID />
     </div>
 
     <div class="part right">

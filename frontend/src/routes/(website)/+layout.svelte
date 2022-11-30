@@ -5,6 +5,7 @@
   import { me, readme } from '$/auth';
   import Admin from '#/Admin.svelte';
   import Header from '#/header/Header.svelte';
+  import Footer from '#/footer/Footer.svelte';
 
   onMount(readme);
 </script>
@@ -27,12 +28,17 @@
   <div class="content">
     <slot />
   </div>
+
+  <Footer />
 </main>
 
 <style>
   main {
+    min-height: calc(100% - 60px);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
   }
   .content {
     width: 100%;

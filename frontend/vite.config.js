@@ -1,8 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import path from 'path';
 
-/** @type {import('vite').UserConfig} */
-const config = {
+export default {
   resolve: {
     alias: {
       $: path.resolve(__dirname, './src/lib/shared'),
@@ -15,5 +14,3 @@ const config = {
   },
   plugins: [sveltekit()]
 };
-
-export default config;

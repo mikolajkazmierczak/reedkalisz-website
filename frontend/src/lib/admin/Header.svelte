@@ -24,7 +24,7 @@
     --gap: 0.9rem;
     z-index: 1;
     overflow: hidden;
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     display: flex;

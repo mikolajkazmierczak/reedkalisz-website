@@ -3,7 +3,9 @@
 
   import { baseUrl } from '$/api';
   import Color from '#c/Color.svelte';
-  import Icon from '$c/Icon.svelte';
+  import AdminBadge from '#c/AdminBadge.svelte';
+  import SaleBadge from '#c/SaleBadge.svelte';
+  import NewBadge from '#c/NewBadge.svelte';
 
   export let product;
   $: ({
@@ -12,6 +14,7 @@
     code,
     slug,
     enabled,
+    new: isNew,
     sale,
     custom_prices_with_labeling,
     custom_prices,
@@ -85,23 +88,26 @@
 </script>
 
 <a class="tile" href="/produkty/{slug}" in:fly={{ y: -20, duration: 100 }}>
-  {#if !enabled}
-    <div class="admin">
-      <div class="icon"><Icon name="eye_off" light strokeWidth="1" /></div>
-      TYLKO ADMIN
-    </div>
-  {/if}
+  <div class="badges">
+    <AdminBadge {enabled} />
+    <NewBadge {isNew} />
+  </div>
+
   <div class="img-wrapper">
     {#if img}<img src={img.src} alt="" class:enabled={img.enabled} />{/if}
   </div>
+
   <div class="info">
+    <div class="badges">
+      <SaleBadge {sale} />
+    </div>
     <div class="text">
       <div class="name">{name}</div>
       <div class="code">{code}</div>
     </div>
     <div class="price">
       {#if price.value}
-        <span>{price.value}<small class="currency">zł</small></span>
+        <span>{price.value.toFixed(2)}<small class="currency">zł</small></span>
       {:else}
         <small class="empty">Zapytaj o cenę</small>
       {/if}
@@ -111,7 +117,7 @@
     </div>
     <div class="colors">
       {#each colors as { amount, first, second, multicolored }}
-        <Color amount={amount ?? 'Brak'} {first} {second} {multicolored} />
+        <Color {amount} {first} {second} {multicolored} />
       {/each}
     </div>
   </div>
@@ -119,44 +125,38 @@
 
 <style>
   .tile {
+    overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     text-decoration: none;
+    background-color: rgb(250, 250, 250);
     transition: background-color 100ms;
   }
   .tile:hover {
     background-color: var(--grey);
   }
 
-  .admin {
-    white-space: nowrap;
+  .badges {
     position: absolute;
     top: 0;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, 25%);
     display: flex;
     align-items: center;
-    background-color: var(--main-2);
-    border-radius: 0 0 10px 10px;
-    padding: 0.1rem 0.9rem;
-    padding-bottom: 0.2rem;
-    font-weight: bold;
-    color: #fff;
-  }
-  .admin .icon {
-    margin-right: 0.25rem;
-    height: 20px;
-    width: 20px;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .img-wrapper {
     aspect-ratio: 1 / 1;
+    padding: 5%;
+    background-color: #fff;
   }
   .img-wrapper img {
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     border-radius: 10px 10px 0 0;
     width: 100%;
@@ -164,9 +164,13 @@
   }
 
   .info {
+    position: relative;
     padding: 0.8rem;
     padding-top: 1rem;
     padding-bottom: 1.2rem;
+  }
+  .info .badges {
+    transform: translate(-50%, -50%);
   }
   .name {
     font-size: 1.05rem;
@@ -200,6 +204,7 @@
 
   .colors {
     display: flex;
+    flex-wrap: wrap;
     gap: 5px;
     margin-top: 5px;
   }

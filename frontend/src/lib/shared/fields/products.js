@@ -62,6 +62,8 @@ export const edit = [
   'labelings.prices_sale.enabled',
   'labelings.prices_sale.amount',
   'labelings.prices_sale.price',
+  'labelings.labeling_field_x',
+  'labelings.labeling_field_y',
   'price',
   'price_sale',
   'price_sale_blacklist',

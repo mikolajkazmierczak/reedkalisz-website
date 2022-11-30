@@ -2,7 +2,7 @@ import api from '$/api';
 import { SearchParams } from '$/searchparams';
 import { treeGetAllChildrenIDs } from '$/utils';
 
-const productsFields = [
+const fields = [
   'id',
   'name',
   'code',
@@ -43,8 +43,8 @@ const productsFields = [
 export async function load({ url, parent }) {
   const getIDs = () => [category, ...treeGetAllChildrenIDs(categories, category)];
   const { categories } = await parent();
-  const category = SearchParams.parseSearchToParams(url.search).c;
-  const productsFilter = category ? { categories: { category: { _in: getIDs() } } } : {};
-  const products = (await api.items('products').readByQuery({ filter: productsFilter, fields: productsFields })).data;
+  const { c: category, q: search } = SearchParams.parseSearchToParams(url.search);
+  const filter = category ? { categories: { category: { _in: getIDs() } } } : {};
+  const products = (await api.items('products').readByQuery({ filter, fields, search })).data;
   return { products };
 }

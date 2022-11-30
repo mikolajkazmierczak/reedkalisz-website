@@ -1,4 +1,5 @@
 import api from '$/api';
+import { SearchParams } from '$/searchparams';
 
 const productFields = [
   'id',
@@ -24,16 +25,19 @@ const productFields = [
   'custom_prices_sale.amount',
   'custom_prices_sale.price',
 
+  'labelings.enabled',
   'labelings.labeling.company.name',
-  'labelings.labeling.name',
   'labelings.labeling.code',
   'labelings.labeling.type',
+  'labelings.labeling.name',
   'labelings.prices.enabled',
   'labelings.prices.amount',
   'labelings.prices.price',
   'labelings.prices_sale.enabled',
   'labelings.prices_sale.amount',
   'labelings.prices_sale.price',
+  'labelings.labeling_field_x',
+  'labelings.labeling_field_y',
 
   'storage.enabled',
   'storage.amount',

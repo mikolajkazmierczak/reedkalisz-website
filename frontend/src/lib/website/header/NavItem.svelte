@@ -33,7 +33,7 @@
   <div class="submenu" on:mouseleave={close} transition:fly={{ y: 10, duration: 400 }}>
     <div class="submenu-content">
       {#each children as child}
-        <NavSubitem item={child} />
+        <NavSubitem item={child} bind:openedID />
       {/each}
     </div>
   </div>

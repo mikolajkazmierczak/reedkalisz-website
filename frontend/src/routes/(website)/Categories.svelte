@@ -17,12 +17,9 @@
   }
 </script>
 
-<div
-  class="wrapper"
-  style:padding-left={20 * (depth - 1) + 'px'}
-  in:slide={{ duration: 150 }}
-  out:slide={{ duration: 150, delay: 150 }}
->
+<!-- out:slide={{ duration: 150, delay: 150 }} -->
+<!-- out:fly={{ y: -15, duration: 150 }} -->
+<div class="wrapper" style:padding-left={20 * (depth - 1) + 'px'} in:slide={{ duration: 150 }}>
   {#each categories as { id, name } (id)}
     <button
       data-sveltekit-prefetch
@@ -30,7 +27,6 @@
       class:selected={selectedID == id}
       on:click={() => choose(id)}
       in:fly={{ y: -15, duration: 150, delay: 150 }}
-      out:fly={{ y: -15, duration: 150 }}
     >
       {name}
     </button>
@@ -46,7 +42,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 1rem;
+    margin-top: 2rem;
   }
 
   button {

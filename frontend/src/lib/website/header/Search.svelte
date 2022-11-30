@@ -10,7 +10,7 @@
 
   function search() {
     const query = value.trim();
-    if (query) goto(`/produkty?q=${query}`);
+    if (query) goto(`/?q=${query}`);
   }
 </script>
 
@@ -26,26 +26,26 @@
     position: relative;
     margin-bottom: 10px;
     width: 100%;
-    height: 30px;
+    height: 2.25rem;
   }
   input {
     outline: none;
     border-radius: 15px;
-    border: 2px solid var(--main-6);
+    border: 1px solid rgba(0, 0, 0, 0.2);
     padding: 10px 2.5rem 10px 0.75rem;
     height: 100%;
     font-size: 1rem;
   }
   .icon {
     cursor: pointer;
-    border-radius: 20px;
+    border-radius: 15px;
     position: absolute;
-    right: 2px;
-    top: 2px;
-    padding: 2px;
-    height: 26px;
+    right: 0.3rem;
+    top: 0.25rem;
+    padding: 0.25rem;
+    height: calc(100% - 0.5rem);
     width: 34px;
-    background-color: var(--main-0);
+    background-color: var(--grey);
   }
   .icon:hover {
     background-color: var(--main-1);

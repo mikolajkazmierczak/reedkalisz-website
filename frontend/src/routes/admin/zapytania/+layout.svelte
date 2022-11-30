@@ -61,9 +61,9 @@
           !!$.file,
           $.spam_chance + '%',
           $.id,
-          $.name,
+          $.name ?? '',
           $.email,
-          $.phone,
+          $.phone ?? '',
           { user: $.user_created, datetime: $.date_created },
           { user: $.user_updated, datetime: $.date_updated }
         ]

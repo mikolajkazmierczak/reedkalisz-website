@@ -52,7 +52,7 @@
   </div>
 
   {#if hasChildren && expanded}
-    <div class="children" transition:slide={{ duration: 100 * children.length }}>
+    <div class="children" transition:slide={{ duration: 200 }}>
       {#each children as { id, name, enabled, children }, i}
         <svelte:self
           {id}

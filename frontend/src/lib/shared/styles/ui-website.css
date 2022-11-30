@@ -4,6 +4,10 @@
   --grey-dark: rgb(200, 200, 200);
   --border: 1px solid var(--main);
 
+  --sale: rgb(160, 226, 154);
+  --sale-dark: rgb(97, 177, 90);
+  --new: rgb(154, 191, 226);
+
   --scroll-thumb: var(--main);
   --scroll-track: var(--light);
 }
