@@ -18,6 +18,8 @@ const productFields = [
   'categories.category',
 
   'custom_prices_with_labeling',
+  'labeling_field_x',
+  'labeling_field_y',
   'custom_prices.enabled',
   'custom_prices.amount',
   'custom_prices.price',

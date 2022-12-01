@@ -24,6 +24,8 @@
     description,
     categories,
     custom_prices_with_labeling,
+    labeling_field_x,
+    labeling_field_y,
     custom_prices,
     custom_prices_sale,
     labelings,
@@ -88,24 +90,37 @@
       <h2>Cennik</h2>
       <div class="prices-wrapper">
         {#if showCustomPrices}
-          <Pricing
-            prices={custom_prices.filter(p => p.enabled)}
-            pricesSale={custom_prices_sale.filter(p => p.enabled)}
-          />
-          {#if custom_prices_with_labeling}
-            <div class="custom-prices-with-labeling">Ceny ze znakowaniem</div>
+          {#if labeling_field_x && labeling_field_x}
+            <small class="labeling-field">
+              Pole znakowania {labeling_field_x}x{labeling_field_y} mm
+            </small>
           {/if}
+          <div class="prices">
+            <Pricing
+              prices={custom_prices.filter(p => p.enabled)}
+              pricesSale={custom_prices_sale.filter(p => p.enabled)}
+            />
+            {#if custom_prices_with_labeling}
+              <div class="prices-with-labeling">Ceny ze znakowaniem</div>
+            {/if}
+          </div>
         {/if}
 
         {#if showLabelingsPrices}
-          {#each labelings.filter(l => l.enabled) as { labeling, prices, prices_sale, labeling_field_x, labeling_field_y }}
-            {@const { company, code, type, name } = labeling}
+          {#each labelings.filter(l => l.enabled) as labeling}
+            {@const { company, code, type, name } = labeling.labeling}
             <h3>{name} <span>{company.name} {code ?? ''} {type ?? ''}</span></h3>
-            {#if labeling_field_x && labeling_field_x}
-              <small class="labeling-field">Pole znakowania {labeling_field_x}x{labeling_field_y} mm</small>
+            {#if labeling.labeling_field_x && labeling.labeling_field_x}
+              <small class="labeling-field">
+                Pole znakowania {labeling.labeling_field_x}x{labeling.labeling_field_y} mm
+              </small>
             {/if}
             <div class="prices">
-              <Pricing prices={prices.filter(p => p.enabled)} pricesSale={prices_sale.filter(p => p.enabled)} />
+              <Pricing
+                prices={labeling.prices.filter(p => p.enabled)}
+                pricesSale={labeling.prices_sale.filter(p => p.enabled)}
+              />
+              <div class="prices-with-labeling">Ceny ze znakowaniem</div>
             </div>
           {/each}
         {/if}
@@ -170,16 +185,17 @@
     margin: 0.5rem 0;
   }
 
-  .custom-prices-with-labeling {
+  .prices-with-labeling {
     display: inline-block;
-    border-radius: 0 0 10px 10px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    opacity: 0.6;
     border-top: none;
     padding: 0.25rem 0.5rem;
-    background-color: var(--main-0);
+    background-color: var(--grey);
+    font-size: small;
+    text-transform: uppercase;
   }
   .prices-wrapper h3 {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     font-weight: normal;
   }
   .prices-wrapper h3 span {

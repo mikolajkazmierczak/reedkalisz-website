@@ -39,6 +39,8 @@ export const edit = [
   'show_price',
   'sale',
   'custom_prices_with_labeling',
+  'labeling_field_x',
+  'labeling_field_y',
   'custom_prices.id',
   'custom_prices.enabled',
   'custom_prices.amount',

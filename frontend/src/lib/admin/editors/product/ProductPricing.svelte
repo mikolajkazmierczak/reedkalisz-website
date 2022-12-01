@@ -8,6 +8,7 @@
   import { globals, companies, globalMargins, priceViews, labelings } from '@/globals';
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
+  import LabelingField from './LabelingField.svelte';
 
   export let product;
   export let productOriginal;
@@ -173,6 +174,11 @@
                 sale={product.sale}
               />
               <Input type="checkbox" bind:value={product.custom_prices_with_labeling}>Ceny ze znakowaniem</Input>
+              {#if product.custom_prices_with_labeling}
+                <div class="ui-box ui-box--optional">
+                  <LabelingField bind:x={product.labeling_field_x} bind:y={product.labeling_field_y} />
+                </div>
+              {/if}
             </div>
           {/if}
         {/if}
@@ -232,14 +238,7 @@
                   />
                 {/if}
 
-                <div class="labeling-field">
-                  <h4>Pole znakowania <small>mm</small></h4>
-                  <div>
-                    <Input type="number" step="1" min="0" bind:value={labeling.labeling_field_x} placeholder="w" />
-                    x
-                    <Input type="number" step="1" min="0" bind:value={labeling.labeling_field_y} placeholder="h" />
-                  </div>
-                </div>
+                <LabelingField bind:x={labeling.labeling_field_x} bind:y={labeling.labeling_field_y} />
               </div>
             {/each}
 
@@ -276,22 +275,5 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
-  }
-
-  .labeling-field {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-  .labeling-field div {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 50%;
-  }
-  .labeling-field h4 {
-    font-weight: normal;
-    margin-bottom: 0.25rem;
   }
 </style>

@@ -14,11 +14,14 @@
   <tr>
     <th>Cena</th>
     {#each prices as { price }, i}
+      {@const sale = !!pricesSale[i]?.price}
       <td>
-        {#if !!pricesSale[i]?.price}
-          <span class="sale-price">{pricesSale[i].price.toFixed(2)}</span><br />
+        {#if sale}
+          <span class="sale-price">{pricesSale[i].price.toFixed(2)}<small>zł</small></span><br />
         {/if}
-        <span class:sale={!!pricesSale[i]?.price}>{price?.toFixed(2) ?? '-'}</span>
+        <span class:sale>
+          {price?.toFixed(2) ?? '-'}{#if !sale}<small>zł</small>{/if}
+        </span>
       </td>
     {/each}
   </tr>
@@ -45,5 +48,9 @@
     border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     vertical-align: top;
+  }
+  small {
+    font-weight: normal;
+    margin-left: 2px;
   }
 </style>
