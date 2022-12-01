@@ -1,6 +1,7 @@
 <script>
   import api from '$/api';
   import Icon from '$c/Icon.svelte';
+  import HoverCircle from '$c/HoverCircle.svelte';
 
   export let product;
 
@@ -86,8 +87,11 @@
   </label>
 
   <button type="submit" on:click|preventDefault={handleSend}>
-    <div class="icon"><Icon name="questions" light /></div>
-    Wyślij
+    <HoverCircle color="var(--main-4)" />
+    <div>
+      <div class="icon"><Icon name="questions" light /></div>
+      Wyślij
+    </div>
   </button>
 
   {#if sent}
@@ -146,14 +150,21 @@
   }
 
   button {
+    overflow: hidden;
+    position: relative;
     cursor: pointer;
-    display: flex;
-    align-items: center;
     margin-top: 1.5rem;
     border-radius: 10px;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0;
     background-color: var(--main);
+  }
+  button > div {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
     color: var(--light);
     font-size: 1rem;
   }
