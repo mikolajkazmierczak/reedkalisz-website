@@ -19,7 +19,7 @@
 </script>
 
 <div class="item">
-  <a data-sveltekit-prefetch {href} class:opened on:mouseenter={open}>
+  <a {href} class:opened on:mouseenter={open}>
     <div class="content" class:folder class:opened>
       {name}
       {#if folder}

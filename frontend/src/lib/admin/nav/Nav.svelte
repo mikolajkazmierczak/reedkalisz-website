@@ -43,7 +43,7 @@
 {#if $me}
   <nav in:fly={{ x: -20, duration: 600 }}>
     <div class="buttons">
-      <a data-sveltekit-prefetch href="/" rel="external" class="logo">
+      <a href="/" rel="external" class="logo">
         <img src="/logo.svg" alt="logo" />
       </a>
       {#each buttons as { href, icon, name }}

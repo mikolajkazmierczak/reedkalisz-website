@@ -11,7 +11,7 @@
 </script>
 
 <div class="item" class:title class:normal class:small>
-  <a data-sveltekit-prefetch {href} on:click={() => (openedID = null)}>{name}</a>
+  <a {href} on:click={() => (openedID = null)}>{name}</a>
   {#if children.length}
     <div class="children">
       {#each children as child}

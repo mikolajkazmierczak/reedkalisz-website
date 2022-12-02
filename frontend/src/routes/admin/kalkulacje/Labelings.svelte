@@ -330,11 +330,21 @@
         <th width="70">Kod</th>
         <th width="70" class="heavy-border">Typ</th>
 
-        <th width="70" class="info"> M <Tooltip label="Marża" /> </th>
-        <th width="70" class="info"> MIN <Tooltip label="Minimum" /> </th>
-        <th width="70" class="info"> P <Tooltip label="Przygotowalnia" /> </th>
-        <th width="70" class="info"> T <Tooltip label="Cena transportu" /> </th>
-        <th width="70" class="info heavy-border"> TP <Tooltip label="Próg dla uwzględnienia transportu" /> </th>
+        <th width="70" class="info" style:color="#0A9f59">
+          M <Tooltip label="Marża" />
+        </th>
+        <th width="70" class="info" style:color="#0A9f59">
+          MIN <Tooltip label="Minimum" />
+        </th>
+        <th width="70" class="info" style:color="#0089ff">
+          P <Tooltip label="Przygotowalnia" />
+        </th>
+        <th width="70" class="info" style:color="#6604C2">
+          T <Tooltip label="Cena transportu" />
+        </th>
+        <th width="70" class="info heavy-border" style:color="#6604C2">
+          TP <Tooltip label="Próg dla uwzględnienia transportu" />
+        </th>
 
         {#each amounts as amount, i}
           {@const firstLumpsumIndex = amounts.map((a, i) => (a == 1 ? i : null)).filter(i => i !== null)[0]}
@@ -494,6 +504,7 @@
   }
   th.info {
     cursor: help;
+    font-weight: bold;
   }
   td {
     overflow: hidden;

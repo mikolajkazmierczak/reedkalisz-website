@@ -22,7 +22,6 @@
 <div class="wrapper" style:padding-left={20 * (depth - 1) + 'px'} in:slide={{ duration: 150 }}>
   {#each categories as { id, name } (id)}
     <button
-      data-sveltekit-prefetch
       class:root
       class:selected={selectedID == id}
       on:click={() => choose(id)}
