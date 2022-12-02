@@ -1,74 +1,287 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 1000 350" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1.72649,0,0,1.83993,-209.787,-364.856)">
-        <text x="283.235px" y="207.035px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(255,148,28);">NC</text>
-        <text x="303.901px" y="207.035px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">=</text>
-        <text x="314.243px" y="207.035px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(255,148,28);">NAKŁAD × CENA</text>
+<svg width="100%" height="100%" viewBox="0 0 1920 1080" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(2.74563,0,0,2.74563,-625.891,-1006.71)">
+        <g transform="matrix(0.938345,0,0,1,26.8303,0)">
+            <text x="435.171px" y="470.334px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(255,153,0);">A</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,27.5967,0)">
+            <text x="460.849px" y="470.334px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.896,0)">
+            <text x="484.894px" y="470.334px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(255,153,0);">CENA</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,33.7281,0)">
+            <text x="547.047px" y="470.334px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">•</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,35.2609,0)">
+            <text x="571.909px" y="470.334px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(159,159,159);">NAKŁAD</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="261.14px" y="492.413px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(255,153,0);">PRODUKT</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,21.4654,0)">
+            <text x="361.403px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,23.7647,0)">
+            <text x="385.448px" y="492.413px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;">MAX</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,26.0639,0)">
+            <text x="422.74px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">(</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,26.8303,0)">
+            <text x="435.171px" y="492.413px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(255,153,0);">A</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,27.5967,0)">
+            <text x="460.849px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">•</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.896,0)">
+            <text x="484.894px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(255,153,0);">MARŻA</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,33.7281,0)">
+            <text x="547.047px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">,</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,35.2609,0)">
+            <text x="571.909px" y="492.413px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(255,153,0);">A</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,36.0273,0)">
+            <text x="597.587px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">+</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,38.3265,0)">
+            <text x="621.632px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(255,153,0);">MIN</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,40.6258,0)">
+            <text x="658.924px" y="492.413px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">)</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="486.348px" y="536.571px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(10,159,89);">b</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.896,0)">
+            <text x="498.141px" y="536.571px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,32.1952,0)">
+            <text x="522.186px" y="536.571px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(10,159,89);">CENA ZNAKOWANIA DLA</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,47.5235,0)">
+            <text x="770.801px" y="536.571px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(10,159,89);">PRZEDZIAŁU</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="486.348px" y="558.651px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(10,159,89);">B</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.896,0)">
+            <text x="498.141px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,32.1952,0)">
+            <text x="522.186px" y="558.651px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;">JEŚLI</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,36.0273,0)">
+            <text x="584.34px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">(</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,36.7937,0)">
+            <text x="596.77px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(159,159,159);">NAKŁAD</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,41.3922,0)">
+            <text x="671.355px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=1,</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,44.4579,0)">
+            <text x="721.078px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(10,159,89);">b</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,45.2243,0)">
+            <text x="733.509px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">,</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,46.7571,0)">
+            <text x="758.37px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(10,159,89);">b</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,47.5235,0)">
+            <text x="784.048px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">•</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,49.8228,0)">
+            <text x="808.093px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(159,159,159);">NAKŁAD</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,54.4213,0)">
+            <text x="882.678px" y="558.651px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">)</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="539.338px" y="580.73px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">+</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,33.7281,0)">
+            <text x="547.047px" y="580.73px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(0,137,255);">PRZYGOTOWALNIA</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="261.14px" y="602.809px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(10,159,89);">ZNAKOWANIE</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,23.7647,0)">
+            <text x="398.695px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,26.0639,0)">
+            <text x="422.74px" y="602.809px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;">MAX</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,28.3632,0)">
+            <text x="460.032px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">(</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.1296,0)">
+            <text x="472.463px" y="602.809px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(10,159,89);">B</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.896,0)">
+            <text x="498.141px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">•</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,32.1952,0)">
+            <text x="522.186px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(10,159,89);">MARŻA</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,36.0273,0)">
+            <text x="584.34px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">,</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,37.5601,0)">
+            <text x="609.201px" y="602.809px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(10,159,89);">B</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,38.3265,0)">
+            <text x="634.879px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">+</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,40.6258,0)">
+            <text x="658.924px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(10,159,89);">MIN</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,42.925,0)">
+            <text x="696.216px" y="602.809px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">)</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="433.358px" y="646.967px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(204,0,29);">C</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,26.8303,0)">
+            <text x="448.418px" y="646.967px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.1296,0)">
+            <text x="472.463px" y="646.967px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(255,153,0);">PRODUKT</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,34.4945,0)">
+            <text x="572.726px" y="646.967px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">+</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,36.7937,0)">
+            <text x="596.77px" y="646.967px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(10,159,89);">ZNAKOWANIE</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="261.14px" y="669.047px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(204,0,29);">CAŁOŚĆ</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,20.699,0)">
+            <text x="348.972px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,22.9983,0)">
+            <text x="373.017px" y="669.047px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;">MAX</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,25.2975,0)">
+            <text x="410.309px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">(</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,26.0639,0)">
+            <text x="422.74px" y="669.047px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(204,0,29);">C</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,26.8303,0)">
+            <text x="448.418px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">•</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.1296,0)">
+            <text x="472.463px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(204,0,29);">MARŻA</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,32.9616,0)">
+            <text x="534.617px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">,</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,34.4945,0)">
+            <text x="559.478px" y="669.047px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(204,0,29);">C</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,35.2609,0)">
+            <text x="585.156px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">+</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,37.5601,0)">
+            <text x="609.201px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(204,0,29);">MIN</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,39.8594,0)">
+            <text x="646.493px" y="669.047px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">)</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="261.14px" y="713.205px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(102,4,194);">TRANSPORT</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,22.9983,0)">
+            <text x="386.264px" y="713.205px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">=</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,25.2975,0)">
+            <text x="410.309px" y="713.205px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;">JEŚLI</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.1296,0)">
+            <text x="472.463px" y="713.205px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">(</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,29.896,0)">
+            <text x="484.894px" y="713.205px" style="font-family:'JetBrainsMono-Bold', 'JetBrains Mono', monospace;font-weight:700;font-size:22.079px;fill:rgb(255,153,0);">A</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,30.6624,0)">
+            <text x="510.572px" y="713.205px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">&gt;</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,32.9616,0)">
+            <text x="534.617px" y="713.205px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(102,4,194);">PRÓG</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,36.0273,0)">
+            <text x="584.34px" y="713.205px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">, 0,</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,39.8594,0)">
+            <text x="646.493px" y="713.205px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(102,4,194);">CENA</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,42.925,0)">
+            <text x="696.216px" y="713.205px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">)</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,16.1005,0)">
+            <text x="261.14px" y="757.363px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(159,159,159);">CENA DLA NAKŁADU</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,28.3632,0)">
+            <text x="473.28px" y="757.363px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">= (</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,31.4288,0)">
+            <text x="509.755px" y="757.363px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(204,0,29);">CAŁOŚĆ</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,36.0273,0)">
+            <text x="597.587px" y="757.363px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">+</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,38.3265,0)">
+            <text x="621.632px" y="757.363px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:22.079px;fill:rgb(102,4,194);">TRANSPORT</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,45.2243,0)">
+            <text x="733.509px" y="757.363px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;">) /</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,48.2899,0)">
+            <text x="783.232px" y="757.363px" style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:22.079px;fill:rgb(159,159,159);">NAKŁAD</text>
+        </g>
     </g>
-    <g transform="matrix(1.72649,0,0,1.83993,-498.482,-236.62)">
-        <text x="288.796px" y="153.167px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(255,148,28);">CEN<tspan x="316.675px 326.009px " y="153.167px 153.167px ">A </tspan>PR<tspan x="347.805px 357.802px " y="153.167px 153.167px ">OD</tspan>UKTU</text>
-        <text x="409.124px" y="153.167px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">= MAX(</text>
-        <text x="450.128px" y="153.167px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(255,148,28);">NC</text>
-        <text x="470.794px" y="153.167px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">•</text>
-        <text x="478.329px" y="153.167px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">MARŻA<tspan x="521.208px 524.542px " y="153.167px 153.167px "> n</tspan>a PRODUKT<tspan x="599.882px " y="153.167px ">,</tspan></text>
-        <text x="606.55px" y="153.167px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(255,148,28);">NC</text>
-        <text x="627.216px" y="153.167px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">+ MINIMUM na PRODUKT)</text>
+    <g transform="matrix(1.80439,0,0,1.80439,1360.68,38.8895)">
+        <clipPath id="_clip1">
+            <rect x="6" y="5" width="244" height="76"/>
+        </clipPath>
+        <g clip-path="url(#_clip1)">
+            <clipPath id="_clip2">
+                <rect x="6" y="5" width="244" height="76"/>
+            </clipPath>
+            <g clip-path="url(#_clip2)">
+                <g transform="matrix(0.554205,-0,-0,0.554205,-754.094,-21.5528)">
+                    <use xlink:href="#_Image3" x="1373.78" y="48.214" width="440.27px" height="137.133px" transform="matrix(0.998345,0,0,0.99372,0,0)"/>
+                </g>
+            </g>
+        </g>
     </g>
-    <g transform="matrix(1.72649,0,0,1.83993,-272.159,-170.103)">
-        <text x="296.367px" y="149.854px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(0,163,110);">CZOPN</text>
-        <text x="341.701px" y="149.854px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">=</text>
-        <text x="352.043px" y="149.854px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(0,163,110);">CENA<tspan x="384.721px 388.055px " y="149.854px 149.854px "> Z</tspan>NAKOW<tspan x="440.273px 448.277px " y="149.854px 149.854px ">AN</tspan>IA<tspan x="467.619px 470.953px " y="149.854px 149.854px "> Z</tspan> ODPOWIEDNIEGO PRZEDZIAŁU NAKŁADÓW</text>
+    <g transform="matrix(1.80439,0,0,1.80439,779.824,-414.625)">
+        <g transform="matrix(0.938345,0,0,1,22.325,0)">
+            <text x="362.097px" y="358.48px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:20px;fill:rgb(159,159,159);">b = 60  dla 1-99</text>
+        </g>
+        <g transform="matrix(0.938345,0,0,1,22.325,0)">
+            <g transform="matrix(20,0,0,20,578.097,378.48)">
+                <path d="M-0.82,0.01C-0.851,0.01 -0.875,0.001 -0.893,-0.018C-0.912,-0.036 -0.921,-0.06 -0.921,-0.091C-0.921,-0.122 -0.912,-0.147 -0.893,-0.165C-0.875,-0.183 -0.851,-0.192 -0.82,-0.192C-0.789,-0.192 -0.764,-0.183 -0.746,-0.165C-0.728,-0.147 -0.719,-0.122 -0.719,-0.091C-0.719,-0.06 -0.728,-0.036 -0.746,-0.018C-0.764,0.001 -0.789,0.01 -0.82,0.01ZM-0.3,0.01C-0.331,0.01 -0.355,0.001 -0.373,-0.018C-0.392,-0.036 -0.401,-0.06 -0.401,-0.091C-0.401,-0.122 -0.392,-0.147 -0.373,-0.165C-0.355,-0.183 -0.331,-0.192 -0.3,-0.192C-0.269,-0.192 -0.244,-0.183 -0.226,-0.165C-0.208,-0.147 -0.199,-0.122 -0.199,-0.091C-0.199,-0.06 -0.208,-0.036 -0.226,-0.018C-0.244,0.001 -0.269,0.01 -0.3,0.01ZM0.22,0.01C0.189,0.01 0.165,0.001 0.147,-0.018C0.128,-0.036 0.119,-0.06 0.119,-0.091C0.119,-0.122 0.128,-0.147 0.147,-0.165C0.165,-0.183 0.189,-0.192 0.22,-0.192C0.251,-0.192 0.276,-0.183 0.294,-0.165C0.312,-0.147 0.321,-0.122 0.321,-0.091C0.321,-0.06 0.312,-0.036 0.294,-0.018C0.276,0.001 0.251,0.01 0.22,0.01Z" style="fill:rgb(159,159,159);fill-rule:nonzero;"/>
+            </g>
+            <text x="362.097px" y="378.48px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:20px;fill:rgb(159,159,159);">b = 0,6 dla 100-</text>
+        </g>
     </g>
-    <g transform="matrix(1.72649,0,0,1.83993,0.121394,168.521)">
-        <text x="0px" y="0px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(0,163,110);">CEN<tspan x="27.879px 37.213px " y="0px 0px ">A </tspan>ZN<tspan x="59.76px 69.094px 78.68px 88.471px 100.471px " y="0px 0px 0px 0px 0px ">AKOWA</tspan>NIA</text>
-        <text x="137.139px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">= MAX(</text>
-        <text x="178.143px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(0,163,110);">Z</text>
-        <text x="188.807px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">•</text>
-        <text x="196.342px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">MARŻA<tspan x="239.221px 242.555px " y="0px 0px "> n</tspan>a ZNAKOW<tspan x="313.219px 321.885px " y="0px 0px ">AN</tspan>IE,</text>
-        <text x="348.557px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(0,163,110);">Z</text>
-        <text x="359.221px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">+ MINIMUM na ZNAKOW<tspan x="497.549px 506.215px " y="0px 0px ">AN</tspan>IE)</text>
+    <g transform="matrix(1.80439,0,0,1.80439,-508.99,-567.607)">
+        <path d="M1056.41,450.803C1025.68,495.836 1062.23,518.449 1120.1,535.93" style="fill:none;stroke:rgb(10,159,89);stroke-width:2.01px;"/>
     </g>
-    <g transform="matrix(1.72649,0,0,1.83993,1.22406,255.584)">
-        <text x="0px" y="0px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(197,43,67);">CAŁOŚĆ</text>
-        <text x="58.002px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">= MAX(</text>
-        <text x="99.006px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(197,43,67);">C</text>
-        <text x="111.006px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">•</text>
-        <text x="118.541px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">MARŻA<tspan x="161.42px 164.754px " y="0px 0px "> n</tspan>a CAŁOŚĆ,</text>
-        <text x="239.426px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(197,43,67);">C</text>
-        <text x="251.426px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">+ MINIMUM na CAŁOŚĆ)</text>
+    <g transform="matrix(0.971362,0.855081,-0.760887,0.864359,715.536,-1178.58)">
+        <path d="M1123,530L1129,542L1117,542L1123,530Z" style="fill:rgb(10,159,89);stroke:rgb(10,159,89);stroke-width:2.97px;"/>
     </g>
-    <g transform="matrix(1.72649,0,0,1.83993,0.627202,289.364)">
-        <text x="0px" y="0px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(53,152,255);">TRANSPOR<tspan x="73.887px " y="0px ">T</tspan></text>
-        <text x="85.887px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">= JEŚLI(</text>
-        <text x="133.57px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(255,148,28);">NC</text>
-        <text x="154.236px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">&gt;</text>
-        <text x="164.578px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">PRÓG TRANSPORTU,</text>
-        <text x="293.25px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;fill:rgb(124,124,124);">0</text>
-        <text x="299.924px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">, CENA<tspan x="340.148px 343.482px " y="0px 0px "> T</tspan>RANSPORTU</text>
-        <text x="426.814px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">)</text>
+    <g transform="matrix(1.0852,0,0,1.1565,262.12,-338.358)">
+        <text x="1123.49px" y="317.096px" style="font-family:'JetBrainsMono-ExtraBold', 'JetBrains Mono', monospace;font-weight:800;font-size:33.597px;fill:rgb(159,159,159);">PRZEDZIAŁY</text>
     </g>
-    <g transform="matrix(1.72649,0,0,1.83993,-0.981268,349.73)">
-        <text x="0px" y="0px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(144,144,144);">CEN<tspan x="27.879px 37.213px " y="0px 0px ">A </tspan>DLA N<tspan x="81.768px 91.102px " y="0px 0px ">AK</tspan>ŁADU</text>
-        <text x="141.1px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">=</text>
-        <text x="151.441px" y="0px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(197,43,67);">CAŁOŚĆ</text>
-        <text x="209.443px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">+</text>
-        <text x="219.785px" y="0px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(53,152,255);">TRANSPOR<tspan x="293.672px " y="0px ">T</tspan></text>
-    </g>
-    <g transform="matrix(1.72649,0,0,1.83993,-0.414763,135.022)">
-        <text x="0px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(0,163,110);">Z</text>
-        <text x="10.664px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">= JEŚLI(NAKŁAD = 1,</text>
-        <text x="139.359px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(0,163,110);">CZOPN</text>
-        <text x="184.693px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">+ PRZYGOT<tspan x="252.82px 262.154px 272.818px 281.484px " y="0px 0px 0px 0px ">OWAL</tspan>NIA,</text>
-        <text x="319.482px" y="0px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(0,163,110);">CZOPN</text>
-        <text x="364.816px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">• NAKŁAD + PRZYGOT<tspan x="494.473px 503.807px 514.471px 523.137px " y="0px 0px 0px 0px ">OWAL</tspan>NIA</text>
-        <text x="551.133px" y="0px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">)</text>
-    </g>
-    <g transform="matrix(1.72649,0,0,1.83993,-343.073,-147.199)">
-        <text x="298.733px" y="202.855px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;fill:rgb(197,43,67);">C</text>
-        <text x="310.733px" y="202.855px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">=</text>
-        <text x="321.075px" y="202.855px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(255,148,28);">CEN<tspan x="348.954px 358.288px " y="202.855px 202.855px ">A </tspan>PR<tspan x="380.085px 390.081px " y="202.855px 202.855px ">OD</tspan>UKTU</text>
-        <text x="441.403px" y="202.855px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:12px;">+</text>
-        <text x="451.745px" y="202.855px" style="font-family:'Arial-Black', 'Arial', sans-serif;font-weight:900;font-size:12px;fill:rgb(0,163,110);">CEN<tspan x="479.624px 488.958px " y="202.855px 202.855px ">A </tspan>ZN<tspan x="511.505px 520.839px 530.425px 540.216px 552.216px " y="202.855px 202.855px 202.855px 202.855px 202.855px ">AKOWA</tspan>NIA</text>
-    </g>
+    <defs>
+        <image id="_Image3" width="441px" height="138px" xlink:href="data:image/jpeg;base64,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"/>
+    </defs>
 </svg>

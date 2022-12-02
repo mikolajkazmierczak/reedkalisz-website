@@ -209,4 +209,10 @@
     display: block;
     opacity: 0.6;
   }
+
+  .questions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 </style>

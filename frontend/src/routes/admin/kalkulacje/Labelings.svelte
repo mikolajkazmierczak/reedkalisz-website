@@ -1,6 +1,5 @@
 <script>
   import { beforeNavigate } from '$app/navigation';
-  import { slide } from 'svelte/transition';
 
   import api from '$/api';
   import heimdall from '$/heimdall';
@@ -9,9 +8,10 @@
 
   import { read as fields, defaults } from '$/fields/labelings';
   import Icon from '$c/Icon.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
+  import HoverCircle from '$c/HoverCircle.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import HoverCircle from '$c/HoverCircle.svelte';
   import Popup from '@c/Popup.svelte';
 
   export let company;
@@ -314,6 +314,7 @@
       <tr>
         <th width="30" class="icon">
           <div class="icon"><Icon name="star" /></div>
+          <Tooltip label="Domyślne dla producenta" />
         </th>
         <th width="30" class="icon">
           <div class="icon"><Icon name="arrow_up" /></div>
@@ -325,24 +326,15 @@
           <div class="icon"><Icon name="delete" /></div>
         </th>
 
+        <th width="140">Nazwa</th>
         <th width="70">Kod</th>
-        <th width="70">Typ</th>
-        <th width="140" class="heavy-border">Nazwa</th>
-        <th width="70" title={'Przygotowalnia'}>
-          P <span class="info">🛈</span>
-        </th>
-        <th width="70" title={'Transport'}>
-          T <span class="info">🛈</span>
-        </th>
-        <th width="70" title={'Próg dla uwzględnienia transportu'}>
-          TP <span class="info">🛈</span>
-        </th>
-        <th width="70" title={'Marża'}>
-          M <span class="info">🛈</span>
-        </th>
-        <th width="70" title={'Minimum'} class="heavy-border">
-          MIN <span class="info">🛈</span>
-        </th>
+        <th width="70" class="heavy-border">Typ</th>
+
+        <th width="70" class="info"> M <Tooltip label="Marża" /> </th>
+        <th width="70" class="info"> MIN <Tooltip label="Minimum" /> </th>
+        <th width="70" class="info"> P <Tooltip label="Przygotowalnia" /> </th>
+        <th width="70" class="info"> T <Tooltip label="Cena transportu" /> </th>
+        <th width="70" class="info heavy-border"> TP <Tooltip label="Próg dla uwzględnienia transportu" /> </th>
 
         {#each amounts as amount, i}
           {@const firstLumpsumIndex = amounts.map((a, i) => (a == 1 ? i : null)).filter(i => i !== null)[0]}
@@ -412,14 +404,21 @@
             </button>
           </td>
 
+          <td class="input type">
+            <Input borderless bind:value={item.name} />
+          </td>
           <td class="input code">
             <Input borderless bind:value={item.code} />
           </td>
-          <td class="input type">
+          <td class="input type heavy-border">
             <Input borderless bind:value={item.type} />
           </td>
-          <td class="input type heavy-border">
-            <Input borderless bind:value={item.name} />
+
+          <td class="input margin">
+            <Input type="number" borderless min={0} step={0.01} bind:value={item.margin} />
+          </td>
+          <td class="input minimum ">
+            <Input type="number" borderless min={0} step={0.01} bind:value={item.minimum} />
           </td>
           <td class="input prepress">
             <Input type="number" borderless min={0} step={0.01} bind:value={item.prepress} />
@@ -427,14 +426,8 @@
           <td class="input transport">
             <Input type="number" borderless min={0} step={0.01} bind:value={item.transport} />
           </td>
-          <td class="input transportThreshold">
+          <td class="input transportThreshold heavy-border">
             <Input type="number" borderless min={0} step={0.01} bind:value={item.transport_threshold} />
-          </td>
-          <td class="input margin">
-            <Input type="number" borderless min={0} step={0.01} bind:value={item.margin} />
-          </td>
-          <td class="input minimum heavy-border">
-            <Input type="number" borderless min={0} step={0.01} bind:value={item.minimum} />
           </td>
 
           {#each item.prices as pa}
@@ -457,7 +450,7 @@
 
 <div class="edit-actions">
   {#if unsaved}
-    <div class="ui-pair" in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }}>
+    <div class="ui-pair">
       <Button icon="close" dangerous on:click={() => confirm('Jesteś pewny? Utracisz wszystkie postępy!') && cancel()}>
         Anuluj
       </Button>
@@ -471,7 +464,7 @@
       {/if}
     {/each}
   {:else}
-    <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }}>
+    <div>
       <Button icon="add" on:click={addLabeling}>Dodaj</Button>
     </div>
   {/if}
@@ -499,9 +492,7 @@
   th.amount:not(.fixed) {
     padding: 0;
   }
-  th span.info {
-    font-size: 0.85rem;
-    opacity: 0.5;
+  th.info {
     cursor: help;
   }
   td {
