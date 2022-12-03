@@ -42,7 +42,7 @@
       itemsCount={items.meta.filter_count}
       items={items.data}
       head={[
-        { checkbox: true, icon: 'eye' },
+        { checkbox: true, icon: 'eye', label: 'Widoczność' },
         { id: true, label: 'ID' },
         { label: 'Nazwa' },
         { blame: true, label: 'Utworzenie' },

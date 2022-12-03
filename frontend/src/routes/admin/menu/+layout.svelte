@@ -68,13 +68,13 @@
         {itemsCount}
         {items}
         head={[
-          { checkbox: true, icon: 'eye' },
+          { checkbox: true, icon: 'eye', label: 'Widoczność' },
           { id: true, label: 'ID' },
           { label: 'Tytuł' },
-          { checkbox: true, icon: 'folder' },
-          { checkbox: true, icon: 'products' },
-          { checkbox: true, icon: 'categories' },
-          { checkbox: true, icon: 'pages' },
+          { checkbox: true, icon: 'folder', label: 'Folder' },
+          { checkbox: true, icon: 'products', label: 'Element: Produkt' },
+          { checkbox: true, icon: 'categories', label: 'Element: Kategoria' },
+          { checkbox: true, icon: 'pages', label: 'Element: Strona' },
           { label: 'Element' },
           { blame: true, label: 'Utworzenie' },
           { blame: true, label: 'Aktualizacja' }

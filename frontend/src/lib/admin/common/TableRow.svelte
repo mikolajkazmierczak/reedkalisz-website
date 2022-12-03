@@ -8,6 +8,7 @@
   import { treeGetItem, treeGetItemAtPath, treeMoveItemToPath } from '$/utils';
 
   import Icon from '$c/Icon.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
   import Blame from '@c/Blame.svelte';
 
   const dispatch = createEventDispatcher();
@@ -172,21 +173,29 @@
   <div class="row row--head" style:grid-template-columns={widths}>
     {#if tree}
       <div class="value value--head value--center">
-        <div><div class="icon"><div><Icon name="text_bullet_list_add" dark /></div></div></div>
+        <div>
+          <Tooltip label="Dodawanie podkategorii" />
+          <div class="icon"><div><Icon name="text_bullet_list_add" dark /></div></div>
+        </div>
       </div>
     {/if}
     {#if tree || order}
       <div class="value value--head value--center">
-        <div><div class="icon"><div><Icon name="hierarchy" dark /></div></div></div>
+        <div>
+          <Tooltip label="Hierarchia" />
+          <div class="icon"><div><Icon name="hierarchy" dark /></div></div>
+        </div>
       </div>
     {/if}
     {#each head as { checkbox, label, icon }}
       <div class="value value--head" class:center={checkbox}>
         <div>
           {#if icon}
-            <div class="icon" style:margin-right={label ? '0.25rem' : '0'}><div><Icon name={icon} dark /></div></div>
+            {#if label}<Tooltip {label} />{/if}
+            <div class="icon"><div><Icon name={icon} dark /></div></div>
+          {:else if label}
+            {label}
           {/if}
-          {#if label}{label}{/if}
         </div>
       </div>
     {/each}

@@ -160,8 +160,9 @@
       ids.push(item.id);
     }
 
-    heimdall.emit('labelings', ids);
+    // TODO: items are refreshing on the page back to old sorting
     itemsOriginal = deep.copy(items);
+    heimdall.emit('labelings', ids);
   }
 
   function removeStart(i) {

@@ -42,9 +42,9 @@
       itemsCount={items.meta.filter_count}
       items={items.data}
       head={[
-        { checkbox: true, icon: 'alert_urgent' },
-        { checkbox: true, icon: 'products' },
-        { checkbox: true, icon: 'attach' },
+        { checkbox: true, icon: 'alert_urgent', label: 'Źródło: Kontakt' },
+        { checkbox: true, icon: 'products', label: 'Źródło: Produkt' },
+        { checkbox: true, icon: 'attach', label: 'Zawiera załącznik' },
         { thin: true, label: 'Spam' },
         { id: true, label: 'ID' },
         { label: 'Imię i nazwisko' },

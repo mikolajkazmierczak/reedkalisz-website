@@ -50,7 +50,7 @@
       {itemsCount}
       {items}
       head={[
-        { checkbox: true, icon: 'eye' },
+        { checkbox: true, icon: 'eye', label: 'Widoczność' },
         { id: true, label: 'ID' },
         { label: 'Nazwa' },
         { blame: true, label: 'Utworzenie' },

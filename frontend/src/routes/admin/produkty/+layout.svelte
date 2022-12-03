@@ -63,9 +63,9 @@
         itemsCount={products.meta.filter_count}
         items={products.data}
         head={[
-          { checkbox: true, icon: 'eye' },
-          { checkbox: true, icon: 'new' },
-          { checkbox: true, icon: 'sale' },
+          { checkbox: true, icon: 'eye', label: 'Widoczność' },
+          { checkbox: true, icon: 'new', label: 'Nowość' },
+          { checkbox: true, icon: 'sale', label: 'Promocja' },
           { id: true, label: 'ID' },
           { label: 'Kod' },
           { label: 'Nazwa' },

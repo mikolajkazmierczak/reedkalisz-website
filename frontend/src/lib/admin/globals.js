@@ -80,12 +80,12 @@ class Globals {
     const isPopulated = get(store) != null;
     const shouldRead = !isPopulated && !ids && !refresh; // not populated AND neither ids nor refresh given
     const shouldUpdate = isPopulated && (ids || refresh); // populated AND either ids or refresh given
-    // console.log('$globals update:', global, { ids, refresh, sortingKey }, shouldRead);
+    // console.log('$globals update:', global, { ids, refresh, sortingKey }, shouldRead, shouldUpdate);
     if (!(shouldRead || shouldUpdate)) return;
 
     const { collection, singleton } = collections.find(c => c.store === store);
 
-    // console.log('$globals read:', collection, ids, refresh);
+    // console.log('$globals read:', collection, singleton);
     if (singleton) {
       // update singleton
       store.set(await api.singleton(collection).read());
