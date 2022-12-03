@@ -27,7 +27,6 @@
   async function read(limit, page, query, category) {
     const filter = category ? { categories: { category: { _eq: category } } } : {};
     products = await api.items('products').readByQuery({ fields, filter, limit, page, search: query, meta: '*' });
-    // console.log('read: products');
   }
 
   $: $categories && read(limit, page, query, category);

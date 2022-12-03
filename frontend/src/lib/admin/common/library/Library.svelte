@@ -24,8 +24,6 @@
   export let picker = false;
   export let selected = null;
 
-  $: console.log(selected);
-
   let files;
   let filesMeta;
 

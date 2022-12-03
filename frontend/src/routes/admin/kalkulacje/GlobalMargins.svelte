@@ -61,7 +61,7 @@
 <div class="wrapper">
   <div class="margins">
     <div>
-      <h4 style:color="#f90">Na produkt</h4>
+      <h4 style:color="#f90">Produkt</h4>
       <div class="ui-pair">
         <div class="input">
           <Input type="number" bind:value={data.product_margin}>Marża</Input>
@@ -75,7 +75,7 @@
     </div>
     <div class="bar" />
     <div>
-      <h4 style:color="#cc001d">Na całość</h4>
+      <h4 style:color="#cc001d">Całość</h4>
       <div class="ui-pair">
         <div class="input">
           <Input type="number" bind:value={data.full_margin}>Marża</Input>

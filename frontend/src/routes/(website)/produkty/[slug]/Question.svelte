@@ -20,7 +20,6 @@
     if (files.length) {
       const form = new FormData();
       form.append('file', files[0]);
-      console.log(form);
       return await api.files.createOne(form);
     }
     return null;
@@ -47,7 +46,6 @@
     } catch (e) {
       // unexpected errors
       errors.form = `Wystąpił błąd: ${e.message}`;
-      console.log(e);
     }
   }
 </script>

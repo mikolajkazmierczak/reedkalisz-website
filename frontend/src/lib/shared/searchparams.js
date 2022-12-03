@@ -92,7 +92,6 @@ export class SearchParams {
     // null -> remove param from url
     const url = get(page).url;
     if (this.pathname != url.pathname) return;
-    // console.log('writeURL', newParams);
 
     for (const [key, value] of Object.entries(newParams)) {
       if (value == null) url.searchParams.delete(key);

@@ -27,7 +27,7 @@
       </div>
     </h3>
   </div>
-  <div class="amount"><small>Ilość:</small> {@html amount || '<small>Na stanie</small>'}</div>
+  <div class="amount"><small>Ilość:</small> {@html amount ?? '<small>Na stanie</small>'}</div>
   <Gallery imgs={img} small />
 </div>
 

@@ -49,7 +49,6 @@
   const mainGallery = getMainGalleryImgs(gallery, storage);
   const showCustomPrices = custom_prices.some(p => p.enabled);
   const showLabelingsPrices = labelings.some(l => l.prices.some(p => p.enabled));
-  console.log(labelings);
 </script>
 
 <svelte:head>

@@ -244,7 +244,6 @@ export async function recalculateProducts(filter, { newPriceView = null, swapLab
   };
 
   const products = (await api.items('products').readByQuery({ fields: productFields, filter })).data;
-  console.log('affected:', products);
 
   // recalculate each product concurrently
   await Promise.all(

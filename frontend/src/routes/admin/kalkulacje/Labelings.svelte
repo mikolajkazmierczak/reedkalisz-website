@@ -312,9 +312,9 @@
   <div class="wrapper">
     <table class="ui-table">
       <tr>
-        <th width="30" class="icon">
-          <div class="icon"><Icon name="star" /></div>
+        <th width="30" class="icon info">
           <Tooltip label="Domyślne dla producenta" />
+          <div class="icon"><Icon name="star" /></div>
         </th>
         <th width="30" class="icon">
           <div class="icon"><Icon name="arrow_up" /></div>
@@ -330,20 +330,25 @@
         <th width="70">Kod</th>
         <th width="70" class="heavy-border">Typ</th>
 
-        <th width="70" class="info" style:color="#0A9f59">
-          M <Tooltip label="Marża" />
+        <th width="70" class="info">
+          <Tooltip label="Marża" />
+          <span style:color="#0A9f59">M</span>
         </th>
-        <th width="70" class="info" style:color="#0A9f59">
-          MIN <Tooltip label="Minimum" />
+        <th width="70" class="info">
+          <Tooltip label="Minimum" />
+          <span style:color="#0A9f59">MIN</span>
         </th>
-        <th width="70" class="info" style:color="#0089ff">
-          P <Tooltip label="Przygotowalnia" />
+        <th width="70" class="info">
+          <Tooltip label="Przygotowalnia" />
+          <span style:color="#0089ff">P</span>
         </th>
-        <th width="70" class="info" style:color="#6604C2">
-          T <Tooltip label="Cena transportu" />
+        <th width="70" class="info">
+          <Tooltip label="Cena transportu" />
+          <span style:color="#6604C2">T</span>
         </th>
-        <th width="70" class="info heavy-border" style:color="#6604C2">
-          TP <Tooltip label="Próg dla uwzględnienia transportu" />
+        <th width="70" class="info heavy-border">
+          <Tooltip label="Próg dla uwzględnienia transportu" />
+          <span style:color="#6604C2">TP</span>
         </th>
 
         {#each amounts as amount, i}
@@ -504,6 +509,8 @@
   }
   th.info {
     cursor: help;
+  }
+  th.info span {
     font-weight: bold;
   }
   td {

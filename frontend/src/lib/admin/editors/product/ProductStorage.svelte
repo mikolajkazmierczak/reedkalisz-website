@@ -1,6 +1,7 @@
 <script>
   import { globals, colors } from '@/globals';
   import { moveItem } from '$/utils';
+  import Tooltip from '$c/Tooltip.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Picker from '@c/library/Picker.svelte';
@@ -110,7 +111,10 @@
                   <div class="img-actions img-actions--switches">
                     <Input type="checkbox" bind:value={img.enabled}>Włączone</Input>
                     <Input type="checkbox" bind:value={img.show_in_gallery}>
-                      <span title={'Czy pokazywać zdjęcie również na końcu galerii'}>Galeria&nbsp;🛈</span>
+                      Galeria
+                      <span class="info">
+                        🛈<Tooltip label="Dołącza zdjęcie na końcu głównej galerii" />
+                      </span>
                     </Input>
                   </div>
                 </div>
@@ -179,5 +183,8 @@
     height: 1rem;
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     border: var(--border-light);
+  }
+  .info {
+    cursor: help;
   }
 </style>

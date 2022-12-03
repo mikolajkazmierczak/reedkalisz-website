@@ -150,20 +150,20 @@
               {/if}
 
               <ProductPricingMargins
-                text="na całość"
-                globalMargin={$globalMargins.full_margin}
-                globalMinimum={$globalMargins.full_minimum}
-                bind:globalEnabled={product.global_full_margin}
-                bind:margin={product.full_margin}
-                bind:minimum={product.full_minimum}
-              />
-              <ProductPricingMargins
                 text="na produkt"
                 globalMargin={$globalMargins.product_margin}
                 globalMinimum={$globalMargins.product_minimum}
                 bind:globalEnabled={product.global_product_margin}
                 bind:margin={product.product_margin}
                 bind:minimum={product.product_minimum}
+              />
+              <ProductPricingMargins
+                text="na całość"
+                globalMargin={$globalMargins.full_margin}
+                globalMinimum={$globalMargins.full_minimum}
+                bind:globalEnabled={product.global_full_margin}
+                bind:margin={product.full_margin}
+                bind:minimum={product.full_minimum}
               />
             </div>
           {:else}

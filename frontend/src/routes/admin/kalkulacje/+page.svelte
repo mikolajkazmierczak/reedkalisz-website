@@ -39,7 +39,7 @@
         </p>
       </div>
       <div class="ui-box">
-        <h3 class="ui-h3 title">Globalne marże</h3>
+        <h3 class="ui-h3 title">Odgórne marże</h3>
         <GlobalMargins data={$globalMargins} />
       </div>
       <div class="ui-box">

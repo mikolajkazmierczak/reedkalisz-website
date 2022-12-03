@@ -92,7 +92,7 @@ class Globals {
     } else {
       const fields = collectionsFields[collection].read;
       if (ids) {
-        updateItemsWithIDs(store, collection, ids, sortingKey, fields);
+        await updateItemsWithIDs(store, collection, ids, sortingKey, fields);
       } else await updateAllItems(store, collection, fields);
     }
   };
