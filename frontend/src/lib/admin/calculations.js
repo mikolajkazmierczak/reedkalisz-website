@@ -39,8 +39,9 @@ function matchLabelingPriceRange(amount, pricesPerAmount) {
   pricesPerAmount.sort((a, b) => a.amount - b.amount);
   let matchingRange = null;
   for (let range of pricesPerAmount) {
-    if (range.price && range.amount <= amount) matchingRange = range; // price must be defined
-    else break;
+    if (range.amount <= amount) {
+      if (range.price) matchingRange = range; // empty prices are ingnored, prices set to 0 are treated as mistakes
+    } else break;
   }
   if (matchingRange === null) return { price: 0, isLumpsum: false };
   return { price: matchingRange.price, isLumpsum: matchingRange.amount == 1 };
@@ -54,7 +55,7 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   prepress = sanitize(prepress); // number
   extra = sanitize(extra); // number
   transport = sanitize(transport); // number
-  transportThreshold = sanitize(transportThreshold); // number
+  // transportThreshold // number -- not sanitized because 0 means free transport
 
   const productPrice = amount * product.price;
   const productPriceWithMargin = Math.max(productPrice * fraction(product.margin), productPrice + product.minimum);
@@ -66,7 +67,7 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   const price = productPriceWithMargin + labelingPriceWithMargin;
   const singlePrice = Math.max(price * fraction(full.margin), price + full.minimum);
 
-  const transportPrice = productPrice > transportThreshold ? 0 : 20; // TODO: this should be revisited
+  const transportPrice = transportThreshold != null && productPrice > transportThreshold ? 0 : transport;
   const fullPrice = singlePrice + extra + transportPrice;
   return round(fullPrice / amount);
 }
