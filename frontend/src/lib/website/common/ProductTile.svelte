@@ -151,8 +151,9 @@
   }
 
   .img-wrapper {
-    aspect-ratio: 1 / 1;
     padding: 5%;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     background-color: #fff;
   }
   .img-wrapper img {
@@ -161,6 +162,7 @@
     border-radius: 10px 10px 0 0;
     width: 100%;
     height: 100%;
+    aspect-ratio: 1 / 1;
   }
 
   .info {
