@@ -4,12 +4,12 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
-  import { edit as fields, defaults } from '$/fields/products';
-  import { deep, slugify, diff, makeTree, treeFlatten, moveItem } from '$/utils';
+  import { edit as fields, defaults } from '%/fields/products';
+  import { deep, slugify, diff, makeTree, treeFlatten, moveItem } from '%/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { globals, users, companies, categories } from '@/globals';
+  import { globals, users, companies, categories, commercialDetails } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
@@ -27,12 +27,15 @@
   let itemOriginal;
   let itemDiff;
 
-  let errors = { code: null };
+  let errors = { code: null, materials: null };
+  $: commercialDetailsOptions =
+    $commercialDetails &&
+    [{ id: null, text: '---' }].concat($commercialDetails.map(({ id, name }) => ({ id, text: name })));
 
   async function save(action) {
     try {
       await action();
-      errors = { code: null };
+      errors = { code: null, materials: null };
     } catch (e) {
       if (e.message == 'Field "code" has to be unique.') {
         errors.code = 'Kod musi być unikalny.';
@@ -46,6 +49,7 @@
 
   async function read() {
     await globals.update(companies);
+    await globals.update(commercialDetails);
     await globals.update(categories);
 
     if (slug == '+') {
@@ -75,12 +79,16 @@
   read();
 
   $: if (item)
-    item.slug = slugify([item?.code, item?.name], [itemOriginal?.code, itemOriginal?.name], itemOriginal?.slug);
+    item.slug = slugify([item?.code, item?.name], {
+      key: true,
+      partsOriginal: [itemOriginal?.code, itemOriginal?.name],
+      slugOriginal: itemOriginal?.slug
+    });
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed, html }) => {
     itemDiff = html;
-    $unsaved = correctSlug && changed;
+    $unsaved = !errors.materials && correctSlug && changed;
   });
 
   heimdall.listen(({ match, me }) => {
@@ -149,17 +157,17 @@
           </div>
           <div class="ui-box">
             <h3 class="ui-h3">API</h3>
-            <Input
-              type="select"
-              bind:value={item.company}
-              options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
-            >
-              Producent
-            </Input>
             <div class="ui-pair">
+              <Input
+                type="select"
+                bind:value={item.company}
+                options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
+              >
+                Producent
+              </Input>
               <Input bind:value={item.api_code}>Kod</Input>
-              <Input bind:value={item.api_id}>ID</Input>
             </div>
+            <Input type="checkbox" bind:value={item.api_enabled}>Włączone</Input>
           </div>
         </div>
 
@@ -207,7 +215,7 @@
     <section class="ui-section">
       <h2 class="ui-h2">Opis</h2>
       <div class="ui-section__row">
-        <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
+        <div class="ui-section__col ui-box" style:grid-column={'1 / span 2'}>
           <div class="ui-pair ui-texteditor">
             <div class="ui-texteditor__draft">
               <Input
@@ -219,9 +227,36 @@
             </div>
             <div class="ui-texteditor__render">
               {#if item.description}
-                {@html marked.parse(item.description)}
+                {@const post =
+                  item.commercial_details !== null &&
+                  $commercialDetails.find(c => c.id === item.commercial_details).content}
+                {@html marked.parse(item.description + (post ? '\n' + post : ''))}
               {/if}
             </div>
+          </div>
+        </div>
+        <div class="ui-section__col">
+          <div class="ui-box">
+            <Input type="select" bind:value={item.commercial_details} options={commercialDetailsOptions}>
+              Informacje handlowe
+            </Input>
+          </div>
+          <div class="ui-box">
+            <h3 class="ui-h3">Detale</h3>
+            <div class="sizes">
+              <Input type="number" min="0" step="0.01" bind:value={item.size_x}>Rozmiar <small>mm</small></Input>
+              <Input type="number" min="0" step="0.01" bind:value={item.size_y} />
+              <Input type="number" min="0" step="0.01" bind:value={item.size_z} />
+            </div>
+            <Input
+              type="list"
+              placeholder="np. stal;plastik"
+              bind:value={item.materials}
+              bind:error={errors.materials}
+              listDisallowNumbers
+            >
+              Materiały
+            </Input>
           </div>
         </div>
       </div>
@@ -244,5 +279,10 @@
   } */
   .category.main {
     outline: var(--outline-dashed);
+  }
+  .sizes {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
   }
 </style>

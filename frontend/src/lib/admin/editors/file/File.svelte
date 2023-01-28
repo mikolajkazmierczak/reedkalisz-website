@@ -2,9 +2,9 @@
   import { goto } from '$app/navigation';
   import api, { baseUrl } from '$/api';
   import heimdall from '$/heimdall';
-  import { filetypeToReadable, bytesToReadable } from '$/utils';
+  import { filetypeToReadable, bytesToReadable } from '%/utils';
 
-  import { edit as fields } from '$/fields/directus_files';
+  import { edit as fields } from '%/fields/directus_files';
   import Upload from '@c/library/Upload.svelte';
   import Editor from '@/editors/Editor.svelte';
   import Button from '@c/Button.svelte';

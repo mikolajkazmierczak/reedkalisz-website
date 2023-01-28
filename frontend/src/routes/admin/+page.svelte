@@ -9,9 +9,10 @@
       title: 'Produkty',
       buttons: [
         { title: 'Produkty', icon: 'products', href: '/admin/produkty' },
+        { title: 'Kolory', icon: 'colors', href: '/admin/kolory' },
         { title: 'Kategorie', icon: 'categories', href: '/admin/kategorie' },
-        { title: 'Kalkulacje', icon: 'calculator', href: '/admin/kalkulacje' },
-        { title: 'Kolory', icon: 'colors', href: '/admin/kolory' }
+        { title: 'Informacje handlowe', icon: 'commercial_details', href: '/admin/informacje-handlowe' },
+        { title: 'Kalkulacje', icon: 'calculator', href: '/admin/kalkulacje' }
       ]
     },
     {
@@ -32,6 +33,10 @@
     }
   ];
 </script>
+
+<svelte:head>
+  <title>Admin | REED Kalisz</title>
+</svelte:head>
 
 {#each buttons as button}
   <div class="section">
@@ -65,12 +70,14 @@
   a {
     display: inline-flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     padding: 2rem 1rem;
     text-decoration: none;
     border-radius: var(--border-radius);
     width: 20ch;
     color: var(--light);
+    text-align: center;
     background-color: var(--primary);
     transition: background-color 100ms ease;
   }

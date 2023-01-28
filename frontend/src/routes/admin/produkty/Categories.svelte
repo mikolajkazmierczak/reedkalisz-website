@@ -1,5 +1,5 @@
 <script>
-  import { makeTree } from '$/utils';
+  import { makeTree } from '%/utils';
   import { globals, categories } from '@/globals';
   import Category from './Category.svelte';
 

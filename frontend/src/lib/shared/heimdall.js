@@ -35,6 +35,16 @@ class Socket {
     };
     this.socket.emit('changes', data);
   }
+
+  onFetch(listener) {
+    this.socket.on('fetch', listener);
+  }
+  offFetch(listener) {
+    this.socket.off('fetch', listener);
+  }
+  emitFetch(companyName, data) {
+    this.socket.emit('fetch', { companyName, data });
+  }
 }
 
 class Heimdall {
@@ -45,7 +55,6 @@ class Heimdall {
   emit(collection, ids, options) {
     this.socket.emitChanges(collection, ids, options);
   }
-
   listen(func, root = false) {
     const listener = data => {
       const match = (collection, ids) => this.match(data, collection, ids);
@@ -62,17 +71,28 @@ class Heimdall {
     });
   }
 
-  match(data, collection, ids = null) {
-    // check if:
-    // - collection matches
-    // - optionally check if any ids from `data.ids` are in `ids`
-    return data.collection === collection && (ids === null || this.filter(data, ids).length != 0);
+  ask(companyName, data) {
+    this.socket.emitFetch(companyName, data);
+  }
+  get(func, root = false) {
+    this.socket.onFetch(func);
+
+    onDestroy(() => {
+      this.socket.offFetch(func);
+      if (root) this.socket.close();
+    });
   }
 
   filter(data, ids = null) {
     // get ids from `data.ids` that are in `ids`
     if (ids && !Array.isArray(ids)) ids = [ids];
     return ids ? data.ids.filter(id => ids.includes(id)) : [];
+  }
+  match(data, collection, ids = null) {
+    // check if:
+    // - collection matches
+    // - optionally check if any ids from `data.ids` are in `ids`
+    return data.collection === collection && (ids === null || this.filter(data, ids).length != 0);
   }
 }
 

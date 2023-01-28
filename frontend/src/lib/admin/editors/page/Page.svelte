@@ -3,8 +3,8 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { edit as fields, defaults } from '$/fields/pages';
-  import { deep, slugify, diff } from '$/utils';
+  import { edit as fields, defaults } from '%/fields/pages';
+  import { deep, slugify, diff } from '%/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
@@ -35,7 +35,12 @@
 
   read();
 
-  $: if (item) item.slug = slugify(item?.name, itemOriginal?.name, itemOriginal?.slug);
+  $: if (item)
+    item.slug = slugify(item?.name, {
+      key: true,
+      partsOriginal: itemOriginal?.name,
+      slugOriginal: itemOriginal?.slug
+    });
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
@@ -101,7 +106,7 @@
     </section>
 
     <section class="ui-section">
-      <h2 class="ui-h2">Opis</h2>
+      <h2 class="ui-h2">Zawartość</h2>
       <div class="ui-section__row">
         <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
           <div class="ui-pair ui-texteditor">

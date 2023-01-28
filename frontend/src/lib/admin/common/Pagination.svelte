@@ -1,5 +1,5 @@
 <script>
-  import { range } from '$/utils';
+  import { range } from '%/utils';
   import Input from '@c/Input.svelte';
   import Icon from '$c/Icon.svelte';
 

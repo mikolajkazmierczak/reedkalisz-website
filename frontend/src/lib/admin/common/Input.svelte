@@ -1,7 +1,8 @@
 <script>
   import { nanoid } from 'nanoid';
-  import { deep } from '$/utils';
+  import { deep } from '%/utils';
   import Icon from '$c/Icon.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
   import Button from '@c/Button.svelte';
 
   export let input = null;
@@ -243,7 +244,8 @@
   {/if}
 
   {#if api}
-    <div class="api-icon" title="Ta wartość będzie aktualizowana przez API">
+    <div class="api-icon">
+      <Tooltip label="Ta wartość będzie aktualizowana przez API" />
       <Icon name="api" light />
     </div>
   {/if}
@@ -403,10 +405,11 @@
   }
 
   .api-icon {
+    cursor: help;
     position: absolute;
-    bottom: 0;
-    left: 0;
-    transform: translate(-50%, 50%);
+    bottom: calc(-1.25rem / 2);
+    left: calc(-1.25rem / 2);
+    /* transform: translate(-50%, 50%); cannot be used, Tooltip would be shifted */
     width: 1.25rem;
     height: 1.25rem;
     padding: 0.1rem;

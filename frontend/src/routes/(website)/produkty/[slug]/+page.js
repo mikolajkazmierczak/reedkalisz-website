@@ -1,5 +1,4 @@
 import api from '$/api';
-import { SearchParams } from '$/searchparams';
 
 const productFields = [
   'id',
@@ -12,6 +11,11 @@ const productFields = [
   'seo_title',
   'seo_description',
   'description',
+  'commercial_details.content',
+  'size_x',
+  'size_y',
+  'size_z',
+  'materials',
 
   'categories.id',
   'categories.index',

@@ -1,0 +1,15 @@
+# General
+HOST="0.0.0.0"
+PORT=999
+API="http://localhost:8055"
+
+# Directus
+DIRECTUS_TOKEN="xxx"
+
+# PAR
+API_USERNAME_PAR="login"
+API_PASSWORD_PAR="password"
+
+# Macma
+API_USERNAME_MACMA="login"
+API_PASSWORD_MACMA="password"

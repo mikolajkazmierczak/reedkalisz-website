@@ -22,6 +22,11 @@
     seo_title,
     seo_description,
     description,
+    commercial_details,
+    size_x,
+    size_y,
+    size_z,
+    materials,
     categories,
     custom_prices_with_labeling,
     labeling_field_x,
@@ -36,30 +41,31 @@
   function getMainGalleryImgs(gallery, storage) {
     const imgs = [];
     for (const img of gallery) {
-      imgs.push(img);
+      if (img.enabled) imgs.push(img);
     }
     for (const s of storage) {
       for (const img of s.img) {
-        imgs.push(img);
+        if (img.enabled && img.show_in_gallery) imgs.push(img);
       }
     }
     return imgs;
   }
 
-  const mainGallery = getMainGalleryImgs(gallery, storage);
+  const mainGalleryImgs = getMainGalleryImgs(gallery, storage);
   const showCustomPrices = custom_prices.some(p => p.enabled);
   const showLabelingsPrices = labelings.some(l => l.prices.some(p => p.enabled));
+  const size = [size_x, size_y, size_z].filter(s => s).join('mm x ') + 'mm';
 </script>
 
 <svelte:head>
-  <title>{seo_title} - {code} | REED Kalisz</title>
+  <title>{code} - {seo_title} | REED Kalisz</title>
   <meta name="description" content={seo_description} />
 </svelte:head>
 
 <div class="wrapper">
   <div class="column left">
     <div class="gallery">
-      <Gallery imgs={mainGallery} />
+      <Gallery imgs={mainGalleryImgs} />
     </div>
 
     {#if storage.length}
@@ -82,7 +88,19 @@
     <h1 class="title">{name}</h1>
     <h2 class="code">{code}</h2>
     {#if description}
-      <div class="description">{@html marked.parse(description)}</div>
+      {@const post = commercial_details ? commercial_details.content : null}
+      <div class="description">
+        {@html marked.parse(description + (post ? '\n' + post : ''))}
+      </div>
+      {#if size_x || size_y || size_z}
+        <p><b>Rozmiar:</b> {size}</p>
+      {/if}
+      {#if materials.length}
+        <p>
+          <b>Materiał{materials.length > 1 ? 'y' : ''}:</b>
+          {materials.join(', ')}
+        </p>
+      {/if}
     {/if}
 
     {#if showCustomPrices || showLabelingsPrices}

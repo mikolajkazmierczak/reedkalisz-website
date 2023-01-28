@@ -27,6 +27,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Admin | Kalkulacje | REED Kalisz</title>
+</svelte:head>
+
 <div class="wrapper">
   {#if $globalMargins && $priceViews}
     <sidebar>

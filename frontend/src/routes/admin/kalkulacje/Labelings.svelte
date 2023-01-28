@@ -3,10 +3,10 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { deep, diff, moveItem, reuseIDs } from '$/utils';
+  import { deep, diff, moveItem, reuseIDs } from '%/utils';
   import { recalculateProducts } from '@/calculations';
 
-  import { read as fields, defaults } from '$/fields/labelings';
+  import { read as fields, defaults } from '%/fields/labelings';
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
   import HoverCircle from '$c/HoverCircle.svelte';

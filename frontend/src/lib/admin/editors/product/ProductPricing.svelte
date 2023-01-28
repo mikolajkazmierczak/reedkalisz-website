@@ -1,7 +1,7 @@
 <script>
-  import { deep, moveItem } from '$/utils';
-  import { recalculateLabelings, toggleCustomPrices } from '@/calculations';
-  import { repairPrices, cleanupPrices } from '@/calculationsPrices';
+  import { deep, moveItem } from '%/utils';
+  import { recalculateLabelings, toggleCustomPrices } from '%/calculations';
+  import { repairPrices, cleanupPrices } from '%/calculationsPrices';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
 

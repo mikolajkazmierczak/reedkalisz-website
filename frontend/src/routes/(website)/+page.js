@@ -1,6 +1,6 @@
 import api from '$/api';
 import { SearchParams } from '$/searchparams';
-import { treeGetAllChildrenIDs } from '$/utils';
+import { treeGetAllChildrenIDs } from '%/utils';
 
 const fields = [
   'id',

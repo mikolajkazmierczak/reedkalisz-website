@@ -62,17 +62,18 @@
   function getImgs(gallery, storage) {
     const imgs = [];
     for (const { enabled, img } of gallery) {
-      imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=thumb` });
+      if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=thumb` });
     }
     for (const s of storage) {
       for (const { enabled, img } of s.img) {
-        imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=thumb` });
+        if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=thumb` });
       }
     }
     return imgs;
   }
 
   function setImg(i) {
+    if (!imgs.length) return;
     img = imgs[i];
   }
 
@@ -94,7 +95,7 @@
   </div>
 
   <div class="img-wrapper">
-    {#if img}<img src={img.src} alt="" class:enabled={img.enabled} />{/if}
+    {#if img}<img src={img.src} alt="" />{/if}
   </div>
 
   <div class="info">
@@ -111,7 +112,7 @@
       {:else}
         <small class="empty">Zapytaj o cenę</small>
       {/if}
-      {#if price.type == 'labeling' || custom_prices_with_labeling}
+      {#if price.value != null && (price.type == 'labeling' || custom_prices_with_labeling)}
         <div class="with-labeling">Ze znakowaniem</div>
       {/if}
     </div>

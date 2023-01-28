@@ -1,6 +1,6 @@
 import api from '$/api';
 import { nanoid } from 'nanoid';
-import { makeTree, treeGetItem, treeRefreshMetaAndParent } from '$/utils';
+import { makeTree, treeGetItem, treeRefreshMetaAndParent } from '%/utils';
 import { menu, categories } from '#/stores';
 
 const menuFields = [

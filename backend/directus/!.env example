@@ -1,0 +1,43 @@
+# https://docs.directus.io/configuration/config-options/
+
+# General
+HOST="0.0.0.0"
+PORT=8055
+PUBLIC_URL="/"
+
+# Database
+DB_CLIENT="sqlite3"
+DB_FILENAME="./data.db"
+
+# Security
+KEY="xxx"
+SECRET="xxx"
+ACCESS_TOKEN_TTL="15m"
+REFRESH_TOKEN_TTL="7d"
+REFRESH_TOKEN_COOKIE_SECURE=false
+REFRESH_TOKEN_COOKIE_SAME_SITE="lax"
+REFRESH_TOKEN_COOKIE_NAME="directus_refresh_token"
+
+# Rate Limiting
+RATE_LIMITER_ENABLED=false
+
+# Cache
+CACHE_ENABLED=false
+
+# CORS
+CORS_ENABLED=true
+CORS_ORIGIN=true
+
+# File Storage
+STORAGE_LOCATIONS="local"
+STORAGE_LOCAL_DRIVER="local"
+STORAGE_LOCAL_ROOT="./uploads"
+
+# Extensions
+EXTENSIONS_PATH="./extensions"
+
+# Email
+EMAIL_FROM="no-reply@directus.io"
+EMAIL_TRANSPORT="sendmail"
+EMAIL_SENDMAIL_NEW_LINE="unix"
+EMAIL_SENDMAIL_PATH="/usr/sbin/sendmail"

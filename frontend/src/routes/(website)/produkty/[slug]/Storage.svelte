@@ -28,7 +28,8 @@
     </h3>
   </div>
   <div class="amount"><small>Ilość:</small> {@html amount ?? '<small>Na stanie</small>'}</div>
-  <Gallery imgs={img} small />
+
+  <Gallery imgs={img.filter(img => img.enabled)} small />
 </div>
 
 <style>

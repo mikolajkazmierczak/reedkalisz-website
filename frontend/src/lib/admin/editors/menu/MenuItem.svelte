@@ -2,8 +2,8 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
-  import { edit as fields, defaults } from '$/fields/menu_items';
-  import { deep, diff, makeTree, treeFlatten } from '$/utils';
+  import { edit as fields, defaults } from '%/fields/menu_items';
+  import { deep, diff, makeTree, treeFlatten } from '%/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';

@@ -1,6 +1,6 @@
 <script>
   import { baseUrl } from '$/api';
-  import { getDatetime } from '$/datetime';
+  import { parseDatetime } from '$/datetime';
   import { users } from '@/globals';
 
   export let user;
@@ -23,7 +23,7 @@
 
   {#if datetime}
     <div class="time">
-      {getDatetime(datetime).str()}
+      {parseDatetime(datetime).str()}
     </div>
   {/if}
 </div>

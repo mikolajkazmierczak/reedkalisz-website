@@ -5,8 +5,8 @@ import { get } from 'svelte/store';
 import api from '$/api';
 import heimdall from '$/heimdall';
 import { unsaved } from '@/stores';
-import { deep, deleteFields } from '$/utils';
-import fields from '$/fields';
+import { deep, deleteFields } from '%/utils';
+import fields from '%/fields';
 
 function checkRoot(root) {
   if (!root) throw new Error('Root pathname was not provided');

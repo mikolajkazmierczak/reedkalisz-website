@@ -1,6 +1,6 @@
 <script>
   import { baseUrl } from '$/api';
-  import { filetypeToReadable, bytesToReadable } from '$/utils';
+  import { filetypeToReadable, bytesToReadable } from '%/utils';
   import Icon from '$c/Icon.svelte';
 
   export let id = null;
@@ -24,7 +24,7 @@
         <Icon name="img" dark />
       {:else}
         <img
-          src="{baseUrl}/assets/{id}#{modified_on ? modified_on : uploaded_on}?key=thumbnail"
+          src="{baseUrl}/assets/{id}?key=thumb#{modified_on ? modified_on : uploaded_on}"
           alt=""
           on:error={() => (imgError = true)}
           on:load={() => (loading = false)}

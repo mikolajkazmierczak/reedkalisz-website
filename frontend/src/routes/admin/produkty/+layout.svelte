@@ -8,7 +8,7 @@
   import { searchparams, SearchParams } from '$/searchparams';
 
   import { categories } from '@/globals';
-  import { search as fields } from '$/fields/products';
+  import { search as fields } from '%/fields/products';
   import Button from '@c/Button.svelte';
   import Table from '@c/Table.svelte';
   import Search from '@c/Search.svelte';
@@ -66,6 +66,7 @@
           { checkbox: true, icon: 'eye', label: 'Widoczność' },
           { checkbox: true, icon: 'new', label: 'Nowość' },
           { checkbox: true, icon: 'sale', label: 'Promocja' },
+          { checkbox: true, icon: 'api', label: 'API' },
           { id: true, label: 'ID' },
           { label: 'Kod' },
           { label: 'Nazwa' },
@@ -78,6 +79,7 @@
             $.enabled,
             $.new,
             $.sale,
+            $.api_enabled,
             $.id,
             $.code,
             $.name,

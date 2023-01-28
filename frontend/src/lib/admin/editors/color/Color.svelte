@@ -1,8 +1,8 @@
 <script>
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { edit as fields, defaults } from '$/fields/colors';
-  import { deep, diff } from '$/utils';
+  import { edit as fields, defaults } from '%/fields/colors';
+  import { deep, diff } from '%/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';

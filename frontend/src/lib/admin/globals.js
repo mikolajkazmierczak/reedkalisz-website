@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
 import api from '$/api';
-import { default as collectionsFields } from '$/fields';
+import { default as collectionsFields } from '%/fields';
 
 // Global arrays of items from their respective collections:
 // - global because they are needed on many pages in the app, so redownlading them every time is pointless
@@ -12,6 +12,7 @@ export const companies = writable(null); // /produkty/:slug, /kalkulacje
 export const labelings = writable(null); // /produkty/:slug, /kalkulacje
 export const priceViews = writable(null); // /produkty/:slug, /kalkulacje
 export const globalMargins = writable(null); // /produkty/:slug, /kalkulacje
+export const commercialDetails = writable(null); // /produkty/:slug
 export const categories = writable(null); // /produkty, /produkty/:slug
 export const colors = writable(null); // /produkty/:slug
 export const menus = writable(null);
@@ -23,6 +24,7 @@ const collections = [
   { collection: 'labelings', store: labelings },
   { collection: 'price_views', store: priceViews },
   { collection: 'global_margins', store: globalMargins, singleton: true },
+  { collection: 'commercial_details', store: commercialDetails },
   { collection: 'categories', store: categories },
   { collection: 'colors', store: colors },
   { collection: 'menus', store: menus },

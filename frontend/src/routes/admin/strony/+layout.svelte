@@ -6,7 +6,7 @@
   import { header } from '@/stores';
   import { searchparams, SearchParams } from '$/searchparams';
 
-  import { search as fields } from '$/fields/pages';
+  import { search as fields } from '%/fields/pages';
   import Button from '@c/Button.svelte';
   import Table from '@c/Table.svelte';
   import Search from '@c/Search.svelte';

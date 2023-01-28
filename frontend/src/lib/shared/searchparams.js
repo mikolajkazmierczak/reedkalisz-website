@@ -5,13 +5,15 @@ import { get, writable } from 'svelte/store';
 export const searchparams = writable(
   new Map([
     ['/admin/produkty', { values, defaults: { l: 50, p: 1, q: null, c: null } }], // limit, page, query, category
-    ['/admin/kategorie', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/biblioteka', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
     ['/admin/kolory', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/kategorie', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/informacje-handlowe', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/menu', { values, defaults: { l: 50, p: 1, q: null, m: null } }], // limit, page, query, menu
     ['/admin/strony', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
     ['/admin/fragmenty', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/menu', { values, defaults: { l: 50, p: 1, q: null, m: null } }] // limit, page, query, menu
+    ['/admin/biblioteka', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/api', { values, defaults: { l: 25, p: 1, q: null, c: null } }] // limit, page, company
   ])
 );
 

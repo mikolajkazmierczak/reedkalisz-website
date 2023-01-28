@@ -68,6 +68,10 @@
   $: if ($unsaved) checkCollection();
 </script>
 
+<svelte:head>
+  <title>Admin | {title} | REED Kalisz</title>
+</svelte:head>
+
 <div class="wrapper" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
   <div class="outside" on:click|self={handleExit} />
   <div class="container" in:fly={{ x: 100, duration: 400 }} out:fly={{ x: 50, duration: 100 }}>

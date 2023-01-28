@@ -1,7 +1,7 @@
 {
   "private": true,
   "version": "1.0.0",
-  "name": "reedkalisz-socket",
+  "name": "reedkalisz-heimdall",
   "description": "REED Kalisz public website and CMS warden",
   "author": {
     "name": "Mikołaj Kaźmierczak",
@@ -9,7 +9,7 @@
     "url": "https://github.com/mikolajkazmierczak"
   },
   "scripts": {
-    "dev": "nodemon ./index.js",
+    "dev": "nodemon --watch ../../shared --watch . ./index.js",
     "start": "node ./index.js"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "node-fetch": "^3.2.10",
     "nodemon": "^2.0.19",
     "polka": "^0.5.2",
+    "reedkalisz-shared": "file:../../shared",
     "socket.io": "^4.5.1"
   },
   "type": "module"

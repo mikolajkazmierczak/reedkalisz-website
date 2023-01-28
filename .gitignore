@@ -1,17 +1,14 @@
-# settings
-.DS_Store
+# common
+.env
+.env.*
+node_modules
+
+# directus
+data.db
+uploads
 
 # sveltekit
 .svelte-kit
-node_modules
 build
 package
 
-# env
-.env
-.env.*
-!.env.example
-
-# database
-data.db
-uploads

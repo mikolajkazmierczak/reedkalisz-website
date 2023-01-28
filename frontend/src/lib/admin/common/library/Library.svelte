@@ -6,7 +6,7 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
 
-  import { read as fields } from '$/fields/directus_files';
+  import { read as fields } from '%/fields/directus_files';
   import Button from '@c/Button.svelte';
 
   // import Filters from '@c/Filters.svelte';

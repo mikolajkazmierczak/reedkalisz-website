@@ -1,5 +1,5 @@
 <script>
-  import { treeFlatten } from '$/utils';
+  import { treeFlatten } from '%/utils';
   import TableRow from '@c/TableRow.svelte';
   import Pagination from '@c/Pagination.svelte';
 

@@ -1,6 +1,6 @@
 <script>
   import { globals, colors } from '@/globals';
-  import { moveItem } from '$/utils';
+  import { moveItem } from '%/utils';
   import Tooltip from '$c/Tooltip.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
@@ -23,6 +23,7 @@
       img: [],
       amount: null,
       api_color_code: '',
+      api_color_id: '',
       color_first: null,
       color_second: null,
       multicolored: false
@@ -73,7 +74,10 @@
 
           <div class="ui-pair">
             <Input type="number" bind:value={storage.amount} api>Ilość</Input>
-            <Input bind:value={storage.api_color_code}>Kod koloru w API</Input>
+            <div class="ui-pair">
+              <Input bind:value={storage.api_color_code}>Kod&nbsp;<small style="opacity:0.65">API</small></Input>
+              <Input bind:value={storage.api_color_id}>ID&nbsp;<small style="opacity:0.65">API</small></Input>
+            </div>
           </div>
           <div class="ui-pair">
             <div>

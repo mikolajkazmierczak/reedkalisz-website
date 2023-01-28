@@ -2,7 +2,7 @@
   import { fly, fade } from 'svelte/transition';
 
   import api from '$/api';
-  import { read as fields } from '$/fields/directus_files';
+  import { read as fields } from '%/fields/directus_files';
 
   import File from '@c/library/File.svelte';
   import Icon from '$c/Icon.svelte';

@@ -1,5 +1,5 @@
 <script>
-  import { moveItem } from '$/utils';
+  import { moveItem } from '%/utils';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Picker from '@c/library/Picker.svelte';

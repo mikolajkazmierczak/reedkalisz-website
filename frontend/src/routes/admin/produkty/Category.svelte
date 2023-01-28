@@ -10,7 +10,7 @@
   export let children;
   $: hasChildren = children.length > 0;
 
-  export let expanded = false;
+  export let expanded = depth == '1'; // default expanded
   export let selected;
   $: active = selected == id;
 

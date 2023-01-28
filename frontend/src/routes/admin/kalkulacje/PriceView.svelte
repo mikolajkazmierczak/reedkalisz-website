@@ -4,7 +4,7 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { deep, diff } from '$/utils';
+  import { deep, diff } from '%/utils';
 
   import { recalculateProducts } from '@/calculations';
   import Input from '@c/Input.svelte';

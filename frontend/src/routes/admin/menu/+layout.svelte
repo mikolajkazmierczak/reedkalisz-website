@@ -4,10 +4,10 @@
   import api from '$/api';
   import { header } from '@/stores';
   import { searchparams, SearchParams } from '$/searchparams';
-  import { makeTree, treeGetItem } from '$/utils';
+  import { makeTree, treeGetItem } from '%/utils';
 
   import { globals, menus, menuItems, categories } from '@/globals';
-  import { search as fields } from '$/fields/menu_items';
+  import { search as fields } from '%/fields/menu_items';
   import Table from '@c/Table.svelte';
   import Filters from '@c/Filters.svelte';
   import Button from '@c/Button.svelte';

@@ -4,8 +4,8 @@
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
-  import { edit as fields, defaults } from '$/fields/categories';
-  import { deep, slugify, diff } from '$/utils';
+  import { edit as fields, defaults } from '%/fields/categories';
+  import { deep, slugify, diff } from '%/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
@@ -45,7 +45,12 @@
 
   read();
 
-  $: if (item) item.slug = slugify(item?.name, itemOriginal?.name, itemOriginal?.slug);
+  $: if (item)
+    item.slug = slugify(item?.name, {
+      key: true,
+      partsOriginal: itemOriginal?.name,
+      slugOriginal: itemOriginal?.slug
+    });
   $: correctSlug = item && !['+', ''].includes(item.slug);
 
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {

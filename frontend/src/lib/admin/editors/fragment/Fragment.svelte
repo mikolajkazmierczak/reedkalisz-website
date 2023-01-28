@@ -3,8 +3,8 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { edit as fields } from '$/fields/fragments';
-  import { deep, diff } from '$/utils';
+  import { edit as fields } from '%/fields/fragments';
+  import { deep, diff } from '%/utils';
 
   import { unsaved } from '@/stores';
   import { users } from '@/globals';

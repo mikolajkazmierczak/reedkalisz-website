@@ -12,17 +12,24 @@
   import { goto } from '$app/navigation';
 
   const buttons = [
-    { href: '/', icon: 'dashboard', name: 'Aktywność' },
-    { href: '/produkty', icon: 'products', name: 'Produkty' },
-    { href: '/kolory', icon: 'colors', name: 'Kolory' },
-    { href: '/kategorie', icon: 'categories', name: 'Kategorie' },
-    { href: '/kalkulacje', icon: 'calculator', name: 'Kalkulacje' },
-    { href: '/menu', icon: 'menu', name: 'Menu' },
-    { href: '/strony', icon: 'pages', name: 'Strony' },
-    { href: '/fragmenty', icon: 'fragments', name: 'Fragmenty' },
-    { href: '/zapytania', icon: 'questions', name: 'Zapytania' },
-    { href: '/biblioteka', icon: 'library', name: 'Biblioteka' },
-    { href: '/api', icon: 'api', name: 'API' }
+    [{ href: '/', icon: 'dashboard', name: 'Dashboard' }],
+    [
+      { href: '/produkty', icon: 'products', name: 'Produkty' },
+      { href: '/kolory', icon: 'colors', name: 'Kolory' },
+      { href: '/kategorie', icon: 'categories', name: 'Kategorie' },
+      { href: '/informacje-handlowe', icon: 'commercial_details', name: 'Informacje handlowe' },
+      { href: '/kalkulacje', icon: 'calculator', name: 'Kalkulacje' }
+    ],
+    [
+      { href: '/menu', icon: 'menu', name: 'Menu' },
+      { href: '/strony', icon: 'pages', name: 'Strony' },
+      { href: '/fragmenty', icon: 'fragments', name: 'Fragmenty' }
+    ],
+    [
+      { href: '/biblioteka', icon: 'library', name: 'Biblioteka' },
+      { href: '/zapytania', icon: 'questions', name: 'Zapytania' },
+      { href: '/api', icon: 'api', name: 'API' }
+    ]
   ];
 
   $: path = $page.url.pathname.replace('/admin', '/').replace('//', '/');
@@ -46,8 +53,11 @@
       <a href="/" rel="external" class="logo">
         <img src="/logo.svg" alt="logo" />
       </a>
-      {#each buttons as { href, icon, name }}
-        <NavButton {icon} label={name} on:click={() => goto('/admin' + href)} tick={href == path} />
+      {#each buttons as group, i}
+        {#if i > 0}<div class="blank" />{/if}
+        {#each group as { href, icon, name }}
+          <NavButton {icon} label={name} on:click={() => goto('/admin' + href)} tick={href == path} />
+        {/each}
       {/each}
     </div>
     <div class="buttons">
@@ -85,10 +95,17 @@
     background-color: var(--primary);
   }
   .buttons {
-    display: grid;
-    row-gap: var(--gap);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap);
     padding: 0.9rem;
     width: 100%;
+  }
+  .blank {
+    width: 50%;
+    height: 2px;
+    background-color: var(--primary-dark);
   }
 
   .logo,
