@@ -3,9 +3,9 @@
 
   import { baseUrl } from '$/api';
   import Color from '#c/Color.svelte';
-  import AdminBadge from '#c/AdminBadge.svelte';
-  import SaleBadge from '#c/SaleBadge.svelte';
-  import NewBadge from '#c/NewBadge.svelte';
+  import AdminBadge from '#c/badges/AdminBadge.svelte';
+  import SaleBadge from '#c/badges/SaleBadge.svelte';
+  import NewBadge from '#c/badges/NewBadge.svelte';
 
   export let product;
   $: ({

@@ -24,16 +24,16 @@
 
 <Header />
 
-<main>
+<div class="wrapper">
   <div class="content">
     <slot />
   </div>
+</div>
 
-  <Footer />
-</main>
+<Footer />
 
 <style>
-  main {
+  .wrapper {
     min-height: calc(100% - 60px);
     display: flex;
     flex-direction: column;

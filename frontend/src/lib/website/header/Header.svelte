@@ -24,13 +24,14 @@
 <style>
   .wrapper {
     z-index: 1;
-    position: sticky;
+    position: fixed;
     top: 0;
     left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 60px;
+    width: 100%;
     background-color: var(--main);
   }
   .content {

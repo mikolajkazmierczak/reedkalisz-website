@@ -1,5 +1,5 @@
 <script>
-  import Badge from '#c/Badge.svelte';
+  import Badge from './Badge.svelte';
 
   export let sale;
 </script>
