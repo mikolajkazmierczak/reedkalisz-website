@@ -15,6 +15,10 @@ const cors = { origin: true };
 const app = polka().listen(PORT, HOST, () => console.log(`🚀 Lift off on port ${PORT}!`));
 const io = new socketio(app.server, { cors });
 
+app.get('/', (req, res) => {
+  res.end('Greetings. I am a vigilant watcher of this realm. My name is Heimdall Odinson.');
+});
+
 io.on('connection', socket => {
   log(`🔌 New connection (${socket.id})`);
   socket.on('disconnect', reason => {
@@ -23,6 +27,7 @@ io.on('connection', socket => {
   });
 
   socket.on('changes', data => {
+    log(`   - changes: ${data}`);
     socket.broadcast.emit('changes', data);
     if (data.selfBroadcast) socket.emit('changes', data);
   });

@@ -22,13 +22,15 @@ export function parseDatetime(datetime, seconds = false) {
 
 export function getISODate() {
   // returns date (now) in format: yyyy-mm-ddThh:mm:ss
-  const date = new Date().toISOString().slice(0, -5); // slice removes ms (.000Z)
-  // add one hour (and adjust for next day)
-  const [datePart, timePart] = date.split('T');
-  const [hours, minutes, seconds] = timePart.split(':');
-  const newHours = (parseInt(hours) + 1) % 24;
-  const newDate = newHours == 0 ? new Date(datePart).addDays(1).toISOString().slice(0, 10) : datePart;
-  return `${newDate}T${newHours}:${minutes}:${seconds}`;
+  const padZero = num => num.toString().padStart(2, '0');
+  const datetime = new Date();
+  const yyyy = datetime.getFullYear();
+  const mm = padZero(datetime.getMonth() + 1);
+  const dd = padZero(datetime.getDate());
+  const hh = padZero(datetime.getHours());
+  const mi = padZero(datetime.getMinutes());
+  const ss = padZero(datetime.getSeconds());
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
 }
 
 export default parseDatetime;

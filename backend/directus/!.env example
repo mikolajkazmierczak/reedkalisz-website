@@ -3,11 +3,22 @@
 # General
 HOST="0.0.0.0"
 PORT=8055
-PUBLIC_URL="/"
+PUBLIC_URL="https://example.com/api"
 
 # Database
 DB_CLIENT="sqlite3"
 DB_FILENAME="./data.db"
+
+# Rate Limiting
+RATE_LIMITER_ENABLED=false
+
+# Cache
+CACHE_ENABLED=false
+
+# File Storage
+STORAGE_LOCATIONS="local"
+STORAGE_LOCAL_DRIVER="local"
+STORAGE_LOCAL_ROOT="./uploads"
 
 # Security
 KEY="xxx"
@@ -17,27 +28,21 @@ REFRESH_TOKEN_TTL="7d"
 REFRESH_TOKEN_COOKIE_SECURE=false
 REFRESH_TOKEN_COOKIE_SAME_SITE="lax"
 REFRESH_TOKEN_COOKIE_NAME="directus_refresh_token"
-
-# Rate Limiting
-RATE_LIMITER_ENABLED=false
-
-# Cache
-CACHE_ENABLED=false
-
-# CORS
 CORS_ENABLED=true
 CORS_ORIGIN=true
-
-# File Storage
-STORAGE_LOCATIONS="local"
-STORAGE_LOCAL_DRIVER="local"
-STORAGE_LOCAL_ROOT="./uploads"
 
 # Extensions
 EXTENSIONS_PATH="./extensions"
 
 # Email
 EMAIL_FROM="no-reply@directus.io"
-EMAIL_TRANSPORT="sendmail"
-EMAIL_SENDMAIL_NEW_LINE="unix"
-EMAIL_SENDMAIL_PATH="/usr/sbin/sendmail"
+EMAIL_TRANSPORT="smtp"
+EMAIL_SMTP_HOST="localhost"
+
+# Use SMTP pooling
+# EMAIL_SMTP_POOL=true
+# EMAIL_SMTP_PORT=465
+# EMAIL_SMTP_SECURE=false # Use TLS
+# EMAIL_SMTP_IGNORE_TLS=false
+# EMAIL_SMTP_USER="username"
+# EMAIL_SMTP_PASSWORD="password"

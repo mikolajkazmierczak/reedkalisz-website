@@ -34,7 +34,7 @@ Heimdall is a server that performs actions based on the information from the adm
 Configure a tool like [nginx](https://www.nginx.com/). Make sure you run everything on HTTPS.\
 Serve SvelteKit on port **80**.\
 Serve Directus on port **8055**.\
-Serve Heimdall on port **999**.
+Serve Heimdall on port **9999**.
 
 #### Backend: <small>`/backend`</small>
 

@@ -4,10 +4,11 @@ import { onDestroy } from 'svelte';
 import { io } from 'socket.io-client';
 import { me } from '$/auth';
 
-// export const baseUrl = 'http://localhost:999';
-// export const baseUrl = 'http://192.168.1.10:999';
-// export const baseUrl = 'http://formixhome.ddns.net:999';
-export const baseUrl = 'http://produktpolski.ddns.net:999';
+// export const baseUrl = 'http://localhost:9999';
+// export const baseUrl = 'http://192.168.1.10:9999';
+// export const baseUrl = 'http://formixhome.ddns.net:9999';
+// export const baseUrl = 'http://produktpolski.ddns.net:9999';
+export const baseUrl = 'https://new.reed.kalisz.pl';
 
 class Socket {
   constructor(url) {
