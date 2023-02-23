@@ -8,7 +8,7 @@
 
   import { globals, menus, menuItems, categories } from '@/globals';
   import { search as fields } from '%/fields/menu_items';
-  import Table from '@c/Table.svelte';
+  import Table from '@c/table/Table.svelte';
   import Filters from '@c/Filters.svelte';
   import Button from '@c/Button.svelte';
   import Search from '@c/Search.svelte';
@@ -72,10 +72,10 @@
           { id: true, label: 'ID' },
           { label: 'Tytuł' },
           { checkbox: true, icon: 'folder', label: 'Folder' },
-          { checkbox: true, icon: 'products', label: 'Element: Produkt' },
-          { checkbox: true, icon: 'categories', label: 'Element: Kategoria' },
-          { checkbox: true, icon: 'pages', label: 'Element: Strona' },
-          { label: 'Element' },
+          { checkbox: true, icon: 'products', label: 'Prowadzi do: Produkt' },
+          { checkbox: true, icon: 'categories', label: 'Prowadzi do: Kategoria' },
+          { checkbox: true, icon: 'pages', label: 'Prowadzi do: Strona' },
+          { label: 'Prowadzi do' },
           { blame: true, label: 'Utworzenie' },
           { blame: true, label: 'Aktualizacja' }
         ]}

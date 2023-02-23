@@ -1,20 +1,10 @@
 <script>
   import { goto } from '$app/navigation';
-  import { slide } from 'svelte/transition';
-  import { createEventDispatcher } from 'svelte';
-
-  import api from '$/api';
-  import heimdall from '$/heimdall';
-  import { treeGetItem, treeGetItemAtPath, treeMoveItemToPath } from '%/utils';
 
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
   import Blame from '@c/Blame.svelte';
-
-  const dispatch = createEventDispatcher();
-
-  const smallestCellWidth = 2.25;
-  const hierarchyCellWidth = smallestCellWidth * 0.8;
+  import Dropzone from './Dropzone.svelte';
 
   export let collection = null;
   export let headRow = false;
@@ -29,7 +19,7 @@
 
   export let order = false;
   export let tree = false;
-  export let maxDepth = 0;
+  export let maxDepth;
   export let widths;
 
   export let expandedItems = null;
@@ -49,123 +39,25 @@
     if (collapsed) expand(item);
   }
 
-  async function saveAfterMove(tree, oldItemData, newItemData) {
-    function getItemsToUpdate(tree, parentID, startIndex) {
-      const parent = treeGetItem(tree, parentID);
-      const children = parent.children ?? parent; // root edge case
-      const updated = children.filter(c => c.index >= startIndex);
-      const indexes = updated.map(c => c.index);
-      const ids = updated.map(c => c.id);
-      return { children, indexes, ids };
-    }
-
-    const { id, parent, index } = newItemData;
-    const movedItemsIDs = [id];
-
-    // update the new item's parent and index
-    await api.items(collection).updateOne(id, { parent, index });
-
-    // update indexes of both parent's children
-    const oldParent = oldItemData.parent;
-    const oldIndex = oldItemData.index;
-    if (parent == oldParent) {
-      if (index == oldIndex) return;
-      const startIndex = index > oldIndex ? oldIndex : index + 1;
-      // get indexes of parent's children and update them
-      const { children, indexes, ids } = getItemsToUpdate(tree, parent, startIndex);
-      await Promise.all(indexes.map(i => api.items(collection).updateOne(children[i].id, { index: i })));
-      movedItemsIDs.push(...ids);
-    } else {
-      // get indexes of new parent's children, old parent's children and update both
-      const newChildrenData = getItemsToUpdate(tree, parent, index + 1);
-      const oldChildrenData = getItemsToUpdate(tree, oldParent, oldIndex);
-      const { children: newChildren, indexes: newIndexes, ids: newIDs } = newChildrenData;
-      const { children: oldChildren, indexes: oldIndexes, ids: oldIDs } = oldChildrenData;
-      await Promise.all([
-        ...newIndexes.map(i => api.items(collection).updateOne(newChildren[i].id, { index: i })),
-        ...oldIndexes.map(i => api.items(collection).updateOne(oldChildren[i].id, { index: i }))
-      ]);
-      movedItemsIDs.push(...newIDs, ...oldIDs);
-    }
-
-    heimdall.emit(collection, movedItemsIDs);
-  }
-
-  export let showDropzonesItemID = null;
+  export let dropzone = null;
   let dragging = false;
-  let dropzoneHoverParent = false;
-  let dropzoneHoverSibling = false;
-  let dropzoneHoverChild = false;
-  $: showDropzones = item && showDropzonesItemID === item.id;
-  $: showDropzoneParent = meta?.depth != 0 && meta?.isLast;
-  $: showDropzoneSibling = !expanded;
-  $: showDropzoneChild = true;
 
   function dragstart(e) {
+    // dragging started
     dragging = true;
     e.dataTransfer.setData('path', meta.path);
     tryCollapse(item);
   }
-  function dragover(e, type) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    dropzoneHoverParent = type === 'P';
-    dropzoneHoverSibling = type === 'S';
-    dropzoneHoverChild = type === 'C';
-  }
-  function dragleave(e) {
-    e.preventDefault();
-    dropzoneHoverParent = false;
-    dropzoneHoverSibling = false;
-    dropzoneHoverChild = false;
-  }
   function dragend(e) {
+    // dragging stopped
     e.preventDefault();
     dragging = false;
-    showDropzones = false;
-    dispatch('dragend');
+    dropzone = null;
   }
-  function dragendBubble() {
-    dispatch('dragend');
-  }
-  async function drop(e, type) {
-    e.preventDefault();
-    dragging = false;
-    showDropzones = false;
-    dispatch('drop');
-    const oldPath = e.dataTransfer.getData('path').split(',').map(Number);
 
-    // if this element is the last child of its parent (and not the root list), we need to collapse it
-    const parent = treeGetItemAtPath(items, oldPath.slice(0, -1));
-    if (!Array.isArray(parent) && parent.children.length == 1) tryCollapse(parent);
-
-    let newPath;
-    if (type === 'P') {
-      newPath = meta.path.slice(0, -1);
-      newPath[newPath.length - 1]++;
-    }
-    if (type === 'S') {
-      newPath = [...meta.path];
-      newPath[newPath.length - 1]++;
-    }
-    if (type === 'C') {
-      newPath = [...meta.path, 0];
-    }
-    const data = treeMoveItemToPath(items, oldPath, newPath);
-    if (data) {
-      const { oldItemData, newItemData } = data;
-      await saveAfterMove(items, oldItemData, newItemData);
-      items = items;
-    }
-  }
-  function dropBubble() {
-    dispatch('drop');
-  }
-  function dragenterItem() {
-    dispatch('dragenterItem', { id: item.id });
-  }
-  function dragenterItemBubble(id) {
-    dispatch('dragenterItem', { id });
+  function dragenter() {
+    // dragged element entered a row
+    dropzone = item.id;
   }
 </script>
 
@@ -203,7 +95,7 @@
 {/if}
 
 {#if item}
-  <div class="row row--item" class:dragging style:grid-template-columns={widths} on:dragenter={dragenterItem}>
+  <div class="row row--item" class:dragging style:grid-template-columns={widths} on:dragenter={dragenter}>
     {#if tree}
       <div
         class="value value--item value--center"
@@ -283,49 +175,18 @@
   </div>
 {/if}
 
-{#if showDropzones && !dragging}
-  {@const blankSpan = (meta.depth ?? 0) - (showDropzoneParent ? 1 : 0) + (showDropzoneSibling ? 0 : 1)}
-  {@const childSpan = maxDepth + 1 - blankSpan - (showDropzoneParent ? 1 : 0) - (showDropzoneSibling ? 1 : 0)}
-  {@const blankWidth = blankSpan * hierarchyCellWidth}
-  {@const parentWidth = hierarchyCellWidth}
-  {@const siblingWidth = hierarchyCellWidth}
-  {@const childWidth = (childSpan || 1) * hierarchyCellWidth}
-  <div class="dropzones" in:slide={{ duration: 100 }} out:slide={{ duration: 300 }}>
-    <div class="dropzone__blank" style:width={smallestCellWidth + 'rem'} />
-    {#if blankSpan != 0}
-      <div class="dropzone__blank" style:width={blankWidth + 'rem'} />
-    {/if}
-    {#if showDropzoneParent}
-      <div
-        class="dropzone"
-        class:hover={dropzoneHoverParent}
-        style:width={parentWidth + 'rem'}
-        on:drop={e => drop(e, 'P')}
-        on:dragover={e => dragover(e, 'P')}
-        on:dragleave={dragleave}
-      />
-    {/if}
-    {#if showDropzoneSibling}
-      <div
-        class="dropzone"
-        class:hover={dropzoneHoverSibling}
-        style:width={siblingWidth + 'rem'}
-        on:drop={e => drop(e, 'S')}
-        on:dragover={e => dragover(e, 'S')}
-        on:dragleave={dragleave}
-      />
-    {/if}
-    {#if showDropzoneChild}
-      <div
-        class="dropzone"
-        class:hover={dropzoneHoverChild}
-        style:width={childWidth + 'rem'}
-        on:drop={e => drop(e, 'C')}
-        on:dragover={e => dragover(e, 'C')}
-        on:dragleave={dragleave}
-      />
-    {/if}
-  </div>
+{#if headRow || item}
+  <Dropzone
+    {collection}
+    bind:items
+    {meta}
+    {maxDepth}
+    {expanded}
+    {tryCollapse}
+    bind:dropzone
+    bind:dragging
+    id={headRow ? -1 : item.id}
+  />
 {/if}
 
 {#if !headRow && tree && expanded}
@@ -341,10 +202,7 @@
       {maxDepth}
       {widths}
       bind:expandedItems
-      {showDropzonesItemID}
-      on:drop={dropBubble}
-      on:dragend={dragendBubble}
-      on:dragenterItem={e => dragenterItemBubble(e.detail.id)}
+      bind:dropzone
     />
   {/each}
 {/if}
@@ -438,22 +296,5 @@
   }
   .dragging {
     opacity: 0.5;
-  }
-  .dropzones {
-    display: flex;
-    height: 2rem;
-  }
-  .dropzone {
-    --border: 1px solid var(--primary-light);
-    height: 100%;
-    background-color: var(--primary-white);
-    border: var(--border);
-    border-right: none;
-  }
-  .dropzone:last-of-type {
-    border-right: var(--border);
-  }
-  .dropzone.hover {
-    background-color: var(--primary-light);
   }
 </style>

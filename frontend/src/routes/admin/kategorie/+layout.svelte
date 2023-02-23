@@ -8,7 +8,7 @@
 
   import { globals, categories } from '@/globals';
   import { search as fields } from '%/fields/categories';
-  import Table from '@c/Table.svelte';
+  import Table from '@c/table/Table.svelte';
   import Button from '@c/Button.svelte';
   import Search from '@c/Search.svelte';
 

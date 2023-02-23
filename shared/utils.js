@@ -198,7 +198,7 @@ export function treeGetItem(tree, id) {
   // Find item in a tree with a given id.
   for (const item of tree) {
     if (item.id == id) return item;
-    if (item.children) {
+    if (item.children.length) {
       const found = treeGetItem(item.children, id);
       if (found) return found;
     }
@@ -212,7 +212,7 @@ export function treeRemoveItem(tree, id) {
       tree.splice(i, 1);
       return item;
     }
-    if (item.children) {
+    if (item.children.length) {
       const found = treeRemoveItem(item.children, id);
       if (found) return found;
     }
@@ -239,7 +239,7 @@ export function treeRemoveMarked(tree) {
       tree.splice(i, 1);
       i--;
     }
-    if (item.children) {
+    if (item.children.length) {
       treeRemoveMarked(item.children);
     }
   }

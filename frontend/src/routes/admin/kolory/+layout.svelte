@@ -8,7 +8,7 @@
   import { globals, colors } from '@/globals';
   import { search as fields } from '%/fields/colors';
   import Button from '@c/Button.svelte';
-  import Table from '@c/Table.svelte';
+  import Table from '@c/table/Table.svelte';
   import Search from '@c/Search.svelte';
 
   $header = { title: 'Kolory', icon: 'colors' };

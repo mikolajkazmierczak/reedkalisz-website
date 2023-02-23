@@ -8,7 +8,7 @@
   import { globals, commercialDetails } from '@/globals';
   import { search as fields } from '%/fields/commercial_details';
   import Button from '@c/Button.svelte';
-  import Table from '@c/Table.svelte';
+  import Table from '@c/table/Table.svelte';
   import Search from '@c/Search.svelte';
 
   $header = { title: 'Informacje handlowe', icon: 'commercial_details' };

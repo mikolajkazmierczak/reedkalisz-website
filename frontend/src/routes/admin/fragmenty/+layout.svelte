@@ -5,7 +5,7 @@
   import { searchparams, SearchParams } from '$/searchparams';
 
   import { search as fields } from '%/fields/fragments';
-  import Table from '@c/Table.svelte';
+  import Table from '@c/table/Table.svelte';
   import Search from '@c/Search.svelte';
 
   $header = { title: 'Fragmenty', icon: 'fragments' };

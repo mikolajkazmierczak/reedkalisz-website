@@ -1,7 +1,8 @@
 <script>
   import { treeFlatten } from '%/utils';
-  import TableRow from '@c/TableRow.svelte';
+  import TableRow from '@c/table/TableRow.svelte';
   import Pagination from '@c/Pagination.svelte';
+  import { getColumnWidths } from './utils';
 
   export let searchParams = null;
   export let limit = null;
@@ -18,41 +19,15 @@
   $: tree = items.some(item => item.children); // has children
   $: itemsFlat = tree ? treeFlatten(items) : items;
   $: maxDepth = tree ? itemsFlat.reduce((max, item) => Math.max(max, item._meta.path.length), 0) - 1 : 0;
-  let expandedItems = [];
+  let expandedItems = []; // ids
+  let dropzone = null; // id
 
-  const smallestCellWidth = 2.25;
-  const hierarchyCellWidth = smallestCellWidth * 0.8;
-
-  function getWidths(head, tree, order, maxDepth) {
-    let widths = [];
-    if (order) widths.push(smallestCellWidth + 'rem');
-    if (tree) widths.push(hierarchyCellWidth * (maxDepth + 1) + 'rem');
-    widths.push(
-      ...head.map(h => {
-        if (h.width) widths.push(h.width);
-        if (h.checkbox) return smallestCellWidth + 'rem';
-        if (h.id || h.thin) return '4rem';
-        if (h.blame) return 'minmax(20ch, 1fr)';
-        return 'minmax(15ch, 1fr)';
-      })
-    );
-    return widths.join(' ');
-  }
-
-  let showDropzonesItemID = null; // id
-  function dropzonesHide() {
-    showDropzonesItemID = null;
-  }
-  function dropzonesShow(e) {
-    showDropzonesItemID = e.detail.id;
-  }
-
-  $: widths = getWidths(head, tree, order, maxDepth);
+  $: widths = getColumnWidths(head, tree, order, maxDepth);
 </script>
 
 <div class="table-wrapper">
   <div class="table">
-    <TableRow headRow {head} {order} {tree} {maxDepth} {widths} {collection} />
+    <TableRow {collection} headRow {head} {order} {tree} {maxDepth} {widths} bind:dropzone />
     {#if items.length}
       {#each items as item (item)}
         <TableRow
@@ -66,10 +41,7 @@
           {maxDepth}
           {widths}
           bind:expandedItems
-          {showDropzonesItemID}
-          on:drop={dropzonesHide}
-          on:dragend={dropzonesHide}
-          on:dragenterItem={dropzonesShow}
+          bind:dropzone
         />
       {/each}
     {:else}
