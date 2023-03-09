@@ -1,4 +1,7 @@
 <script>
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+
   import { fly } from 'svelte/transition';
   import Icon from '$c/Icon.svelte';
   import NavSubitem from './NavSubitem.svelte';
@@ -6,93 +9,92 @@
   export let item;
   $: ({ id, folder, name, href, children } = item);
 
-  export let openedID;
-  $: opened = openedID === id;
-
-  function open() {
-    openedID = null;
-    if (children.length) openedID = id;
-  }
-  function close() {
-    openedID = null;
-  }
+  $: contactHref = 'https://new.reed.kalisz.pl/kontakt';
+  $: isContactPage = href === contactHref;
+  $: active = href === $page.url.pathname || (isContactPage && $page.url.href === contactHref);
 </script>
 
-<div class="item">
-  <a {href} class:opened on:mouseenter={open}>
-    <div class="content" class:folder class:opened>
+<div class="item" class:active>
+  <a {href} on:click|preventDefault={active ? goto('/') : goto(href)}>
+    <div class="content" class:folder>
       {name}
       {#if folder}
-        <div class="icon"><Icon name="chevron_down" light /></div>
+        <div class="icon"><Icon name="chevron_down" color={active ? 'var(--light)' : 'var(--main)'} /></div>
       {/if}
     </div>
   </a>
-</div>
 
-{#if children.length && opened}
-  <div class="submenu" on:mouseleave={close} transition:fly={{ y: 10, duration: 400 }}>
-    <div class="submenu-content">
-      {#each children as child}
-        <NavSubitem item={child} bind:openedID />
-      {/each}
+  <!-- {#if children.length}
+    <div class="submenu" transition:fly={{ y: 10, duration: 400 }}>
+      <div class="submenu-content">
+        {#each children as child}
+          <NavSubitem item={child} />
+        {/each}
+      </div>
     </div>
-  </div>
-{/if}
+  {/if} -->
+</div>
 
 <style>
   .item {
+    --border-blank: 2px solid transparent;
+    --border: 2px solid var(--main);
+    position: relative;
     display: flex;
-    align-items: flex-end;
-    height: 100%;
+    align-items: center;
   }
   a {
-    border-radius: 15px 15px 0 0;
-    padding-bottom: 10px;
-    font-weight: 700;
+    border: var(--border-blank);
     text-decoration: none;
     text-transform: uppercase;
-    transition: background-color 200ms;
+    font-size: 1.15rem;
+    font-weight: 500;
   }
-  a.opened {
-    background-color: var(--main-6);
+  .item:hover a {
+    border: var(--border);
+    background-color: var(--white);
+  }
+  .item.active a {
+    background-color: var(--main);
   }
   .content {
     display: flex;
     align-items: center;
     gap: 5px;
-    border-radius: 15px;
-    padding: 0 15px;
-    height: 30px;
-    color: var(--light);
-    background-color: var(--main-6);
+    padding: 0 1rem;
+    height: 2.5rem;
+    color: var(--main);
     transition: border-radius 100ms;
   }
-  .content.folder {
-    padding-right: 10px;
+  .item.active .content {
+    color: var(--white);
   }
-  .content.opened {
-    border-radius: 15px 15px 0 0;
+  .content.folder {
+    padding-right: 0.5rem;
   }
   .icon {
-    width: 15px;
+    width: 1.25rem;
   }
 
   .submenu {
-    position: fixed;
-    top: 60px;
+    position: absolute;
+    top: calc(100% - 2px);
     left: 0;
-    display: flex;
+    display: none;
     justify-content: center;
-    width: 100%;
-    background-color: var(--main-0);
+    width: 120ch;
+    border: var(--border);
+    background-color: var(--white);
+  }
+  .item:hover .submenu {
+    display: flex;
   }
   .submenu-content {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 2rem;
+    padding: 2rem;
+    padding-bottom: 1.5rem;
     width: 100%;
-    max-width: 1200px;
-    padding: 20px;
-    padding-bottom: 30px;
   }
 </style>

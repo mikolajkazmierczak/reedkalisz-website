@@ -27,6 +27,10 @@
   --shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
 }
 
+* {
+  font-family: 'Fira Sans', sans-serif;
+}
+
 .ui-section {
   margin-bottom: 2rem;
 }

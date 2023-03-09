@@ -27,30 +27,40 @@
       </div>
     </h3>
   </div>
-  <div class="amount"><small>Ilość:</small> {@html amount ?? '<small>Na stanie</small>'}</div>
+
+  <!-- <div class="amount"><small>Ilość:</small> {@html amount ?? '<small>Na stanie</small>'}</div> -->
 
   <Gallery imgs={img.filter(img => img.enabled)} small />
 </div>
 
 <style>
   .storage {
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    /* border-radius: 10px; */
+    /* border: 1px solid rgba(0, 0, 0, 0.1); */
     padding: 0.5rem;
-    width: calc((100% - 2rem) / 3);
+    width: calc((100% - 1rem) / 2);
     background-color: rgb(250, 250, 250);
+  }
+
+  .storage .code {
+    white-space: nowrap;
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .storage h3 {
+    display: flex;
+    flex-direction: column;
   }
   .storage .color {
     font-size: x-small;
     font-weight: normal;
     text-transform: uppercase;
   }
-  .storage .code {
-    white-space: nowrap;
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
+
   .storage .amount {
     white-space: nowrap;
     margin: 0.5rem 0;

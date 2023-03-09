@@ -1,21 +1,22 @@
 <script>
+  import { onDestroy } from 'svelte';
   import { goto } from '$app/navigation';
-  import { fly } from 'svelte/transition';
-
-  import Categories from './Categories.svelte';
-  import Products from './Products.svelte';
-  import { categories } from '#/stores';
+  import Menu from '#/products/Menu.svelte';
 
   export let data;
-  $: ({ products } = data);
 
-  let categoryID = null;
-  let lastCategoryID = null;
-  $: if (categoryID !== lastCategoryID) {
-    lastCategoryID = categoryID;
-    const href = categoryID ? `?c=${categoryID}` : '/';
-    goto(href, { replaceState: true, noScroll: true });
-  }
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress++;
+  }, 1000);
+  const timeout = setTimeout(() => {
+    clearInterval(interval);
+    goto('/kategorie');
+  }, 5000);
+  onDestroy(() => {
+    clearInterval(interval);
+    clearTimeout(timeout);
+  });
 </script>
 
 <svelte:head>
@@ -27,16 +28,40 @@
   />
 </svelte:head>
 
-<h1>Gadżety reklamowe</h1>
+<div class="wrapper">
+  <div class="menu">
+    <Menu items={data.menus.side} />
+  </div>
 
-<Categories categories={$categories.find(c => c.id == 88).children} bind:categoryID />
-
-<Products {products} />
+  <main>
+    <h1>Witamy na naszej nowej stronie internetowej!</h1>
+    <p>Uzupełniamy asortyment, prosimy o cierpliwość<br />i zachęcamy do częstych odwiedzin :)</p>
+    <h1>{'.'.repeat(progress)}</h1>
+  </main>
+</div>
 
 <style>
+  .wrapper {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    margin-top: 6rem;
+    width: 100%;
+  }
+
+  .menu {
+    padding: 3.5rem 4.1rem;
+    padding-right: 0;
+  }
+
+  main {
+    margin-top: 10rem;
+    text-align: center;
+  }
   h1 {
-    margin-top: 3rem;
-    font-weight: 900;
     font-size: 3rem;
+  }
+  p {
+    margin-top: 1rem;
+    font-size: 2rem;
   }
 </style>

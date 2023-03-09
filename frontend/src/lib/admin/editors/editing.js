@@ -75,11 +75,29 @@ async function cancel(item, itemOriginal, { root, prompt = null } = {}) {
   return [item, itemOriginal];
 }
 
-async function remove(collection, id, { root, prompt = null } = {}) {
+async function remove(collection, id, { root, prompt = null, parent = null, index = null, menu = null } = {}) {
   if (confirm(prompt ?? 'Na pewno chcesz usunąć ten element?')) {
     if (id != '+') {
+      const ids = [id];
       await api.items(collection).deleteOne(id);
-      heimdall.emit(collection, id);
+
+      // refresh indexes
+      if (index != null) {
+        const filters = [{ parent: parent ? { _eq: parent } : { _null: true } }];
+        const options = {
+          fields: ['id', 'index'],
+          filter: { _and: menu ? [...filters, { menu: { _eq: menu } }] : filters }
+        };
+        const itemsToUpdate = (await api.items(collection).readByQuery(options)).data;
+        for (const { id, index: i } of itemsToUpdate) {
+          if (i > index) {
+            await api.items(collection).updateOne(id, { index: i - 1 });
+            ids.push(id);
+          }
+        }
+      }
+
+      heimdall.emit(collection, ids);
     }
     unsaved.set(false);
     gotoRoot(root);

@@ -208,7 +208,6 @@
     $apiSnapshot = data.api_snapshot;
     $apiSnapshotDate = data.api_snapshot_date;
     fetching = false;
-    console.log($apiSnapshotDate);
   }
   async function fetchAPI() {
     if (fetching) return;

@@ -1,13 +1,11 @@
 <script>
-  import { marked } from 'marked';
-
   export let data;
 </script>
 
 <div class="wrapper">
-  <h1>Kontakt</h1>
-
-  {@html marked.parse(data.fragment.content)}
+  <article>
+    {@html data.fragment.content}
+  </article>
 </div>
 
 <style>
@@ -15,9 +13,9 @@
     margin: 0 auto;
     margin-top: 8rem;
     padding: 2rem;
-    max-width: 60ch;
+    max-width: 1000px;
   }
-  h1 {
-    margin-bottom: 2rem;
+  article {
+    margin-top: 2rem;
   }
 </style>

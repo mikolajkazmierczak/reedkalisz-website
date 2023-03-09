@@ -35,6 +35,7 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
     width: 20px;
     height: 20px;
+    aspect-ratio: 1;
   }
   .color {
     display: grid;

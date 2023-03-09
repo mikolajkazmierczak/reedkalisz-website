@@ -36,22 +36,22 @@
   }
 
   .main {
-    border-radius: 10px 10px 0 0;
-    border: var(--border);
+    /* border-radius: 10px 10px 0 0; */
+    /* border: var(--border); */
     padding: 5%;
     width: 100%;
     aspect-ratio: 1 / 1;
   }
   .main.single {
-    border-radius: 10px;
+    /* border-radius: 10px; */
   }
   .picker {
     overflow: hidden;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-    border-radius: 0 0 10px 10px;
-    border: var(--border);
-    border-top: none;
+    /* border-radius: 0 0 10px 10px; */
+    /* border: var(--border); */
+    /* border-top: none; */
     background-color: rgb(250, 250, 250);
   }
   .picker.small {

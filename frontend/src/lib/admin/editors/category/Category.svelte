@@ -40,7 +40,7 @@
   }
 
   async function remove() {
-    editing.remove('categories', item.id, { root: '/admin/kategorie' });
+    editing.remove('categories', item.id, { root: '/admin/kategorie', parent: item.parent, index: item.index });
   }
 
   read();

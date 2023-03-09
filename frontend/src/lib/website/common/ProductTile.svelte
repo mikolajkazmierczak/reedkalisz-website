@@ -62,11 +62,11 @@
   function getImgs(gallery, storage) {
     const imgs = [];
     for (const { enabled, img } of gallery) {
-      if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=thumb` });
+      if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=medium` });
     }
     for (const s of storage) {
       for (const { enabled, img } of s.img) {
-        if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=thumb` });
+        if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=medium` });
       }
     }
     return imgs;
@@ -130,14 +130,13 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    border-radius: 10px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     text-decoration: none;
     background-color: rgb(250, 250, 250);
-    transition: background-color 100ms;
   }
   .tile:hover {
-    background-color: var(--grey);
+    border: 1px solid var(--main-1);
+    background-color: var(--main-0);
   }
 
   .badges {
@@ -176,7 +175,7 @@
     transform: translate(-50%, -50%);
   }
   .name {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: bold;
   }
   .tile:hover .name {

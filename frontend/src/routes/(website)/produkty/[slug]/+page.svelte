@@ -145,7 +145,7 @@
     {/if}
 
     <div class="questions">
-      <h2>Zapytaj / Zamów</h2>
+      <h2>Zapytaj</h2>
       <Question product={{ code, name, slug }} />
     </div>
   </div>
@@ -154,13 +154,16 @@
 <style>
   .wrapper {
     display: grid;
-    grid-template-columns: 2fr 3fr;
-    gap: 4rem;
-    margin-top: 3rem;
+    grid-template-columns: 3fr 7fr;
+    gap: 6rem;
   }
 
   /* .column.left */
 
+  .column.left {
+    padding: 7.5rem 1.5rem 2rem 1.5rem;
+    background-color: var(--light);
+  }
   .storages {
     display: flex;
     flex-wrap: wrap;
@@ -171,6 +174,7 @@
 
   .column.right {
     position: relative;
+    padding: 9.5rem 0 3rem 0;
   }
   .badges {
     position: absolute;
@@ -197,6 +201,7 @@
   }
   .description {
     margin-top: 2rem;
+    max-width: 100ch;
   }
   :global(.description p) {
     margin: 0.5rem 0;

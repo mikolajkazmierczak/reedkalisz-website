@@ -1,6 +1,4 @@
 <script>
-  export let openedID;
-
   export let item;
   $: ({ name, href, children, _meta } = item);
   $: meta = _meta;
@@ -11,7 +9,7 @@
 </script>
 
 <div class="item" class:title class:normal class:small>
-  <a {href} on:click={() => (openedID = null)}>{name}</a>
+  <a {href}>{name}</a>
   {#if children.length}
     <div class="children">
       {#each children as child}
@@ -31,7 +29,7 @@
   }
   .title > a {
     margin-bottom: 10px;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     text-transform: uppercase;
     font-weight: 900;
     opacity: 0.85;

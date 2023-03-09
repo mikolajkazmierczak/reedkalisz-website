@@ -1,12 +1,12 @@
 import api from '$/api';
 import { nanoid } from 'nanoid';
 import { makeTree, treeGetItem, treeRefreshMetaAndParent } from '%/utils';
-import { menu, categories } from '#/stores';
 
-const menuFields = [
+const menusFields = [
   'id',
   'enabled',
   'folder',
+  'menu',
   'parent',
   'index',
   'name',
@@ -24,6 +24,8 @@ const menuFields = [
 ];
 
 const categoriesFields = ['id', 'enabled', 'parent', 'index', 'name', 'slug', 'img'];
+
+const fragmentsFields = ['id', 'name', 'content', 'data'];
 
 const convertCategoryToMenuItem = category => ({
   id: nanoid(8), // fake menu item id to make sure nothing breaks
@@ -75,19 +77,31 @@ function someCategoriesEmbeded(menuTree) {
 }
 
 export async function load() {
-  const menuFilter = { menu: { _eq: 1 } };
-  const menuItems = (await api.items('menu_items').readByQuery({ filter: menuFilter, fields: menuFields })).data;
-  const menuTree = makeTree(menuItems.filter(item => item.enabled));
+  const menusItems = (await api.items('menu_items').readByQuery({ fields: menusFields })).data;
 
   const categoriesItems = (await api.items('categories').readByQuery({ fields: categoriesFields })).data;
   const categoriesTree = makeTree(categoriesItems.filter(item => item.enabled));
 
-  embedCategories(menuTree, categoriesTree);
-  if (someCategoriesEmbeded(menuTree)) {
-    treeRefreshMetaAndParent(menuTree);
-  }
+  const makeMenuTree = id => {
+    const tree = makeTree(menusItems.filter(m => m.menu == id && m.enabled));
+    embedCategories(tree, categoriesTree);
+    if (someCategoriesEmbeded(tree)) {
+      treeRefreshMetaAndParent(tree);
+    }
+    return tree;
+  };
 
-  menu.set(menuTree);
-  categories.set(categoriesTree);
-  return { menu: menuTree, categories: categoriesTree };
+  const menusTrees = {
+    top: makeMenuTree(1),
+    side: makeMenuTree(2),
+    footer: makeMenuTree(3)
+  };
+
+  const footerFragments = {
+    about: await api.items('fragments').readOne(2, { fields: fragmentsFields }),
+    rights: await api.items('fragments').readOne(3, { fields: fragmentsFields }),
+    office: await api.items('fragments').readOne(4, { fields: fragmentsFields })
+  };
+
+  return { menus: menusTrees, categories: categoriesTree, footer: footerFragments };
 }

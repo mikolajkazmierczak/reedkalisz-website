@@ -1,33 +1,22 @@
 <script>
-  import { menu } from '#/stores';
+  import { addLinks } from '#/utils';
   import NavItem from './NavItem.svelte';
 
-  export let openedID = null;
+  export let items;
 
-  function addLinks(items) {
-    for (let item of items) {
-      const productUrl = item.product ? `/produkty/${item.product.slug}` : null;
-      const categoryUrl = item.category ? `/kategorie/${item.category.slug}` : null;
-      const pageUrl = item.page ? `/${item.page.slug}` : null;
-      item.href = productUrl || categoryUrl || pageUrl || item.url;
-      if (item.children) addLinks(item.children);
-    }
-  }
-
-  addLinks($menu);
+  addLinks(items);
 </script>
 
 <nav>
-  {#each $menu as item}
-    <NavItem {item} bind:openedID />
+  {#each items as item}
+    <NavItem {item} />
   {/each}
 </nav>
 
 <style>
   nav {
     display: flex;
-    align-items: flex-end;
-    gap: 15px;
+    align-items: center;
     height: 100%;
   }
 </style>

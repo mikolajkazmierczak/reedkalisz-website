@@ -163,6 +163,7 @@
     // TODO: items are refreshing on the page back to old sorting
     itemsOriginal = deep.copy(items);
     heimdall.emit('labelings', ids);
+    location.reload()
   }
 
   function removeStart(i) {

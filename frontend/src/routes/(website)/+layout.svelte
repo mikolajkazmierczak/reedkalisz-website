@@ -7,42 +7,29 @@
   import Header from '#/header/Header.svelte';
   import Footer from '#/footer/Footer.svelte';
 
+  export let data;
+
   onMount(readme);
 </script>
-
-<svelte:head>
-  <style>
-    body {
-      overflow-y: scroll;
-    }
-  </style>
-</svelte:head>
 
 {#if $me}
   <Admin />
 {/if}
 
-<Header />
+<Header menu={data.menus.top} />
 
 <div class="wrapper">
-  <div class="content">
-    <slot />
-  </div>
+  <slot />
 </div>
 
-<Footer />
+<Footer fragments={data.footer} menu={data.menus.footer} />
 
 <style>
   .wrapper {
-    min-height: calc(100% - 60px);
+    min-height: calc(100% - 18rem); /* footer height */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-  }
-  .content {
-    width: 100%;
-    max-width: 1200px;
-    padding: 30px 20px;
   }
 </style>

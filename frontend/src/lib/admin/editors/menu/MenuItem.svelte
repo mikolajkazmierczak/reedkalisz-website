@@ -41,7 +41,12 @@
   }
 
   async function remove() {
-    editing.remove('menu_items', item.id, { root: '/admin/menu' });
+    editing.remove('menu_items', item.id, {
+      root: '/admin/menu',
+      parent: item.parent,
+      index: item.index,
+      menu: item.menu
+    });
   }
 
   read();
@@ -88,29 +93,29 @@
             {/if}
           </div>
 
-          <div class="ui-box ui-box--uneditable">
+          <div class="ui-box ui-box--uneditable" data-sveltekit-preload-data="off">
             <h3 class="ui-h3">Element</h3>
             {#if item.product}
               <div class="type">
                 <small>PRODUKT</small>
-                <a href="/produkty/{item.product.slug}">{item.product.name}</a>
+                <a href="/produkty/{item.product.slug}" target="_blank" rel="noreferrer">{item.product.name}</a>
               </div>
             {:else if item.category}
               {@const category = categoriesTreeFlattened.find(c => c.id == item.category.id)}
               {@const categoryLabel = category._meta.path.map(p => p + 1).join('.') + ' ' + category.name}
               <div class="type">
                 <small>KATEGORIA</small>
-                <a href="/kategorie/{item.category.slug}">{categoryLabel}</a>
+                <a href="/kategorie/{item.category.slug}" target="_blank" rel="noreferrer">{categoryLabel}</a>
               </div>
             {:else if item.page}
               <div class="type">
                 <small>STRONA</small>
-                <a href="/{item.page.slug}">{item.page.name}</a>
+                <a href="/{item.page.slug}" target="_blank" rel="noreferrer">{item.page.name}</a>
               </div>
             {:else if item.url}
               <div class="type">
                 <small>ZEWNĘTRZNY LINK</small>
-                <a href={item.url}>{item.url}</a>
+                <a href={item.url} target="_blank" rel="noreferrer">{item.url}</a>
               </div>
             {:else}
               Tu będzie link
