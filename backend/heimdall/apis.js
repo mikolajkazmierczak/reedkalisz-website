@@ -43,7 +43,6 @@ class PARAPI extends ExternalAPI {
         name,
         code,
         slug: slugify([item.code, item.name], { key: true }),
-        api_code: code,
         seo_title: item.name,
         seo_description: item.desc,
         description: item.desc,

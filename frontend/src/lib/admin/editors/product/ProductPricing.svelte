@@ -128,7 +128,7 @@
         {#if product.show_price}
           {#if someLabelingsEnabled}
             <div class="ui-box">
-              <Input type="number" min={0} step={0.01} bind:value={product.price} api>Cena</Input>
+              <Input type="number" min={0} step={0.01} bind:value={product.price} api={product.api_enabled}>Cena</Input>
 
               {#if product.sale}
                 <div class="ui-box ui-box--optional">

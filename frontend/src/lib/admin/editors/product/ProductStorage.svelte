@@ -73,10 +73,14 @@
           </div>
 
           <div class="ui-pair">
-            <Input type="number" bind:value={storage.amount} api>Ilość</Input>
+            <Input type="number" bind:value={storage.amount} api={product.api_enabled}>Ilość</Input>
             <div class="ui-pair">
-              <Input bind:value={storage.api_color_code}>Kod&nbsp;<small style="opacity:0.65">API</small></Input>
-              <Input bind:value={storage.api_color_id}>ID&nbsp;<small style="opacity:0.65">API</small></Input>
+              <Input bind:value={storage.api_color_code}>
+                Kod{#if product.api_enabled}&nbsp;<small style="opacity:0.65">API</small>{/if}
+              </Input>
+              {#if product.api_enabled}
+                <Input bind:value={storage.api_color_id}>ID&nbsp;<small style="opacity:0.65">API</small></Input>
+              {/if}
             </div>
           </div>
           <div class="ui-pair">

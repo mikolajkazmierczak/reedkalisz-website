@@ -197,7 +197,8 @@
       'storage.color_second'
     ];
     const filter = { company: { _eq: 1 } };
-    dbItems = (await api.items('products').readByQuery({ fields, filter })).data;
+    dbItems = (await api.items('products').readByQuery({ fields, filter, limit: -1 })).data;
+    console.log('dbItems', dbItems);
   }
 
   async function fetchSnapshot(company) {

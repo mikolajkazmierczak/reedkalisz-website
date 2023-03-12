@@ -112,12 +112,26 @@
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">
-            <div class="ui-pair">
+            <div class="toggles">
               <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
               <Input type="checkbox" bind:value={item.new}>Nowość</Input>
+              <Input type="checkbox" bind:value={item.api_enabled}>API</Input>
             </div>
             <Input bind:value={item.name}>Nazwa</Input>
-            <Input bind:value={item.code} error={errors.code}>Kod</Input>
+            <div class="ui-pair">
+              <Input bind:value={item.code} error={errors.code}>
+                Kod{#if item.api_enabled}&nbsp;<small style="opacity:0.65">API</small>{/if}
+              </Input>
+              {#if item.api_enabled}
+                <Input
+                  type="select"
+                  bind:value={item.company}
+                  options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
+                >
+                  Producent&nbsp;<small style="opacity:0.65">API</small>
+                </Input>
+              {/if}
+            </div>
           </div>
           <div class="ui-box">
             <h3 class="ui-h3">Kategorie</h3>
@@ -154,20 +168,6 @@
             <h3 class="ui-h3">SEO</h3>
             <Input bind:value={item.seo_title}>Tytuł</Input>
             <Input type="textarea" bind:value={item.seo_description}>Opis</Input>
-          </div>
-          <div class="ui-box">
-            <h3 class="ui-h3">API</h3>
-            <div class="ui-pair">
-              <Input
-                type="select"
-                bind:value={item.company}
-                options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
-              >
-                Producent
-              </Input>
-              <Input bind:value={item.api_code}>Kod</Input>
-            </div>
-            <Input type="checkbox" bind:value={item.api_enabled}>Włączone</Input>
           </div>
         </div>
 
@@ -277,6 +277,11 @@
     max-height: 500px;
     overflow-wrap: break-word;
   } */
+  .toggles {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
   .category.main {
     outline: var(--outline-dashed);
   }
