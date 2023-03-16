@@ -44,6 +44,6 @@
   .tiles {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 0.75rem;
+    gap: 2rem 0.75rem;
   }
 </style>

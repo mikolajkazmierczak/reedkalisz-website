@@ -3,9 +3,12 @@
   import Search from './Search.svelte';
 
   export let menu;
+  let y;
 </script>
 
-<div class="wrapper">
+<svelte:window bind:scrollY={y} />
+
+<div class="wrapper" class:scrolled={y > 0}>
   <a class="logo" href="/">
     <img src="/logo.svg" alt="reed logo" />
   </a>
@@ -29,12 +32,16 @@
     height: 6rem;
     width: 100%;
     backdrop-filter: blur(2px);
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: var(--white);
+    border-bottom: 1px solid var(--main);
+    /* transition: border-bottom 100ms; */
   }
 
   .logo {
+    position: relative;
+    top: 1rem;
     display: block;
-    height: 100%;
+    height: 6rem;
     margin-right: 1rem;
   }
   .logo img {

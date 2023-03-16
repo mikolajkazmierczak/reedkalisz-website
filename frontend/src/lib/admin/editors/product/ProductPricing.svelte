@@ -176,7 +176,11 @@
               <Input type="checkbox" bind:value={product.custom_prices_with_labeling}>Ceny ze znakowaniem</Input>
               {#if product.custom_prices_with_labeling}
                 <div class="ui-box ui-box--optional">
-                  <LabelingField bind:x={product.labeling_field_x} bind:y={product.labeling_field_y} />
+                  <LabelingField
+                    bind:x={product.labeling_field_x}
+                    bind:y={product.labeling_field_y}
+                    bind:place={product.labeling_place}
+                  />
                 </div>
               {/if}
             </div>
@@ -238,7 +242,11 @@
                   />
                 {/if}
 
-                <LabelingField bind:x={labeling.labeling_field_x} bind:y={labeling.labeling_field_y} />
+                <LabelingField
+                  bind:x={labeling.labeling_field_x}
+                  bind:y={labeling.labeling_field_y}
+                  bind:place={labeling.labeling_place}
+                />
               </div>
             {/each}
 

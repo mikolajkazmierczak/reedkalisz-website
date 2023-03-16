@@ -131,11 +131,12 @@
     display: flex;
     flex-direction: column;
     border: 1px solid rgba(0, 0, 0, 0.1);
+    /* padding: 0.5rem; */
     text-decoration: none;
     background-color: rgb(250, 250, 250);
   }
   .tile:hover {
-    border: 1px solid var(--main-1);
+    /* border: 1px solid var(--main-1); */
     background-color: var(--main-0);
   }
 

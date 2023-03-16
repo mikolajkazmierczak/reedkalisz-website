@@ -2,7 +2,7 @@ import polka from 'polka';
 import { Server as socketio } from 'socket.io';
 import 'dotenv/config';
 
-import apis from './apis.js';
+import apis from './apis';
 
 const doLog = true;
 function log(string) {
@@ -14,6 +14,15 @@ const cors = { origin: true };
 
 const app = polka().listen(PORT, HOST, () => console.log(`🚀 Lift off on port ${PORT}!`));
 const io = new socketio(app.server, { cors });
+
+async function fetchAPI(companyName) {
+  switch (companyName) {
+    case 'PAR':
+      return await apis.PARAPI.fetch(process.env.API_USERNAME_PAR, process.env.API_PASSWORD_PAR);
+    case 'Asgard':
+      return await apis.AsgardAPI.fetch(process.env.API_USERNAME_ASGARD, process.env.API_PASSWORD_ASGARD);
+  }
+}
 
 app.get('/', (req, res) => {
   res.end('Greetings. I am a vigilant watcher of this realm. My name is Heimdall Odinson.');
@@ -32,18 +41,15 @@ io.on('connection', socket => {
     if (data.selfBroadcast) socket.emit('changes', data);
   });
 
-  socket.on('fetch', async ({ companyName, data }) => {
+  socket.on('fetch', async ({ companyName }) => {
     log(`📡 Fetching data (${socket.id})`);
     log(`   - api: ${companyName}`);
-    let output = null;
     try {
-      if (companyName == 'PAR') {
-        output = await apis.PARAPI.fetch(process.env.API_USERNAME_PAR, process.env.API_PASSWORD_PAR);
-      }
+      data = await fetchAPI(companyName);
+      socket.emit('fetch', data);
       log(`   - success`);
     } catch (err) {
       log(`   - error ${err}`);
     }
-    socket.emit('fetch', output);
   });
 });

@@ -31,6 +31,7 @@
     custom_prices_with_labeling,
     labeling_field_x,
     labeling_field_y,
+    labeling_place,
     custom_prices,
     custom_prices_sale,
     labelings,
@@ -112,6 +113,9 @@
               Pole znakowania {labeling_field_x}x{labeling_field_y} mm
             </small>
           {/if}
+          {#if labeling_place}
+            <small class="place">{labeling_place}</small>
+          {/if}
           <div class="prices">
             <Pricing
               prices={custom_prices.filter(p => p.enabled)}
@@ -131,6 +135,9 @@
               <small class="labeling-field">
                 Pole znakowania {labeling.labeling_field_x}x{labeling.labeling_field_y} mm
               </small>
+            {/if}
+            {#if labeling.labeling_place}
+              <small class="place">{labeling.labeling_place}</small>
             {/if}
             <div class="prices">
               <Pricing

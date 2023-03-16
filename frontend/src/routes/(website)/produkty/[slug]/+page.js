@@ -24,6 +24,7 @@ const productFields = [
   'custom_prices_with_labeling',
   'labeling_field_x',
   'labeling_field_y',
+  'labeling_place',
   'custom_prices.enabled',
   'custom_prices.amount',
   'custom_prices.price',
@@ -44,6 +45,7 @@ const productFields = [
   'labelings.prices_sale.price',
   'labelings.labeling_field_x',
   'labelings.labeling_field_y',
+  'labelings.labeling_place',
 
   'storage.enabled',
   'storage.amount',

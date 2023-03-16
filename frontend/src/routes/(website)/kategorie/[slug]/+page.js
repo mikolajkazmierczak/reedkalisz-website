@@ -61,6 +61,6 @@ export async function load({ url, parent, params }) {
   const { q: query } = SearchParams.parseSearchToParams(url.search);
 
   const filter = await getFilter(query, params.slug);
-  const products = (await api.items('products').readByQuery({ filter, fields })).data;
+  const products = (await api.items('products').readByQuery({ filter, fields, limit: -1 })).data;
   return { menus, products };
 }
