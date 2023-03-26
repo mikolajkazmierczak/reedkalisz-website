@@ -39,7 +39,6 @@
 
 <style>
   footer {
-    margin-top: 2rem;
     min-height: 16rem;
     height: auto;
     width: 100%;
@@ -57,7 +56,7 @@
   .about,
   .menu,
   .office {
-    width: 30%;
+    max-width: 55ch;
   }
 
   .rights {

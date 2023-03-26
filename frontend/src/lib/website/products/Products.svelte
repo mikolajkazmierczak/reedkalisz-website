@@ -28,7 +28,6 @@
   .wrapper {
     display: grid;
     grid-template-columns: 1fr 3fr;
-    margin-top: 6rem;
     width: 100%;
   }
 

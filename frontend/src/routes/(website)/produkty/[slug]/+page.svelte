@@ -6,7 +6,7 @@
   import NewBadge from '#c/badges/NewBadge.svelte';
   import Gallery from './Gallery.svelte';
   import Storage from './Storage.svelte';
-  import Pricing from './Pricing.svelte';
+  import Prices from './Prices.svelte';
   import Question from './Question.svelte';
 
   export let data;
@@ -108,44 +108,26 @@
       <h2>Cennik</h2>
       <div class="prices-wrapper">
         {#if showCustomPrices}
-          {#if labeling_field_x && labeling_field_x}
-            <small class="labeling-field">
-              Pole znakowania {labeling_field_x}x{labeling_field_y} mm
-            </small>
-          {/if}
-          {#if labeling_place}
-            <small class="place">{labeling_place}</small>
-          {/if}
-          <div class="prices">
-            <Pricing
-              prices={custom_prices.filter(p => p.enabled)}
-              pricesSale={custom_prices_sale.filter(p => p.enabled)}
-            />
-            {#if custom_prices_with_labeling}
-              <div class="prices-with-labeling">Ceny ze znakowaniem</div>
-            {/if}
-          </div>
+          <Prices
+            field={[labeling_field_x, labeling_field_y]}
+            place={labeling_place}
+            prices={custom_prices}
+            pricesSale={custom_prices_sale}
+            pricesWithLabeling={custom_prices_with_labeling}
+          />
         {/if}
 
         {#if showLabelingsPrices}
           {#each labelings.filter(l => l.enabled) as labeling}
             {@const { company, code, type, name } = labeling.labeling}
-            <h3>{name} <span>{company.name} {code ?? ''} {type ?? ''}</span></h3>
-            {#if labeling.labeling_field_x && labeling.labeling_field_x}
-              <small class="labeling-field">
-                Pole znakowania {labeling.labeling_field_x}x{labeling.labeling_field_y} mm
-              </small>
-            {/if}
-            {#if labeling.labeling_place}
-              <small class="place">{labeling.labeling_place}</small>
-            {/if}
-            <div class="prices">
-              <Pricing
-                prices={labeling.prices.filter(p => p.enabled)}
-                pricesSale={labeling.prices_sale.filter(p => p.enabled)}
-              />
-              <div class="prices-with-labeling">Ceny ze znakowaniem</div>
-            </div>
+            <h3>{name} <span>{code ?? ''} - {type ?? ''}</span></h3>
+            <Prices
+              field={[labeling.labeling_field_x, labeling.labeling_field_x]}
+              place={labeling.labeling_place}
+              prices={labeling.prices}
+              pricesSale={labeling.prices_sale}
+              pricesWithLabeling
+            />
           {/each}
         {/if}
       </div>
@@ -168,7 +150,7 @@
   /* .column.left */
 
   .column.left {
-    padding: 7.5rem 1.5rem 2rem 1.5rem;
+    padding: 3rem 1.5rem 2rem 1.5rem;
     background-color: var(--light);
   }
   .storages {
@@ -181,7 +163,7 @@
 
   .column.right {
     position: relative;
-    padding: 9.5rem 0 3rem 0;
+    padding: 4.5rem 0 3rem 0;
   }
   .badges {
     position: absolute;
@@ -214,28 +196,12 @@
     margin: 0.5rem 0;
   }
 
-  .prices-with-labeling {
-    display: inline-block;
-    opacity: 0.6;
-    border-top: none;
-    padding: 0.25rem 0.5rem;
-    background-color: var(--grey);
-    font-size: small;
-    text-transform: uppercase;
-  }
   .prices-wrapper h3 {
     margin-top: 1.5rem;
     font-weight: normal;
   }
   .prices-wrapper h3 span {
     font-size: 0.75em;
-    opacity: 0.6;
-  }
-  .prices {
-    margin-top: 0.5rem;
-  }
-  .labeling-field {
-    display: block;
     opacity: 0.6;
   }
 

@@ -1,4 +1,4 @@
-import { PARAPI } from './apis/PAR.js';
-import { AsgardAPI } from './apis/Asgard.js';
+import { PARAPI } from './PAR.js';
+import { AsgardAPI } from './Asgard.js';
 
-export default { PARAPI: PARAPI(), AsgardAPI: AsgardAPI() };
+export default { PARAPI: new PARAPI(), AsgardAPI: new AsgardAPI() };

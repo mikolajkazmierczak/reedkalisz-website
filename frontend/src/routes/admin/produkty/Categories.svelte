@@ -22,6 +22,7 @@
   <div>
     <h3 class="title">Kategorie</h3>
     <Category id={null} name={'Wszystkie'} enabled children={[]} depth={0} bind:selected={category} />
+    <Category id={-1} name={'Bez kategorii'} enabled children={[]} depth={0} bind:selected={category} />
     {#if items}
       {#each items as { id, name, enabled, children }, i}
         <Category {id} {name} {enabled} {children} depth={i + 1} bind:selected={category} />

@@ -108,7 +108,7 @@
     </div>
     <div class="price">
       {#if price.value}
-        <span>{price.value.toFixed(2)}<small class="currency">zł</small></span>
+        <span><small class="from">od</small>{price.value.toFixed(2)}<small class="currency">zł</small></span>
       {:else}
         <small class="empty">Zapytaj o cenę</small>
       {/if}
@@ -188,6 +188,11 @@
     align-items: center;
     font-size: 1.25rem;
     margin: 0.75rem 0;
+  }
+  .from {
+    margin-right: 0.35rem;
+    font-size: 0.7em;
+    opacity: 0.5;
   }
   .currency {
     margin-left: 0.15rem;

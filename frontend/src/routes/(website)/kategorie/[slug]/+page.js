@@ -17,6 +17,7 @@ const fields = [
   'custom_prices_sale.enabled',
   'custom_prices_sale.price',
 
+  'labelings.enabled',
   'labelings.prices.enabled',
   'labelings.prices.price',
   'labelings.prices_sale.enabled',
@@ -62,5 +63,19 @@ export async function load({ url, parent, params }) {
 
   const filter = await getFilter(query, params.slug);
   const products = (await api.items('products').readByQuery({ filter, fields, limit: -1 })).data;
+
+  // sort products from lowest to highest price
+  products.sort((a, b) => {
+    const getLowestPrice = product => {
+      const get = prices => prices.filter(p => p.enabled && p.price).map(p => p.price);
+      const lowest = (prices, pricesSale) => Math.min(...get(prices), ...get(pricesSale));
+      const labelings = product.labelings.filter(l => l.enabled);
+      return labelings.length > 0
+        ? Math.min(...labelings.map(l => lowest(l.prices, l.prices_sale)))
+        : lowest(product.custom_prices, product.custom_prices_sale);
+    };
+    return getLowestPrice(a) - getLowestPrice(b);
+  });
+
   return { menus, products };
 }

@@ -2,7 +2,7 @@ import polka from 'polka';
 import { Server as socketio } from 'socket.io';
 import 'dotenv/config';
 
-import apis from './apis';
+import apis from './apis/index.js';
 
 const doLog = true;
 function log(string) {
@@ -45,7 +45,7 @@ io.on('connection', socket => {
     log(`📡 Fetching data (${socket.id})`);
     log(`   - api: ${companyName}`);
     try {
-      data = await fetchAPI(companyName);
+      const data = await fetchAPI(companyName);
       socket.emit('fetch', data);
       log(`   - success`);
     } catch (err) {

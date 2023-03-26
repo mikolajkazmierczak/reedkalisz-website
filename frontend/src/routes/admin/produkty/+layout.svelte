@@ -1,6 +1,5 @@
 <script>
   import { goto } from '$app/navigation';
-  import { fade } from 'svelte/transition';
 
   import api from '$/api';
   import heimdall from '$/heimdall';
@@ -25,8 +24,13 @@
   let products;
 
   async function read(limit, page, query, category) {
-    const filter = category ? { categories: { category: { _eq: category } } } : {};
-    products = await api.items('products').readByQuery({ fields, filter, limit, page, search: query, meta: '*' });
+    const filter = () => {
+      if (category == -1) return { categories: { _null: true } };
+      if (category == null) return {};
+      return { categories: { category: { _eq: category } } };
+    };
+    const options = { fields, filter: filter(), limit, page, search: query, meta: '*' };
+    products = await api.items('products').readByQuery(options);
   }
 
   $: $categories && read(limit, page, query, category);
@@ -46,13 +50,12 @@
     <div class="items">
       <div class="actions">
         <div>
-          <Button on:click={() => goto(`/admin/produkty/+`)} icon="add">Dodaj</Button>
-          {#if category}
-            <div transition:fade={{ duration: 100 }}>
-              <Button on:click={() => goto(`/admin/produkty/+?c=${category}`)} icon="add">
-                <span>Dodaj w <small>{$categories.find(c => c.id == category).name}</small></span>
-              </Button>
-            </div>
+          {#if category == -1 || category == null}
+            <Button on:click={() => goto(`/admin/produkty/+`)} icon="add">Dodaj</Button>
+          {:else}
+            <Button on:click={() => goto(`/admin/produkty/+?c=${category}`)} icon="add">
+              <span>Dodaj w <small>{$categories.find(c => c.id == category).name}</small></span>
+            </Button>
           {/if}
         </div>
         <Search {searchParams} {query} />

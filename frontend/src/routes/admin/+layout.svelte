@@ -45,6 +45,7 @@
 </script>
 
 <svelte:head>
+  <meta name="robots" content="noindex" />
   <style>
     body {
       background-color: var(--accent-white);
