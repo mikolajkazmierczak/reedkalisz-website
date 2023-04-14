@@ -122,7 +122,7 @@
             {@const { company, code, type, name } = labeling.labeling}
             <h3>{name} <span>{code ?? ''} - {type ?? ''}</span></h3>
             <Prices
-              field={[labeling.labeling_field_x, labeling.labeling_field_x]}
+              field={[labeling.labeling_field_x, labeling.labeling_field_y]}
               place={labeling.labeling_place}
               prices={labeling.prices}
               pricesSale={labeling.prices_sale}

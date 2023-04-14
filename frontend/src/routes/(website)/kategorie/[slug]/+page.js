@@ -1,3 +1,5 @@
+import { error } from '@sveltejs/kit';
+
 import api from '$/api';
 import { SearchParams } from '$/searchparams';
 import { treeGetAllChildrenIDs } from '%/utils';
@@ -50,7 +52,8 @@ export async function load({ url, parent, params }) {
     // by category
     if (slug && slug != '_') {
       const categoryOptions = { filter: { slug }, fields: ['id'] };
-      const category = (await api.items('categories').readByQuery(categoryOptions)).data[0].id;
+      const category = (await api.items('categories').readByQuery(categoryOptions)).data[0]?.id;
+      if (!category) throw error(404, '404');
       const getIDs = c => [c, ...treeGetAllChildrenIDs(categories, c)];
       return { categories: { category: { _in: getIDs(category) } } };
     }
