@@ -66,16 +66,16 @@
     {#if tree}
       <div class="value value--head value--center">
         <div>
-          <Tooltip label="Dodawanie podkategorii" />
-          <div class="icon"><div><Icon name="text_bullet_list_add" dark /></div></div>
+          <Tooltip>Dodawanie podkategorii</Tooltip>
+          <div class="icon"><div><Icon fill name="text_bullet_list_add" dark /></div></div>
         </div>
       </div>
     {/if}
     {#if tree || order}
       <div class="value value--head value--center">
         <div>
-          <Tooltip label="Hierarchia" />
-          <div class="icon"><div><Icon name="hierarchy" dark /></div></div>
+          <Tooltip>Hierarchia</Tooltip>
+          <div class="icon"><div><Icon fill name="hierarchy" dark /></div></div>
         </div>
       </div>
     {/if}
@@ -83,8 +83,10 @@
       <div class="value value--head" class:center={checkbox}>
         <div>
           {#if icon}
-            {#if label}<Tooltip {label} />{/if}
-            <div class="icon"><div><Icon name={icon} dark /></div></div>
+            {#if label}
+              <Tooltip>{label}</Tooltip>
+            {/if}
+            <div class="icon"><div><Icon fill name={icon} dark /></div></div>
           {:else if label}
             {label}
           {/if}
@@ -104,7 +106,7 @@
           expand(item);
         }}
       >
-        <div><div class="icon"><div><Icon name="add" dark /></div></div></div>
+        <div><div class="icon"><div><Icon fill name="add" dark /></div></div></div>
       </div>
     {/if}
     {#if tree || order}
@@ -120,12 +122,12 @@
           on:dragend={dragend}
         >
           {#if expandable}
-            <div class="icon"><div><Icon name={expanded ? 'chevron_down' : 'chevron_right'} dark /></div></div>
+            <div class="icon"><div><Icon fill name={expanded ? 'chevron_down' : 'chevron_right'} dark /></div></div>
           {:else}
             <div />
           {/if}
           {#if order}
-            <div class="icon drag"><div><Icon name="drag" dark /></div></div>
+            <div class="icon drag"><div><Icon fill name="drag" dark /></div></div>
           {/if}
         </div>
       </div>
@@ -159,9 +161,9 @@
         <div>
           {#if checkbox}
             {#if value}
-              <Icon name="ok" color={'var(--primary)'} strokeWidth="1" />
+              <Icon fill name="ok" color={'var(--primary)'} strokeWidth="1" />
             {:else}
-              <Icon name="close" color={'var(--accent)'} />
+              <Icon fill name="close" color={'var(--accent)'} />
             {/if}
           {:else if blame}
             <Blame {...value} />

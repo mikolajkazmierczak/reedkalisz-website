@@ -1,69 +1,102 @@
 <script>
+  import AdminOnlyOverlay from '#c/AdminOnlyOverlay.svelte';
   import Color from '#c/Color.svelte';
   import Gallery from './Gallery.svelte';
 
+  export let company;
+  $: codeSeparator = getCodeSeparator(company);
+
   export let code;
   export let storage;
-  const { api_color_code, amount, img, color_first, color_second, multicolored } = storage;
+  $: ({ enabled, amount, multicolored, api_color_code, color_first, color_second, img } = storage);
+
+  function getCodeSeparator(company) {
+    switch (company?.name) {
+      case 'PAR':
+        return '.';
+      case 'MidOcean':
+        return '-';
+      default:
+        return '';
+    }
+  }
 </script>
 
 <div class="storage">
-  <div class="code">
-    <Color {amount} first={color_first} second={color_second} {multicolored} />
+  <AdminOnlyOverlay show={!enabled} />
+
+  <div class="badge">
+    <div class="swatch">
+      <Color {multicolored} first={color_first} second={color_second} {amount} size="2rem" />
+    </div>
     <h3>
-      <small>{code}{api_color_code}</small>
+      <small class="code">{code}{api_color_code ? codeSeparator : ''}{api_color_code}</small>
       <div class="color">
         {#if multicolored}
-          <span>WIELOKOROWY</span>
+          <span>WIELOKOLOROWY</span>
         {:else if color_first || color_second}
           {#if color_first}
-            <span>
-              {color_first.name}
-              {#if color_second}&nbsp;/{/if}
-            </span>
+            {color_first.name}
+            {#if color_second}&nbsp;/&nbsp;{/if}
           {/if}
-          {#if color_second}<br /><span>{color_second.name}</span>{/if}
+          {#if color_second}
+            {color_second.name}
+          {/if}
         {/if}
       </div>
     </h3>
   </div>
 
-  <!-- <div class="amount"><small>Ilość:</small> {@html amount ?? '<small>Na stanie</small>'}</div> -->
+  <div class="amount">
+    <small>Dostępność:</small>
+    {#if amount == 0}
+      <b><small class="empty">BRAK</small></b>
+    {:else if amount}
+      {amount}
+    {:else}
+      <b><small>ZAPYTAJ</small></b>
+    {/if}
+  </div>
 
-  <Gallery imgs={img.filter(img => img.enabled)} small />
+  <Gallery small imgs={img} />
 </div>
 
 <style>
   .storage {
+    position: relative;
     display: flex;
     flex-direction: column;
-    /* border-radius: 10px; */
-    /* border: 1px solid rgba(0, 0, 0, 0.1); */
-    padding: 0.5rem;
+    padding: 0.5rem 0;
     width: calc((100% - 1rem) / 2);
-    background-color: rgb(250, 250, 250);
   }
 
-  .storage .code {
+  .badge {
     white-space: nowrap;
     display: grid;
-    grid-template-columns: 20px 1fr;
+    grid-template-columns: auto 1fr;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
-  .storage h3 {
+  h3 {
     display: flex;
     flex-direction: column;
   }
-  .storage .color {
+  .swatch {
+    margin-top: 0.05rem;
+  }
+  .color {
     font-size: x-small;
     font-weight: normal;
     text-transform: uppercase;
   }
 
-  .storage .amount {
+  .amount {
     white-space: nowrap;
-    margin: 0.5rem 0;
+    margin-left: 1.25rem;
+    margin-bottom: 0.5rem;
     opacity: 0.8;
+  }
+  .empty {
+    color: var(--main);
   }
 </style>

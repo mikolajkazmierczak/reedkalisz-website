@@ -22,11 +22,15 @@
   }
 
   async function handleDelete() {
-    if (confirm('Napewno?')) {
+    if (confirm('Na :) pewno?')) {
       await api.files.deleteOne(id);
       heimdall.emit('directus_files', id);
       goto('/admin/biblioteka', { replaceState: true, noScroll: true });
     }
+  }
+
+  function getAssetsPathname(url) {
+    return new URL(url).pathname;
   }
 
   read();
@@ -37,48 +41,49 @@
 
 <Editor root="/admin/biblioteka" icon="library" title={id}>
   {#if file}
-    <section class="ui-section__row">
-      <div class="ui-section__col ui-box ui-box--uneditable">
-        <div>
-          <b>ID:</b>
-          <a href="{baseUrl}/assets/{id}" target="_blank" rel="noreferrer">{id}</a>
-        </div>
-        <div>
-          <b>Plik:</b>
-          {filetypeToReadable(file.type)}
-          {bytesToReadable(file.filesize)}
-        </div>
-        <br />
+    <section class="ui-section">
+      <div class="ui-section__row">
+        <div class="ui-section__col info">
+          <div class="ui-box ui-box--uneditable">
+            <h3 class="ui-h3">Link do pliku</h3>
+            <a href="{baseUrl}/assets/{id}" target="_blank">
+              <span class="assets-url">{getAssetsPathname(baseUrl)}/assets/</span>{id}
+            </a>
 
-        <div>
-          <b>Nazwa na dysku:</b> <br />
-          {file.filename_disk}
+            <h3 class="ui-h3">Właściwości</h3>
+            <div>
+              {filetypeToReadable(file.type)}
+              {bytesToReadable(file.filesize)}
+              {#if file.width}
+                {file.width}x{file.height}
+              {/if}
+            </div>
+
+            <h3 class="ui-h3">Pobierz</h3>
+            <a href="{baseUrl}/assets/{id}?download" target="_blank">{file.filename_download}</a>
+          </div>
         </div>
-        <div>
-          <b>Nazwa przy pobraniu:</b> <br />
-          <a href="{baseUrl}/assets/{id}?download">{file.filename_download}</a> <br />
+
+        <div class="ui-section__col blame">
+          <div class="ui-box swap">
+            <h3 class="ui-h3">Podmień plik</h3>
+            Linku do pliku się nie zmieni.
+            <Upload update={id} on:upload={read} />
+          </div>
         </div>
-        <br />
 
-        <div><b>Dodano:</b> <br /> <Blame user={file.uploaded_by} datetime={file.uploaded_on} /></div>
-        {#if file.modified_by}
-          <div><b>Zaktualizowano:</b> <br /> <Blame user={file.modified_by} datetime={file.modified_on} /></div>
-        {/if}
-        <br />
-
-        {#if file.width}
-          <div><b>Szerokość:</b> <br /> {file.width}</div>
-          <div><b>Wysokość:</b> <br /> {file.height}</div>
-          <br />
-        {/if}
-      </div>
-
-      <div class="ui-section__col ui-box actions">
-        <Button icon="delete" dangerous on:click={handleDelete}>Usuń</Button>
-        <br /><br />
-        <div>
-          <b>Zamień plik:</b> <br />
-          <Upload update={id} on:upload={read} />
+        <div class="ui-section__col actions">
+          <div class="ui-box">
+            <Button icon="delete" dangerous on:click={handleDelete}>Usuń</Button>
+          </div>
+          <div class="ui-box ui-box--uneditable">
+            <h3 class="ui-h3">Utworzenie</h3>
+            <div><Blame user={file.uploaded_by} datetime={file.uploaded_on} /></div>
+            {#if file.modified_by}
+              <h3 class="ui-h3">Aktualizacja</h3>
+              <div><Blame user={file.modified_by} datetime={file.modified_on} /></div>
+            {/if}
+          </div>
         </div>
       </div>
     </section>
@@ -95,7 +100,7 @@
         {/if}
       {:else}
         <div class="icon">
-          <Icon name="file" />
+          <Icon fill name="file" />
         </div>
       {/if}
     </div>
@@ -103,11 +108,18 @@
 </Editor>
 
 <style>
-  .ui-box {
-    display: block;
+  .info {
+    grid-column: 1 / 2;
   }
+  .assets-url {
+    font-size: 0.9rem;
+  }
+
   .actions {
-    grid-column: 2 / 4;
+    grid-column: 3 / 4;
+  }
+  .swap {
+    gap: 0.5rem;
   }
 
   .file {

@@ -24,6 +24,12 @@
   let products;
 
   async function read(limit, page, query, category) {
+    if (category !== null && category !== -1 && !$categories.find(c => c.id == category)) {
+      // TODO: doesn't work after deleting a category you're in
+      searchParams.set({ c: null });
+      return;
+    }
+
     const filter = () => {
       if (category == -1) return { categories: { _null: true } };
       if (category == null) return {};

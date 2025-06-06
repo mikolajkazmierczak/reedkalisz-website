@@ -92,3 +92,39 @@ export function cleanupPrices(amounts, prices1, prices2, pricesReusable = null) 
 
   return [prices1, prices2];
 }
+
+export function getMinMaxPrices(product) {
+  // returns { min: number/null, max: number/null, min_sale: number/null, max_sale: number/null }
+  const prices = {
+    min: null,
+    max: null,
+    minSale: null,
+    maxSale: null
+  };
+
+  if (product.show_price === false) {
+    return prices;
+  }
+
+  const setMinMax = (pricePerAmounts, min = 'min', max = 'max') => {
+    for (const { price } of pricePerAmounts.filter(p => p.enabled && p.price)) {
+      if (prices[min] === null || price < prices[min]) prices[min] = price;
+      if (prices[max] === null || price > prices[max]) prices[max] = price;
+    }
+  };
+
+  const pricePerAmounts = [product.custom_prices, ...product.labelings.map(({ prices }) => prices)].flat();
+  // console.log('pricePerAmounts', pricePerAmounts);
+  setMinMax(pricePerAmounts);
+
+  if (product.sale) {
+    const salePricePerAmounts = [
+      product.custom_prices_sale,
+      ...product.labelings.map(({ prices_sale }) => prices_sale)
+    ].flat();
+    // console.log('salePricePerAmounts', salePricePerAmounts);
+    setMinMax(salePricePerAmounts, 'minSale', 'maxSale');
+  }
+
+  return prices;
+}

@@ -32,7 +32,7 @@
 <div class="pagination">
   <div class="buttons">
     <button class="arrow" class:active={page == 1} on:click={prev}>
-      <div class="icon"><Icon name="arrow_left" dark /></div>
+      <div class="icon"><Icon fill name="arrow_left" dark /></div>
     </button>
 
     {#if pagesCount <= 11}
@@ -66,7 +66,7 @@
     {/if}
 
     <button class="arrow" class:active={page == pagesCount || pagesCount == 0} on:click={next}>
-      <div class="icon"><Icon name="arrow_right" dark /></div>
+      <div class="icon"><Icon fill name="arrow_right" dark /></div>
     </button>
   </div>
 

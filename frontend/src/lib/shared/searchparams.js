@@ -36,6 +36,29 @@ function values() {
   }
 }
 
+export function parseSearchToParams(search) {
+  // Parse URL and return an object with the specified search params.
+  // `search`: '?number=42&string=excalibur' -> { number: 42, string: 'excalibur' }
+  const searchParams = new URLSearchParams(search);
+  const keys = searchParams.keys();
+  const params = {};
+  for (const key of keys) {
+    const v = searchParams.get(key);
+    params[key] = v ? (isNaN(Number(v)) ? v : Number(v)) : null;
+  }
+  return params;
+}
+
+export function parseParamsToSearch(params) {
+  // Parse an object with the specified search params and return a URL.
+  // `params`: { number: 42, string: 'excalibur' } -> '?number=42&string=excalibur'
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value != null) searchParams.set(key, value);
+  }
+  return '?' + searchParams.toString();
+}
+
 export class SearchParams {
   constructor(pathname, refresh = false) {
     this.pathname = pathname;
@@ -140,27 +163,12 @@ export class SearchParams {
     return { params, defaults, values };
   }
 
-  static parseSearchToParams(search) {
-    // Parse URL and return an object with the specified search params.
-    // `search`: '?number=42&string=excalibur' -> { number: 42, string: 'excalibur' }
-    const searchParams = new URLSearchParams(search);
-    const keys = searchParams.keys();
-    const params = {};
-    for (const key of keys) {
-      const v = searchParams.get(key);
-      params[key] = v ? (isNaN(Number(v)) ? v : Number(v)) : null;
-    }
-    return params;
+  static parseParamsToSearch(params) {
+    return parseParamsToSearch(params);
   }
 
-  static parseParamsToSearch(params) {
-    // Parse an object with the specified search params and return a URL.
-    // `params`: { number: 42, string: 'excalibur' } -> '?number=42&string=excalibur'
-    const searchParams = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) {
-      if (value != null) searchParams.set(key, value);
-    }
-    return '?' + searchParams.toString();
+  static parseSearchToParams(search) {
+    return parseSearchToParams(search);
   }
 
   static read() {

@@ -68,7 +68,14 @@
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
-        <div class="ui-section__col">
+        {#if item.description}
+          <div class="ui-section__col" style:grid-column={'1 / span 2'}>
+            <div class="ui-box ui-box--uneditable">
+              <div>{@html marked.parse(item.description)}</div>
+            </div>
+          </div>
+        {/if}
+        <div class="ui-section__col" style:grid-column={item.description ? '3 / span 1' : '1 / span 1'}>
           <div class="ui-box ui-box--uneditable">
             <h3 class="ui-h3">Aktualizacja</h3>
             <p>
@@ -84,7 +91,7 @@
     </section>
 
     <section class="ui-section">
-      <h2 class="ui-h2">Opis</h2>
+      <h2 class="ui-h2">Zawartość</h2>
       <div class="ui-section__row">
         <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
           <div class="ui-pair ui-texteditor">
@@ -118,6 +125,7 @@
             <div class="ui-texteditor__draft code">
               <Input
                 type="textarea"
+                format="json"
                 bind:value={data}
                 rows={30}
                 error={dataParsingError ? `<b>SYNTAX ERROR</b>&nbsp; ${dataParsingError}` : false}
@@ -131,6 +139,13 @@
 </Editor>
 
 <style>
+  :global(pre) {
+    margin: 0;
+  }
+  :global(code, code *) {
+    font-family: monospace;
+    font-size: 0.9rem;
+  }
   .code {
     grid-column: 1 / span 4;
   }

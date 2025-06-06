@@ -81,14 +81,14 @@
           <div class="button back" role="button" on:click={handleCancel}>
             <HoverCircle color={'var(--main-3)'} />
             <div class="icon" in:spin>
-              <Icon name="close" dark />
+              <Icon fill name="close" dark />
             </div>
           </div>
         {:else}
           <div class="button back" role="button" on:click={handleExit}>
             <HoverCircle color={'var(--accent-light)'} />
             <div class="icon" in:spin>
-              <Icon name="arrow_left" dark />
+              <Icon fill name="arrow_left" dark />
             </div>
           </div>
         {/if}
@@ -98,7 +98,7 @@
             <div class="button save" role="button" on:click={handleSave}>
               <HoverCircle color={'var(--success)'} />
               {#if !saving}
-                <div class="icon"><Icon name="ok" dark /></div>
+                <div class="icon"><Icon fill name="ok" dark /></div>
               {/if}
               <span>
                 {#if saving}Zapisuję...{:else}Zapisz{/if}
@@ -110,7 +110,7 @@
 
       <div class="title">
         <div class="icon">
-          <Icon name={icon} />
+          <Icon fill name={icon} />
         </div>
         <h2>{title ?? 'Wczytywanie...'}</h2>
       </div>
@@ -179,8 +179,9 @@
     position: sticky;
     top: 0;
     left: 0;
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    align-items: center; /* centers actions, for some reason */
     gap: 1rem;
     padding: 0 2rem;
     height: 4rem;
@@ -210,6 +211,7 @@
   }
 
   .title {
+    overflow: hidden;
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -223,7 +225,9 @@
     aspect-ratio: 1 / 1;
   }
   .title h2 {
+    overflow: hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
     font-weight: 900;
   }
 

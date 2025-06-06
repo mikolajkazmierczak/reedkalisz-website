@@ -10,7 +10,9 @@
 <header>
   <div class="text">
     {#key icon}
-      <div class="icon" in:fly={{ y: 50, duration: 350 }}><Icon name={icon} /></div>
+      <div class="icon" in:fly={{ y: 50, duration: 350 }}>
+        <Icon fill name={icon} />
+      </div>
     {/key}
     {#key title}
       <h1 in:fly={{ y: 50, duration: 500 }}>{title}</h1>

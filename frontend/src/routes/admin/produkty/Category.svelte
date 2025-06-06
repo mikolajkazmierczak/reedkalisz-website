@@ -43,9 +43,9 @@
     {#if hasChildren}
       <div class="expander" class:active={expanded} role="button" on:click={() => (expanded = !expanded)}>
         {#if expanded}
-          <Icon name="chevron_down" />
+          <Icon fill name="chevron_down" />
         {:else}
-          <Icon name="chevron_right" />
+          <Icon fill name="chevron_right" />
         {/if}
       </div>
     {/if}
@@ -86,7 +86,9 @@
     width: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
-    transition: background-color 100ms, padding 200ms;
+    transition:
+      background-color 100ms,
+      padding 200ms;
   }
   .title.disabled {
     opacity: 0.35;

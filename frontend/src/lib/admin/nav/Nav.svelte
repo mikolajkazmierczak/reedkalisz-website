@@ -66,11 +66,11 @@
         {#if awaitingLogout}
           <Loader />
         {:else}
-          <Icon name="logout" light />
+          <Icon fill name="logout" light />
         {/if}
       </NavButton>
       <div class="avatar">
-        <Tooltip label="{$me.first_name} {$me.last_name}" />
+        <Tooltip>{$me.first_name} {$me.last_name}</Tooltip>
         <img src="{baseUrl}/assets/{$me.avatar}" alt="" />
       </div>
     </div>

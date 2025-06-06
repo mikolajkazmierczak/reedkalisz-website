@@ -9,7 +9,7 @@
   export let item;
   $: ({ id, folder, name, href, children } = item);
 
-  $: contactHref = 'https://new.reed.kalisz.pl/kontakt';
+  $: contactHref = 'https://reed.kalisz.pl/kontakt';
   $: isContactPage = href === contactHref;
   $: active = href === $page.url.pathname || (isContactPage && $page.url.href === contactHref);
 </script>
@@ -19,7 +19,7 @@
     <div class="content" class:folder>
       {name}
       {#if folder}
-        <div class="icon"><Icon name="chevron_down" color={active ? 'var(--light)' : 'var(--main)'} /></div>
+        <div class="icon"><Icon fill name="chevron_down" color={active ? 'var(--light)' : 'var(--main)'} /></div>
       {/if}
     </div>
   </a>
@@ -37,37 +37,49 @@
 
 <style>
   .item {
-    --border-blank: 2px solid transparent;
-    --border: 2px solid var(--main);
+    --bg: transparent;
+    --bg-hover: var(--main);
+    --bg-active: var(--main);
+    --color: var(--main);
+    --color-hover: var(--light);
+    --color-active: var(--light);
     position: relative;
-    display: flex;
-    align-items: center;
+    height: 100%;
   }
   a {
-    border: var(--border-blank);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
     text-decoration: none;
     text-transform: uppercase;
     font-size: 1.15rem;
     font-weight: 500;
+    background-color: var(--bg);
   }
   .item:hover a {
-    border: var(--border);
-    background-color: var(--white);
+    background-color: var(--bg-hover);
   }
   .item.active a {
-    background-color: var(--main);
+    background-color: var(--bg-active);
   }
   .content {
     display: flex;
     align-items: center;
     gap: 5px;
     padding: 0 1rem;
-    height: 2.5rem;
-    color: var(--main);
+    height: 100%;
     transition: border-radius 100ms;
+    color: var(--color);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 1);
+  }
+  .item:hover .content {
+    color: var(--color-hover);
+    text-shadow: initial;
   }
   .item.active .content {
-    color: var(--white);
+    color: var(--color-active);
+    text-shadow: initial;
   }
   .content.folder {
     padding-right: 0.5rem;

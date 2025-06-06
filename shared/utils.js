@@ -14,6 +14,8 @@ export const deep = {
   same: (obj1, obj2) => dequal(obj1, obj2)
 };
 
+export const uid = keyLength => nanoid(keyLength);
+
 export const slugify = (parts, { key = false, keyLength = 8, partsOriginal = null, slugOriginal = null } = {}) => {
   if (!Array.isArray(parts)) parts = [parts];
   if (!Array.isArray(partsOriginal)) partsOriginal = [partsOriginal];
@@ -106,6 +108,17 @@ export function diff(item, itemOriginal, { editorPreset = false, fieldsToIgnore 
       html: diffToHtml(diff)
     });
   });
+}
+
+export function diffSync(item, itemOriginal) {
+  const itemCopy = deep.copy(item);
+  const itemOriginalCopy = deep.copy(itemOriginal);
+  const diff = diffJson(itemOriginalCopy, itemCopy);
+  return {
+    diff: diff,
+    changed: diff.some(part => part.added || part.removed),
+    html: diffToHtml(diff)
+  };
 }
 
 export function filetypeToReadable(filetype) {
@@ -248,12 +261,12 @@ export function treeRemoveMarked(tree) {
 export function treeGetItemAtPath(tree, path) {
   // Find item using it's path.
   if (path.length === 0) return tree;
-  if (path.length === 1) return tree[path[0]];
-  return treeGetItemAtPath(tree[path[0]].children, path.slice(1));
+  if (path.length === 1) return tree.find(item => item.index == path[0]);
+  return treeGetItemAtPath(tree.find(item => item.index == path[0]).children, path.slice(1));
 }
 export function treePushItemAtPath(tree, path, item) {
   // Insert item at path.
-  const parent = tree[path[0]];
+  const parent = tree.find(item => item.index == path[0]);
   if (path.length === 1) {
     tree.splice(path[0], 0, item); // if path[0] is bigger then the array, it will still be added at the end
   } else treePushItemAtPath(parent.children, path.slice(1), item);
@@ -282,6 +295,16 @@ export function treeGetItemIDsFromPath(tree, path) {
     ids.push(item.id);
   }
   return ids;
+}
+
+export function treeGetItemsFromPath(tree, path) {
+  // Find all items in a path.
+  const items = [];
+  for (let i = 0; i < path.length; i++) {
+    const item = treeGetItemAtPath(tree, path.slice(0, i + 1));
+    items.push(item);
+  }
+  return items;
 }
 
 export function treeGetAllChildrenIDs(tree, id) {

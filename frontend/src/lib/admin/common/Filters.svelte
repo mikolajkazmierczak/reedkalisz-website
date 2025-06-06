@@ -1,22 +1,29 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import Icon from '$c/Icon.svelte';
   import Filter from './Filter.svelte';
 
-  export let title;
+  const dispatch = createEventDispatcher();
+
+  export let title = null;
   export let filters;
 
   export let selected;
+
+  function propagate(e) {
+    dispatch('change', { value: e.detail.value });
+  }
 </script>
 
 <div class="filters">
   {#if title}
-    <div class="icon" title="Filtrowanie">
-      <Icon name="filter" />
+    <div title="Filtrowanie">
+      <Icon height="1.5em" name="filter" />
     </div>
     {title}
   {/if}
   {#each filters as filter}
-    <Filter {...filter} bind:selected />
+    <Filter {...filter} bind:selected on:change={propagate} />
   {/each}
 </div>
 
@@ -25,8 +32,5 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-  }
-  .icon {
-    height: 1.5em;
   }
 </style>

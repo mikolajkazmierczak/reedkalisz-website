@@ -39,7 +39,7 @@
 <div class="wrapper">
   {#if !!query}
     <button class="clear" on:click={clear} transition:fly={{ x: 25, duration: 200 }}>
-      <div class="icon"><Icon name="arrow_clockwise" color="var(--primary)" /></div>
+      <div class="icon"><Icon fill name="arrow_clockwise" color="var(--primary)" /></div>
     </button>
   {/if}
 

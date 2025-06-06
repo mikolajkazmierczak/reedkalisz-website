@@ -1,5 +1,7 @@
 <script>
   import { page } from '$app/stores';
+
+  // TODO: refresh after auth
 </script>
 
 <div class="wrapper">

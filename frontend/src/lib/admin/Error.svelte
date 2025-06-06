@@ -15,7 +15,7 @@
   <div class="wrapper" transition:fly={{ y: 20, duration: 300 }}>
     <div class="head">
       <div class="hide" on:click={hide}>
-        <Icon name="close" />
+        <Icon fill name="close" />
       </div>
       <h1>Wystąpił nieoczekiwany błąd</h1>
       <p>Każdemu może się zdarzyć...</p>

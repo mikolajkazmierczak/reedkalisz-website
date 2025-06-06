@@ -1,84 +1,60 @@
 import { error } from '@sveltejs/kit';
+import { writable, get } from 'svelte/store';
 
 import api from '$/api';
-import { SearchParams } from '$/searchparams';
+import { parseSearchToParams } from '$/searchparams';
 import { treeGetAllChildrenIDs } from '%/utils';
+import { fields } from '#/products/fields';
 
-const fields = [
-  'id',
-  'name',
-  'code',
-  'slug',
-  'enabled',
-  'new',
-  'sale',
+const countStore = writable();
+const filterStore = writable();
 
-  'custom_prices_with_labeling',
-  'custom_prices.enabled',
-  'custom_prices.price',
-  'custom_prices_sale.enabled',
-  'custom_prices_sale.price',
-
-  'labelings.enabled',
-  'labelings.prices.enabled',
-  'labelings.prices.price',
-  'labelings.prices_sale.enabled',
-  'labelings.prices_sale.price',
-
-  'storage.enabled',
-  'storage.amount',
-  'storage.color_first.enabled',
-  'storage.color_first.name',
-  'storage.color_first.color',
-  'storage.color_second.enabled',
-  'storage.color_second.name',
-  'storage.color_second.color',
-  'storage.multicolored',
-  'storage.api_color_code',
-  'storage.img.enabled',
-  'storage.img.img',
-  'storage.img.show_in_gallery',
-
-  'gallery.enabled',
-  'gallery.img'
-];
+async function getFilter(query, slug, categoriesItems, categoriesTree) {
+  // by search query
+  if (query) {
+    return { _or: [{ name: { _contains: query } }, { code: { _contains: query } }] };
+  }
+  // by category
+  if (slug && slug != '_') {
+    const category = categoriesItems.find(c => c.slug === slug)?.id;
+    if (!category) throw error(404, '404');
+    const getIDs = c => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
+    return { categories: { category: { _in: getIDs(category) } } };
+  }
+  // all products
+  return {};
+}
 
 export async function load({ url, parent, params }) {
-  const getFilter = async (query, slug) => {
-    // by search query
-    if (query) {
-      return { _or: [{ name: { _contains: query } }, { code: { _contains: query } }] };
-    }
-    // by category
-    if (slug && slug != '_') {
-      const categoryOptions = { filter: { slug }, fields: ['id'] };
-      const category = (await api.items('categories').readByQuery(categoryOptions)).data[0]?.id;
-      if (!category) throw error(404, '404');
-      const getIDs = c => [c, ...treeGetAllChildrenIDs(categories, c)];
-      return { categories: { category: { _in: getIDs(category) } } };
-    }
-    // all products
-    return {};
-  };
+  const { categoriesTree, categoriesItems, menus } = await parent();
 
-  const { menus, categories } = await parent();
-  const { q: query } = SearchParams.parseSearchToParams(url.search);
+  const { l, p, q } = parseSearchToParams(url.search);
 
-  const filter = await getFilter(query, params.slug);
-  const products = (await api.items('products').readByQuery({ filter, fields, limit: -1 })).data;
+  const filter = await getFilter(q, params.slug, categoriesItems, categoriesTree);
+  const sort = ['price_min'];
+  const limit = l || 25;
+  const page = p || 1;
 
-  // sort products from lowest to highest price
-  products.sort((a, b) => {
-    const getLowestPrice = product => {
-      const get = prices => prices.filter(p => p.enabled && p.price).map(p => p.price);
-      const lowest = (prices, pricesSale) => Math.min(...get(prices), ...get(pricesSale));
-      const labelings = product.labelings.filter(l => l.enabled);
-      return labelings.length > 0
-        ? Math.min(...labelings.map(l => lowest(l.prices, l.prices_sale)))
-        : lowest(product.custom_prices, product.custom_prices_sale);
-    };
-    return getLowestPrice(a) - getLowestPrice(b);
-  });
+  let products = (await api.items('products').readByQuery({ filter, sort, fields, limit, page, meta: '*' })).data;
 
-  return { menus, products };
+  // a tragic way to count products without running too many requests
+  // to workaround meta.filter_count consistently returning the wrong values
+  let count = get(countStore);
+  const oldFilter = get(filterStore);
+  if (oldFilter !== JSON.stringify(filter)) {
+    count = (await api.items('products').readByQuery({ filter, fields: ['id'], limit: -1 })).data.length;
+    countStore.set(count);
+    filterStore.set(JSON.stringify(filter));
+  }
+
+  // add calendars from the fragment as tiles
+  if (params.slug === 'kalendarze-Bf4TIYjf') {
+    const calendars = (await api.items('fragments').readOne(11)).data;
+    products = [
+      ...calendars.map((c, i) => ({ ...c, id: calendars.length - i - 1, alt: c.title })).filter(p => p.show),
+      ...products
+    ];
+  }
+
+  return { menus, products, limit, page, count };
 }

@@ -6,6 +6,7 @@
   import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '%/fields/products';
   import { deep, slugify, diff, makeTree, treeFlatten, moveItem } from '%/utils';
+  import { getMinMaxPrices } from '%/calculationsPrices';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
@@ -34,6 +35,13 @@
 
   async function save(action) {
     try {
+      // set min and max prices
+      const minMaxPrices = getMinMaxPrices(item); // takes care of nullifying for privacy
+      item.price_min = minMaxPrices.min;
+      item.price_max = minMaxPrices.max;
+      item.price_min_sale = minMaxPrices.minSale;
+      item.price_max_sale = minMaxPrices.maxSale;
+      // save
       await action();
       errors = { code: null, materials: null };
     } catch (e) {
@@ -115,22 +123,27 @@
             <div class="toggles">
               <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
               <Input type="checkbox" bind:value={item.new}>Nowość</Input>
-              <Input type="checkbox" bind:value={item.api_enabled}>API</Input>
+              <Input type="checkbox" bind:value={item.bestseller}>Bestseller</Input>
+            </div>
+            <div class="toggles">
+              <Input type="checkbox" bind:value={item.coming_soon}>Już wkrótce</Input>
+              <Input type="checkbox" bind:value={item.out_of_stock}>Koniec nakładu</Input>
+              <!-- <Input type="checkbox" bind:value={item.api_enabled}>API</Input> -->
             </div>
             <Input bind:value={item.name}>Nazwa</Input>
             <div class="ui-pair">
               <Input bind:value={item.code} error={errors.code}>
                 Kod{#if item.api_enabled}&nbsp;<small style="opacity:0.65">API</small>{/if}
               </Input>
-              {#if item.api_enabled}
-                <Input
-                  type="select"
-                  bind:value={item.company}
-                  options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
-                >
-                  Producent&nbsp;<small style="opacity:0.65">API</small>
-                </Input>
-              {/if}
+              <!-- {#if item.api_enabled} -->
+              <Input
+                type="select"
+                bind:value={item.company}
+                options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
+              >
+                Producent&nbsp;<small style="opacity:0.65">API</small>
+              </Input>
+              <!-- {/if} -->
             </div>
           </div>
           <div class="ui-box">
@@ -168,6 +181,11 @@
             <h3 class="ui-h3">SEO</h3>
             <Input bind:value={item.seo_title}>Tytuł</Input>
             <Input type="textarea" bind:value={item.seo_description}>Opis</Input>
+          </div>
+
+          <div class="ui-box" class:admin-notes-filled={!!item.admin_notes}>
+            <h3 class="ui-h3">Notatki</h3>
+            <Input type="textarea" bind:value={item.admin_notes}></Input>
           </div>
         </div>
 
@@ -277,9 +295,9 @@
     max-height: 500px;
     overflow-wrap: break-word;
   } */
+
   .toggles {
     display: flex;
-    justify-content: space-between;
     gap: 1rem;
   }
   .category.main {
@@ -289,5 +307,9 @@
     display: flex;
     align-items: flex-end;
     gap: 1rem;
+  }
+
+  .admin-notes-filled {
+    background-color: #ffdf83;
   }
 </style>

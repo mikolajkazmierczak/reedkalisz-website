@@ -19,7 +19,7 @@
   let items;
 
   async function read(limit, page, query) {
-    const options = { fields, limit, page, search: query, meta: '*' };
+    const options = { fields, sort: ['-date_created'], limit, page, search: query, meta: '*' };
     items = await api.items('questions').readByQuery(options);
   }
 

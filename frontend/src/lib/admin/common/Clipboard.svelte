@@ -17,7 +17,7 @@
 </script>
 
 <button on:click={copy}>
-  <Icon name="copy" />
+  <Icon fill name="copy" />
 </button>
 
 <style>

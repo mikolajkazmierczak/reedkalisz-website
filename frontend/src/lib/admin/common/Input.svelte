@@ -29,6 +29,7 @@
   // textarea
   export let resize = false;
   export let rows = 3;
+  export let format = 'html'; // text, html, markdown, json
 
   // select
   export let options = [];
@@ -97,7 +98,17 @@
       style:border-radius={borderRadius}
     />
   {:else if type == 'textarea'}
-    <textarea {id} bind:value {placeholder} {disabled} class:error class:borderless {rows} class:resize />
+    <textarea
+      {id}
+      bind:value
+      {placeholder}
+      {disabled}
+      class:error
+      class:borderless
+      {rows}
+      class:resize
+      class:json={format === 'json'}
+    />
   {:else if type == 'email'}
     <input
       {id}
@@ -193,7 +204,7 @@
           style:border-radius={borderRadius}
         />
         <!-- <button class="list__tidy" on:click={() => (list = value.join(';'))} title="Uporządkuj">
-          <Icon name="broom" />
+          <Icon fill name="broom" />
         </button> -->
       </div>
       <div class="list-items">
@@ -208,7 +219,7 @@
               }}
             >
               {v}
-              <div class="icon"><Icon name="close" /></div>
+              <div class="icon"><Icon fill name="close" /></div>
             </button>
           {/each}
         {/if}
@@ -245,8 +256,8 @@
 
   {#if api}
     <div class="api-icon">
-      <Tooltip label="Ta wartość będzie aktualizowana przez API" />
-      <Icon name="api" light />
+      <Tooltip>Ta wartość będzie aktualizowana przez API</Tooltip>
+      <Icon fill name="api" light />
     </div>
   {/if}
 </div>
@@ -291,6 +302,10 @@
   }
   textarea.resize {
     resize: both;
+  }
+  textarea.json {
+    font-family: monospace;
+    font-size: 0.9rem;
   }
 
   select {

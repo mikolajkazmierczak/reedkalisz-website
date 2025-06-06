@@ -8,7 +8,8 @@ import { me } from '$/auth';
 // export const baseUrl = 'http://192.168.1.10:9999';
 // export const baseUrl = 'http://formixhome.ddns.net:9999';
 // export const baseUrl = 'http://produktpolski.ddns.net:9999';
-export const baseUrl = 'https://new.reed.kalisz.pl';
+export const baseUrl = 'https://reed.kalisz.pl';
+export const restUrl = `${baseUrl}/heimdall`;
 
 class Socket {
   constructor(url) {
@@ -43,8 +44,8 @@ class Socket {
   offFetch(listener) {
     this.socket.off('fetch', listener);
   }
-  emitFetch(companyName, data) {
-    this.socket.emit('fetch', { companyName, data });
+  emitFetch(company, data) {
+    this.socket.emit('fetch', { company, data });
   }
 }
 
@@ -72,8 +73,20 @@ class Heimdall {
     });
   }
 
-  ask(companyName, data) {
-    this.socket.emitFetch(companyName, data);
+  // async fetch(url, options) {
+  //   // fetches data from url with options, automatically handles FormData objects
+  //   const bodyIsFormData = options.body instanceof FormData;
+  //   if (bodyIsFormData) options.body = Object.fromEntries(options.body);
+  //   const res = await fetch(`${restUrl}/fetch`, {
+  //     'Content-Type': 'text/html; charset=utf-8',
+  //     method: 'POST',
+  //     body: JSON.stringify({ url, options, bodyIsFormData })
+  //   });
+  //   return await res.text();
+  // }
+
+  ask(company, data) {
+    this.socket.emitFetch(company, data);
   }
   get(func, root = false) {
     this.socket.onFetch(func);

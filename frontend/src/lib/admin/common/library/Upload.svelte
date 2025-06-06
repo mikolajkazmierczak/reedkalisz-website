@@ -40,14 +40,13 @@
 <div class="wrapper" class:highlighted>
   <div class="text">
     {#if uploading}
-      <div class="icon">
-        <Icon name="upload" dark />
-      </div>
-      <span>Przeciągnij lub <span style:text-decoration="underline">Wybierz</span></span>
+      <Icon height="3rem" name="upload" dark />
+      <span>Przeciągnij<br />lub <span style:text-decoration="underline">Wybierz</span></span>
     {:else}
       <span>Przetwarzanie...</span>
     {/if}
   </div>
+
   <input
     disabled={!uploading}
     multiple={!update}
@@ -70,21 +69,26 @@
   .wrapper.highlighted {
     background-color: var(--accent-light);
   }
+
   .text {
     pointer-events: none;
+
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 1rem;
-    font-size: 1.5rem;
+
     padding: 0.5rem;
+    width: 100%;
+    height: 100%;
+
+    font-size: 1.5rem;
   }
-  .icon {
-    height: 2rem;
-  }
+
   input {
     cursor: pointer;
     opacity: 0;

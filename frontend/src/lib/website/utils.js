@@ -7,3 +7,13 @@ export function addLinks(items) {
     if (item.children) addLinks(item.children);
   }
 }
+
+export function parseColor(multicolored, first, second) {
+  const bg = first ?? second; // first could be unset
+  const fg = second; // doesnt matter if first is unset
+
+  const title = bg && fg ? `${bg.name} / ${fg.name}` : bg ? bg.name : fg ? fg.name : null;
+  const label = multicolored ? 'Wielokolorowy' : (title ?? 'Nieokreślony');
+
+  return { label, bg, fg };
+}

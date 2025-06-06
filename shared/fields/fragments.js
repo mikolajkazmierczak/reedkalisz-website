@@ -2,7 +2,7 @@ export const search = ['id', 'user_created', 'date_created', 'user_updated', 'da
 export const show = [...search];
 
 export const read = [...search];
-export const edit = [...search];
+export const edit = [...search, 'description'];
 
 export const defaults = () => ({
   id: '+',
@@ -11,8 +11,9 @@ export const defaults = () => ({
   user_updated: null,
   date_updated: null,
   name: '',
+  description: '',
   content: '',
-  data: {}
+  data: null
 });
 
 export default { search, show, read, edit, defaults };

@@ -33,11 +33,7 @@
     <HoverCircle color={hoverColor} />
   {/if}
   <div class="content" class:label={$$slots.default} class:square>
-    {#if icon}
-      <div class="icon">
-        <Icon name={icon} light={!secondary} dark={secondary} />
-      </div>
-    {/if}
+    {#if icon}<Icon height="58%" name={icon} light={!secondary} dark={secondary} />{/if}
     {#if $$slots.default}<slot />{/if}
   </div>
 </button>
@@ -88,9 +84,5 @@
   [disabled] {
     cursor: not-allowed;
     background-color: var(--accent-white);
-  }
-
-  .icon {
-    height: 58%;
   }
 </style>

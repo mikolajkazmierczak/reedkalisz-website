@@ -17,6 +17,7 @@
   nav {
     display: flex;
     align-items: center;
-    height: 100%;
+    height: 2.5rem;
+    /* border: 2px solid var(--main); */
   }
 </style>

@@ -10,7 +10,7 @@
 
 {#if demo}
   <div class="demo">
-    <div class="close" on:click={() => (demo = false)}><Icon name="close" color="var(--demo-dark)" /></div>
+    <div class="close" on:click={() => (demo = false)}><Icon fill name="close" color="var(--demo-dark)" /></div>
     <small>Dokumentuj błędy!</small>
     <h1>WERSJA DEMO</h1>
   </div>
@@ -18,7 +18,7 @@
 
 {#if unstable}
   <div class="unstable">
-    <div class="close" on:click={() => (unstable = false)}><Icon name="close" color="var(--main)" /></div>
+    <div class="close" on:click={() => (unstable = false)}><Icon fill name="close" color="var(--main)" /></div>
     <small>Nie korzystaj z serwisu!</small>
     <h1>WYKRYTO NIESTABILNOŚĆ</h1>
   </div>

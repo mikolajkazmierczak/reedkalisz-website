@@ -14,7 +14,7 @@
   export let productOriginal;
 
   async function read() {
-    // info: $companies are loaded in parent component
+    // $companies loaded in parent component
     await globals.update(globalMargins);
     await globals.update(priceViews);
     await globals.update(labelings);
@@ -61,7 +61,14 @@
   // LABELINGS
   function updateLabelingsPrices() {
     if ($globalMargins && $priceViews && $labelings && product)
-      recalculateLabelings(priceViewData.amounts, $globalMargins, $labelings, product, productLabelingsReusable);
+      recalculateLabelings(
+        priceViewData.amounts,
+        $globalMargins,
+        $labelings,
+        $companies,
+        product,
+        productLabelingsReusable
+      );
   }
   $: $labelings?.sort((a, b) => {
     // labelings are sorted by the user with the exception of the company
@@ -109,6 +116,7 @@
 </script>
 
 {#if product && $labelings && $priceViews && $globalMargins}
+  {@const company = $companies.find(c => c.id === product.company)}
   <section class="ui-section">
     <h2 class="ui-h2">Cennik</h2>
     <div class="ui-section__row">
@@ -128,7 +136,28 @@
         {#if product.show_price}
           {#if someLabelingsEnabled}
             <div class="ui-box">
-              <Input type="number" min={0} step={0.01} bind:value={product.price} api={product.api_enabled}>Cena</Input>
+              <div class="ui-pair">
+                <Input type="number" min={0} step={0.01} bind:value={product.price} api={product.api_enabled}>
+                  Cena
+                </Input>
+
+                {#if company?.api_handling_costs}
+                  <Input
+                    type="select"
+                    bind:value={product.handling_cost}
+                    options={[
+                      { id: null, text: '---' }, // deselect
+                      ...company.api_handling_costs.map(({ price, code, name }) => {
+                        const text = `${price} zł (${code}${name ? ` / ${name}` : ''})`;
+                        return { id: price, text };
+                      })
+                    ]}
+                    api={product.api_enabled}
+                  >
+                    Koszty manipulacyjne
+                  </Input>
+                {/if}
+              </div>
 
               {#if product.sale}
                 <div class="ui-box ui-box--optional">
@@ -219,11 +248,20 @@
                 <Input
                   type="select"
                   bind:value={labeling.labeling}
-                  options={$labelings.map(({ id, company, code, type, name }) => {
-                    company = $companies.find(c => c.id == company);
-                    return { id, text: `${company.name} ${code || '-'} ${type || '-'} ${name || '-'}` };
-                  })}
+                  options={$labelings
+                    .filter(({ company: cid }) => {
+                      if (!company) return true; // all labelings
+                      return [company.id, 4].includes(cid); // also include REED labelings
+                    })
+                    .map(({ id, company: cid, code, type, name }) => {
+                      const { name: cname } = $companies.find(c => c.id == cid);
+                      return { id, text: `${cname} ${code || '-'} ${type || '-'} ${name || '-'}` };
+                    })}
                 />
+
+                {#if company?.api_handling_costs && product.handling_cost}
+                  <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
+                {/if}
 
                 {#if chosenLabeling && labeling.enabled}
                   <ProductPricingTable

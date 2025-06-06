@@ -12,6 +12,9 @@
   --sale: rgb(160, 226, 154);
   --sale-dark: rgb(97, 177, 90);
   --new: rgb(154, 191, 226);
+  --bestseller: rgb(255, 203, 34);
+  --coming-soon: rgb(225, 163, 255);
+  --out-of-stock: rgb(215, 215, 215);
 
   --scroll-thumb: var(--main);
   --scroll-track: var(--light);

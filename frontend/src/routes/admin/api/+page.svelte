@@ -1,368 +1,547 @@
 <script>
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { parseDatetime, getISODate } from '$/datetime';
-  import { searchparams, SearchParams } from '$/searchparams';
-  import { header } from '@/stores';
-  import { globals, companies, colors, priceViews } from '@/globals';
+  import { dequal } from 'dequal';
+  import { parseDatetime } from '%/datetime';
   import { capitalize } from '%/utils';
   import { defaults } from '%/fields/products';
-  import { countSelected, findColorID, parseColors, merge } from './helpers';
-  import { apiSnapshot, apiSnapshotDate, selected, expanded } from './stores';
+  import { searchparams, SearchParams } from '$/searchparams';
+  import { header } from '@/stores';
+  import { globals, companies, colors, labelings, priceViews, globalMargins } from '@/globals';
+  import { recalculateProducts } from '@/calculations';
+  import { round, findColorId } from './utils.js';
+  import { selected, countSelected, clearSelected } from './selected.js';
+  import { merge } from './items.js';
 
   import Loader from '$c/Loader.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
   import Pagination from '@c/Pagination.svelte';
   import Filters from '@c/Filters.svelte';
   import Button from '@c/Button.svelte';
   import Input from '@c/Input.svelte';
   import Search from '@c/Search.svelte';
-  import { onMount } from 'svelte';
+  import Items from './Items.svelte';
 
   $header = { title: 'API', icon: 'api' };
 
   const searchParams = new SearchParams('/admin/api');
   $: [limit, page, query, company] = $searchparams.get(searchParams.pathname).values();
+  // uh oh, be careful, the reactivity of the values above is wonky
+  // if one of them changes, all of them change, this means triggering functions below
 
-  function setCompany(c) {
-    searchParams.set({ c });
-    company = c;
+  let selectedCompany;
+
+  const supportedCompanyNames = ['PAR', 'MidOcean', 'BlueCollection', 'Macma', 'EasyGifts', 'Promotionway', 'AXPOL'];
+  $: supportedCompanies = $companies?.filter(c => supportedCompanyNames.includes(c.name));
+  $: supportedCompanies && selectCompany();
+
+  function selectCompany(id = null) {
+    // `company` changes don't trigger this
+    id = id || company;
+    selectedCompany = supportedCompanies.find(c => c.id === id);
+    searchParams.set({ c: id, p: 1 }); // also resets page
+    clearSelected();
   }
 
-  $: selectedCompany = company;
-  $: if (selectedCompany == null && $companies) selectedCompany = $companies[0].id;
-  $: selectedCompany != company && setCompany(selectedCompany);
-  $: comp = $companies?.find(c => c.id == selectedCompany);
+  // set on filter change
+  function handleCompanyChange(e) {
+    selectCompany(e.detail.value.id);
+  }
+
+  // set default if unset of unsupported
+  $: if (supportedCompanies && (!company || !supportedCompanies.find(c => c.id === company))) {
+    selectCompany(supportedCompanies[0].id);
+  }
 
   let fetching = false;
+  let fetchingPhase = 1;
   let uploading = false;
 
-  let nameFirst = false;
-  let dbFirst = true;
-
   let dbItems;
-  let items;
-  $: items = merge(dbItems, $apiSnapshot, { nameFirst, dbFirst, query });
-  $: selectedCount = countSelected($selected);
+  let apiItems;
+  let sort = {
+    nameFirst: true,
+    dbFirst: false,
+    notInApiFirst: true
+  };
 
-  async function upload() {
-    if (!uploading && confirm(`Zaimportować ${selectedCount} produktów?`)) {
-      uploading = true;
-      const codes = [...new Set($selected)];
-      const colorsCopy = $colors; // $colors won't update each time a color is created so we need a copy
-      const colorsIDs = [];
-      const productsIDs = [];
-      for (const code of codes) {
-        const item = items.find(i => i.code == code);
-        if (!item) continue;
-        await uploadItem(item, codes, colorsCopy, colorsIDs, productsIDs);
-      }
-      if (colorsIDs.length) heimdall.emit('colors', colorsIDs);
-      if (productsIDs.length) heimdall.emit('products', productsIDs);
-      $selected = [];
-      uploading = false;
+  let lastCompany = null;
+  $: if (selectedCompany && selectedCompany.id !== lastCompany) {
+    lastCompany = selectedCompany.id;
+    fetchItems();
+  }
+  $: mergedItems = merge(selectedCompany, dbItems, apiItems, { sort, query });
+
+  $: lastScan = parseDatetime(selectedCompany?.api_last_scan).str() ?? 'Nie skanowano';
+  $: selectedCount = $selected && countSelected(mergedItems); // { items: 1, storages: 2, all: 3 }
+
+  // TODO: add api_handling_costs the same way that api_discount works,
+  //       but change the way they work so that you have to click save
+  $: discount = selectedCompany?.api_discount ?? 0;
+
+  async function handleDiscountChange(e) {
+    let newDiscount = Number(e.target.value); // str
+    if (newDiscount != selectedCompany.api_discount) {
+      if (newDiscount < 0 || newDiscount > 100) newDiscount = 0;
+      await api.items('companies').updateOne(selectedCompany.id, { api_discount: newDiscount });
+      heimdall.emit('companies', selectedCompany.id);
     }
   }
-  async function uploadItem(item, codes, colors, colorsIDs, productsIDs) {
-    const selectedStorages = item.storage.filter(s => codes.includes(getFullCode(item, s)));
+
+  async function uploadColor(name, hex) {
+    return await api.items('colors').createOne({
+      enabled: true,
+      name: capitalize(name),
+      color: hex || null,
+      company: selectedCompany.id
+    });
+  }
+
+  async function importImage(storage, img, index) {
+    // try to import the image from different urls or throw
+    const urlsToTry =
+      selectedCompany.name === 'AXPOL'
+        ? [
+            `https://axpol.com.pl/files/fotov/${img}`,
+            `https://axpol.com.pl/files/fotob/${img}`,
+            `https://axpol.com.pl/files/foto_add_view/${img}`,
+            `https://axpol.com.pl/files/foto_add_big/${img}`,
+            `https://axpol.com.pl/files/foto_add_hr/${img}`,
+            `https://axpol.com.pl/files/foto_add_lr/${img}`
+          ]
+        : [img];
+    for (const url of urlsToTry) {
+      try {
+        console.log(`attempting to import image (${url})`);
+        const data = { title: `${storage._uid} ${index}` };
+        const file = await api.files.import({ url, data });
+        console.log(`- success (${url})`);
+        return file.id;
+      } catch (e) {
+        console.log(`- failed (${url}): ${e}`);
+      }
+    }
+    throw new Error(`${img} import failed`);
+  }
+
+  async function uploadImages(storage) {
+    const imgs = [];
+    const failedImgs = [];
+
+    await Promise.all(
+      storage.img.map(async (img, index) => {
+        try {
+          const id = await importImage(storage, img, index);
+          imgs.push({ index, img: id, enabled: true, show_in_gallery: true });
+        } catch (e) {
+          console.log(`failed to import image (${img}): ${e}`);
+          failedImgs.push(img);
+        }
+      })
+    );
+
+    if (failedImgs.length) alert(`UWAGA! Niektóre zdjęcia nie zostały zaimportowane: ${failedImgs}`);
+    return { imgs };
+  }
+
+  async function uploadItem(item, newIds) {
+    const selectedStorages = item.storage.filter(s => $selected.has(s._uid));
 
     for (const storage of selectedStorages) {
       // first upload all imgs in storage
-      const imgs = [];
-      for (const [i, img] of storage.img.entries()) {
-        try {
-          const file = await api.files.import({
-            url: `https://www.par.com.pl${img}`,
-            data: { title: `${comp.name} ${getFullCode(item, storage)} ${i}` }
-          });
-          imgs.push({
-            index: i,
-            img: file.id,
-            enabled: true,
-            show_in_gallery: true
-          });
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      const { imgs } = await uploadImages(storage);
       storage.img = imgs;
 
-      // then create new colors in db if needed
-      const getColor = async name => {
+      // then assign existing colors or upload new ones
+      const tryGetColor = async (name, hex) => {
         if (!name) return null;
-        const colorID = findColorID(colors, name);
-        if (colorID) return colorID;
-        // color doesn't exist yetalready exists
-        const newColor = await api.items('colors').createOne({
-          name: capitalize(name),
-          color: '#ffffff',
-          enabled: true
-        });
-        colors.push(newColor);
-        colorsIDs.push(newColor.id);
+        // check if color exists
+        const color = findColorId(name);
+        if (color !== null) return color;
+        // upload new color
+        const newColor = await uploadColor(name, hex);
+        $colors.push(newColor); // needed, because $colors does not update until emitting ids to heimdall
+        newIds.colors.push(newColor.id);
         return newColor.id;
       };
-      storage.color_first = await getColor(storage.color_first);
-      storage.color_second = await getColor(storage.color_second);
+
+      storage.color_first = await tryGetColor(storage.color_first, storage._color_first_hex);
+      storage.color_second = await tryGetColor(storage.color_second, storage._color_second_hex);
+
+      // disable the storage
+      storage.enabled = false;
     }
 
     // lastly upload item
-    if (item.id) {
-      const combinedStorages = [...item.storage.filter(s => s.id), ...selectedStorages];
-      const itemData = { storage: combinedStorages.map((s, i) => ({ ...s, index: i })) };
-      await api.items('products').updateOne(item.id, itemData);
-      productsIDs.push(item.id);
+    if (item._db) {
+      const storage = [...item.storage.filter(s => s._db), ...selectedStorages];
+      const storageReindexed = storage.map((s, i) => ({ ...s, index: i }));
+      await api.items('products').updateOne(item.id, { storage: storageReindexed });
+      newIds.products.push(item.id);
     } else {
-      const priceView = $priceViews.find(pv => pv.default);
-      const prices = priceView.amounts.map(a => ({ enabled: false, amount: a, price: null }));
-      const itemData = {
+      const priceView = $priceViews.find(p => p.default);
+      const prices = priceView.amounts.map(amount => ({ enabled: false, amount, price: null }));
+      const storage = selectedStorages.map((s, i) => ({ ...s, index: i }));
+      const newItem = {
         ...defaults(),
         ...item,
         enabled: false,
-        company: comp.id,
         api_enabled: true,
-        price_view: priceView.id,
+        company: selectedCompany.id,
         show_price: false,
+        price_view: priceView.id,
         custom_prices: prices,
         custom_prices_sale: prices,
-        storage: selectedStorages.map((s, i) => ({ ...s, index: i }))
+        storage
       };
-      delete itemData.id;
-
-      const newProduct = await api.items('products').createOne(itemData);
-      productsIDs.push(newProduct.id);
+      delete newItem.id; // '+' in defaults()
+      const newProduct = await api.items('products').createOne(newItem);
+      newIds.products.push(newProduct.id);
     }
   }
 
-  async function removeItem(item) {
-    if (confirm(`OPERACJA NIEODWRACALNA!\nUsunąć produkt ${item.code}?`)) {
-      await api.items('products').deleteOne(item.id);
-      heimdall.emit('products', item.id);
+  async function upload() {
+    // items are uploaded synchronously because they might share colors
+    if (!uploading && confirm(`Zaimportować ${selectedCount.all} elementów?`)) {
+      uploading = true;
+      const newIds = { products: [], colors: [] };
+      const failedItems = [];
+      for (const uid of $selected) {
+        try {
+          // note: if a storage is selected, the item is too
+          const item = mergedItems.find(i => i._uid === uid);
+          if (!item) continue; // which storages are selected is checked later based on the item
+          await uploadItem(item, newIds);
+        } catch (e) {
+          console.log(`failed to import item (${uid}): ${e}`);
+          failedItems.push(uid);
+        }
+      }
+      if (newIds.products.length) heimdall.emit('products', newIds.products);
+      if (newIds.colors.length) heimdall.emit('colors', newIds.colors);
+      clearSelected();
+      uploading = false;
+      if (failedItems.length) alert(`UWAGA! Niektóre elementy nie zostały zaimportowane: ${failedItems}`);
     }
   }
-  async function removeStorage(item, storage) {
-    if (confirm(`OPERACJA NIEODWRACALNA!\nUsunąć wariant ${getFullCode(item, storage)}?`)) {
-      const newData = {
-        // filter out:
-        // - all storages without id (not in db yet)
-        // - storage that we want to delete
-        storage: item.storage.filter(s => s.id && s.id != storage.id).map((s, i) => ({ ...s, index: i }))
+
+  async function updatePricesAndStorages() {
+    // update the price and storage amounts if they changed
+    fetchingPhase = 2;
+    const updates = [];
+    const updatedItemsIds = { disabled: new Set(), changedPrice: new Set(), changedStorage: new Set() };
+
+    for (const dbItem of dbItems) {
+      const disableAndZeroStorage = s => {
+        // disable and zero the amount of the storage (if not true already)
+        if (s.enabled || s.amount !== 0) {
+          updates.push(api.items('products_storage').updateOne(s.id, { enabled: false, amount: 0 }));
+          updatedItemsIds.changedStorage.add(dbItem.id);
+        }
       };
-      await api.items('products').updateOne(item.id, newData);
-      heimdall.emit('products', item.id);
+
+      const apiItem = apiItems.find(i => i.code == dbItem.code);
+      if (apiItem) {
+        // item exists in the api
+        // update the price if it changed (or if manipulation from MidOcean changed)
+        const apiPrice = round(apiItem.price);
+        const priceChanged = dbItem.price !== apiPrice;
+        const handlingCostChanged = dbItem.handling_cost !== apiItem.handling_cost;
+        if (priceChanged || handlingCostChanged) {
+          const productUpdates = { price: apiPrice, handling_cost: apiItem.handling_cost };
+          updates.push(api.items('products').updateOne(dbItem.id, productUpdates));
+          updatedItemsIds.changedPrice.add(dbItem.id);
+        }
+
+        for (const dbStorage of dbItem.storage) {
+          const apiStorage = apiItem.storage.find(s => s.api_color_code == dbStorage.api_color_code);
+          if (apiStorage) {
+            // storage exists in the api
+            // update the amount if it changed
+            if (apiStorage.amount !== dbStorage.amount) {
+              updates.push(api.items('products_storage').updateOne(dbStorage.id, { amount: apiStorage.amount }));
+              updatedItemsIds.changedStorage.add(dbItem.id);
+            }
+          } else {
+            // storage not in the api
+            disableAndZeroStorage(dbStorage);
+          }
+        }
+      } else {
+        // item not in the api
+        // disable the item
+        if (dbItem.enabled) {
+          updates.push(api.items('products').updateOne(dbItem.id, { enabled: false }));
+          updatedItemsIds.disabled.add(dbItem.id);
+        }
+        // disable and zero amounts of all storages
+        for (const dbStorage of dbItem.storage) {
+          disableAndZeroStorage(dbStorage);
+        }
+      }
     }
+
+    await Promise.all(updates);
+
+    return { ...updatedItemsIds, all: new Set(Object.values(updatedItemsIds).flat()) };
   }
 
-  const getFullCode = (item, storage) => `${item.code}.${storage.api_color_code}`;
-
-  function setValue(arrStore, val, add = true) {
-    arrStore.update(arr => (add ? [...arr, val] : arr.filter(a => a != val)));
-  }
-  function toggleValue(arr, arrStore, val) {
-    const set = arr.includes(val);
-    setValue(arrStore, val, !set);
-    return !set;
+  async function updatePricelists(ids) {
+    // recalculate labeling prices for all items with the given ids
+    fetchingPhase = 3;
+    if (ids.length === 0) return;
+    await recalculateProducts({ id: { _in: ids } });
   }
 
-  function toggleExpand(code) {
-    toggleValue($expanded, expanded, code);
-  }
-  function toggleAddItem(item) {
-    const newValue = toggleValue($selected, selected, item.code);
-    item.storage.forEach(s => !s.id && setValue(selected, getFullCode(item, s), newValue));
-  }
-  function toggleAddStorage(item, storage) {
-    const newValue = toggleValue($selected, selected, getFullCode(item, storage));
-    if (newValue) setValue(selected, item.code, true);
-    else {
-      const noStorageSelected = item.storage.every(s => !$selected.includes(getFullCode(item, s)));
-      if (noStorageSelected) setValue(selected, item.code, false);
-    }
-  }
-  function toggleCheck(code) {
-    let c = comp.api_checked;
-    c = c.includes(code) ? c.filter(c => c != code) : [...c, code];
-    api.items('companies').updateOne(comp.id, { api_checked: c });
-    heimdall.emit('companies', comp.id);
+  async function updateDb() {
+    // update prices and storages, then recalculate labeling prices, then fetch updated dbItems
+    const updatedItemsIds = await updatePricesAndStorages();
+    await updatePricelists(Array.from(updatedItemsIds.changedPrice));
+
+    fetching = false; // this must be set before emitting heimdall events, or the product list won't reload
+    heimdall.emit('products', Array.from(updatedItemsIds.all));
   }
 
-  async function dbLoad() {
+  async function fetchApi() {
+    if (fetching) return;
+    fetching = true;
+    fetchingPhase = 1;
+    heimdall.ask(selectedCompany);
+    // await updateDb(); // bypasses the first phase (commment out heimdall above!)
+  }
+
+  async function fetchDbItems() {
     const fields = [
       'id',
+      'enabled',
       'name',
       'code',
       'slug',
+      'price',
       'storage.id',
+      'storage.enabled',
+      'storage.amount',
       'storage.api_color_code',
       'storage.color_first',
       'storage.color_second'
     ];
-    const filter = { company: { _eq: 1 } };
-    dbItems = (await api.items('products').readByQuery({ fields, filter, limit: -1 })).data;
-    console.log('dbItems', dbItems);
+    const filter = { company: { _eq: selectedCompany.id } };
+    const res = await api.items('products').readByQuery({ fields, filter, limit: -1 });
+    return res.data;
   }
 
-  async function fetchSnapshot(company) {
-    if (fetching || !company) return;
-    fetching = true;
-    const fields = ['api_snapshot', 'api_snapshot_date'];
-    const data = await api.items('companies').readOne(company.id, { fields });
-    $apiSnapshot = data.api_snapshot;
-    $apiSnapshotDate = data.api_snapshot_date;
-    fetching = false;
+  async function fetchApiItemsSnapshot() {
+    const snapshotFileId = selectedCompany.api_snapshot;
+    if (snapshotFileId) {
+      const download = await fetch(`/api/assets/${snapshotFileId}`);
+      return await download.json();
+    }
+    return null;
   }
-  async function fetchAPI() {
-    if (fetching) return;
+
+  async function fetchItems() {
     fetching = true;
-    heimdall.ask(comp.name);
+    fetchingPhase = 0;
+    [dbItems, apiItems] = await Promise.all([fetchDbItems(), fetchApiItemsSnapshot()]);
+    fetching = false;
   }
 
   globals.update(companies);
   globals.update(colors);
   globals.update(priceViews);
-  // reload apiSnapshot
-  $: if (!$apiSnapshot) fetchSnapshot(comp);
+  globals.update(globalMargins);
+  globals.update(labelings);
+
+  // triggered by fetchApi (heimdall.ask)
   heimdall.get(async data => {
-    const time = getISODate();
-    await api.items('companies').updateOne(comp.id, { api_snapshot: data, api_snapshot_date: time });
-    $apiSnapshot = data;
-    $apiSnapshotDate = time;
-    fetching = false;
+    if (!data || data?.error) {
+      alert('Wystąpił błąd podczas skanowania API, spróbuj ponownie. Jeśli problem się powtarza, daj znać.');
+      window.location.reload(); // refresh window, might just be an expired token
+      return;
+    }
+
+    const { items } = data;
+    if (!items || items.length === 0) {
+      fetching = false;
+      throw Error(
+        'API nie zwróciło żadnych produktów. Możliwe, że wprowadzono zmiany w strukturze API. Baza danych nie została zmodyfikowana.'
+      );
+    }
+
+    const companyUpdates = {};
+
+    const tryAddCompanyUpdate = (dbKey, key) => {
+      // update if a given property was provided in the response and is different from the current value
+      if (data?.[key] && !dequal(selectedCompany[dbKey], data[key])) companyUpdates[dbKey] = data[key];
+    };
+    tryAddCompanyUpdate('api_last_scan', 'lastScan');
+    tryAddCompanyUpdate('api_discount', 'discount');
+    tryAddCompanyUpdate('api_handling_costs', 'handlingCosts');
+
+    // update or create snapshot if needed
+    if (!dequal(items, apiItems)) {
+      const formData = new FormData();
+      const file = new Blob([JSON.stringify(items)], { type: 'application/json' });
+      const fileName = `api_snapshot_${selectedCompany.name.toLowerCase()}.json`;
+      formData.append('file', file, fileName);
+      if (selectedCompany.api_snapshot) {
+        // update snapshot
+        await api.files.updateOne(selectedCompany.api_snapshot, formData);
+      } else {
+        // create snapshot
+        const { id } = await api.files.createOne(formData);
+        companyUpdates.api_snapshot = id;
+      }
+      heimdall.emit('directus_files', companyUpdates?.api_snapshot || selectedCompany.api_snapshot);
+    }
+
+    // update company if needed
+    if (Object.keys(companyUpdates).length > 0) {
+      await api.items('companies').updateOne(selectedCompany.id, companyUpdates);
+      heimdall.emit('companies', selectedCompany.id);
+    }
+
+    apiItems = items;
+    await updateDb();
   });
-  // reload dbItems
+
   heimdall.listen(async ({ data }) => {
-    if (data.collection == 'products') await dbLoad();
+    if (!fetching && data.collection == 'products') {
+      fetching = true;
+      fetchingPhase = 0;
+      dbItems = await fetchDbItems();
+      fetching = false;
+    }
   });
-  onMount(async () => await dbLoad());
 </script>
 
 <svelte:head>
   <title>Admin | API | REED Kalisz</title>
 </svelte:head>
 
-{#if $companies}
+{#if supportedCompanies}
   <div class="actions">
     <div>
       <div>
-        {#if selectedCount}
+        {#if selectedCount.all}
           <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
             {uploading ? 'Dodawanie...' : 'Dodaj'}
           </Button>
         {/if}
-        <Button icon="cloud" on:click={fetchAPI}>Skanuj API</Button>
+        <Button icon="cloud" on:click={fetchApi}>Skanuj API</Button>
       </div>
+
       <Filters
-        filters={$companies.map(({ id, name }) => ({ label: name, value: id })).filter(f => f.label == 'PAR')}
-        bind:selected={selectedCompany}
+        filters={supportedCompanies.map(c => ({ label: c.name, value: c }))}
+        selected={selectedCompany}
+        on:change={handleCompanyChange}
       />
-      <p><b>Ostatni skan:</b> {parseDatetime($apiSnapshotDate).str() ?? 'brak'}</p>
+
+      <p><b>Ostatni skan:</b>&nbsp;{lastScan}</p>
+
+      {#if selectedCompany.api_discount !== null}
+        <p>
+          <b>Rabat:</b>&nbsp;<input
+            class="discount"
+            type="number"
+            min="0"
+            max="100"
+            value={discount}
+            on:input={handleDiscountChange}
+          />&nbsp;%
+        </p>
+      {/if}
     </div>
+
     <Search {searchParams} {query} />
   </div>
 {/if}
 
 <div class="content">
-  {#if !fetching && !items}
-    <h2>Narzędzie API</h2>
-    <p>Skanuj listę produktów zewnętrzengo dostawcy<br />i wybierz, które dodać do bazy danych.</p>
-  {/if}
-
   {#if fetching}
-    <p class="loader"><Loader dark />&nbsp;&nbsp;Trwa pobieranie danych</p>
-    <small>Pobierana jest duża ilość danych.</small><br />
-    <small>Może to potrwać do kilku minut.</small>
+    {#if fetchingPhase === 0}
+      <p class="aligned"><Loader dark /> Pobieranie danych</p>
+    {:else if fetchingPhase === 1}
+      <p class="aligned"><Loader dark /> Pobieranie zewnętrznych danych (1/3)</p>
+      <small>Pobierana jest duża ilość danych, może to zająć kilka minut.</small>
+    {:else if fetchingPhase === 2}
+      <p class="aligned"><Loader dark /> Aktualizacja cen jednostkowych oraz stanów magazynowych (2/3)</p>
+      <small>Może to zająć kilka minut.</small>
+    {:else if fetchingPhase === 3}
+      <p class="aligned"><Loader dark /> Aktualizacja cenników (3/3)</p>
+      <small>Może to zająć kilka minut.</small>
+    {/if}
   {/if}
 
-  {#if !fetching && items}
-    {@const pagedItems = items.slice((page - 1) * limit, page * limit)}
+  {#if !fetching && mergedItems && selectedCompany && $colors}
+    {@const pagedItems = mergedItems.slice((page - 1) * limit, page * limit)}
 
-    <h2>
-      <span>Produkty {selectedCount > 0 ? `(${selectedCount})` : ''}</span>
+    <div class="options">
+      <h2>Produkty</h2>
+      {#if selectedCount.all}
+        <b>
+          {selectedCount.items} produkt{selectedCount.items > 1 ? 'y' : ''}
+          ({selectedCount.storages} kolor{selectedCount.storages > 1 ? 'ów' : ''})
+        </b>
+      {/if}
       <div class="sorting">
-        <label><input type="radio" bind:group={nameFirst} name="nameFirst" value={false} />Kod (A-Z)</label>
-        <label><input type="radio" bind:group={nameFirst} name="nameFirst" value={true} />Nazwa (A-Z)</label>
-        <Input type="checkbox" bind:value={dbFirst}>Najpierw dodane</Input>
+        <label><input type="radio" bind:group={sort.nameFirst} name="sortNameFirst" value={false} />Kod (A-Z)</label>
+        <label><input type="radio" bind:group={sort.nameFirst} name="sortNameFirst" value={true} />Nazwa (A-Z)</label>
+        <Input type="checkbox" bind:value={sort.notInApiFirst}>Najpierw wycofane</Input>
+        <Input type="checkbox" bind:value={sort.dbFirst}>Najpierw zaimportowane</Input>
       </div>
-    </h2>
+    </div>
 
-    <table>
-      {#each pagedItems as item}
-        {@const apiURL = search => `https://www.par.com.pl/products?search=${search}`}
-        {@const dbURL = slug => `/admin/produkty/${slug}`}
-        {@const itemExpanded = $expanded.includes(item.code)}
-        {@const itemSelected = $selected.includes(item.code)}
-        {@const itemChecked = comp.api_checked.includes(item.code)}
-        <tr
-          class:db={item.id}
-          class:removed={!item._api || item.storage.some(s => !s._api)}
-          class:selected={itemSelected}
-        >
-          <td><input type="checkbox" checked={itemChecked} on:click={() => toggleCheck(item.code)} /></td>
-          <td>
-            {#if !item.storage.every(s => s.id)}
-              {@const all = item.storage.every(s => $selected.includes(getFullCode(item, s)))}
-              {@const some = item.storage.some(s => $selected.includes(getFullCode(item, s)))}
-              <button on:click={() => toggleAddItem(item)}>{all ? '-' : some ? '/' : '+'}</button>
-            {/if}
-          </td>
-          <td><b>{item._index + 1}</b></td>
-          <td>
-            {#if item.storage.length}
-              <button on:click={() => toggleExpand(item.code)}>{itemExpanded ? '-' : `+${item.storage.length}`}</button>
-            {/if}
-          </td>
-          <td>{item.code}</td>
-          <td class="name">
-            {#if item.id}
-              <a href={dbURL(item.slug)} target="_blank" rel="noreferrer">{item.name}</a>
-            {:else}
-              {item.name}
-            {/if}
-          </td>
-          <td><a class="onhover" href={apiURL(item.code)} target="_blank" rel="noreferrer">Strona producenta</a></td>
-          <td>
-            {#if item.id}
-              <button class="onhover remove" on:click={() => removeItem(item)}>⨯</button>
-            {/if}
-          </td>
-        </tr>
-
-        {#if $colors && itemExpanded}
-          {#each item.storage as storage}
-            {@const fullCode = getFullCode(item, storage)}
-            {@const storageSelected = $selected.includes(fullCode)}
-            {@const storageChecked = comp.api_checked.includes(fullCode)}
-            <tr class:db={storage.id} class:removed={!storage._api} class:selected={storageSelected}>
-              <td><input type="checkbox" checked={storageChecked} on:click={() => toggleCheck(fullCode)} /></td>
-              <td>
-                {#if !storage.id}
-                  <button on:click={() => toggleAddStorage(item, storage)}>{storageSelected ? '-' : '+'}</button>
-                {/if}
-              </td>
-              <td><span style:opacity={0.65}>{storage._index + 1}</span></td>
-              <td />
-              <td>{fullCode}</td>
-              <td class="name">{parseColors($colors, [storage.color_first, storage.color_second])}</td>
-              <td><a class="onhover" href={apiURL(fullCode)} target="_blank" rel="noreferrer">Strona producenta</a></td>
-              <td>
-                {#if storage.id}
-                  <button class="onhover remove" on:click={() => removeStorage(item, storage)}>⨯</button>
-                {/if}
-              </td>
-            </tr>
-          {/each}
-        {/if}
-      {/each}
-    </table>
+    {#if pagedItems.length === 0}
+      <p>Brak wyników</p>
+    {:else}
+      <Items items={pagedItems} company={selectedCompany} />
+    {/if}
   {/if}
 </div>
 
-{#if !fetching && items}
-  <Pagination {searchParams} {limit} {page} count={items.length} />
+{#if !fetching && mergedItems}
+  <Pagination {searchParams} {limit} {page} count={mergedItems.length} />
 {/if}
 
+<div class="warning">
+  <span>BETA</span>&nbsp;&nbsp;Porzućcie wszelką nadzieję, wy, którzy tu wchodzicie.
+</div>
+
 <style>
-  .content {
-    margin-left: 0.5rem;
+  label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    gap: 0.35rem;
+  }
+  input[type='number'] {
+    margin: 0;
+    padding: 0;
+    width: 3rem;
+    height: 1.5rem;
+    padding: 0.2rem;
+    text-align: center;
+    font-size: 1rem;
+    text-align: left;
+  }
+  input[type='radio'] {
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    margin-right: 0.2rem;
+  }
+  p {
+    display: flex;
+    align-items: center;
+    margin: 0;
+  }
+  .aligned {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .actions {
@@ -382,10 +561,15 @@
     gap: 1rem;
   }
 
-  h2 {
+  .content {
+    margin-left: 0.5rem;
+  }
+
+  .options {
     display: flex;
-    margin-bottom: 0.5rem;
+    align-items: center;
     gap: 1rem;
+    margin-bottom: 0.5rem;
   }
   .sorting {
     display: flex;
@@ -393,76 +577,23 @@
     gap: 1rem;
     font-weight: normal;
   }
-  p {
-    margin: 0.5rem 0;
-  }
-  .loader {
-    display: flex;
-    align-items: center;
-  }
 
-  table {
-    border-collapse: collapse;
-    margin-left: -0.25rem;
+  .warning {
+    position: fixed;
+    z-index: 5;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--main);
+    padding: 0.3rem 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: hsl(200, 15%, 20%);
+    background-color: var(--accent);
   }
-  tr {
-    height: 30px;
-  }
-  tr.db {
-    background-color: var(--accent-light);
-  }
-  tr.removed {
-    background-color: var(--main-1);
-  }
-  tr.selected {
-    background-color: var(--primary-white);
-  }
-  tr:hover {
-    outline: 1px solid var(--accent);
-  }
-
-  td {
-    text-align: left;
-    margin: 0;
-    padding: 0.1rem 0.25rem;
-  }
-  td,
-  td * {
-    font-family: monospace;
-    font-size: 1rem;
-  }
-
-  a:hover {
-    text-decoration: none;
-  }
-  button {
-    cursor: pointer;
-    width: 100%;
-  }
-  label {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    font-size: 1rem;
-    gap: 0.35rem;
-  }
-  input {
-    cursor: pointer;
-    width: 1rem;
-    height: 1rem;
-  }
-  input[type='radio'] {
-    margin: 0;
-    margin-right: 0.2rem;
-  }
-  .onhover {
-    display: none;
-  }
-  tr:hover .onhover {
-    display: inherit;
-  }
-  .remove {
+  .warning span {
     font-weight: bold;
-    color: var(--main-3);
+    color: var(--main);
   }
 </style>

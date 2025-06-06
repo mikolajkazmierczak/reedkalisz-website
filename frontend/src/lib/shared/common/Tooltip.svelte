@@ -2,40 +2,61 @@
   import { onMount } from 'svelte';
   import { spring } from 'svelte/motion';
 
-  export let label = null;
+  export let border = 'var(--border)';
+  export let backgroundColor = 'var(--light)';
 
-  let elem;
-  let parent;
+  export let show = null; // show/hide (if null then visibility is controlled by parentHover)
 
-  let visible = false;
+  let tooltip;
+  let parentHover = false;
+
   let mouse = spring({ x: 0, y: 0 }, { stiffness: 0.1, damping: 0.5 });
 
+  $: visible = show === null ? parentHover : show;
+
+  function handlePointerMove(e) {
+    mouse.set({ x: e.clientX + 25, y: e.clientY });
+  }
+
   onMount(() => {
-    // this might seem 'unsvelty' but it allows this component to be put as a child of any element and it will just work
-    parent = elem.parentNode;
-    parent.addEventListener('mouseenter', () => (visible = true));
-    parent.addEventListener('mouseleave', () => (visible = false));
+    // this might seem 'unsvelty' but it allows this component
+    // to be put as a child of any element and it will just work
+    const parent = tooltip.parentNode;
+    parent.addEventListener('pointerenter', () => (parentHover = true));
+    parent.addEventListener('pointerleave', () => (parentHover = false));
   });
 </script>
 
-<svelte:window on:mousemove={e => mouse.set({ x: e.clientX + 25, y: e.clientY })} />
+<svelte:window on:pointermove={handlePointerMove} />
 
-<div bind:this={elem} class="tooltip" class:visible style="top:{$mouse.y}px; left:{$mouse.x}px;">{@html label}</div>
+<div
+  bind:this={tooltip}
+  class:visible
+  style:border
+  style:background-color={backgroundColor}
+  style:top="{$mouse.y}px"
+  style:left="{$mouse.x}px"
+>
+  <slot />
+</div>
 
 <style>
-  .tooltip {
+  div {
     pointer-events: none;
     z-index: 1000;
     position: fixed;
-    border: var(--border);
+    top: 0;
+    left: 0;
     padding: 0.25rem 0.5rem;
-    background-color: var(--light);
-    transform: scale(0);
-    transform-origin: top left;
-    transition: transform 200ms;
     font-size: 1rem;
+    transform: translateY(-10px);
+    opacity: 0;
+    transition:
+      transform 200ms,
+      opacity 200ms;
   }
-  .tooltip.visible {
-    transform: scale(1);
+  div.visible {
+    transform: translateY(0);
+    opacity: 1;
   }
 </style>

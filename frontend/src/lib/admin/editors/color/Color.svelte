@@ -6,7 +6,7 @@
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { users } from '@/globals';
+  import { globals, companies, users } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
@@ -22,6 +22,8 @@
   }
 
   async function read() {
+    await globals.update(companies);
+
     if (id == '+') {
       item = defaults();
     } else {
@@ -57,6 +59,13 @@
               <Input bind:value={item.color}>Kolor <small>HEX</small></Input>
               <Input type="color" bind:value={item.color}>Wybierz</Input>
             </div>
+            <Input
+              type="select"
+              bind:value={item.company}
+              options={$companies.map(({ id, name }) => ({ id, text: name }))}
+            >
+              Firma
+            </Input>
           </div>
         </div>
 

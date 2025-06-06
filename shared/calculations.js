@@ -1,6 +1,8 @@
 import { reuseIDs } from './utils';
 import { calculate as productFields } from './fields/products';
-import { repairPrices, cleanupPrices } from './calculationsPrices';
+import { repairPrices, cleanupPrices, getMinMaxPrices } from './calculationsPrices';
+
+// TODO: this whole file should be a class Calculator
 
 function fraction(percent) {
   // convert percentage to fraction
@@ -106,10 +108,11 @@ function updateCustomPrices(amounts, product, someLabelingsEnabled) {
   );
 }
 
-export function calculatePrices(amounts, global, labeling, product, productLabeling) {
+function calculatePrices(amounts, global, labeling, company, product, productLabeling) {
   // amounts: [number]
   // global: global_margin object
   // labeling: labeling object
+  // company: company object
   // product: product object
   // productLabeling: product_labeling object
   // returns { prices: [{amount,price}], pricesSale: [{amount,price}] }  <- lengths of prices and pricesSale are equal
@@ -144,15 +147,16 @@ export function calculatePrices(amounts, global, labeling, product, productLabel
     };
   };
 
-  const { price, price_sale, price_sale_blacklist } = product;
+  const { price, price_sale, price_sale_blacklist, handling_cost } = product;
   const blacklist = price_sale_blacklist ?? [];
+  const hc = handling_cost ?? 0; // add handling cost to the unit price
   return {
-    prices: amounts.map(amount => pricePerAmount(amount, price)),
-    pricesSale: amounts.map(amount => pricePerAmount(amount, blacklist.includes(amount) ? null : price_sale))
+    prices: amounts.map(amount => pricePerAmount(amount, price + hc)),
+    pricesSale: amounts.map(amount => pricePerAmount(amount, blacklist.includes(amount) ? null : price_sale + hc))
   };
 }
 
-export function recalculateLabelings(amounts, global, labelings, product, productLabelingsReusable = null) {
+export function recalculateLabelings(amounts, global, labelings, companies, product, productLabelingsReusable = null) {
   // Recalculates labelings prices and pricesSale.
   //   Toggles state (enabled) of each pricePerAmount appropriately.
   // `productLabelingsReusable`: [{ id: int, pricesIDs: [int], pricesSaleIDs: [int] }, ... } - reusable prices ids
@@ -161,7 +165,8 @@ export function recalculateLabelings(amounts, global, labelings, product, produc
   let r = 0;
   for (const productLabeling of product.labelings) {
     const labeling = labelings.find(l => l.id == productLabeling.labeling);
-    const calculated = calculatePrices(amounts, global, labeling, product, productLabeling);
+    const company = companies.find(c => c.id == labeling.company);
+    const calculated = calculatePrices(amounts, global, labeling, company, product, productLabeling);
 
     // enable or disable prices (visibility for a public user)
     const pricesState = productLabeling.enabled && product.show_price;
@@ -192,7 +197,7 @@ export function recalculateLabelings(amounts, global, labelings, product, produc
   product.labelings.forEach((l, i) => (l.index = i));
 }
 
-async function recalculateProduct(api, amounts, global, labelings, product, swapLabelings = null) {
+async function recalculateProduct(api, amounts, global, labelings, companies, product, swapLabelings = null) {
   // Swaps and/or deletes labelings (updates indexes).
   // Recalculates customPrices, customPricesSale and each labelings prices and pricesSale.
   //   Toggles state (enabled) of each pricePerAmount appropriately.
@@ -212,9 +217,11 @@ async function recalculateProduct(api, amounts, global, labelings, product, swap
   }
   // indexes are not updated here, they are updated in recalculateLabelings()
 
-  recalculateLabelings(amounts, global, labelings, product);
+  recalculateLabelings(amounts, global, labelings, companies, product);
   const someLabelingsEnabled = product?.labelings.some(l => l.enabled);
   updateCustomPrices(amounts, product, someLabelingsEnabled);
+
+  const { min, max, minSale, maxSale } = getMinMaxPrices(product);
 
   const updates = {
     price_view: product.price_view, // already updated in recalculateProducts()
@@ -222,7 +229,12 @@ async function recalculateProduct(api, amounts, global, labelings, product, swap
     custom_prices_sale: product.custom_prices_sale,
     labelings: product.labelings.map(({ id, index, labeling, prices, prices_sale }) => {
       return { id, index, labeling, prices, prices_sale };
-    })
+    }),
+    // min and max prices
+    price_min: min,
+    price_max: max,
+    price_min_sale: minSale,
+    price_max_sale: maxSale
   };
   await api.items('products').updateOne(product.id, updates);
 }
@@ -233,10 +245,10 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
   //
   // api - an API instance
   // filter - directus filter for products
-  // globals: { globalMargins, priceViews, labelings }
+  // globals: { globalMargins, priceViews, labelings, companies }
   // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
 
-  const products = (await api.items('products').readByQuery({ fields: productFields, filter })).data;
+  const products = (await api.items('products').readByQuery({ fields: productFields, filter, limit: -1 })).data;
 
   // recalculate each product concurrently
   await Promise.all(
@@ -248,6 +260,7 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
         priceView.amounts,
         globals.globalMargins,
         globals.labelings,
+        globals.companies,
         product,
         swapLabelings
       );

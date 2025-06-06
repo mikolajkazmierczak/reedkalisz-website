@@ -8,6 +8,8 @@
   import GlobalMargins from './GlobalMargins.svelte';
   import Labelings from './Labelings.svelte';
 
+  // import { recalculateProducts } from '@/calculations';
+
   $header = { title: 'Kalkulacje', icon: 'calculator' };
 
   async function read() {
@@ -25,6 +27,10 @@
   function toggleInfo() {
     info = !info;
   }
+
+  // function recalculateAll() {
+  //   recalculateProducts({}); // dangerous!
+  // }
 </script>
 
 <svelte:head>
@@ -58,7 +64,12 @@
       {#each $companies as company}
         {@const items = $labelings.filter(l => l.company === company.id)}
         <div class="company">
-          <h1>{company.name}</h1>
+          <div class="title">
+            <h1>{company.name}</h1>
+            {#if company?.api_handling_costs}
+              <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
+            {/if}
+          </div>
           <Labelings {company} {items} />
         </div>
       {/each}
@@ -67,9 +78,9 @@
 </div>
 
 {#if info}
-  <div class="info" on:click={toggleInfo} transition:fly={{ y: -30, duration: 200 }}>
+  <button class="info" on:click={toggleInfo} transition:fly={{ y: -30, duration: 200 }}>
     <img src="/imgs/price_formula.svg" alt="price formula" />
-  </div>
+  </button>
 {/if}
 
 <slot />
@@ -93,10 +104,17 @@
     width: 100%;
   }
   .company {
+    position: relative;
     margin-bottom: 2rem;
   }
-  .company h1 {
+  .company .title {
+    display: flex;
+    align-items: flex-end;
     margin-bottom: 0.5rem;
+  }
+  .company .title small {
+    margin-bottom: 5px;
+    margin-left: 1rem;
   }
 
   @keyframes outline-flash {

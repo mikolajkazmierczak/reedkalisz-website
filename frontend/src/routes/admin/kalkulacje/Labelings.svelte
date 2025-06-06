@@ -163,7 +163,7 @@
     // TODO: items are refreshing on the page back to old sorting
     itemsOriginal = deep.copy(items);
     heimdall.emit('labelings', ids);
-    location.reload()
+    location.reload();
   }
 
   function removeStart(i) {
@@ -218,8 +218,8 @@
     removeFinish();
   }
 
-  function pushAmount(i) {
-    if (i == undefined) i = amounts.length;
+  function pushAmount(i = null) {
+    if (i === null) i = amounts.length;
     for (const item of items) {
       item.prices.splice(i, 0, { amount: null, price: null });
     }
@@ -288,7 +288,7 @@
   bind:opened={deleting}
   on:close={removeFinish}
 >
-  <small>W produktach, które korzystają z tego znakowania zostanie ono usunięte. Możesz też wybrać zamiennik.</small>
+  <small>Znakowanie zostanie usunięte w produktach, które z niego korzystają. Możesz wybrać zamiennik.</small>
   <Input
     type="select"
     bind:value={swapID}
@@ -305,7 +305,11 @@
   <div class="ui-pair popup-actions">
     <Button on:click={removeFinish}>Anuluj</Button>
     <Button on:click={remove} dangerous>
-      {#if deletingSaving} Usuwanie... {:else} Usuń {/if}
+      {#if deletingSaving}
+        Usuwanie...
+      {:else}
+        Usuń
+      {/if}
     </Button>
   </div>
 </Popup>
@@ -314,43 +318,43 @@
   <div class="wrapper">
     <table class="ui-table">
       <tr>
-        <th width="30" class="icon info">
-          <Tooltip label="Domyślne dla producenta" />
-          <div class="icon"><Icon name="star" /></div>
+        <th width="30">
+          <Tooltip>Domyślne dla producenta</Tooltip>
+          <Icon fill name="star" />
         </th>
-        <th width="30" class="icon">
-          <div class="icon"><Icon name="arrow_up" /></div>
+        <!-- <th width="30">
+          <Icon fill name="arrow_up" />
         </th>
-        <th width="30" class="icon">
-          <div class="icon"><Icon name="arrow_down" /></div>
-        </th>
-        <th width="30" class="icon heavy-border">
-          <div class="icon"><Icon name="delete" /></div>
+        <th width="30">
+          <Icon fill name="arrow_down" />
+        </th> -->
+        <th width="30" class="heavy-border">
+          <Icon fill name="delete" />
         </th>
 
         <th width="140">Nazwa</th>
         <th width="70">Kod</th>
         <th width="70" class="heavy-border">Typ</th>
 
-        <th width="70" class="info">
-          <Tooltip label="Marża" />
-          <span style:color="#0A9f59">M</span>
+        <th width="70">
+          <Tooltip>Marża</Tooltip>
+          <b style:color="#0A9f59">M</b>
         </th>
-        <th width="70" class="info">
-          <Tooltip label="Minimum" />
-          <span style:color="#0A9f59">MIN</span>
+        <th width="70">
+          <Tooltip>Minimum</Tooltip>
+          <b style:color="#0A9f59">MIN</b>
         </th>
-        <th width="70" class="info">
-          <Tooltip label="Przygotowalnia" />
-          <span style:color="#0089ff">P</span>
+        <th width="70">
+          <Tooltip>Przygotowalnia</Tooltip>
+          <b style:color="#0089ff">P</b>
         </th>
-        <th width="70" class="info">
-          <Tooltip label="Cena transportu" />
-          <span style:color="#6604C2">T</span>
+        <th width="70">
+          <Tooltip>Cena transportu</Tooltip>
+          <b style:color="#6604C2">T</b>
         </th>
-        <th width="70" class="info heavy-border">
-          <Tooltip label="Próg dla uwzględnienia transportu" />
-          <span style:color="#6604C2">TP</span>
+        <th width="70" class="heavy-border">
+          <Tooltip>Próg dla uwzględnienia transportu</Tooltip>
+          <b style:color="#6604C2">TP</b>
         </th>
 
         {#each amounts as amount, i}
@@ -377,7 +381,7 @@
         <th width="30" rowspan={items.length + 1} class="action action-amount-push">
           <button on:click={() => pushAmount()}>
             <HoverCircle />
-            <div class="icon"><Icon name="add" light /></div>
+            <div class="icon"><Icon fill name="add" light /></div>
           </button>
         </th>
       </tr>
@@ -388,17 +392,18 @@
             {#if !item.default}
               <button on:click={() => setDefault(i)}>
                 <HoverCircle color={'var(--accent-light)'} />
-                <div class="icon"><Icon name="star" /></div>
+                <div class="icon"><Icon fill name="star" /></div>
               </button>
             {:else}
-              <div class="dummy" title={'To jest znakowanie domyślne'} />
+              <Tooltip>Domyślne dla producenta</Tooltip>
+              <div class="dummy" />
             {/if}
           </td>
-          <td class="input action up">
+          <!-- <td class="input action up">
             {#if !i == 0}
               <button on:click={() => moveLabeling(i, -1)}>
                 <HoverCircle color={'var(--accent-light)'} />
-                <div class="icon"><Icon name="arrow_up" /></div>
+                <div class="icon"><Icon fill name="arrow_up" /></div>
               </button>
             {:else}
               <div class="dummy" />
@@ -408,16 +413,16 @@
             {#if i < items.length - 1}
               <button on:click={() => moveLabeling(i, 1)}>
                 <HoverCircle color={'var(--accent-light)'} />
-                <div class="icon"><Icon name="arrow_down" /></div>
+                <div class="icon"><Icon fill name="arrow_down" /></div>
               </button>
             {:else}
               <div class="dummy" />
             {/if}
-          </td>
+          </td> -->
           <td class="input action down heavy-border">
             <button on:click={() => removeStart(i)}>
               <HoverCircle color={'var(--main-3)'} />
-              <div class="icon"><Icon name="delete" /></div>
+              <div class="icon"><Icon fill name="delete" /></div>
             </button>
           </td>
 
@@ -434,7 +439,7 @@
           <td class="input margin">
             <Input type="number" borderless min={0} step={0.01} bind:value={item.margin} />
           </td>
-          <td class="input minimum ">
+          <td class="input minimum">
             <Input type="number" borderless min={0} step={0.01} bind:value={item.minimum} />
           </td>
           <td class="input prepress">
@@ -453,12 +458,12 @@
             </td>
           {/each}
 
-          <td class="action action-amount action-amount-remove">
-            <button on:click={removeAmount}>
-              <HoverCircle color={'var(--main)'} />
-              <div class="icon"><Icon name="delete" light /></div>
-            </button>
-          </td>
+          <!-- <td class="action action-amount action-amount-remove">
+              <button on:click={removeAmount}>
+                <HoverCircle color={'var(--main)'} />
+                <Icon fill name="delete" light />
+              </button>
+            </td> -->
         </tr>
       {/each}
     </table>
@@ -492,28 +497,31 @@
     <pre style="width:200px;">{@html item}</pre>
   {/each}
 </div> -->
+
 <style>
   .wrapper {
     overflow-x: auto;
     margin-bottom: 0.75rem;
   }
   table {
+    /* overflow: auto; */
+    /* position: relative; */
     table-layout: fixed;
     border-radius: 0;
     width: 1px; /* yes :) this makes the table respect column withds */
   }
+  /* thead tr:nth-child(1) th {
+    position: sticky;
+    top: 4rem;
+    z-index: 1;
+  } */
   th {
     border-bottom: var(--border-heavy);
     font-weight: normal;
+    white-space: nowrap;
   }
   th.amount:not(.fixed) {
     padding: 0;
-  }
-  th.info {
-    cursor: help;
-  }
-  th.info span {
-    font-weight: bold;
   }
   td {
     overflow: hidden;

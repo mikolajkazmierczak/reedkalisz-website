@@ -105,19 +105,29 @@
   export let strokeWidth = 0.3;
   $: chosenColor = color ? color : light ? colors.light : dark ? colors.dark : defaultColor;
 
+  const defaultSize = 20;
   export let width = 20;
   export let height = 20;
+
+  export let fill = false;
+
+  export let style = '';
+
+  function getSize(size, otherSize) {
+    if (fill) return '100%'; // fill overwrites the size
+    if (size !== defaultSize) return typeof size === 'string' ? size : size + 'px';
+    return otherSize !== defaultSize ? 'auto' : defaultSize + 'px'; // if the other size is set, this one will conform
+  }
 </script>
 
 {#if icon}
-  <svg viewBox="0 0 {width} {height}" stroke-width={strokeWidth} stroke={chosenColor} fill={chosenColor}>
+  <svg
+    viewBox="0 0 20 20"
+    stroke-width={strokeWidth}
+    stroke={chosenColor}
+    fill={chosenColor}
+    style="width:{getSize(width, height)}; height:{getSize(height, width)}; {style}"
+  >
     <use href="/icons/{source}/{icon}.svg#svg" />
   </svg>
 {/if}
-
-<style>
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-</style>

@@ -6,7 +6,8 @@ export const search = [
   'date_updated',
   'name',
   'color',
-  'enabled'
+  'enabled',
+  'company'
 ];
 export const show = [...search];
 

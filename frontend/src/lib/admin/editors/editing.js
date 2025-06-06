@@ -101,6 +101,9 @@ async function remove(collection, id, { root, prompt = null, parent = null, inde
     }
     unsaved.set(false);
     gotoRoot(root);
+    return true;
+  } else {
+    return false;
   }
 }
 

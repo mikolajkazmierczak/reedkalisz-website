@@ -64,7 +64,9 @@
           <div class="ui-pair storage-actions">
             <Input type="checkbox" bind:value={storage.enabled}>Włączone</Input>
             <div>
-              {#if !i == 0} <Button icon="arrow_left" on:click={() => moveStorage(i, -1)} square /> {/if}
+              {#if !i == 0}
+                <Button icon="arrow_left" on:click={() => moveStorage(i, -1)} square />
+              {/if}
               {#if i < product.storage.length - 1}
                 <Button icon="arrow_right" on:click={() => moveStorage(i, 1)} square />
               {/if}
@@ -108,7 +110,9 @@
                 <div class="img" class:main={j == 0}>
                   <div class="img-actions img-actions--buttons">
                     <div>
-                      {#if !j == 0} <Button icon="arrow_left" on:click={() => moveStorageImg(i, j, -1)} square /> {/if}
+                      {#if !j == 0}
+                        <Button icon="arrow_left" on:click={() => moveStorageImg(i, j, -1)} square />
+                      {/if}
                       {#if j < storage.img.length - 1}
                         <Button icon="arrow_right" on:click={() => moveStorageImg(i, j, 1)} square />
                       {/if}
@@ -121,7 +125,7 @@
                     <Input type="checkbox" bind:value={img.show_in_gallery}>
                       Galeria
                       <span class="info">
-                        🛈<Tooltip label="Dołącza zdjęcie na końcu głównej galerii" />
+                        🛈<Tooltip>Dołącza zdjęcie na końcu głównej galerii</Tooltip>
                       </span>
                     </Input>
                   </div>

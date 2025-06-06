@@ -12,12 +12,10 @@
 
 <footer>
   <div class="columns">
-    <div class="about">
-      <h3>{about.name}</h3>
+    <div class="text text__about">
       {@html marked.parse(about.content)}
     </div>
-    <div class="office">
-      <h3>{office.name}</h3>
+    <div class="text text__office">
       {@html marked.parse(office.content)}
     </div>
     {#if menu.length}
@@ -42,21 +40,22 @@
     min-height: 16rem;
     height: auto;
     width: 100%;
-    background-color: var(--grey);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: var(--white);
   }
 
   .columns {
     display: flex;
     justify-content: center;
     gap: 3rem;
-    align-items: flex-start;
-    padding: 2rem 8rem;
+    padding-top: 2rem;
   }
 
-  .about,
-  .menu,
-  .office {
-    max-width: 55ch;
+  :global(.text p) {
+    margin: 1rem 0;
+  }
+  .text__about {
+    width: 60ch;
   }
 
   .rights {

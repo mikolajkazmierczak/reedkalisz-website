@@ -21,7 +21,7 @@
   <div class="thumbnail" class:boilerplate={!isImg || loading || imgError}>
     {#if isImg}
       {#if imgError}
-        <Icon name="img" dark />
+        <Icon fill name="img" dark />
       {:else}
         <img
           src="{baseUrl}/assets/{id}?key=thumb#{modified_on ? modified_on : uploaded_on}"
@@ -30,13 +30,13 @@
           on:load={() => (loading = false)}
         />
         {#if loading}
-          <Icon name="img" dark />
+          <Icon fill name="img" dark />
         {/if}
       {/if}
     {:else if id}
-      <Icon name="file" dark />
+      <Icon fill name="file" dark />
     {:else}
-      <Icon name="edit" dark />
+      <Icon fill name="edit" dark />
     {/if}
   </div>
   <div class="text">
@@ -52,7 +52,9 @@
     cursor: pointer;
     --border-radius: 0.5rem;
     border-radius: var(--border-radius);
-    transition: padding 100ms, border 100ms;
+    transition:
+      padding 100ms,
+      border 100ms;
   }
   .wrapper:hover {
     padding: 0.5rem;

@@ -45,7 +45,7 @@
       {#each button.buttons as { title, icon, href }}
         <a {href}>
           <div class="icon">
-            <Icon name={icon} light />
+            <Icon fill name={icon} light />
           </div>
           {title}
         </a>

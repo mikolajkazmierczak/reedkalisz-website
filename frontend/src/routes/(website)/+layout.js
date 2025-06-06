@@ -22,9 +22,7 @@ const menusFields = [
   'category.name',
   'img'
 ];
-
 const categoriesFields = ['id', 'enabled', 'parent', 'index', 'name', 'slug', 'img'];
-
 const fragmentsFields = ['id', 'name', 'content', 'data'];
 
 const convertCategoryToMenuItem = category => ({
@@ -45,17 +43,18 @@ const convertCategoryToMenuItem = category => ({
   // other _meta, parent, index will be asigned later
 });
 
-function embedAllChildren(menuItem, category) {
-  // Pass all children of a category as children of menu item.
-  for (const categoryChild of category.children) {
-    const menuItemChild = convertCategoryToMenuItem(categoryChild);
-    embedAllChildren(menuItemChild, categoryChild);
-    menuItem.children.push(menuItemChild);
-  }
-}
-
 function embedCategories(menuTree, categoriesTree) {
   // Embeds categories in the menu.
+
+  function embedAllChildren(menuItem, category) {
+    // Pass all children of a category as children of menu item.
+    for (const categoryChild of category.children) {
+      const menuItemChild = convertCategoryToMenuItem(categoryChild);
+      embedAllChildren(menuItemChild, categoryChild);
+      menuItem.children.push(menuItemChild);
+    }
+  }
+
   for (let item of menuTree) {
     if (item.category && !item._meta?.embeded) {
       const category = treeGetItem(categoriesTree, item.category.id);
@@ -76,32 +75,24 @@ function someCategoriesEmbeded(menuTree) {
   return false;
 }
 
-export async function load() {
-  const menusItems = (await api.items('menu_items').readByQuery({ fields: menusFields })).data;
+function makeMenuTree(menuId, menuItems, categoriesTree) {
+  // Makes a menu tree from menu items.
+  const tree = makeTree(menuItems.filter(m => m.enabled && m.menu == menuId));
+  embedCategories(tree, categoriesTree);
+  if (someCategoriesEmbeded(tree)) treeRefreshMetaAndParent(tree);
+  return tree;
+}
 
-  const categoriesItems = (await api.items('categories').readByQuery({ fields: categoriesFields })).data;
+export async function load() {
+  const categoriesItems = (await api.items('categories').readByQuery({ fields: categoriesFields, limit: -1 })).data;
   const categoriesTree = makeTree(categoriesItems.filter(item => item.enabled));
 
-  const makeMenuTree = id => {
-    const tree = makeTree(menusItems.filter(m => m.menu == id && m.enabled));
-    embedCategories(tree, categoriesTree);
-    if (someCategoriesEmbeded(tree)) {
-      treeRefreshMetaAndParent(tree);
-    }
-    return tree;
-  };
+  const menuItems = (await api.items('menu_items').readByQuery({ fields: menusFields, limit: -1 })).data;
+  const menu = id => makeMenuTree(id, menuItems, categoriesTree);
+  const menus = { top: menu(1), side: menu(2), footer: menu(3) };
 
-  const menusTrees = {
-    top: makeMenuTree(1),
-    side: makeMenuTree(2),
-    footer: makeMenuTree(3)
-  };
+  const fragment = async id => await api.items('fragments').readOne(id, { fields: fragmentsFields });
+  const footerFragments = { about: await fragment(2), office: await fragment(4), rights: await fragment(3) };
 
-  const footerFragments = {
-    about: await api.items('fragments').readOne(2, { fields: fragmentsFields }),
-    rights: await api.items('fragments').readOne(3, { fields: fragmentsFields }),
-    office: await api.items('fragments').readOne(4, { fields: fragmentsFields })
-  };
-
-  return { menus: menusTrees, categories: categoriesTree, footer: footerFragments };
+  return { categoriesTree, categoriesItems, menus, footerFragments };
 }

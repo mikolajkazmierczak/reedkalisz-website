@@ -5,7 +5,7 @@
   import { header } from '@/stores';
   import { searchparams, SearchParams } from '$/searchparams';
 
-  import { globals, colors } from '@/globals';
+  import { globals, colors, companies } from '@/globals';
   import { search as fields } from '%/fields/colors';
   import Button from '@c/Button.svelte';
   import Table from '@c/table/Table.svelte';
@@ -31,8 +31,9 @@
     }
   }
 
+  globals.update(companies);
   globals.update(colors);
-  $: $colors && read(limit, page, query);
+  $: $companies && $colors && read(limit, page, query);
 </script>
 
 {#if items}
@@ -51,6 +52,7 @@
         { id: true, label: 'ID' },
         { label: 'Nazwa' },
         { color: true, label: 'Kolor' },
+        { label: 'Firma' },
         { blame: true, label: 'Utworzenie' },
         { blame: true, label: 'Aktualizacja' }
       ]}
@@ -61,6 +63,7 @@
           $.id,
           $.name,
           $.color,
+          $companies.find(c => c.id == $.company).name,
           { user: $.user_created, datetime: $.date_created },
           { user: $.user_updated, datetime: $.date_updated }
         ]

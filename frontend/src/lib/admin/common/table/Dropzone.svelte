@@ -95,7 +95,7 @@
         on:dragover={e => dragover(e, 'P')}
         on:dragleave={dragleave}
       >
-        <div class="icon"><Icon name="arrow_left" color={'var(--primary)'} /></div>
+        <div class="icon"><Icon fill name="arrow_left" color={'var(--primary)'} /></div>
       </div>
     {/if}
 
@@ -121,7 +121,7 @@
         on:dragover={e => dragover(e, 'C')}
         on:dragleave={dragleave}
       >
-        <div class="icon"><Icon name="arrow_right" color={'var(--primary)'} /></div>
+        <div class="icon"><Icon fill name="arrow_right" color={'var(--primary)'} /></div>
       </div>
     {/if}
   </div>

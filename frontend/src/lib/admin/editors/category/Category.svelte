@@ -5,7 +5,7 @@
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '%/fields/categories';
-  import { deep, slugify, diff } from '%/utils';
+  import { deep, slugify, diff, makeTree, treeFlatten } from '%/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
@@ -15,6 +15,7 @@
   import Button from '@c/Button.svelte';
   import Blame from '@c/Blame.svelte';
   import Picker from '@c/library/Picker.svelte';
+  import Popup from '@c/Popup.svelte';
 
   const searchParams = SearchParams.read();
 
@@ -24,6 +25,10 @@
   let itemOriginal;
 
   $: hasChildren = $categories?.find(category => category.parent == item?.id);
+
+  let deletingOpen = false;
+  let deleting = false; // prevent double click
+  let deletingSwapId = null; // id of the category that is being swapped with the one being deleted
 
   async function read() {
     await globals.update(categories);
@@ -39,8 +44,45 @@
     itemOriginal = item ? deep.copy(item) : null;
   }
 
+  function removeOpen() {
+    deletingOpen = true;
+  }
+  function removeClose() {
+    deletingSwapId = null;
+    deletingOpen = false;
+  }
   async function remove() {
-    editing.remove('categories', item.id, { root: '/admin/kategorie', parent: item.parent, index: item.index });
+    if (deleting) return; // prevent double click
+    deleting = true;
+
+    // get all products that use this category
+    const filter = { categories: { category: { _eq: item.id } } };
+    const fields = ['id', 'categories.id', 'categories.category'];
+    const products = (await api.items('products').readByQuery({ fields, filter, limit: -1 })).data;
+    const productsIds = products.map(p => p.id);
+    const categoriesIds = products.map(p => p.categories.map(c => c.category)).flat();
+
+    // remove category (and it's occurrences in products)
+    const confirmed = await editing.remove('categories', item.id, {
+      root: '/admin/kategorie',
+      parent: item.parent,
+      index: item.index
+    });
+
+    if (confirmed && productsIds) {
+      if (deletingSwapId && !categoriesIds.includes(deletingSwapId)) {
+        for (const p of products) {
+          const categories = p.categories.map((c, index) => {
+            return c.category == item.id ? { index, category: deletingSwapId } : { index, ...c };
+          });
+          await api.items('products').updateOne(p.id, { categories });
+        }
+      }
+      heimdall.emit('products', productsIds);
+    }
+
+    deleting = false;
+    removeClose();
   }
 
   read();
@@ -64,6 +106,29 @@
     }
   });
 </script>
+
+<Popup title="Na pewno?" maxWidth={'300px'} bind:opened={deletingOpen} on:close={removeClose}>
+  <small>Kategoria zostanie usunięta z powiązanych produktów.</small>
+  <Input
+    type="select"
+    bind:value={deletingSwapId}
+    options={[
+      { id: null, text: 'Brak zamiennika' },
+      ...treeFlatten(makeTree($categories)).map(({ id, name, _meta }) => {
+        const path = _meta.path.map(p => p + 1).join('.');
+        return { id, text: `${path} ${name}` };
+      })
+    ]}
+  >
+    Możesz wybrać zamiennik
+  </Input>
+  <div class="ui-pair popup-actions">
+    <Button on:click={removeClose}>Anuluj</Button>
+    <Button on:click={remove} dangerous>
+      {#if deleting}Usuwanie...{:else}Usuń{/if}
+    </Button>
+  </div>
+</Popup>
 
 <Editor
   root="/admin/kategorie"
@@ -93,7 +158,9 @@
 
         <div class="ui-section__col">
           <div class="ui-box">
-            <Button icon="delete" on:click={remove} dangerous disabled={hasChildren}>Usuń</Button>
+            <Button icon="delete" on:click={removeOpen} dangerous disabled={item.id === '+' || hasChildren}>
+              Usuń
+            </Button>
             {#if hasChildren}
               <p>
                 Nie można usunąć kategorii, która ma podkategorie.<br />

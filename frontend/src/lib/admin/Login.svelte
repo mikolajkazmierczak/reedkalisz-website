@@ -30,9 +30,7 @@
 
   <div class="login" transition:fly={{ y: 20, duration: 600 }}>
     <div class="circle">
-      <div class="icon">
-        <Icon name="lock" dark />
-      </div>
+      <Icon height="60%" name="lock" dark />
     </div>
     <form>
       <h1>Zaloguj się</h1>
@@ -86,9 +84,6 @@
     width: 50px;
     height: 50px;
     background-color: var(--light);
-  }
-  .circle .icon {
-    height: 60%;
   }
 
   form {

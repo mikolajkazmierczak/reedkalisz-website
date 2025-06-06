@@ -13,8 +13,12 @@
 <button class="button" class:round on:click>
   <HoverCircle color={'var(--primary-dark)'} show={tick} />
   <div class="content">
-    {#if label}<Tooltip {label} />{/if}
-    {#if icon}<Icon name={icon} light />{/if}
+    {#if label}
+      <Tooltip>{label}</Tooltip>
+    {/if}
+    {#if icon}
+      <Icon fill name={icon} light />
+    {/if}
     <slot />
   </div>
 </button>

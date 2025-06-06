@@ -12,7 +12,7 @@
   </tr>
 
   <tr>
-    <th>Cena</th>
+    <th>Cena /szt.</th>
     {#each prices as { price }, i}
       {@const sale = !!pricesSale[i]?.price}
       <td>
@@ -30,6 +30,7 @@
 <style>
   table {
     font-size: 1.15rem;
+    background-color: var(--white);
   }
   .sale {
     text-decoration: line-through;

@@ -8,10 +8,11 @@
   let email;
   let phone;
   let name;
-  let content = `Dzień dobry, czy "${product.name}" wciąż jest dostępny?\nPozdrawiam`;
+  let content = ''; // `Dzień dobry, czy "${product.name}" wciąż jest dostępny?\nPozdrawiam`;
   let fileInput;
 
-  let saving = false;
+  let consent = false;
+  let sending = false;
   let sent = false;
   let errors = {};
 
@@ -36,13 +37,13 @@
 
     try {
       // upload
-      saving = true;
+      sending = true;
       const info = `# Kod: ${product.code}\n\n`;
       const question = { email, phone, name, content: info + content.trim() };
       // const file = await sendFile();
       // if (file) question.file = file.id;
       await api.items('questions').createOne(question);
-      saving = false;
+      sending = false;
       sent = true;
     } catch (e) {
       // unexpected errors
@@ -52,10 +53,10 @@
 </script>
 
 <form>
-  <div class="row">
-    <div class="col">
+  <div class="content">
+    <div class="content__column">
       <label>
-        <span class="first">Email<span class="required">*</span></span>
+        <span>Email<span class="red">*</span></span>
         <input type="email" bind:value={email} class:error={errors?.email} />
         {#if errors?.email}
           <span class="input-error">{errors.email}</span>
@@ -71,9 +72,9 @@
       </label>
     </div>
 
-    <div class="col">
+    <div class="content__column">
       <label>
-        <span>Wiadomość<span class="required">*</span></span>
+        <span>Wiadomość<span class="red">*</span></span>
         <textarea rows="8" bind:value={content} class:error={errors?.content} />
         {#if errors?.content}
           <span class="input-error">{errors.content}</span>
@@ -82,134 +83,157 @@
       <!-- <label>
         <span>Załącz plik</span>
         <input type="file" bind:this={fileInput} />
-      </label> -->
+        </label> -->
     </div>
   </div>
 
   <label class="fake">
-    <span>Info</span>
+    <span>Fake</span>
     <input type="text" />
   </label>
 
-  <div class="send">
-    <button type="submit" on:click|preventDefault={handleSend}>
-      <HoverCircle color="var(--main-4)" />
-      <div>
-        <div class="icon"><Icon name="questions" light /></div>
-        Wyślij
-      </div>
-    </button>
+  <div class="send-wrapper">
+    <div class="send">
+      <button type="submit" disabled={!consent} on:click|preventDefault={handleSend}>
+        {#if consent}
+          <HoverCircle color="var(--main-4)" />
+        {/if}
+        <div>
+          <Icon name="questions" light height="1.5rem" />
+          Wyślij
+        </div>
+      </button>
+    </div>
 
-    {#if sent}
-      <div class="form-success">Wiadomość została wysłana!</div>
-    {/if}
-    {#if errors?.form}
-      <div class="form-error">{errors.form}</div>
-    {/if}
+    <div class="consent-and-feedback">
+      <label class="consent">
+        <input type="checkbox" bind:checked={consent} />
+        <small>
+          Zapoznałem się z <a href="/obowiazek-informacyjny">obowiązkiem informacyjnym</a> i
+          <a href="/polityka-prywatnosci">polityką prywatności</a>.
+        </small>
+      </label>
+      {#if sent}
+        <div class="feedback">Wiadomość została wysłana!</div>
+      {/if}
+      {#if errors?.form}
+        <div class="feedback red">{errors.form}</div>
+      {/if}
+    </div>
   </div>
 </form>
 
 <style>
   form {
-    /* border-radius: 10px; */
-    border: 1px solid var(--main-1);
-    /* background-color: var(--main-0); */
+    border: 2px solid var(--main);
+    background-color: var(--white);
     padding: 1rem;
   }
 
-  .row {
+  .content {
     display: flex;
     gap: 1rem;
   }
-
-  .send {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-
-  label {
+  .content label {
     display: flex;
     flex-direction: column;
   }
-  span {
+  .content span {
     margin-top: 0.75rem;
     margin-bottom: 0.25rem;
   }
-  .required {
+  .content span.red {
     color: var(--main);
   }
-  input,
-  textarea {
+  .content input,
+  .content textarea {
     outline: none;
     border: none;
-    /* border-radius: 10px; */
     border: 1px solid rgba(0, 0, 0, 0.1);
     padding: 0.5rem;
     font-size: 1rem;
   }
-  input {
+  .content input {
     width: 30ch;
   }
-  textarea {
+  .content textarea {
     width: 40ch;
   }
-  input.error,
-  textarea.error {
+  .content input.error,
+  .content textarea.error {
     background-color: var(--main-0);
   }
-  .input-error {
+  .content .input-error {
     font-size: small;
     margin-top: 0.25rem;
     margin-left: 0.5rem;
     color: var(--main);
   }
-  input:focus,
-  textarea:focus {
+  .content input:focus,
+  .content textarea:focus {
     border-color: var(--main-3);
   }
-  input[type='file'] {
+  .content input[type='file'] {
     padding: 0;
     border-radius: 0;
     border: none;
   }
 
-  .fake {
-    display: none;
+  .send-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 1.5rem;
   }
-
-  button {
+  .send {
+    display: flex;
+  }
+  .send button {
+    cursor: pointer;
     overflow: hidden;
     position: relative;
-    cursor: pointer;
-    /* border-radius: 10px; */
     border: none;
-    padding: 0;
     background-color: var(--main);
   }
-  button > div {
-    position: relative;
+  .send button:disabled {
+    cursor: not-allowed;
+    background-color: var(--grey-dark);
+  }
+  .send button > div {
     z-index: 1;
+    position: relative;
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     padding: 0.5rem 1rem;
-    color: var(--light);
+    color: var(--white);
     font-size: 1rem;
   }
-  button .icon {
-    margin-right: 0.5rem;
-    width: 1.5rem;
+  .consent-and-feedback {
+    display: flex;
+    flex-direction: column;
   }
-
-  .form-success,
-  .form-error {
-    /* font-size: small; */
+  .consent {
+    display: flex;
+    gap: 0.25rem;
   }
-  .form-success {
+  .consent input {
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+  }
+  .consent small {
+    position: relative;
+    top: 0.1rem;
+    white-space: nowrap;
+  }
+  .feedback {
+    margin-left: 0.2rem;
     font-weight: bold;
   }
-  .form-error {
-    color: var(--main);
+
+  .fake {
+    /* fake input to throw off bots */
+    display: none;
   }
 </style>

@@ -1,6 +1,6 @@
 <script>
+  import { parseDatetime } from '%/datetime';
   import { baseUrl } from '$/api';
-  import { parseDatetime } from '$/datetime';
   import { users } from '@/globals';
 
   export let user;

@@ -1,5 +1,6 @@
 <script>
   import PricesTable from './PricesTable.svelte';
+  import Icon from '$c/Icon.svelte';
 
   export let field;
   export let place;
@@ -10,13 +11,14 @@
 </script>
 
 {#if field[0] && field[1]}
-  <small class="field">
-    Pole znakowania: {field[0]}x{field[1]} mm
+  <small class="info field">
+    <Icon name="arrow_expand" height="1.25rem" style="position:relative;top:1px;" />Pole znakowania:
+    <b>{field[0]}x{field[1]} mm</b>
   </small>
 {/if}
 {#if place}
-  <small class="place">
-    Miejsce znakowania: {place}
+  <small class="info place">
+    <Icon name="resize_small" height="1.25rem" style="position:relative;top:1px;" />Miejsce znakowania: <b>{place}</b>
   </small>
 {/if}
 <div class="prices">
@@ -39,9 +41,10 @@
   .prices {
     margin-top: 0.5rem;
   }
-  .field,
-  .place {
-    display: block;
+  .info {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
     opacity: 0.6;
   }
 </style>

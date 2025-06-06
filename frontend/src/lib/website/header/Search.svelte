@@ -14,7 +14,7 @@
 </script>
 
 <div class="wrapper">
-  <input type="text" placeholder="Czego potrzebujesz?" bind:value on:keydown={handleKeydown} />
+  <input type="text" bind:value on:keydown={handleKeydown} />
   <button on:click={search}>SZUKAJ</button>
 </div>
 
@@ -34,9 +34,10 @@
     font-size: 1rem;
     width: 25ch;
     color: var(--main);
+    transition: background-color 0.2s ease-in-out;
   }
-  input::placeholder {
-    color: rgb(0, 0, 0, 0.4);
+  input:hover {
+    background-color: var(--main-0);
   }
   button {
     cursor: pointer;

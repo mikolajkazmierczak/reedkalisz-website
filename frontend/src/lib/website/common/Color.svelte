@@ -1,20 +1,29 @@
 <script>
-  import Tooltip from '$c/Tooltip.svelte';
+  import ProductColorTooltip from '#/products/ProductColorTooltip.svelte';
+  import { parseColor } from '#/utils';
 
-  export let amount;
-  export let first = null; // name, color, enabled
+  export let multicolored = false;
+  export let first = null; // { name, color, enabled }
   export let second = null;
 
-  $: bg = first ?? second; // first could be unset
-  $: fg = second; // doesnt matter if first is unset
-  export let multicolored = false;
+  export let amount = null;
 
-  $: title = bg && fg ? `${bg.name} / ${fg.name}` : bg ? bg.name : fg ? fg.name : null;
-  $: label = multicolored ? 'Wielokolorowy' : title ?? 'Nieokreślony';
+  export let size = '20px';
+  export let notooltip = false;
+
+  export let onhoverchange = () => {};
+  function handleHoverChange(e) {
+    onhoverchange(e.type === 'pointerenter'); // otherwise must be 'pointerleave'
+  }
+
+  $: ({ label, bg, fg } = parseColor(multicolored, first, second));
 </script>
 
-<div class="color-wrapper">
-  <Tooltip label="<b>{label}</b><br/>Dostępność: {amount || 'Na stanie'}" />
+<div class="wrapper" style:height={size} on:pointerenter={handleHoverChange} on:pointerleave={handleHoverChange}>
+  {#if !notooltip}
+    <ProductColorTooltip {label} {amount} />
+  {/if}
+
   {#if multicolored}
     <div class="color multi">
       <img src="/multicolor.svg" alt="" />
@@ -28,28 +37,25 @@
 </div>
 
 <style>
-  .color-wrapper {
+  .wrapper {
+    cursor: help;
     overflow: hidden;
     position: relative;
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    width: 20px;
-    height: 20px;
-    aspect-ratio: 1;
+    aspect-ratio: 1 / 1;
   }
+
   .color {
     display: grid;
     place-items: center;
     width: 100%;
     height: 100%;
   }
-  .none {
-    opacity: 0.5;
-  }
   .multi {
+    transform: rotate(45deg);
     /* background: rgb(180, 58, 58, 1); */
     /* background: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); */
-    transform: rotate(45deg);
   }
   .multi img {
     width: 100%;
@@ -62,5 +68,8 @@
     height: 100%;
     transform: translateY(-50%) rotate(45deg);
     transform-origin: center left;
+  }
+  .none {
+    opacity: 0.5;
   }
 </style>

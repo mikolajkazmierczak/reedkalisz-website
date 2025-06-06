@@ -1,9 +1,9 @@
 <script>
   import Badge from './Badge.svelte';
 
-  export let sale;
+  export let show = true;
 </script>
 
-{#if sale}
-  <Badge bgcolor="var(--sale)" icon="sale" label="Promocja" />
+{#if show}
+  <Badge icon="sale" label="Promocja" bg="var(--sale)" />
 {/if}

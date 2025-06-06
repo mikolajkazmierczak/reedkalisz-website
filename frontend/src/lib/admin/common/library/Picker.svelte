@@ -48,13 +48,13 @@
         <div slot="picker" class="buttons">
           <button on:click={close}>
             <HoverCircle />
-            <div class="icon"><Icon name="arrow_left" light /></div>
+            <div class="icon"><Icon fill name="arrow_left" light /></div>
             <span>Powrót</span>
           </button>
           {#if selected}
             <button class="deselect" on:click={() => (selected = null)}>
               <HoverCircle />
-              <div class="icon"><Icon name="close" light /></div>
+              <div class="icon"><Icon fill name="close" light /></div>
               <span>Wyczyść</span>
             </button>
           {/if}

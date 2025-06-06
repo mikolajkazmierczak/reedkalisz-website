@@ -20,21 +20,23 @@
 
 <style>
   .wrapper {
-    z-index: 1;
+    z-index: 10;
     position: fixed;
     top: 0;
     left: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* border-bottom: 1px solid var(--main); */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     padding: 0 4rem;
     padding-top: 1.5rem;
-    height: 6rem;
+    height: 5rem;
     width: 100%;
-    backdrop-filter: blur(2px);
-    background-color: var(--white);
-    border-bottom: 1px solid var(--main);
-    /* transition: border-bottom 100ms; */
+    backdrop-filter: blur(3px);
+    background-color: rgba(255, 255, 255, 0.8);
+    /* background-color: var(--main); */
+    /* background-color: var(--accent); */
   }
 
   .logo {
