@@ -1,6 +1,4 @@
-# Engineering Thesis
-
-## Public website with a CMS to manage it.
+# Public website with a CMS to manage it
 
 This project was created for [REED](https://reed.kalisz.pl/) company that specializes in comprehensive printing and advertising services.
 They needed a web-based system designed to support product catalog management and handle customer inquiries. It consists of two main components: a public-facing website and an admin panel.
