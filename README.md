@@ -1,4 +1,4 @@
-# Public website with a CMS to manage it
+# Public website and CMS for REED Kalisz
 
 This project was created for [REED](https://reed.kalisz.pl/) company that specializes in comprehensive printing and advertising services.
 They needed a web-based system designed to support product catalog management and handle customer inquiries. It consists of two main components: a public-facing website and an admin panel.
@@ -15,9 +15,11 @@ The system is tailored to the client's requirements, with some key features:
 
 The public website enables customers to browse products, view detailed information, and submit inquiries. A simple menu was provided that allows to gradually expand nested categories, thus filtering the products.
 
-![publiczna_strona](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/publiczna_strona.png)
+![home](https://github.com/user-attachments/assets/d99ea562-ae3d-4ee4-820a-2ec3f1a70ddc)
 
-![produkt](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/produkt_1.png)
+![products](https://github.com/user-attachments/assets/e458e691-62f9-44db-8eff-52c4b03dcbbf)
+
+![product](https://github.com/user-attachments/assets/7fba3346-dad7-4faf-a36d-cdfc1418fb17)
 
 ### The Admin Panel
 
@@ -27,39 +29,37 @@ The admin panel was built to manage calculators, products, colors, categories, m
 
 The management of products, colors, categories, menus, pages and certain website fragments all happens in visually similiar panels. Products can be assigned to multiple categories and colors. You can also upload images and files.
 
-![product list view](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/widok_produkty.png)
-
-![single product view](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/widok_produkt_1.png)
-
-<p align="right">
-  <img src="screenshots/widok_produkt_4.jpg" alt="product pricing view" style="width: 80%;">
-</p>
-
-<p align="right">
-  <img src="screenshots/widok_produkt_6.png" alt="product colors view" style="width: 80%;">
-</p>
-
-![alt text](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/widok_kategorie.png)
-
-![alt text](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/widok_pliki.png)
-
 #### Inquiries
 
 A section of the panel is dedicated to managing customer inquiries, as well as adding inquiries not directly submitted through the website.
-
-![alt text](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/widok_zapytania.jpg)
 
 #### Calculators
 
 Without a doubt, the most important feature of the admin panel is the **automated price calculators**. They significantly reduce the time spent on manual calculations and ensure consistent pricing in all products.
 
-![alt text](https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/widok_kalkulacje.jpg)
-
 #### APIs
 
 A crucial aspect of the website is the ability to import product data from external supplier APIs. But an even more important aspect, and for the most part why this project was even born, is the ability to automatically recalculate the pricing tables of all imported products on demand. It significantly reduces time spent managing the system.
 
-![]()
+![admin-products](https://github.com/user-attachments/assets/9ac8d2e8-b706-4bfe-ab0e-ac63a1c5879f)
+
+![admin-product](https://github.com/user-attachments/assets/c37c03c4-166a-4c26-bc9d-434b38ebde75)
+
+<p align="right">
+  <img src="https://github.com/user-attachments/assets/c07c55c7-9ca5-4427-9ac7-6724eb609fb7" alt="admin-product-prices" style="width: 80%;">
+</p>
+
+<p align="right">
+  <img src="https://github.com/user-attachments/assets/ec1b0595-b97a-43ea-abb1-ed48c7e9df45" alt="admin-product-colors" style="width: 80%;">
+</p>
+
+![admin-categories](https://github.com/user-attachments/assets/5e5045ec-cc97-41b1-b91b-860f73e3510a)
+
+![admin-files](https://github.com/user-attachments/assets/76b5fcea-731b-47f9-b257-815f37093be4)
+
+![admin-calculations](https://github.com/user-attachments/assets/fa9bebc7-43af-4539-ab72-2c1cf0ceae39)
+
+![admin-api](https://github.com/user-attachments/assets/a21a542f-0710-4089-8b31-1753daaca949)
 
 #### Development
 
@@ -77,30 +77,6 @@ Elementary usability tests confirmed the interface's intuitiveness, and performa
 
 This project demonstrates my ability to deliver a comprehensive, real-world, customer-driven solution that combines technical expertise and a focus on user experience.
 
-<br/>
-
-## `Develop 👨‍💻`
-
-### Backend: <small>`/backend`</small>
-
-#### Directus: <small>`/backend/directus`</small>
-
-Directus turns an SQL database into a REST API.
-
-`npm run start` ([docs](https://docs.directus.io/self-hosted/installation/cli/#_3-start-your-project))
-
-#### Heimdall: <small>`/backend/heimdall`</small>
-
-Heimdall is a server that performs actions based on the information from the admin panel.
-
-`npm run dev`
-
-### Frontend: <small>`/frontend`</small>
-
-`npm run dev` ([docs](https://kit.svelte.dev/docs/introduction#getting-started))
-
-<br/>
-
 ## `Develop 👨‍💻`
 
 Both the public website and admin panel are statically generated. Powered by [SvelteKit](https://kit.svelte.dev/).\
@@ -110,21 +86,15 @@ The admin panel is using a REST API that runs as a node server. Powered by [Dire
 
 #### 1. Directus: <small>`/backend/directus`</small>
 
-Directus turns an SQL database into a REST API.
-
-`npm run start`
+`npm run start` | Directus turns an SQL database into a REST API.
 
 #### 2. Heimdall: <small>`/backend/heimdall`</small>
 
-Heimdall is a custom server that performs actions based on the information from the admin panel.
-
-`npm run dev`
+`npm run dev` | Heimdall is a custom server that performs actions based on the information from the admin panel.
 
 ### Frontend: <small>`/frontend`</small>
 
 `npm run dev`
-
-<br/>
 
 ## `Deploy 🏃`
 
@@ -135,9 +105,11 @@ Serve SvelteKit on port **80**.\
 Serve Directus on port **8055**.\
 Serve Heimdall on port **999**.
 
-<br/>
-
 #### Backend: <small>`/backend`</small>
 
 1. Run Directus (<small>`npm run start`</small>)
 2. Run Heimdall (<small>`npm run start`</small>)
+
+#### Frontend: <small>`/frontend`</small>
+
+Build (<small>`npm run build`</small>) and run the node server (<small>`node ./build`</small>).
