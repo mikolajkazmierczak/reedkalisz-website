@@ -75,26 +75,28 @@ Technologically, the project leverages Directus (a Backend-as-a-Service solution
 
 Elementary usability tests confirmed the interface's intuitiveness, and performance benchmarks showed significant improvements over the client's previous system. Adding a typical new product from scratch now takes 76 seconds compared to 442 seconds previously. Future enhancements will include more external API integrations, scheduling tools for automatic product publication and pricing recalculation, and further UX improvements both in the admin panel and the public-facing website.
 
-This project demonstrates my ability to deliver a comprehensive, real-world, customer-driven solution that combines technical expertise and a focus on user experience.
+As such, this project demonstrates my ability to deliver a comprehensive, real-world, customer-driven solution that combines technical expertise and a focus on user experience.
+
+<br/>
 
 ## `Develop 👨‍💻`
 
 Both the public website and admin panel are statically generated. Powered by [SvelteKit](https://kit.svelte.dev/).\
 The admin panel is using a REST API that runs as a node server. Powered by [Directus](https://directus.io/).
 
-### Backend: <small>`/backend`</small>
+#### <small>`/backend/directus`</small> — Directus turns an SQL database into a REST API.
 
-#### 1. Directus: <small>`/backend/directus`</small>
+`npm run start` 
 
-`npm run start` | Directus turns an SQL database into a REST API.
-
-#### 2. Heimdall: <small>`/backend/heimdall`</small>
-
-`npm run dev` | Heimdall is a custom server that performs actions based on the information from the admin panel.
-
-### Frontend: <small>`/frontend`</small>
+#### <small>`/backend/heimdall`</small> — Heimdall is a custom socket server and external API middleman.
 
 `npm run dev`
+
+#### <small>`/frontend`</small> — SvelteKit is a highly performant and developer friendly frontend framework.
+
+`npm run dev` 
+
+<br/>
 
 ## `Deploy 🏃`
 
@@ -105,11 +107,15 @@ Serve SvelteKit on port **80**.\
 Serve Directus on port **8055**.\
 Serve Heimdall on port **999**.
 
-#### Backend: <small>`/backend`</small>
+#### <small>`/backend/directus`</small>
 
-1. Run Directus (<small>`npm run start`</small>)
-2. Run Heimdall (<small>`npm run start`</small>)
+`npm run start` — run Directus
 
-#### Frontend: <small>`/frontend`</small>
+#### <small>`/backend/heimdall`</small>
 
-Build (<small>`npm run build`</small>) and run the node server (<small>`node ./build`</small>).
+`npm run start` — run Heimdall, a custom socket server and external API middleman
+
+#### <small>`/frontend`</small>
+
+`npm run build` — build SvelteKit for Node\
+`node ./build` — run Node server
