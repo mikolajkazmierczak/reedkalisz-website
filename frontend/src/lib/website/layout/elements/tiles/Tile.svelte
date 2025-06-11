@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { baseUrl } from '$/api';
   import Icon from '$c/Icon.svelte';
 
   import { editing } from '#/layout/store';
@@ -223,7 +224,7 @@
         class:href={$editing ? false : tile.uri}
       >
         {#if tile.img}
-          <img src={tile.img} alt="" />
+          <img src={baseUrl + tile.img} alt="" />
         {/if}
         <div class="content" class:dark class:contrast>
           <div class="text">

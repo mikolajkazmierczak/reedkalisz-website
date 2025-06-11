@@ -6,7 +6,7 @@ API="http://localhost:8055"
 # Directus
 DIRECTUS_TOKEN=""
 
-# Api
+# API
 API_PAR_USERNAME=""
 API_PAR_PASSWORD=""
 API_BLUECOLLECTION_LOGIN=""
