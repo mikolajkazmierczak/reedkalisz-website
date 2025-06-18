@@ -28,10 +28,9 @@
   .items {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
+    gap: 0.5rem;
   }
   .add {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
   }
 </style>

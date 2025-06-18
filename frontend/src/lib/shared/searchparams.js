@@ -11,9 +11,10 @@ export const searchparams = writable(
     ['/admin/menu', { values, defaults: { l: 50, p: 1, q: null, m: null } }], // limit, page, query, menu
     ['/admin/strony', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
     ['/admin/fragmenty', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/kalkulacje', { values, defaults: { c: null } }], // company
     ['/admin/biblioteka', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
     ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/api', { values, defaults: { l: 25, p: 1, q: null, c: null } }] // limit, page, company
+    ['/admin/api', { values, defaults: { l: 25, p: 1, q: null, c: null } }] // limit, page, query, company
   ])
 );
 

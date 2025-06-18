@@ -175,19 +175,24 @@
   <div class="ui-pair popup-actions">
     <Button on:click={removeFinish}>Anuluj</Button>
     <Button on:click={remove} dangerous>
-      {#if deletingSaving} Usuwanie... {:else} Usuń {/if}
+      {#if deletingSaving}
+        Usuwanie...
+      {:else}
+        Usuń
+      {/if}
     </Button>
   </div>
 </Popup>
 
 <style>
   .item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 0.25rem;
     border-radius: var(--border-radius);
     border: var(--border-light);
-    padding: 0.5rem;
+    padding: 0.25rem;
+    width: 100%;
     background-color: var(--primary-white);
   }
   .item.default {
@@ -197,10 +202,12 @@
   .item-actions {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
   }
   .save-actions {
-    margin-top: 0.75rem;
+    width: 40ch;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
   }
   .popup-actions {
     margin-top: 1rem;

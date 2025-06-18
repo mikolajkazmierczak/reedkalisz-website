@@ -58,50 +58,48 @@
   $: diff(data, dataOriginal, { fieldsToIgnore }).then(({ changed }) => (unsaved = changed));
 </script>
 
-<div class="wrapper">
-  <div class="margins">
-    <div>
-      <h4 style:color="#f90">Produkt</h4>
-      <div class="ui-pair">
-        <div class="input">
-          <Input type="number" bind:value={data.product_margin}>Marża</Input>
-          <small>%</small>
-        </div>
-        <div class="input">
-          <Input type="number" bind:value={data.product_minimum}>Minimum</Input>
-          <small>zł</small>
-        </div>
+<div class="margins">
+  <div>
+    <h4 style:color="#f90">Produkt</h4>
+    <div class="ui-pair">
+      <div class="input">
+        <Input type="number" bind:value={data.product_margin}>Marża</Input>
+        <small>%</small>
       </div>
-    </div>
-    <div class="bar" />
-    <div>
-      <h4 style:color="#cc001d">Całość</h4>
-      <div class="ui-pair">
-        <div class="input">
-          <Input type="number" bind:value={data.full_margin}>Marża</Input>
-          <small>%</small>
-        </div>
-        <div class="input">
-          <Input type="number" bind:value={data.full_minimum}>Minimum</Input>
-          <small>zł</small>
-        </div>
+      <div class="input">
+        <Input type="number" bind:value={data.product_minimum}>Minimum</Input>
+        <small>zł</small>
       </div>
     </div>
   </div>
-
-  {#if unsaved}
-    <div class="ui-pair edit" transition:slide={{ duration: 200 }}>
-      <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
-      <Button icon="ok" on:click={save}>
-        {#if saving}Zapisuję...{:else}Zapisz{/if}
-      </Button>
+  <div>
+    <h4 style:color="#cc001d">Całość</h4>
+    <div class="ui-pair">
+      <div class="input">
+        <Input type="number" bind:value={data.full_margin}>Marża</Input>
+        <small>%</small>
+      </div>
+      <div class="input">
+        <Input type="number" bind:value={data.full_minimum}>Minimum</Input>
+        <small>zł</small>
+      </div>
     </div>
-  {/if}
+  </div>
 </div>
+
+{#if unsaved}
+  <div class="ui-pair edit" transition:slide={{ duration: 200 }}>
+    <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
+    <Button icon="ok" on:click={save}>
+      {#if saving}Zapisuję...{:else}Zapisz{/if}
+    </Button>
+  </div>
+{/if}
 
 <style>
   .margins {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 1rem;
   }
@@ -115,11 +113,7 @@
     right: 0.45rem;
     opacity: 0.5;
   }
-  .bar {
-    width: 1px;
-    height: 4rem;
-    background-color: rgba(0, 0, 0, 0.1);
-  }
+
   .edit {
     margin-top: 1rem;
   }

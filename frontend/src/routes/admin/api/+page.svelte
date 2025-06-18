@@ -14,7 +14,6 @@
   import { merge } from './items.js';
 
   import Loader from '$c/Loader.svelte';
-  import Tooltip from '$c/Tooltip.svelte';
   import Pagination from '@c/Pagination.svelte';
   import Filters from '@c/Filters.svelte';
   import Button from '@c/Button.svelte';

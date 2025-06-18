@@ -1,9 +1,12 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import { nanoid } from 'nanoid';
   import { deep } from '%/utils';
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
   import Button from '@c/Button.svelte';
+
+  const dispatch = createEventDispatcher();
 
   export let input = null;
 
@@ -96,6 +99,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
+      on:click={e => dispatch('click', { e })}
+      on:input={e => dispatch('input', { e })}
     />
   {:else if type == 'textarea'}
     <textarea
@@ -108,6 +113,8 @@
       {rows}
       class:resize
       class:json={format === 'json'}
+      on:click={e => dispatch('click', { e })}
+      on:input={e => dispatch('input', { e })}
     />
   {:else if type == 'email'}
     <input
@@ -120,6 +127,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
+      on:click={e => dispatch('click', { e })}
+      on:input={e => dispatch('input', { e })}
     />
   {:else if type == 'password'}
     <input
@@ -132,6 +141,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
+      on:click={e => dispatch('click', { e })}
+      on:input={e => dispatch('input', { e })}
     />
   {:else if type == 'date'}
     <input
@@ -144,6 +155,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
+      on:click={e => dispatch('click', { e })}
+      on:input={e => dispatch('input', { e })}
     />
   {:else if type == 'time'}
     <input
@@ -156,6 +169,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
+      on:click={e => dispatch('click', { e })}
+      on:input={e => dispatch('input', { e })}
       {step}
     />
   {:else if type == 'color'}
@@ -168,6 +183,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
+      on:click={e => dispatch('click', { e })}
+      on:input={e => dispatch('input', { e })}
     />
   {:else if type == 'checkbox'}
     <div class="checkbox" class:error on:click={() => (value = !value)} on:keydown={() => {}}>
@@ -243,6 +260,8 @@
           {min}
           {max}
           {step}
+          on:click={e => dispatch('click', { e })}
+          on:input={e => dispatch('input', { e })}
         />
         {#if error}<span class="error-info">{error}</span>{/if}
       </div>
