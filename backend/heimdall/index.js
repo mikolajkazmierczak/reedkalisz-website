@@ -35,29 +35,6 @@ async function fetchAPI(company) {
   return await api[company.name].fetch({ company, env: getCompanyEnv(company) });
 }
 
-// function convertBodyToFormData(options) {
-//   const formData = new FormData();
-//   for (const [key, value] of Object.entries(options.body)) {
-//     formData.append(key, value);
-//   }
-//   options.body = new URLSearchParams(formData);
-// }
-
-// app.post('/fetch', async (req, res) => {
-//   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-//   const { url, options, bodyIsFormData } = JSON.parse(req.body);
-//   if (bodyIsFormData) convertBodyToFormData(options);
-//   const response = await fetch(url, options);
-//   // TODO improve this
-//   // const data = await response.text();
-//   console.log(JSON.stringify(response));
-
-//   const stuff = Object.getOwnPropertySymbols(response)[1];
-//   console.log(JSON.stringify(stuff));
-
-//   res.end(JSON.stringify(stuff));
-// });
-
 app.get('/', (req, res) => {
   res.end('Greetings. I am a vigilant watcher of this realm. My name is Heimdall Odinson.');
 });
