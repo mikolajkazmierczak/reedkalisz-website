@@ -1,5 +1,5 @@
 <script>
-  import api from '$/api';
+  import api, { baseUrl } from '$/api';
   import heimdall from '$/heimdall';
   import { dequal } from 'dequal';
   import { parseDatetime } from '%/datetime';
@@ -332,7 +332,7 @@
   async function fetchApiItemsSnapshot() {
     const snapshotFileId = selectedCompany.api_snapshot;
     if (snapshotFileId) {
-      const download = await fetch(`/api/assets/${snapshotFileId}`);
+      const download = await fetch(`${baseUrl}/assets/${snapshotFileId}`);
       return await download.json();
     }
     return null;

@@ -123,81 +123,85 @@
 {#if items.length}
   <div class="wrapper">
     <table class="ui-table">
-      <tr>
-        <th width="60">
-          <Tooltip>Kolejność</Tooltip>
-          <Icon width="15" name="arrow_down" />
-        </th>
-        <th width="30">
-          <Tooltip>Domyślne dla producenta</Tooltip>
-          <Icon width="15" name="star" />
-        </th>
-        <th width="30" class="heavy-border">
-          <Icon width="15" name="delete" />
-        </th>
-
-        <th width="140">Nazwa</th>
-        <th width="100">Kod</th>
-        <th width="100" class="heavy-border">Typ</th>
-
-        <th width="60">
-          <Tooltip>Marża</Tooltip>
-          <b style:color="#0A9f59">M</b>
-        </th>
-        <th width="60">
-          <Tooltip>Minimum</Tooltip>
-          <b style:color="#0A9f59">MIN</b>
-        </th>
-        <th width="60">
-          <Tooltip>Przygotowalnia</Tooltip>
-          <b style:color="#0089ff">P</b>
-        </th>
-        <th width="60">
-          <Tooltip>Cena transportu</Tooltip>
-          <b style:color="#6604C2">T</b>
-        </th>
-        <th width="70" class="heavy-border">
-          <Tooltip>Próg dla uwzględnienia transportu</Tooltip>
-          <b style:color="#6604C2">TP</b>
-        </th>
-
-        {#each items[0].prices as p, i (p._uid)}
-          {@const isLumpsum = p.amount == 1}
-
-          <th width="80" class="amount" class:amount--lumpsum={isLumpsum}>
-            <div class="amount-actions">
-              <Button icon="delete" on:click={() => removeAmount(i)} square dangerous />
-            </div>
-
-            {#if isLumpsum}
-              <div class="lumpsum">
-                <small>Ryczałt</small>
-              </div>
-            {/if}
-
-            <Input
-              type="number"
-              borderless
-              min={0}
-              step={1}
-              value={p.amount}
-              on:click={handleAmountClick}
-              on:input={e => handleAmountInput(e, i)}
-            />
+      <thead>
+        <tr>
+          <th width="60" class="col-sticky col-index">
+            <Tooltip>Kolejność</Tooltip>
+            <Icon width="15" name="arrow_down" />
           </th>
+          <th width="30">
+            <Tooltip>Domyślne dla producenta</Tooltip>
+            <Icon width="15" name="star" />
+          </th>
+          <th width="30" class="heavy-border">
+            <Icon width="15" name="delete" />
+          </th>
+
+          <th width="140">Nazwa</th>
+          <th width="100" class="col-sticky col-code">Kod</th>
+          <th width="100" class="heavy-border">Typ</th>
+
+          <th width="60">
+            <Tooltip>Marża</Tooltip>
+            <b style:color="#0A9f59">M</b>
+          </th>
+          <th width="60">
+            <Tooltip>Minimum</Tooltip>
+            <b style:color="#0A9f59">MIN</b>
+          </th>
+          <th width="60">
+            <Tooltip>Przygotowalnia</Tooltip>
+            <b style:color="#0089ff">P</b>
+          </th>
+          <th width="60">
+            <Tooltip>Cena transportu</Tooltip>
+            <b style:color="#6604C2">T</b>
+          </th>
+          <th width="70" class="heavy-border">
+            <Tooltip>Próg dla uwzględnienia transportu</Tooltip>
+            <b style:color="#6604C2">TP</b>
+          </th>
+
+          {#each items[0].prices as p, i (p._uid)}
+            {@const isLumpsum = p.amount == 1}
+
+            <th width="80" class="amount" class:amount--lumpsum={isLumpsum}>
+              <div class="amount-actions">
+                <Button icon="delete" on:click={() => removeAmount(i)} square dangerous />
+              </div>
+
+              {#if isLumpsum}
+                <div class="lumpsum">
+                  <small>Ryczałt</small>
+                </div>
+              {/if}
+
+              <Input
+                type="number"
+                borderless
+                min={0}
+                step={1}
+                value={p.amount}
+                on:click={handleAmountClick}
+                on:input={e => handleAmountInput(e, i)}
+              />
+            </th>
+          {/each}
+
+          <th width="30" rowspan={items.length + 1} class="action action-amount-push">
+            <button on:click={() => addAmount()}>
+              <HoverCircle />
+              <div class="icon"><Icon fill name="add" light /></div>
+            </button>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {#each items as item, i (item._uid)}
+          <Labeling bind:items bind:item index={i} />
         {/each}
-
-        <th width="30" rowspan={items.length + 1} class="action action-amount-push">
-          <button on:click={() => addAmount()}>
-            <HoverCircle />
-            <div class="icon"><Icon fill name="add" light /></div>
-          </button>
-        </th>
-      </tr>
-
-      {#each items as item, i (item._uid)}
-        <Labeling bind:items bind:item index={i} />
-      {/each}
+      </tbody>
     </table>
   </div>
 {/if}
@@ -205,7 +209,9 @@
 <div class="edit-actions">
   {#if unsaved}
     <div class="ui-pair">
-      <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
+      {#if !saving}
+        <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
+      {/if}
       <Button icon="ok" on:click={trySave}>
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
@@ -222,24 +228,41 @@
 
 <style>
   .wrapper {
-    overflow-x: auto;
+    overflow: auto;
+    max-width: 100%;
+    max-height: 70vh;
     margin-bottom: 0.75rem;
+    border: var(--border-light);
   }
   table {
-    table-layout: fixed;
+    overflow: auto;
     border-radius: 0;
+    table-layout: fixed;
+    border: none;
     width: 1px; /* makes the table respect column widths... yes :) */
   }
-  /* thead tr:nth-child(1) th {
+  thead {
     position: sticky;
-    top: 4rem;
+    /* top: 4rem; */
+    top: 0;
+    z-index: 2;
+  }
+  .col-sticky {
+    position: sticky;
+    /* left: 4rem; */
+    left: 0;
     z-index: 1;
-  } */
+  }
+  .col-code {
+    /* left: calc(4rem + 60px); */
+    left: 60px;
+  }
   th {
     border-bottom: var(--border-heavy);
     font-weight: normal;
     white-space: nowrap;
   }
+
   th.amount {
     padding: 0;
   }

@@ -80,7 +80,7 @@
 </Popup>
 
 <tr class:remove={item._remove}>
-  <td class="input type">
+  <th class="input type col-sticky col-index">
     <Input
       type="number"
       borderless
@@ -90,7 +90,7 @@
       on:click={handleIndexClick}
       on:input={handleIndexInput}
     />
-  </td>
+  </th>
 
   <td class="input action default" class:default={item.default}>
     {#if !item.default}
@@ -113,7 +113,7 @@
   <td class="input type">
     <Input borderless bind:value={item.name} />
   </td>
-  <td class="input code">
+  <td class="input code col-sticky col-code">
     <Input borderless bind:value={item.code} />
   </td>
   <td class="input type heavy-border">
@@ -148,9 +148,17 @@
     opacity: 0.3;
   }
 
-  td {
-    overflow: hidden;
+  .col-sticky {
+    position: sticky;
+    /* left: 4rem; */
+    left: 0;
+    z-index: 1;
   }
+  .col-code {
+    /* left: calc(4rem + 60px); */
+    left: 60px;
+  }
+
   .action button {
     overflow: hidden;
     position: relative;

@@ -50,7 +50,6 @@
 
 <style>
   .company {
-    overflow-x: auto;
     position: relative;
     margin-bottom: 2rem;
     width: 100%;

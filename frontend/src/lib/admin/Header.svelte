@@ -24,7 +24,7 @@
   header {
     --height: 4rem;
     --gap: 0.9rem;
-    z-index: 1;
+    z-index: 5;
     overflow: hidden;
     position: sticky;
     top: 0;
