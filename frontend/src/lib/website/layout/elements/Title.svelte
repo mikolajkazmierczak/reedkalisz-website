@@ -2,7 +2,7 @@
   import GoButton from '#c/GoButton.svelte';
 
   import { editing } from '#/layout/store';
-  import { parseUri } from '#/layout/utils';
+  import { parseHref } from '#/layout/utils';
   import Button from '#/layout/Button.svelte';
   import ButtonInputs from '#/layout/ButtonInputs.svelte';
   import FloatingInputs from '#/layout/FloatingInputs.svelte';
@@ -10,7 +10,7 @@
 
   export let element;
 
-  $: ({ href, target } = parseUri(element?.uri));
+  $: ({ href, target } = parseHref(element?.uri));
 
   let inputsOpen = false;
 

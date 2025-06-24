@@ -1,5 +1,5 @@
 <script>
-  import { parseUri } from '#/layout/utils';
+  import { parseHref } from '#/layout/utils';
 
   export let type = 'text';
   export let label;
@@ -11,7 +11,7 @@
 
   $: if (type === 'uri') {
     // replace with parsed uri (url or pathname)
-    const { href } = parseUri(value);
+    const { href } = parseHref(value);
     if (href) value = href;
   }
 </script>

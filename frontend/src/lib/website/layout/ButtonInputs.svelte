@@ -1,13 +1,13 @@
 <script>
   import Icon from '$c/Icon.svelte';
 
-  import { parseUri } from '#/layout/utils';
+  import { parseHref } from '#/layout/utils';
   import Input from '#/layout/Input.svelte';
 
   export let button;
   export let uri;
 
-  $: ({ href } = parseUri(uri));
+  $: ({ href } = parseHref(uri));
 </script>
 
 <Input label="Przycisk" bind:value={button} />

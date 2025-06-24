@@ -1,6 +1,6 @@
 import { invalidate } from '$app/navigation';
 import { uid } from '%/utils';
-import api from '$/api';
+import api, { baseUrl } from '$/api';
 
 const createTile = $ => ({
   _id: uid(),
@@ -80,8 +80,19 @@ export function parseBack(parsed) {
   });
 }
 
-export function parseUri(uri) {
-  // TODO: if uri is internal but from /api/assets/... then target should be _blank
+function isUUID(str) {
+  // Check if the string is a valid UUID (version 1-5)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
+export function parseImg(uri) {
+  if (!uri) return null;
+  if (isUUID(uri)) return `${baseUrl}/assets/${uri}`; // internal asset (UUID)
+  return uri;
+}
+
+export function parseHref(uri) {
   const empty = { href: null, target: null };
   if (!uri) return empty;
   if (uri.startsWith('/api/assets/')) {

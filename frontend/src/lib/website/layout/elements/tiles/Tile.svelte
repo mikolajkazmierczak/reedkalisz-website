@@ -4,7 +4,7 @@
   import Icon from '$c/Icon.svelte';
 
   import { editing } from '#/layout/store';
-  import { parseUri } from '#/layout/utils';
+  import { parseImg, parseHref } from '#/layout/utils';
   import Input from '#/layout/Input.svelte';
   import Button from '#/layout/Button.svelte';
   import ButtonInputs from '#/layout/ButtonInputs.svelte';
@@ -19,7 +19,7 @@
   export let tile;
 
   $: ({ _empty } = tile);
-  $: ({ href, target } = parseUri(tile?.uri));
+  $: ({ href, target } = parseHref(tile?.uri));
 
   $: if (tile.img) {
     tile.red = false;
@@ -224,7 +224,7 @@
         class:href={$editing ? false : tile.uri}
       >
         {#if tile.img}
-          <img src={baseUrl + tile.img} alt="" />
+          <img src={parseImg(tile.img)} alt="" />
         {/if}
         <div class="content" class:dark class:contrast>
           <div class="text">
