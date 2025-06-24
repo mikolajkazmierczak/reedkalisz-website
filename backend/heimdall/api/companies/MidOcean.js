@@ -43,7 +43,20 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
   }));
   printdata = printdata.products.map(p => ({
     productCode: p.master_code,
-    manipulation: p.print_manipulation
+    manipulation: p.print_manipulation,
+    positions: p.printing_positions.map(pos => {
+      const a = pos.max_print_size_height;
+      const b = pos.max_print_size_width;
+      const areaType = pos.print_position_type;
+      const area = areaType === 'Rectangle' ? a * b : areaType === 'Ellipse' ? Math.PI * a * b : null;
+      return {
+        techniques: pos.printing_techniques.map(t => t.id),
+        label: pos.position_id,
+        height: a,
+        width: b,
+        area
+      };
+    })
   }));
   stock = stock.stock.map(s => ({
     sku: s.sku,
@@ -65,10 +78,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
         return parseCode(p.sku).productCode === productCode; // TODO: are prices same for all variants (probably not for textiles)
       })?.price || null;
 
-    const handlingCostCode =
-      printdata.find(p => {
-        return p.productCode === productCode;
-      })?.manipulation || null;
+    const handlingCostCode = printdata.find(p => p.productCode === productCode)?.manipulation || null;
     const handling_cost = handlingCosts.find(h => h.code === handlingCostCode)?.price || null;
 
     const description = $?.commercial_description || $?.long_description || $?.short_description || null;
@@ -108,7 +118,8 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
 
         if (hasLongTail) data._incompatible = true;
         return data;
-      })
+      }),
+      _labelings: printdata.find(p => p.productCode === productCode)?.positions || []
     };
     if (data.storage.every(s => s?._incompatible)) data._incompatible = true;
     return data;

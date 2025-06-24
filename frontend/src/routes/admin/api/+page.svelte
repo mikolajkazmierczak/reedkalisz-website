@@ -12,6 +12,7 @@
   import { round, findColorId } from './utils.js';
   import { selected, countSelected, clearSelected } from './selected.js';
   import { merge } from './items.js';
+  import { createLabelings } from './labelings.js';
 
   import Loader from '$c/Loader.svelte';
   import Pagination from '@c/Pagination.svelte';
@@ -191,7 +192,8 @@
         price_view: priceView.id,
         custom_prices: prices,
         custom_prices_sale: prices,
-        storage
+        storage,
+        labelings: createLabelings(item._labelings)
       };
       delete newItem.id; // '+' in defaults()
       const newProduct = await api.items('products').createOne(newItem);
