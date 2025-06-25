@@ -4,6 +4,7 @@
   import { dequal } from 'dequal';
   import { parseDatetime } from '%/datetime';
   import { capitalize } from '%/utils';
+  import { recalculateLabelings } from '%/calculations';
   import { defaults } from '%/fields/products';
   import { searchparams, SearchParams } from '$/searchparams';
   import { header } from '@/stores';
@@ -193,8 +194,9 @@
         custom_prices: prices,
         custom_prices_sale: prices,
         storage,
-        labelings: createLabelings(item._labelings)
+        labelings: createLabelings(item.price, item._labelings)
       };
+      recalculateLabelings(priceView.amounts, $globalMargins, $labelings, $companies, newItem);
       delete newItem.id; // '+' in defaults()
       const newProduct = await api.items('products').createOne(newItem);
       newIds.products.push(newProduct.id);

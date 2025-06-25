@@ -114,7 +114,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
           color_first: vColor[0],
           color_second: vColor[1]
         };
-        console.log(data);
+        // console.log(data);
 
         if (hasLongTail) data._incompatible = true;
         return data;
