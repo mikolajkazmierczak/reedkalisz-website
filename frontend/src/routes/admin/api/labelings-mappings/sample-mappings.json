@@ -1,0 +1,44 @@
+[
+  {
+    "_uid": "xxx",
+    "_index": 0,
+    "code": "P1",
+    "type": "direct",
+    "mapping": {
+      "company": 4,
+      "code": "RT1"
+    }
+  },
+  {
+    "_uid": "yyy",
+    "_index": 1,
+    "code": "P2",
+    "type": "price",
+    "mapping": [
+      {
+        "_uid": "aaa",
+        "_index": 0,
+        "type": "gte",
+        "threshold": 0,
+        "company": 4,
+        "code": "L1"
+      },
+      {
+        "_uid": "bbb",
+        "_index": 1,
+        "type": "gt",
+        "threshold": 3,
+        "company": 4,
+        "code": "L2"
+      },
+      {
+        "_uid": "ccc",
+        "_index": 2,
+        "type": "gt",
+        "threshold": 5,
+        "company": 4,
+        "code": "L3"
+      }
+    ]
+  }
+]

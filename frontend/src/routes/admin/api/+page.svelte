@@ -4,7 +4,6 @@
   import { dequal } from 'dequal';
   import { parseDatetime } from '%/datetime';
   import { capitalize } from '%/utils';
-  import { recalculateLabelings } from '%/calculations';
   import { defaults } from '%/fields/products';
   import { searchparams, SearchParams } from '$/searchparams';
   import { header } from '@/stores';
@@ -22,6 +21,7 @@
   import Input from '@c/Input.svelte';
   import Search from '@c/Search.svelte';
   import Items from './Items.svelte';
+  import LabelingsMappings from './labelings-mappings/LabelingsMappings.svelte';
 
   $header = { title: 'API', icon: 'api' };
 
@@ -194,12 +194,14 @@
         custom_prices: prices,
         custom_prices_sale: prices,
         storage,
-        labelings: createLabelings(item.price, item._labelings)
+        labelings: item._labelings ? createLabelings(selectedCompany, item) : []
       };
-      recalculateLabelings(priceView.amounts, $globalMargins, $labelings, $companies, newItem);
       delete newItem.id; // '+' in defaults()
       const newProduct = await api.items('products').createOne(newItem);
       newIds.products.push(newProduct.id);
+      if (newProduct.labelings.length) {
+        recalculateProducts({ id: { _eq: newProduct.id } });
+      }
     }
   }
 
@@ -507,9 +509,11 @@
   <Pagination {searchParams} {limit} {page} count={mergedItems.length} />
 {/if}
 
-<div class="warning">
+<LabelingsMappings company={selectedCompany} />
+
+<!-- <div class="warning">
   <span>BETA</span>&nbsp;&nbsp;Porzućcie wszelką nadzieję, wy, którzy tu wchodzicie.
-</div>
+</div> -->
 
 <style>
   label {

@@ -102,14 +102,14 @@ const mapping = {
 };
 
 function newProductLabeling(company, apiLabeling, index, labelingID) {
-  // TODO: should the price calculation be done here? or after the item is created in +page.js?
   // Create a new labeling object with the given parameters.
+  // The prices are calculated in +page.js
   const global_margin = company === 2 ? false : true; // disabled in MidOcean
   const { width, height, label } = apiLabeling;
   return {
     ...defaults(),
     index,
-    enabled: true, // enabled by default?
+    enabled: true,
     global_margin,
     labeling: labelingID,
     labeling_field_x: width,
@@ -148,49 +148,58 @@ function clearDuplicates(labelings) {
   return Array.from(unique.values());
 }
 
-export function createLabelings(price, apiLabelings) {
+export function createLabelings(companyData, apiItem) {
   // Create product labelings based on the data fetched from the API, and the mapping defined above.
   // data: [{ techniques: ['CODE',...], label: 'top side', height: 0, width: 0, area: 0 }, ...]
-  const result = [];
+  const productLabelings = [];
+  const mappings = companyData.api_labelings_mapping;
+  if (!mappings) {
+    console.warn('No labelings mapping found for the company.');
+    return productLabelings;
+  }
 
-  for (const apiLabeling of apiLabelings) {
+  for (const apiLabeling of apiItem._labelings) {
     const { techniques, area } = apiLabeling;
+
+    let index = 0;
     for (const technique of techniques) {
-      if (!mapping[technique]) {
-        console.warn(`Labeling code ${technique} not found in mapping.`);
+      if (!mappings[technique]) {
+        console.warn(`Labeling code "${technique}" not found in mapping.`);
         continue;
       }
 
-      let index = 0;
-
-      const rule = mapping[technique];
       let company, code;
+      const rule = mappings[technique];
       if (!rule.criteria) {
-        // simple case: company and code are defined directly
+        // direct case: company and code are defined directly
         ({ company, code } = rule);
       } else if (rule.criteria === 'price') {
-        // price-based thresholds
-        const threshold = chooseThreshold(price, rule.thresholds);
+        // price-based case: company and code are defined based on thresholds
+        const threshold = chooseThreshold(item.price, rule.thresholds);
         if (!threshold) {
-          console.warn(`No threshold found for price ${price} in labeling ${technique}.`);
+          console.warn(`No threshold for price "${item.price}" for "${technique}".`);
           continue;
         }
         ({ company, code } = threshold);
       } else if (rule.criteria === 'area') {
-        // area-based thresholds
+        // area-based case: company and code are defined based on thresholds
         const threshold = chooseThreshold(area, rule.thresholds);
         if (!threshold) {
-          console.warn(`No threshold found for area ${area} in labeling ${technique}.`);
+          console.warn(`No threshold for area "${area}" for "${technique}".`);
           continue;
         }
         ({ company, code } = threshold);
       }
 
       const labeling = findLabeling(company, code);
-      if (!labeling) continue;
-      result.push(newProductLabeling(company, apiLabeling, index++, labeling.id));
+      if (!labeling) {
+        console.warn(`Labeling with company "${company.name}" and code "${code}" not found.`);
+        continue;
+      }
+
+      productLabelings.push(newProductLabeling(company, apiLabeling, index++, labeling.id));
     }
   }
 
-  return clearDuplicates(result);
+  return clearDuplicates(productLabelings);
 }

@@ -9,7 +9,8 @@ export const search = [
   'api_flags',
   'api_last_scan',
   'api_discount',
-  'api_handling_costs'
+  'api_handling_costs',
+  'api_labelings_mappings'
 ];
 export const show = [...search];
 
@@ -27,7 +28,8 @@ export const defaults = () => ({
   api_flags: null, // object
   api_last_scan: null, // timestamp
   api_discount: null,
-  api_handling_costs: null // object
+  api_handling_costs: null, // object
+  api_labelings_mappings: null // object
 });
 
 export default { search, show, read, edit, defaults };

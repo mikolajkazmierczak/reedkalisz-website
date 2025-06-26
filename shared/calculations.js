@@ -197,7 +197,7 @@ export function recalculateLabelings(amounts, global, labelings, companies, prod
   product.labelings.forEach((l, i) => (l.index = i));
 }
 
-async function recalculateProduct(api, amounts, global, labelings, companies, product, swapLabelings = null) {
+async function recalculateProduct(api, amounts, global, labelings, companies, product, { swapLabelings = null } = {}) {
   // Swaps and/or deletes labelings (updates indexes).
   // Recalculates customPrices, customPricesSale and each labelings prices and pricesSale.
   //   Toggles state (enabled) of each pricePerAmount appropriately.
@@ -262,7 +262,7 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
         globals.labelings,
         globals.companies,
         product,
-        swapLabelings
+        { swapLabelings }
       );
     })
   );
