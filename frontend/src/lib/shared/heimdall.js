@@ -1,12 +1,12 @@
-import { PUBLIC_BASE_URL } from '$env/static/public';
+import { PUBLIC_HEIMDALL_URL } from '$env/static/public';
 import { get } from 'svelte/store';
 import { onDestroy } from 'svelte';
 
 import { io } from 'socket.io-client';
 import { me } from '$/auth';
 
-export const baseUrl = PUBLIC_BASE_URL;
-export const restUrl = `${baseUrl}/heimdall`;
+// this should be "https://reed.kalisz.pl" not "https://reed.kalisz.pl/heimdall", or "https://localhost:9999"
+export const baseUrl = PUBLIC_HEIMDALL_URL;
 
 class Socket {
   constructor(url) {
@@ -69,18 +69,6 @@ class Heimdall {
       if (root) this.socket.close();
     });
   }
-
-  // async fetch(url, options) {
-  //   // fetches data from url with options, automatically handles FormData objects
-  //   const bodyIsFormData = options.body instanceof FormData;
-  //   if (bodyIsFormData) options.body = Object.fromEntries(options.body);
-  //   const res = await fetch(`${restUrl}/fetch`, {
-  //     'Content-Type': 'text/html; charset=utf-8',
-  //     method: 'POST',
-  //     body: JSON.stringify({ url, options, bodyIsFormData })
-  //   });
-  //   return await res.text();
-  // }
 
   ask(company, data) {
     this.socket.emitFetch(company, data);

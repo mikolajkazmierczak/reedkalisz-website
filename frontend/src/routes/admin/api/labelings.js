@@ -24,15 +24,19 @@ function newProductLabeling(selectedCompany, apiLabeling, index, labelingID) {
 function findLabeling(company, code) {
   const labeling = get(labelings).find(l => l.company === company && l.code === code);
   if (labeling) return labeling;
-  console.warn(`Labeling with company ${company} and code ${code} not found.`);
+  console.warn(`Labeling ${companyName}/${code} not found.`);
 }
 
 function chooseThreshold(value, thresholds) {
   // Choose the appropriate threshold based on the value and the defined thresholds.
   let chosen = null;
   for (const threshold of thresholds) {
+    console.log(threshold);
+
     const { threshold: v, type: t } = threshold;
     if ((t === 'gte' && value >= v) || (t === 'gt' && value > v)) {
+      console.log('chosen');
+
       chosen = threshold;
     }
   }
@@ -95,10 +99,7 @@ export function createLabelings(selectedCompany, apiItem) {
       const companyName = get(companies).find(c => c.id === company)?.name;
 
       const labeling = findLabeling(company, code);
-      if (!labeling) {
-        console.warn(`Labeling ${companyName}/${code} not found.`);
-        continue;
-      }
+      if (!labeling) continue;
 
       console.log(`Labeling created (${companyName}/${code}).`);
       productLabelings.push(newProductLabeling(selectedCompany, apiLabeling, index++, labeling.id));
