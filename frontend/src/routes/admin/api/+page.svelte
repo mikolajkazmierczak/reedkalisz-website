@@ -193,8 +193,8 @@
         price_view: priceView.id,
         custom_prices: prices,
         custom_prices_sale: prices,
-        global_full_margin: selectCompany.id === 2, // MidOcean exception
-        global_product_margin: selectCompany.id !== 2, // MidOcean exception
+        global_full_margin: selectedCompany.id === 2, // MidOcean exception
+        global_product_margin: selectedCompany.id !== 2, // MidOcean exception
         storage,
         labelings: item._labelings ? createLabelings(selectedCompany, item) : []
       };
