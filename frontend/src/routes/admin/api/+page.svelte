@@ -193,6 +193,8 @@
         price_view: priceView.id,
         custom_prices: prices,
         custom_prices_sale: prices,
+        global_full_margin: selectCompany.id === 2, // MidOcean exception
+        global_product_margin: selectCompany.id !== 2, // MidOcean exception
         storage,
         labelings: item._labelings ? createLabelings(selectedCompany, item) : []
       };
@@ -509,7 +511,7 @@
   <Pagination {searchParams} {limit} {page} count={mergedItems.length} />
 {/if}
 
-<LabelingsMappings company={selectedCompany} />
+<LabelingsMappings apiCompany={selectedCompany} />
 
 <!-- <div class="warning">
   <span>BETA</span>&nbsp;&nbsp;Porzućcie wszelką nadzieję, wy, którzy tu wchodzicie.

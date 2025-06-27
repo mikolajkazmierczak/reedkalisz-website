@@ -47,7 +47,7 @@ export async function walkObject(object, filters, func, _regex = null, _path = '
   if (Array.isArray(object)) {
     for (const [index, val] of object.entries()) {
       if (typeof val === 'object' && val !== null) {
-        await walkObject(val, null, func, _regex, _path, object, index);
+        await walkObject(val, filters, func, _regex, _path, object, index);
       }
     }
   } else {
@@ -58,7 +58,7 @@ export async function walkObject(object, filters, func, _regex = null, _path = '
       if (match) {
         await func(object, key, val, _path, _parent, _index);
       } else if (typeof val === 'object' && val !== null) {
-        await walkObject(val, null, func, _regex, newPath, object, key);
+        await walkObject(val, filters, func, _regex, newPath, object, key);
       }
     }
   }
@@ -73,6 +73,7 @@ export async function getFields(object, filters) {
 }
 export async function deleteFields(object, filters) {
   // WARNING: inplace!
+  console.log('Deleting fields:', filters);
   await walkObject(object, filters, (obj, key) => {
     delete obj[key];
   });

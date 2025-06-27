@@ -1,11 +1,11 @@
-import { PUBLIC_HEIMDALL_URL } from '$env/static/public';
+import { PUBLIC_BASE_URL } from '$env/static/public';
 import { get } from 'svelte/store';
 import { onDestroy } from 'svelte';
 
 import { io } from 'socket.io-client';
 import { me } from '$/auth';
 
-export const baseUrl = PUBLIC_HEIMDALL_URL;
+export const baseUrl = PUBLIC_BASE_URL;
 export const restUrl = `${baseUrl}/heimdall`;
 
 class Socket {
