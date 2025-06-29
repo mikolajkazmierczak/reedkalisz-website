@@ -42,7 +42,7 @@
 
 {#each thresholds as { _uid, _index: i, type, threshold, company, code } (_uid)}
   <div class="ui-box ui-box--optional threshold">
-    <Button square icon="delete" on:click={() => remove(_uid)} />
+    <Button dangerous square icon="delete" on:click={() => remove(_uid)} />
     <Input type="number" min={0} step={1} value={i} on:click={handleIndexClick} on:input={e => handleInput(e, _uid)} />
     <div class="icon">|</div>
     <Input type="select" bind:value={type} options={types} />

@@ -36,7 +36,7 @@
 
 <div class="ui-box ui-box--element wrapper">
   <div class="left">
-    <Button square icon="delete" on:click={remove} />
+    <Button dangerous square icon="delete" on:click={remove} />
     <Input type="number" min={0} step={1} value={mapping._index} on:click={handleIndexClick} on:input={handleInput} />
     <div class="icon">|</div>
     <Input bind:value={mapping.code} placeholder="Kod producenta" />
