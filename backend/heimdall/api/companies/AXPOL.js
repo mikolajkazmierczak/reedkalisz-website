@@ -6,6 +6,8 @@ import { parseSearchParams, parseFormData } from '../utils.js';
 import { parseSize, parsePrice } from './EasyGifts.js';
 import { parseItems } from '../common.js';
 
+import { apiAgent } from 'reedkalisz-shared/ca/AXPOL.js';
+
 function parseColor(color) {
   // 'color1' -> { first: 'color1', second: null }
   // 'color1, color2' -> { first: 'color1', second: 'color2' }
@@ -93,6 +95,7 @@ async function fetchApi(method, { jwt = null, searchparams = null, formdata = nu
   };
   if (jwt) options.headers.Authorization = `Bearer ${jwt}`;
   if (formdata) options.body = parseFormData(formdata);
+  if (apiAgent) options.agent = apiAgent; // use the custom https agent with the intermediate certificate
 
   const res = await fetch(`https://axpol.com.pl/api/b2b-api/${params}`, options);
   return await res.json();
@@ -125,8 +128,9 @@ export class AXPOL extends Api {
     const { uid, jwt } = (await endpoints.customerLogin(key, username, password)).data;
 
     // Get the product count.
-    const { count } = (await endpoints.productCount(key, uid, jwt, date)).data;
-    console.log(`   - count: ${count}`);
+    // const { count } = (await endpoints.productCount(key, uid, jwt, date)).data;
+    // console.log(`   - count: ${count}`);
+    const count = 100;
 
     // Get the products, in chunks of 1000.
     const limit = 1000;

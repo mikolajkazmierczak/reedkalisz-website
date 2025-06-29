@@ -1,4 +1,5 @@
 <script>
+  import { PUBLIC_BASE_URL } from '$env/static/public';
   import api, { baseUrl } from '$/api';
   import heimdall from '$/heimdall';
   import { dequal } from 'dequal';
@@ -98,31 +99,65 @@
     });
   }
 
+  // async function uploadImageAXPOL(url) {
+  //   const urlsToTry = [
+  //     `https://axpol.com.pl/files/fotov/${url}`,
+  //     `https://axpol.com.pl/files/fotob/${url}`,
+  //     `https://axpol.com.pl/files/foto_add_view/${url}`,
+  //     `https://axpol.com.pl/files/foto_add_big/${url}`,
+  //     `https://axpol.com.pl/files/foto_add_hr/${url}`,
+  //     `https://axpol.com.pl/files/foto_add_lr/${url}`
+  //   ];
+  //   for (const u of urlsToTry) {
+  //     console.log(`attempting image import ${u}`);
+  //     const img = await fetch(u, {
+  //       method: 'GET'
+  //     });
+  //     const blob = await img.blob();
+  //     console.log(blob);
+
+  //     // import the image from the url
+  //     // then upload it to directus with api.files.createMany()
+  //   }
+  // }
+
   async function importImage(storage, img, index) {
-    // try to import the image from different urls or throw
-    const urlsToTry =
-      selectedCompany.name === 'AXPOL'
-        ? [
-            `https://axpol.com.pl/files/fotov/${img}`,
-            `https://axpol.com.pl/files/fotob/${img}`,
-            `https://axpol.com.pl/files/foto_add_view/${img}`,
-            `https://axpol.com.pl/files/foto_add_big/${img}`,
-            `https://axpol.com.pl/files/foto_add_hr/${img}`,
-            `https://axpol.com.pl/files/foto_add_lr/${img}`
-          ]
-        : [img];
+    // try to import the image from different urls or throw\
+    const AXPOL = selectedCompany.name === 'AXPOL';
+    const urlsToTry = AXPOL
+      ? [
+          `https://axpol.com.pl/files/fotov/${img}`,
+          `https://axpol.com.pl/files/fotob/${img}`,
+          `https://axpol.com.pl/files/foto_add_view/${img}`,
+          `https://axpol.com.pl/files/foto_add_big/${img}`,
+          `https://axpol.com.pl/files/foto_add_hr/${img}`,
+          `https://axpol.com.pl/files/foto_add_lr/${img}`
+        ]
+      : [img];
+
     for (const url of urlsToTry) {
+      console.log(`attempting image import (${url})`);
       try {
-        console.log(`attempting to import image (${url})`);
-        const data = { title: `${storage._uid} ${index}` };
-        const file = await api.files.import({ url, data });
-        console.log(`- success (${url})`);
-        return file.id;
+        if (AXPOL) {
+          const res = await fetch(`/admin/api/fetch-image-blob?url=${encodeURIComponent(url)}`);
+          if (!res.ok) throw new Error(`- failed image import (${url})`);
+          const blob = await res.blob();
+          const form = new FormData();
+          const file = new File([blob], `${storage._uid} ${index}`, { type: blob.type });
+          form.append('file', file);
+          const fileData = await api.files.createOne(form);
+          console.log(`- successful image import (${url})`);
+          return fileData.id;
+        } else {
+          const data = { title: `${storage._uid} ${index}` };
+          const file = await api.files.import({ url, data });
+          console.log(`- successful image import (${url})`);
+          return file.id;
+        }
       } catch (e) {
-        console.log(`- failed (${url}): ${e}`);
+        console.warn(e);
       }
     }
-    throw new Error(`${img} import failed`);
   }
 
   async function uploadImages(storage) {
@@ -135,7 +170,6 @@
           const id = await importImage(storage, img, index);
           imgs.push({ index, img: id, enabled: true, show_in_gallery: true });
         } catch (e) {
-          console.log(`failed to import image (${img}): ${e}`);
           failedImgs.push(img);
         }
       })
@@ -242,7 +276,7 @@
       const disableAndZeroStorage = s => {
         // disable and zero the amount of the storage (if not true already)
         if (s.enabled || s.amount !== 0) {
-          updates.push(api.items('products_storage').updateOne(s.id, { enabled: false, amount: 0 }));
+          updates.push(() => api.items('products_storage').updateOne(s.id, { enabled: false, amount: 0 }));
           updatedItemsIds.changedStorage.add(dbItem.id);
         }
       };
@@ -256,7 +290,7 @@
         const handlingCostChanged = dbItem.handling_cost !== apiItem.handling_cost;
         if (priceChanged || handlingCostChanged) {
           const productUpdates = { price: apiPrice, handling_cost: apiItem.handling_cost };
-          updates.push(api.items('products').updateOne(dbItem.id, productUpdates));
+          updates.push(() => api.items('products').updateOne(dbItem.id, productUpdates));
           updatedItemsIds.changedPrice.add(dbItem.id);
         }
 
@@ -266,7 +300,7 @@
             // storage exists in the api
             // update the amount if it changed
             if (apiStorage.amount !== dbStorage.amount) {
-              updates.push(api.items('products_storage').updateOne(dbStorage.id, { amount: apiStorage.amount }));
+              updates.push(() => api.items('products_storage').updateOne(dbStorage.id, { amount: apiStorage.amount }));
               updatedItemsIds.changedStorage.add(dbItem.id);
             }
           } else {
@@ -278,7 +312,7 @@
         // item not in the api
         // disable the item
         if (dbItem.enabled) {
-          updates.push(api.items('products').updateOne(dbItem.id, { enabled: false }));
+          updates.push(() => api.items('products').updateOne(dbItem.id, { enabled: false }));
           updatedItemsIds.disabled.add(dbItem.id);
         }
         // disable and zero amounts of all storages
@@ -288,7 +322,13 @@
       }
     }
 
-    await Promise.all(updates);
+    // await Promise.all(updates);
+    // run updates sequentially to avoid overloading the server
+    // TODO: batch updates instead of running them one by one
+    for (const [i, update] of updates.entries()) {
+      console.log(`Update ${i + 1}/${updates.length} completed`);
+      await update();
+    }
 
     return { ...updatedItemsIds, all: new Set(Object.values(updatedItemsIds).flat()) };
   }

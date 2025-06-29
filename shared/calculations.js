@@ -251,21 +251,42 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
   const products = (await api.items('products').readByQuery({ fields: productFields, filter, limit: -1 })).data;
 
   // recalculate each product concurrently
-  await Promise.all(
-    products.map(product => {
-      if (newPriceView != null) product.price_view = newPriceView;
-      const priceView = globals.priceViews.find(pv => pv.id == product.price_view);
-      return recalculateProduct(
-        api,
-        priceView.amounts,
-        globals.globalMargins,
-        globals.labelings,
-        globals.companies,
-        product,
-        { swapLabelings }
-      );
-    })
-  );
+  // await Promise.all(
+  // products.map(product => {
+  // if (newPriceView != null) product.price_view = newPriceView;
+  // const priceView = globals.priceViews.find(pv => pv.id == product.price_view);
+  // return recalculateProduct(
+  //   api,
+  //   priceView.amounts,
+  //   globals.globalMargins,
+  //   globals.labelings,
+  //   globals.companies,
+  //   product,
+  //   { swapLabelings }
+  // );
+  // });
+  // );
+
+  // recalculate all products sequentially to avoid overloading the server
+  // (a workaround of sorts for the Directus API rate limiting)
+  // TODO: batch more products together, e.g. 10 at a time
+  console.log(`Recalculating ${products.length} products...`);
+
+  for (const [i, product] of products.entries()) {
+    console.log(`Updating product ${i}/${products.length} (id: ${product.id})...`);
+
+    if (newPriceView != null) product.price_view = newPriceView;
+    const priceView = globals.priceViews.find(pv => pv.id == product.price_view);
+    await recalculateProduct(
+      api,
+      priceView.amounts,
+      globals.globalMargins,
+      globals.labelings,
+      globals.companies,
+      product,
+      { swapLabelings }
+    );
+  }
 
   return {
     products,
