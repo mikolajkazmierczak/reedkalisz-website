@@ -128,9 +128,8 @@ export class AXPOL extends Api {
     const { uid, jwt } = (await endpoints.customerLogin(key, username, password)).data;
 
     // Get the product count.
-    // const { count } = (await endpoints.productCount(key, uid, jwt, date)).data;
-    // console.log(`   - count: ${count}`);
-    const count = 100;
+    const { count } = (await endpoints.productCount(key, uid, jwt, date)).data;
+    console.log(`   - count: ${count}`);
 
     // Get the products, in chunks of 1000.
     const limit = 1000;
