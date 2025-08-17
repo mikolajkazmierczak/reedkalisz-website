@@ -61,16 +61,10 @@
   }
 </script>
 
-<div class="wrapper">
-  <h2>Reguły importowania znakowań</h2>
+<div class="wrapper ui-box" class:shrink={!mappings}>
+  <h3>Reguły importowania znakowań</h3>
 
   {#if mappings}
-    <p>
-      Do znakowań z API producenta (kod po lewej) można tu przypisać nasze Kalkulacje (po prawej) według określonych
-      reguł (cena, obszar znakowania).<br />Jeśli przy importowaniu wykryte zostanie znakowanie spełniające regułę,
-      zostanie ono automatycznie dodane do produktu.
-    </p>
-
     <div class="mappings">
       {#each mappings as mapping (mapping._uid)}
         <Mapping {apiCompany} bind:mappings bind:mapping />
@@ -86,7 +80,7 @@
       {/if}
     </div>
   {:else}
-    <p>API producenta nie jest jeszcze wspierane lub jego struktura nie zawiera znakowań.</p>
+    <p>Nie zaimplementowano dla API tego producenta lub jego struktura nie zawiera znakowań.</p>
   {/if}
 </div>
 
@@ -95,11 +89,8 @@
     margin-top: 2rem;
     margin-bottom: 20rem;
   }
-  h2 {
-    margin-bottom: 0.5rem;
-  }
-  p {
-    margin-bottom: 1rem;
+  .wrapper.shrink {
+    display: inline-flex;
   }
   .mappings {
     display: flex;
@@ -110,6 +101,5 @@
   .actions {
     display: flex;
     gap: 1rem;
-    margin-top: 1rem;
   }
 </style>
