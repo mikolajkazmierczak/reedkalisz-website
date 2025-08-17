@@ -1,5 +1,4 @@
 <script>
-  import { PUBLIC_BASE_URL } from '$env/static/public';
   import api, { baseUrl } from '$/api';
   import heimdall from '$/heimdall';
   import { dequal } from 'dequal';
@@ -98,28 +97,6 @@
       company: selectedCompany.id
     });
   }
-
-  // async function uploadImageAXPOL(url) {
-  //   const urlsToTry = [
-  //     `https://axpol.com.pl/files/fotov/${url}`,
-  //     `https://axpol.com.pl/files/fotob/${url}`,
-  //     `https://axpol.com.pl/files/foto_add_view/${url}`,
-  //     `https://axpol.com.pl/files/foto_add_big/${url}`,
-  //     `https://axpol.com.pl/files/foto_add_hr/${url}`,
-  //     `https://axpol.com.pl/files/foto_add_lr/${url}`
-  //   ];
-  //   for (const u of urlsToTry) {
-  //     console.log(`attempting image import ${u}`);
-  //     const img = await fetch(u, {
-  //       method: 'GET'
-  //     });
-  //     const blob = await img.blob();
-  //     console.log(blob);
-
-  //     // import the image from the url
-  //     // then upload it to directus with api.files.createMany()
-  //   }
-  // }
 
   async function importImage(storage, img, index) {
     // try to import the image from different urls or throw\
@@ -551,7 +528,9 @@
   <Pagination {searchParams} {limit} {page} count={mergedItems.length} />
 {/if}
 
-<LabelingsMappings apiCompany={selectedCompany} />
+{#if !fetching && selectedCompany}
+  <LabelingsMappings apiCompany={selectedCompany} />
+{/if}
 
 <!-- <div class="warning">
   <span>BETA</span>&nbsp;&nbsp;Porzućcie wszelką nadzieję, wy, którzy tu wchodzicie.

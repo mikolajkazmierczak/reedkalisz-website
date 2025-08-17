@@ -2,33 +2,36 @@
   import { deep, uid, diffSync, deleteFields } from '%/utils';
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Mapping from './Mapping.svelte';
 
   export let apiCompany;
 
-  let mappingsOriginal;
-  let mappings;
+  let mappingsOriginal = null;
+  let mappings = null;
+
   $: apiCompany && updateMappings();
   $: unsaved = diffSync(mappings || [], mappingsOriginal || []).changed;
 
   function updateMappings() {
-    if (!apiCompany || !apiCompany.api_labelings_mappings) return;
-    const items = deep.copy(apiCompany.api_labelings_mappings).map((item, i) => {
-      if (Array.isArray(item.data)) {
-        item.data = item.data.map((data, j) => ({
-          _uid: uid(10),
-          _index: j,
-          ...data
-        }));
-      }
-      return {
-        _uid: uid(10),
-        _index: i,
-        ...item
-      };
-    });
+    const items =
+      apiCompany && apiCompany.api_labelings_mappings
+        ? deep.copy(apiCompany.api_labelings_mappings).map((item, i) => {
+            if (Array.isArray(item.data)) {
+              item.data = item.data.map((data, j) => ({
+                _uid: uid(10),
+                _index: j,
+                ...data
+              }));
+            }
+            return {
+              _uid: uid(10),
+              _index: i,
+              ...item
+            };
+          })
+        : null;
+
     mappingsOriginal = items;
     mappings = deep.copy(items);
   }
@@ -59,9 +62,15 @@
 </script>
 
 <div class="wrapper">
-  <h2>Mapowanie automatycznych znakowań</h2>
+  <h2>Reguły importowania znakowań</h2>
 
   {#if mappings}
+    <p>
+      Do znakowań z API producenta (kod po lewej) można tu przypisać nasze Kalkulacje (po prawej) według określonych
+      reguł (cena, obszar znakowania).<br />Jeśli przy importowaniu wykryte zostanie znakowanie spełniające regułę,
+      zostanie ono automatycznie dodane do produktu.
+    </p>
+
     <div class="mappings">
       {#each mappings as mapping (mapping._uid)}
         <Mapping {apiCompany} bind:mappings bind:mapping />
@@ -77,7 +86,7 @@
       {/if}
     </div>
   {:else}
-    <p>Struktura API producenta nie umożliwia konfiguracji automatycznych znakowań.</p>
+    <p>API producenta nie jest jeszcze wspierane lub jego struktura nie zawiera znakowań.</p>
   {/if}
 </div>
 
@@ -87,6 +96,9 @@
     margin-bottom: 20rem;
   }
   h2 {
+    margin-bottom: 0.5rem;
+  }
+  p {
     margin-bottom: 1rem;
   }
   .mappings {

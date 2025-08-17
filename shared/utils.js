@@ -73,7 +73,6 @@ export async function getFields(object, filters) {
 }
 export async function deleteFields(object, filters) {
   // WARNING: inplace!
-  console.log('Deleting fields:', filters);
   await walkObject(object, filters, (obj, key) => {
     delete obj[key];
   });
