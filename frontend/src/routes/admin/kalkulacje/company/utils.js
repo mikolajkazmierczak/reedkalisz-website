@@ -1,6 +1,7 @@
 import api from '$/api';
 import { read as fields, defaults } from '%/fields/labelings';
 import { deep, diffSync, uid } from '%/utils';
+import { globals } from '@/globals';
 import { recalculateProducts } from '@/calculations';
 
 const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
@@ -20,11 +21,13 @@ export function createNewLabeling(company, items) {
   if (items.length === 0) {
     item.default = true;
   }
-  for (const amount of getAmounts(items)) {
-    item.prices.push({ amount, price: null, _uid: uid(10) });
-  }
+  const amounts = getAmounts(items);
   if (amounts.length === 0) {
     item.prices.push({ amount: 1, price: null }); // TODO: lumpsum is mandatory, why?
+  } else {
+    for (const amount of amounts) {
+      item.prices.push({ amount, price: null, _uid: uid(10) });
+    }
   }
   return item;
 }
@@ -92,7 +95,7 @@ export function prepareSave(items) {
 async function saveItem(item) {
   if (item._new) {
     // CREATE
-    const created = await apiitems('labelings').createOne(item, { fields });
+    const created = await api.items('labelings').createOne(item, { fields });
     return { labelings: [created.id], products: [] };
   } else if (item._remove) {
     // DELETE
@@ -107,6 +110,8 @@ async function saveItem(item) {
     // UPDATE
     const updated = await api.items('labelings').updateOne(item.id, item, { fields });
     // TODO: check if the item changed prices or amounts, if not, skip recalculation
+    // update the labelings global before recalculation
+    await globals.update('labelings', { ids: [updated.id] });
     // update affected products
     const filter = { labelings: { labeling: { _eq: updated.id } } };
     const { ids } = await recalculateProducts(filter);

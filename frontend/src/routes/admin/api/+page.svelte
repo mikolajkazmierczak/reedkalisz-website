@@ -99,18 +99,10 @@
   }
 
   async function importImage(storage, img, index) {
-    // try to import the image from different urls or throw\
+    // try to import the image from different urls or throw
     const AXPOL = selectedCompany.name === 'AXPOL';
-    const urlsToTry = AXPOL
-      ? [
-          `https://axpol.com.pl/files/fotov/${img}`,
-          `https://axpol.com.pl/files/fotob/${img}`,
-          `https://axpol.com.pl/files/foto_add_view/${img}`,
-          `https://axpol.com.pl/files/foto_add_big/${img}`,
-          `https://axpol.com.pl/files/foto_add_hr/${img}`,
-          `https://axpol.com.pl/files/foto_add_lr/${img}`
-        ]
-      : [img];
+    const parts = ['v', 'b', '_add_view', '_add_big', '_add_hr', '_add_lr'];
+    const urlsToTry = AXPOL ? parts.map(t => `https://axpol.com.pl/files/foto${t}/${img}`) : [img];
 
     for (const url of urlsToTry) {
       console.log(`attempting image import (${url})`);
