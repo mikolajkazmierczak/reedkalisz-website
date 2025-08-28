@@ -8,14 +8,14 @@
   import HoverCircle from '$c/HoverCircle.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import { createNewLabeling, getChanged, prepareSave, save } from './utils';
+  import { createNewLabeling, getChanged, tryCleanItems, save } from './utils';
   import Labeling from './Labeling.svelte';
 
   export let unsaved;
 
   export let company;
   export let itemsOriginal;
-  export let items;
+  export let items; // TODO: confusing rerenders happen while saving
 
   // Items state needs to be tracked for changes. We also need to track if the item is new,
   // whether it will be deleted (and whether it will swapped).
@@ -41,24 +41,32 @@
   // _swap: id, // item that will be swapped with this one when deleted
 
   let saving = false;
+  let changedOverride = null; // populated when saving to avoid misleading rerenders
   $: changed = getChanged(items, itemsOriginal);
-  $: unsaved = changed.length > 0;
+  $: unsaved = changedOverride ? changedOverride.length > 0 : changed.length > 0;
 
   async function trySave() {
     if (saving) return; // prevent double click
     saving = true;
+
     const labelingIDs = [];
     const productIDs = [];
-    if (prepareSave(items, changed)) {
-      items = items; // prepareSave also modifies the items
-      for await (const { uid, ids } of save(items, changed)) {
-        changed = changed.filter(c => c._uid !== uid);
+    if (tryCleanItems(items)) {
+      changedOverride = deep.copy(changed);
+
+      for await (const { uid, ids } of save(changedOverride)) {
+        changedOverride = changedOverride.filter(c => c._uid !== uid);
         labelingIDs.push(...ids.labelings);
         productIDs.push(...ids.products);
       }
-      heimdall.emit('labelings', labelingIDs);
-      heimdall.emit('products', productIDs);
+
+      if (labelingIDs.length) heimdall.emit('labelings', labelingIDs);
+      if (productIDs.length) heimdall.emit('products', productIDs);
+
+      changedOverride = null;
     }
+
+    items = items;
     saving = false;
   }
 
@@ -206,9 +214,9 @@
   </div>
 {/if}
 
-<div class="edit-actions">
-  {#if unsaved}
-    <div class="ui-pair">
+{#if unsaved}
+  <div class="edit-actions">
+    <div class:ui-pair={!saving}>
       {#if !saving}
         <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
       {/if}
@@ -216,15 +224,18 @@
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
     </div>
-    {#each changed as { code, name, type }}
+    {#each changedOverride ? changedOverride : changed as { code, name, type }}
       <small>{code || name || type || '???'}</small>
     {/each}
-  {:else}
-    <div>
-      <Button icon="add" on:click={addLabeling}>Dodaj</Button>
-    </div>
-  {/if}
-</div>
+  </div>
+  <div style="margin-top: 0.5rem;">
+    <small>
+      Czas zapisywania zależy od ilości powiązanych produktów. Podczas zapisywania dane w tabeli mogą ulegać zmianom.
+    </small>
+  </div>
+{:else}
+  <Button icon="add" on:click={addLabeling}>Dodaj</Button>
+{/if}
 
 <style>
   .wrapper {

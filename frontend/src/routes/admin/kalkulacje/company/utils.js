@@ -88,7 +88,7 @@ function tryRemoveDuplicateAmounts(items) {
   return true;
 }
 
-export function prepareSave(items) {
+export function tryCleanItems(items) {
   return tryRemoveEmptyAmounts(items) && tryRemoveDuplicateAmounts(items);
 }
 
@@ -99,22 +99,25 @@ async function saveItem(item) {
     return { labelings: [created.id], products: [] };
   } else if (item._remove) {
     // DELETE
-    // update affected products
+    // the global is already updated here, because it updates after every UPDATE, and DELETEs are last
     const filter = { labelings: { labeling: { _eq: item.id } } };
     const swapLabelings = new Map([[item.id, item._swap]]); // will delete the labeling if swapID is null
-    const { ids } = await recalculateProducts(filter, { swapLabelings });
-    // delete the labeling
+    const { ids } = await recalculateProducts(filter, { swapLabelings, emit: false });
+
     await api.items('labelings').deleteOne(item.id);
+
     return { labelings: [item.id], products: ids };
   } else {
     // UPDATE
     const updated = await api.items('labelings').updateOne(item.id, item, { fields });
+
+    // TODO: global needs to be updated for recalculation, but it also confusingly rerenders the labelings
+    await globals.update('labelings', { ids: [updated.id] }); // global needs to be updated for recalculation
+
     // TODO: check if the item changed prices or amounts, if not, skip recalculation
-    // update the labelings global before recalculation
-    await globals.update('labelings', { ids: [updated.id] });
-    // update affected products
     const filter = { labelings: { labeling: { _eq: updated.id } } };
-    const { ids } = await recalculateProducts(filter);
+    const { ids } = await recalculateProducts(filter, { emit: false });
+
     return { labelings: [updated.id], products: ids };
   }
 }
@@ -122,9 +125,9 @@ async function saveItem(item) {
 export async function* save(changed) {
   // First existing items are updated, and new ones are created.
   // Then items marked for removal are deleted, and some are swapped (that's why updating and creating is first).
-  changed = changed.sort((a, b) => (a._remove ? 1 : b._remove ? -1 : 0)); // remove items last
+  const copy = deep.copy(changed).sort((a, b) => (a._remove ? 1 : b._remove ? -1 : 0)); // remove items last
 
-  for (const item of deep.copy(changed)) {
+  for (const item of copy) {
     // cleanup update data
     for (const field of fieldsToIgnore) {
       delete item[field];
