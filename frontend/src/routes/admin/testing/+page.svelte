@@ -106,7 +106,72 @@
       // });
     }
   }
+
+  async function createItem() {
+    const randomId = Math.floor(Math.random() * 100);
+    return await api.items('test').createOne({
+      name: 'Test ' + randomId,
+      count: randomId
+    });
+  }
+  async function createItems(count) {
+    for (const i of Array(count).keys()) {
+      const data = await createItem();
+      console.log(i, data);
+    }
+  }
+
+  function itemUpdates() {
+    return {
+      count: Math.floor(Math.random() * 100),
+      deep: { count_deep: Math.floor(Math.random() * 100) }
+    };
+  }
+
+  async function updateBatch(n) {
+    const start = performance.now();
+
+    const items = Array.from(Array(n).keys()).map(i => ({ id: i + 1, ...itemUpdates() }));
+
+    await api.items('test').updateBatch(items);
+
+    const end = performance.now();
+    console.log('updateBatch time', end - start);
+  }
+  async function updateMany(n) {
+    const start = performance.now();
+
+    for (const i of Array(n).keys()) {
+      await api.items('test').updateOne(i + 1, itemUpdates());
+    }
+
+    const end = performance.now();
+    console.log('updateMany time', end - start);
+  }
+  async function updateManyBatched(n) {
+    const start = performance.now();
+
+    let queue = [];
+    for (const i of Array(n).keys()) {
+      const req = api.items('test').updateOne(i + 1, itemUpdates());
+      queue.push(req);
+      if (queue.length === 20) {
+        await Promise.all(queue);
+        queue = [];
+      }
+    }
+
+    const end = performance.now();
+    console.log('updateManyBatched time', end - start);
+  }
+
+  const amount = 1000;
 </script>
 
-<button on:click={() => fix('products', mapProduct)}>read products</button>
-<button on:click={() => fix('products_storage', mapStorage)}>read products storage</button>
+<!-- <button on:click={() => fix('products', mapProduct)}>read products</button> -->
+<!-- <button on:click={() => fix('products_storage', mapStorage)}>read products storage</button> -->
+
+<button on:click={() => updateBatch(amount)}>updateBatch</button>
+<button on:click={() => updateMany(amount)}>updateMany</button>
+<button on:click={() => updateManyBatched(amount)}>updateManyBatched</button>
+<button on:click={() => createItems(100)}>createItems</button>

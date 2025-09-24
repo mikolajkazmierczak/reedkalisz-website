@@ -237,6 +237,21 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
     price_max_sale: maxSale
   };
   await api.items('products').updateOne(product.id, updates);
+
+  // // recalculate all products at once
+  // return {
+  //   price_view: product.price_view, // already updated in recalculateProducts()
+  //   custom_prices: product.custom_prices,
+  //   custom_prices_sale: product.custom_prices_sale,
+  //   labelings: product.labelings.map(({ id, index, labeling, prices, prices_sale }) => {
+  //     return { id, index, labeling, prices, prices_sale };
+  //   }),
+  //   // min and max prices
+  //   price_min: min,
+  //   price_max: max,
+  //   price_min_sale: minSale,
+  //   price_max_sale: maxSale
+  // };
 }
 
 export async function recalculateProducts(api, filter, globals, { newPriceView = null, swapLabelings = null } = {}) {
@@ -281,4 +296,26 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
     products,
     ids: products.map(p => p.id)
   };
+
+  // // recalculate all products at once
+  // const ids = products.map(p => p.id);
+  // console.log(products.length ? `Recalculating ${ids} products...` : 'Nothing to recalculate', filter);
+
+  // const updates = products.map(product => {
+  //   if (newPriceView != null) product.price_view = newPriceView;
+  //   const priceView = globals.priceViews.find(pv => pv.id == product.price_view);
+  //   const data = recalculateProduct(
+  //     priceView.amounts,
+  //     globals.globalMargins,
+  //     globals.labelings,
+  //     globals.companies,
+  //     product,
+  //     { swapLabelings }
+  //   );
+  //   return { id: product.id, ...data };
+  // });
+
+  // await api.items('products').updateBatch(updates);
+
+  // return { ids };
 }
