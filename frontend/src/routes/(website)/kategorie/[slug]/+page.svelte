@@ -1,4 +1,5 @@
 <script>
+  import { marked } from 'marked';
   import Pagination from '#c/Pagination.svelte';
   import Menu from '#/menu/Menu.svelte';
   import Products from '#/products/Products.svelte';
@@ -19,6 +20,12 @@
   <Menu items={data.menus.side} />
 
   <main>
+    {#if data.category?.description}
+      <div class="description">
+        <h1>{data.category.name}</h1>
+        <p>{@html marked.parse(data.category.description)}</p>
+      </div>
+    {/if}
     {#if data.products && data.products.length}
       <Pagination limit={data.limit} page={data.page} count={data.count} />
       <Products products={data.products} />
@@ -42,5 +49,15 @@
     flex-direction: column;
     gap: 1rem;
     padding: 1.5rem 0;
+  }
+  .description {
+    background-color: rgba(255, 255, 255, 0.185);
+    backdrop-filter: blur(2px);
+    border-radius: 1rem;
+    border: 1px solid rgb(214, 214, 214);
+    padding: 1.5rem 2rem;
+  }
+  :global(.description p, .description ul) {
+    margin: 0.5rem;
   }
 </style>

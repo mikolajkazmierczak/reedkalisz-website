@@ -22,7 +22,7 @@ const menusFields = [
   'category.name',
   'img'
 ];
-const categoriesFields = ['id', 'enabled', 'parent', 'index', 'name', 'slug', 'img'];
+const categoriesFields = ['id', 'enabled', 'parent', 'index', 'name', 'slug', 'img', 'description'];
 const fragmentsFields = ['id', 'name', 'content', 'data'];
 
 const convertCategoryToMenuItem = category => ({

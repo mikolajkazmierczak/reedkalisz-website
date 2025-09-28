@@ -9,17 +9,15 @@ import { fields } from '#/products/fields';
 const countStore = writable();
 const filterStore = writable();
 
-async function getFilter(query, slug, categoriesItems, categoriesTree) {
+async function getFilter(query, category, categoriesTree) {
   // by search query
   if (query) {
     return { _or: [{ name: { _contains: query } }, { code: { _contains: query } }] };
   }
   // by category
-  if (slug && slug != '_') {
-    const category = categoriesItems.find(c => c.slug === slug)?.id;
-    if (!category) throw error(404, '404');
+  if (category) {
     const getIDs = c => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
-    return { categories: { category: { _in: getIDs(category) } } };
+    return { categories: { category: { _in: getIDs(category.id) } } };
   }
   // all products
   return {};
@@ -30,7 +28,10 @@ export async function load({ url, parent, params }) {
 
   const { l, p, q } = parseSearchToParams(url.search);
 
-  const filter = await getFilter(q, params.slug, categoriesItems, categoriesTree);
+  const category = categoriesItems.find(c => c.slug === params.slug);
+  if (params.slug !== '_' && !category) throw error(404, '404');
+
+  const filter = await getFilter(q, category, categoriesTree);
   const sort = ['price_min'];
   const limit = l || 25;
   const page = p || 1;
@@ -56,5 +57,5 @@ export async function load({ url, parent, params }) {
     ];
   }
 
-  return { menus, products, limit, page, count };
+  return { category, menus, products, limit, page, count };
 }
