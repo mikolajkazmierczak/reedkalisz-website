@@ -1,24 +1,25 @@
 <script>
   import api, { baseUrl } from '$/api';
   import heimdall from '$/heimdall';
-  import { dequal } from 'dequal';
-  import { parseDatetime } from '%/datetime';
-  import { capitalize } from '%/utils';
-  import { defaults } from '%/fields/products';
   import { searchparams, SearchParams } from '$/searchparams';
-  import { header } from '@/stores';
-  import { globals, companies, colors, labelings, priceViews, globalMargins } from '@/globals';
+  import { parseDatetime } from '%/datetime';
+  import { defaults } from '%/fields/products';
+  import { getUid } from '%/uid';
+  import { capitalize } from '%/utils';
   import { recalculateProducts } from '@/calculations';
-  import { round, findColorId } from './utils.js';
-  import { selected, countSelected, clearSelected } from './selected.js';
+  import { colors, companies, globalMargins, globals, labelings, priceViews } from '@/globals';
+  import { header } from '@/stores';
+  import { dequal } from 'dequal';
   import { merge } from './items.js';
   import { createLabelings } from './labelings.js';
+  import { clearSelected, countSelected, selected } from './selected.js';
+  import { findColorId, round } from './utils.js';
 
   import Loader from '$c/Loader.svelte';
-  import Pagination from '@c/Pagination.svelte';
-  import Filters from '@c/Filters.svelte';
   import Button from '@c/Button.svelte';
+  import Filters from '@c/Filters.svelte';
   import Input from '@c/Input.svelte';
+  import Pagination from '@c/Pagination.svelte';
   import Search from '@c/Search.svelte';
   import Items from './Items.svelte';
   import LabelingsMappings from './labelings-mappings/LabelingsMappings.svelte';
@@ -250,6 +251,9 @@
         }
       };
 
+      const uid = getUid(selectedCompany.name, dbItem);
+      const isDone = selectedCompany.api_flags.done.includes(uid);
+
       const apiItem = apiItems.find(i => i.code == dbItem.code);
       if (apiItem) {
         // item exists in the api
@@ -259,6 +263,11 @@
         const handlingCostChanged = dbItem.handling_cost !== apiItem.handling_cost;
         if (priceChanged || handlingCostChanged) {
           const productUpdates = { price: apiPrice, handling_cost: apiItem.handling_cost };
+          // re-enable the item if it was marked as done
+          if (isDone && !dbItem.enabled) {
+            productUpdates.enabled = true;
+          }
+          // apply updates
           updates.push(() => api.items('products').updateOne(dbItem.id, productUpdates));
           updatedItemsIds.changedPrice.add(dbItem.id);
         }
@@ -267,9 +276,18 @@
           const apiStorage = apiItem.storage.find(s => s.api_color_code == dbStorage.api_color_code);
           if (apiStorage) {
             // storage exists in the api
+            const storageUpdates = {};
             // update the amount if it changed
-            if (apiStorage.amount !== dbStorage.amount) {
-              updates.push(() => api.items('products_storage').updateOne(dbStorage.id, { amount: apiStorage.amount }));
+            if (dbStorage.amount !== apiStorage.amount) {
+              storageUpdates.amount = apiStorage.amount;
+            }
+            // re-enable the storage if the item was marked as done
+            if (isDone && !dbStorage.enabled) {
+              storageUpdates.enabled = true;
+            }
+            // apply updates
+            if (Object.keys(storageUpdates).length > 0) {
+              updates.push(() => api.items('products_storage').updateOne(dbStorage.id, storageUpdates));
               updatedItemsIds.changedStorage.add(dbItem.id);
             }
           } else {
