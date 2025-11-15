@@ -1,7 +1,7 @@
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
-import { arraysToJson, fetchSimpleApi } from '../utils.js';
 import { parseItems } from '../common.js';
+import { arraysToJson, fetchSimpleApi } from '../utils.js';
 
 function parseStock(stock) {
   if (!stock) return null; // "ask about stock"
@@ -60,17 +60,15 @@ export function parseCode(short, full) {
   return { productCode, colorCode };
 }
 
-export function getPrice(prices, productCode) {
+export function getPrice(prices, codeFull) {
   return prices.find(price => {
-    const codes = parseCode(price?.codeShort, price?.codeFull);
-    return codes.productCode === productCode; // TODO: are prices same for all variants (pendrives? textiles?)
+    return price?.codeFull === codeFull; // TODO: are prices same for all variants (pendrives? textiles?)
   });
 }
 
-export function getStock(stocks, productCode, colorCode) {
+export function getStock(stocks, codeFull) {
   return stocks.find(stock => {
-    const codes = parseCode(stock?.codeShort, stock?.codeFull);
-    return codes.productCode === productCode && codes.colorCode === colorCode;
+    return stock?.codeFull === codeFull;
   });
 }
 
@@ -84,8 +82,9 @@ function parse(company, offer, prices, stocks) {
     const name = $.name || '';
     const description = $.intro || '';
     const size = parseSize($.size);
-    const price = getPrice(prices, productCode);
-    const stock = getStock(stocks, productCode, colorCode);
+    const price = getPrice(prices, $.codeFull);
+    const stock = getStock(stocks, $.codeFull);
+    
     return {
       name,
       code: productCode,

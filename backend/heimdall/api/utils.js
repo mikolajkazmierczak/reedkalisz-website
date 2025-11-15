@@ -1,5 +1,5 @@
-import convert from 'xml-js';
 import { getISODate } from 'reedkalisz-shared/datetime.js';
+import convert from 'xml-js';
 
 function camelCase(str) {
   // Transforms a string (snake_case, SNAKE_CASE, kebab-case, PascalCase, camelCase) to camelCase.
