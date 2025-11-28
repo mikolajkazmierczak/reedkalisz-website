@@ -1,6 +1,6 @@
-import { reuseIDs } from './utils';
-import { calculate as productFields } from './fields/products';
-import { repairPrices, cleanupPrices, getMinMaxPrices } from './calculationsPrices';
+import { cleanupPrices, getMinMaxPrices, repairPrices } from "./calculationsPrices";
+import { calculate as productFields } from "./fields/products";
+import { reuseIDs } from "./utils";
 
 // TODO: this whole file should be a class Calculator
 
@@ -19,7 +19,7 @@ function sanitize(data) {
   // resursively replace falsy values with 0 in a nested object
   // e.g. { a: null, b: { c: null }, d: [{ e: null }], f: [] }
   //      { a: 0,    b: { c: 0    }, d: [{ e: 0    }], f: [] }
-  if (typeof data == 'object' && data != null) {
+  if (typeof data == "object" && data != null) {
     if (Array.isArray(data)) {
       for (let [i, val] of data.entries()) {
         data[i] = sanitize(val);
@@ -56,14 +56,23 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   // transportThreshold // number -- not sanitized because 0 means free transport
 
   const productPrice = amount * product.price;
-  const productPriceWithMargin = Math.max(productPrice * fraction(product.margin), productPrice + product.minimum);
+  const productPriceWithMargin = Math.max(
+    productPrice * fraction(product.margin),
+    productPrice + product.minimum,
+  );
 
   const range = matchLabelingPriceRange(amount, labeling.prices);
   const labelingPrice = (range.isLumpsum ? range.price : amount * range.price) + prepress;
-  const labelingPriceWithMargin = Math.max(labelingPrice * fraction(labeling.margin), labelingPrice + labeling.minimum);
+  const labelingPriceWithMargin = Math.max(
+    labelingPrice * fraction(labeling.margin),
+    labelingPrice + labeling.minimum,
+  );
 
   const price = productPriceWithMargin + labelingPriceWithMargin;
-  const singlePrice = Math.max(price * fraction(full.margin), price + full.minimum);
+  const singlePrice = Math.max(
+    price * fraction(full.margin),
+    price + full.minimum,
+  );
 
   const transportPrice = transportThreshold != null && productPrice > transportThreshold ? 0 : transport;
   const fullPrice = singlePrice + extra + transportPrice;
@@ -71,12 +80,12 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
 }
 
 function togglePrices(prices, state) {
-  prices.forEach(p => (p.enabled = state));
+  prices.forEach((p) => (p.enabled = state));
 }
 
 export function toggleCustomPrices(prices, pricesSale, showPrice, sale, someLabelingsEnabled) {
-  const disable = prices => togglePrices(prices, false);
-  const enable = prices => togglePrices(prices, true);
+  const disable = (prices) => togglePrices(prices, false);
+  const enable = (prices) => togglePrices(prices, true);
   if (!showPrice || someLabelingsEnabled) {
     disable(prices);
     disable(pricesSale);
@@ -90,21 +99,24 @@ export function toggleCustomPrices(prices, pricesSale, showPrice, sale, someLabe
 function updateCustomPrices(amounts, product, someLabelingsEnabled) {
   const customPricesReusable = {
     prices1: [...product.custom_prices],
-    prices2: [...product.custom_prices_sale]
+    prices2: [...product.custom_prices_sale],
   };
-  [product.custom_prices, product.custom_prices_sale] = repairPrices(product.custom_prices, product.custom_prices_sale);
+  [product.custom_prices, product.custom_prices_sale] = repairPrices(
+    product.custom_prices,
+    product.custom_prices_sale,
+  );
   [product.custom_prices, product.custom_prices_sale] = cleanupPrices(
     amounts,
     product.custom_prices,
     product.custom_prices_sale,
-    customPricesReusable
+    customPricesReusable,
   );
   toggleCustomPrices(
     product.custom_prices,
     product.custom_prices_sale,
     product.show_price,
     product.sale,
-    someLabelingsEnabled
+    someLabelingsEnabled,
   );
 }
 
@@ -126,24 +138,24 @@ function calculatePrices(amounts, global, labeling, company, product, productLab
         {
           price,
           margin: product.global_product_margin ? global.product_margin : product.product_margin,
-          minimum: product.global_product_margin ? global.product_minimum : product.product_minimum
+          minimum: product.global_product_margin ? global.product_minimum : product.product_minimum,
         },
         {
           // TODO: possibility to turn off labeling amounts? would need a different property though
           // prices: labeling.prices.filter(p => p.enabled).map(p => ({ amount: p.amount, price: p.price })),
-          prices: labeling.prices.map(p => ({ amount: p.amount, price: p.price })),
+          prices: labeling.prices.map((p) => ({ amount: p.amount, price: p.price })),
           margin: productLabeling.global_margin ? labeling.margin : productLabeling.margin,
-          minimum: productLabeling.global_margin ? labeling.minimum : productLabeling.minimum
+          minimum: productLabeling.global_margin ? labeling.minimum : productLabeling.minimum,
         },
         {
           margin: product.global_full_margin ? global.full_margin : product.full_margin,
-          minimum: product.global_full_margin ? global.full_minimum : product.full_minimum
+          minimum: product.global_full_margin ? global.full_minimum : product.full_minimum,
         },
         labeling.prepress,
         labeling.extra,
         labeling.transport,
-        labeling.transport_threshold
-      )
+        labeling.transport_threshold,
+      ),
     };
   };
 
@@ -151,8 +163,8 @@ function calculatePrices(amounts, global, labeling, company, product, productLab
   const blacklist = price_sale_blacklist ?? [];
   const hc = handling_cost ?? 0; // add handling cost to the unit price
   return {
-    prices: amounts.map(amount => pricePerAmount(amount, price + hc)),
-    pricesSale: amounts.map(amount => pricePerAmount(amount, blacklist.includes(amount) ? null : price_sale + hc))
+    prices: amounts.map((amount) => pricePerAmount(amount, price + hc)),
+    pricesSale: amounts.map((amount) => pricePerAmount(amount, blacklist.includes(amount) ? null : price_sale + hc)),
   };
 }
 
@@ -164,8 +176,8 @@ export function recalculateLabelings(amounts, global, labelings, companies, prod
 
   let r = 0;
   for (const productLabeling of product.labelings) {
-    const labeling = labelings.find(l => l.id == productLabeling.labeling);
-    const company = companies.find(c => c.id == labeling.company);
+    const labeling = labelings.find((l) => l.id == productLabeling.labeling);
+    const company = companies.find((c) => c.id == labeling.company);
     const calculated = calculatePrices(amounts, global, labeling, company, product, productLabeling);
 
     // enable or disable prices (visibility for a public user)
@@ -207,7 +219,7 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
 
   if (swapLabelings) {
     for (const [oldID, newID] of swapLabelings) {
-      const i = product.labelings.findIndex(l => l.labeling === oldID);
+      const i = product.labelings.findIndex((l) => l.labeling === oldID);
       if (newID === null) {
         product.labelings.splice(i, 1);
       } else {
@@ -218,7 +230,7 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
   // indexes are not updated here, they are updated in recalculateLabelings()
 
   recalculateLabelings(amounts, global, labelings, companies, product);
-  const someLabelingsEnabled = product?.labelings.some(l => l.enabled);
+  const someLabelingsEnabled = product?.labelings.some((l) => l.enabled);
   updateCustomPrices(amounts, product, someLabelingsEnabled);
 
   const { min, max, minSale, maxSale } = getMinMaxPrices(product);
@@ -234,24 +246,9 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
     price_min: min,
     price_max: max,
     price_min_sale: minSale,
-    price_max_sale: maxSale
+    price_max_sale: maxSale,
   };
-  await api.items('products').updateOne(product.id, updates);
-
-  // // recalculate all products at once
-  // return {
-  //   price_view: product.price_view, // already updated in recalculateProducts()
-  //   custom_prices: product.custom_prices,
-  //   custom_prices_sale: product.custom_prices_sale,
-  //   labelings: product.labelings.map(({ id, index, labeling, prices, prices_sale }) => {
-  //     return { id, index, labeling, prices, prices_sale };
-  //   }),
-  //   // min and max prices
-  //   price_min: min,
-  //   price_max: max,
-  //   price_min_sale: minSale,
-  //   price_max_sale: maxSale
-  // };
+  await api.items("products").updateOne(product.id, updates);
 }
 
 export async function recalculateProducts(api, filter, globals, { newPriceView = null, swapLabelings = null } = {}) {
@@ -263,10 +260,11 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
   // globals: { globalMargins, priceViews, labelings, companies }
   // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
 
-  const products = (await api.items('products').readByQuery({ fields: productFields, filter, limit: -1 })).data;
+  console.log("Fetching files to recalculate... Filter: ", filter);
+  const products = (await api.items("products").readByQuery({ fields: productFields, filter, limit: -1 })).data;
 
   // recalculate all products in batches to avoid Directus rate limiting
-  console.log(products.length ? `Recalculating ${products.length} products...` : 'Nothing to recalculate', filter);
+  console.log(products.length ? `Recalculating ${products.length} products...` : "Nothing to recalculate", filter);
 
   const batchSize = 20;
   let queue = [];
@@ -274,7 +272,7 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
     console.log(`Updating product ${i + 1}/${products.length} (id: ${product.id})...`);
 
     if (newPriceView != null) product.price_view = newPriceView;
-    const priceView = globals.priceViews.find(pv => pv.id == product.price_view);
+    const priceView = globals.priceViews.find((pv) => pv.id == product.price_view);
     const promise = recalculateProduct(
       api,
       priceView.amounts,
@@ -282,7 +280,7 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
       globals.labelings,
       globals.companies,
       product,
-      { swapLabelings }
+      { swapLabelings },
     );
     queue.push(promise);
 
@@ -294,28 +292,6 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
 
   return {
     products,
-    ids: products.map(p => p.id)
+    ids: products.map((p) => p.id),
   };
-
-  // // recalculate all products at once
-  // const ids = products.map(p => p.id);
-  // console.log(products.length ? `Recalculating ${ids} products...` : 'Nothing to recalculate', filter);
-
-  // const updates = products.map(product => {
-  //   if (newPriceView != null) product.price_view = newPriceView;
-  //   const priceView = globals.priceViews.find(pv => pv.id == product.price_view);
-  //   const data = recalculateProduct(
-  //     priceView.amounts,
-  //     globals.globalMargins,
-  //     globals.labelings,
-  //     globals.companies,
-  //     product,
-  //     { swapLabelings }
-  //   );
-  //   return { id: product.id, ...data };
-  // });
-
-  // await api.items('products').updateBatch(updates);
-
-  // return { ids };
 }

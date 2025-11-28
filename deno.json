@@ -1,0 +1,18 @@
+{
+  "unstable": ["fmt-component"],
+  "fmt": {
+    "lineWidth": 120
+  },
+  "lint": {
+    "rules": { "tags": ["recommended"] }
+  },
+  "exclude": [
+    ".svelte-kit",
+    ".vite",
+    "node_modules",
+    "build",
+    "uploads",
+    "*.db",
+    "package-lock.json"
+  ]
+}

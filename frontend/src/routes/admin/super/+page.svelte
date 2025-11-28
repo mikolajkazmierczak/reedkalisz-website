@@ -1,5 +1,15 @@
 <script>
   import api from '$/api';
+  import { recalculateProducts } from '@/calculations';
+  import { companies, globalMargins, globals, labelings, priceViews } from '@/globals';
+  import { header } from '@/stores';
+
+  $header = { title: 'Super Admin', icon: 'dashboard' };
+
+  globals.update(companies);
+  globals.update(labelings);
+  globals.update(globalMargins);
+  globals.update(priceViews);
 
   function isDateBetween(dateToCheck, startDate, endDate) {
     const date = new Date(dateToCheck);
@@ -166,6 +176,15 @@
   }
 
   const amount = 1000;
+
+  async function recalculateAll() {
+    const start = performance.now();
+
+    await recalculateProducts(undefined, { emit: false });
+
+    const end = performance.now();
+    console.log('recalculateAll time', end - start);
+  }
 </script>
 
 <!-- <button on:click={() => fix('products', mapProduct)}>read products</button> -->
@@ -174,4 +193,11 @@
 <button on:click={() => updateBatch(amount)}>updateBatch</button>
 <button on:click={() => updateMany(amount)}>updateMany</button>
 <button on:click={() => updateManyBatched(amount)}>updateManyBatched</button>
-<button on:click={() => createItems(100)}>createItems</button>
+
+<br /><br />
+
+<button on:click={() => createItems(100)}>create products</button>
+
+<br /><br /><br />
+
+<button on:click={() => recalculateAll()}>recalculate all products</button>
