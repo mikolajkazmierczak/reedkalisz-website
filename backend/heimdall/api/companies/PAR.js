@@ -1,7 +1,7 @@
-import fetch from 'node-fetch';
-import { slugify } from 'reedkalisz-shared/utils.js';
-import { getISODate } from 'reedkalisz-shared/datetime.js';
-import { Api } from '../base.js';
+import fetch from "node-fetch";
+import { getISODate } from "reedkalisz-shared/datetime.js";
+import { slugify } from "reedkalisz-shared/utils.js";
+import { Api } from "../base.js";
 
 function parseStorage(item, colorCode) {
   const { imgs, amount, id, colors } = item;
@@ -12,13 +12,13 @@ function parseStorage(item, colorCode) {
     api_color_id: id,
     multicolored: false,
     color_first: colors[0] ?? null, // str
-    color_second: colors[1] ?? null // str
+    color_second: colors[1] ?? null, // str
   };
 }
 
 function parseMain(item, code, colorCode) {
-  const name = item.name.split(',')[0].trim();
-  const sizes = item.size.split('x').map(Number);
+  const name = item.name.split(",")[0].trim();
+  const sizes = item.size.split("x").map(Number);
   const { desc, materials, price } = item;
   return {
     // only define fields that are both:
@@ -36,23 +36,23 @@ function parseMain(item, code, colorCode) {
     materials,
     price,
     storage: [parseStorage(item, colorCode)], // first color varitant
-    gallery: []
+    gallery: [],
   };
 }
 
 function parseCode(code) {
   // formats: 'XXXXXX', 'XXXXXX.XX', 'XXXXXX.XX.XX', ...?
-  const [productCode, ...tail] = code.split('.');
+  const [productCode, ...tail] = code.split(".");
   // TODO: for now colorCode includes the code for quality (e.g. '00.QII' for transparent color, second hand quality)
-  const colorCode = tail.join('.'); // colorCode: '', 'XX', 'XX.XX'
+  const colorCode = tail.join("."); // colorCode: '', 'XX', 'XX.XX'
   return { productCode, colorCode };
 }
 
 function parse(products, stocks) {
-  products = products.products.map(item => item.product);
-  stocks = stocks.products.map(item => item.product);
-  const items = products.map($ => {
-    const s = stocks.find(s => s.id == $.id);
+  products = products.products.map((item) => item.product);
+  stocks = stocks.products.map((item) => item.product);
+  const items = products.map(($) => {
+    const s = stocks.find((s) => s.id == $.id);
     return {
       id: Number($.id),
       code: $.kod,
@@ -61,9 +61,9 @@ function parse(products, stocks) {
       size: $.wymiary,
       materials: [$.material_wykonania, $.material_dodatkowy].filter(Boolean),
       colors: [$.kolor_podstawowy, $.kolor_dodatkowy].filter(Boolean),
-      imgs: $.zdjecia.map(item => `https://www.par.com.pl${item.zdjecie}`),
+      imgs: $.zdjecia.map((item) => `https://www.par.com.pl${item.zdjecie}`),
       amount: Number(s.stan_magazynowy),
-      price: Number(s.cena_po_rabacie)
+      price: Number(s.cena_po_rabacie),
     };
   });
 
@@ -71,20 +71,23 @@ function parse(products, stocks) {
   for (let item of items) {
     const { productCode, colorCode } = parseCode(item.code);
     // first create main item (and first storage item), then add storage items
-    const main = parsed.find(item => item.code == productCode);
-    if (!main) parsed.push(parseMain(item, productCode, colorCode));
-    else main.storage.push(parseStorage(item, colorCode));
+    const i = parsed.findIndex((item) => item.code == productCode);
+    if (i === -1) parsed.push(parseMain(item, productCode, colorCode));
+    else {
+      if (parsed[i].price < item.price) parsed[i].price = item.price; // replace with highest price
+      parsed[i].storage.push(parseStorage(item, colorCode));
+    }
   }
   return parsed;
 }
 
 export class PAR extends Api {
   async fetch({ env: { username, password } }) {
-    const auth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
+    const auth = "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
     const options = { headers: { Authorization: auth } };
     const [resProducts, resStocks] = await Promise.all([
-      fetch('https://www.par.com.pl/api/products.json', options),
-      fetch('https://www.par.com.pl/api/stocks.json', options)
+      fetch("https://www.par.com.pl/api/products.json", options),
+      fetch("https://www.par.com.pl/api/stocks.json", options),
     ]);
     const products = await resProducts.json();
     const stocks = await resStocks.json();
