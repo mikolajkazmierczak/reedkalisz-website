@@ -1,13 +1,13 @@
 <script>
-  import { fly, fade } from 'svelte/transition';
+  import { fade, fly } from "svelte/transition";
 
-  import api from '$/api';
-  import { read as fields } from '%/fields/directus_files';
+  import api from "$/api";
+  import { read as fields } from "%/fields/directus_files";
 
-  import File from '@c/library/File.svelte';
-  import Icon from '$c/Icon.svelte';
-  import HoverCircle from '$c/HoverCircle.svelte';
-  import Library from '@c/library/Library.svelte';
+  import HoverCircle from "$c/HoverCircle.svelte";
+  import Icon from "$c/Icon.svelte";
+  import File from "@c/library/File.svelte";
+  import Library from "@c/library/Library.svelte";
 
   let opened;
 
@@ -87,7 +87,7 @@
     padding: 1rem;
     width: 100%;
     background-color: var(--accent-white);
-    background-image: url('/imgs/dot_grid.png');
+    background-image: url("/imgs/dot_grid.png");
     background-size: 160px;
   }
 

@@ -1,8 +1,8 @@
 <script>
-  import { fly } from 'svelte/transition';
-  import Input from '@c/Input.svelte';
-  import Button from '@c/Button.svelte';
-  import Icon from '$c/Icon.svelte';
+  import Icon from "$c/Icon.svelte";
+  import Button from "@c/Button.svelte";
+  import Input from "@c/Input.svelte";
+  import { fly } from "svelte/transition";
 
   export let searchParams = null;
   export let query;
@@ -23,9 +23,9 @@
 </script>
 
 <svelte:window
-  on:keydown={e => {
+  on:keydown={(e) => {
     // check if ctrl+f is pressed
-    if (e.ctrlKey && e.key == 'q') {
+    if (e.ctrlKey && e.key == "q") {
       e.preventDefault();
       e.stopPropagation();
       // focus on input
@@ -45,8 +45,8 @@
 
   <div
     class="search"
-    on:keypress={e => {
-      if (e.key === 'Enter') search();
+    on:keypress={(e) => {
+      if (e.key === "Enter") search();
     }}
   >
     <div class="input-wrapper">
