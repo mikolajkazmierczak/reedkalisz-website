@@ -1,15 +1,15 @@
 <script>
-  import { tick } from 'svelte';
-  import { deep, uid } from '%/utils';
-  import heimdall from '$/heimdall';
+  import heimdall from "$/heimdall";
+  import { deep, uid } from "%/utils";
+  import { tick } from "svelte";
 
-  import Icon from '$c/Icon.svelte';
-  import Tooltip from '$c/Tooltip.svelte';
-  import HoverCircle from '$c/HoverCircle.svelte';
-  import Input from '@c/Input.svelte';
-  import Button from '@c/Button.svelte';
-  import { createNewLabeling, getChanged, tryCleanItems, save } from './utils';
-  import Labeling from './Labeling.svelte';
+  import HoverCircle from "$c/HoverCircle.svelte";
+  import Icon from "$c/Icon.svelte";
+  import Tooltip from "$c/Tooltip.svelte";
+  import Button from "@c/Button.svelte";
+  import Input from "@c/Input.svelte";
+  import Labeling from "./Labeling.svelte";
+  import { createNewLabeling, getChanged, save, tryCleanItems } from "./utils";
 
   export let unsaved;
 
@@ -55,13 +55,13 @@
       changedOverride = deep.copy(changed);
 
       for await (const { uid, ids } of save(changedOverride)) {
-        changedOverride = changedOverride.filter(c => c._uid !== uid);
+        changedOverride = changedOverride.filter((c) => c._uid !== uid);
         labelingIDs.push(...ids.labelings);
         productIDs.push(...ids.products);
       }
 
-      if (labelingIDs.length) heimdall.emit('labelings', labelingIDs);
-      if (productIDs.length) heimdall.emit('products', productIDs);
+      if (labelingIDs.length) heimdall.emit("labelings", labelingIDs);
+      if (productIDs.length) heimdall.emit("products", productIDs);
 
       changedOverride = null;
     }
@@ -71,7 +71,7 @@
   }
 
   function cancel() {
-    if (confirm('Jesteś pewny? Ta akcja jest nieodwracalna.')) {
+    if (confirm("Jesteś pewny? Ta akcja jest nieodwracalna.")) {
       items = deep.copy(itemsOriginal);
     }
   }
@@ -86,7 +86,7 @@
         _uid: uid(10),
         enabled: false,
         amount: null,
-        price: null
+        price: null,
       });
     }
     items = items;
@@ -120,7 +120,7 @@
       .map(({ i }) => i);
     for (const item of items) {
       const temp = deep.copy(item.prices);
-      item.prices = newIndexes.map(i => temp[i]);
+      item.prices = newIndexes.map((i) => temp[i]);
     }
     items = items;
     await tick();
@@ -191,7 +191,7 @@
                 step={1}
                 value={p.amount}
                 on:click={handleAmountClick}
-                on:input={e => handleAmountInput(e, i)}
+                on:input={(e) => handleAmountInput(e, i)}
               />
             </th>
           {/each}
@@ -225,12 +225,14 @@
       </Button>
     </div>
     {#each changedOverride ? changedOverride : changed as { code, name, type }}
-      <small>{code || name || type || '???'}</small>
+      <small>{code || name || type || "???"}</small>
     {/each}
   </div>
-  <div style="margin-top: 0.5rem;">
+  <div class="edit-info">
     <small>
-      Czas zapisywania zależy od ilości powiązanych produktów. Podczas zapisywania dane w tabeli mogą ulegać zmianom.
+      <b>Zapisywanie może (bardzo) długo potrwać.</b><br />
+      Czas zapisywania zależy od ilości powiązanych produktów.<br />
+      Podczas zapisywania dane w tabeli mogą ulegać zmianom.
     </small>
   </div>
 {:else}
@@ -343,9 +345,12 @@
 
   .edit-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 1rem;
-    height: 2rem;
+  }
+  .edit-info {
+    margin-top: 0.5rem;
   }
 
   .icon {

@@ -1,49 +1,50 @@
 <script>
-  import { readUid } from '%/uid';
-  import api from '$/api';
-  import heimdall from '$/heimdall';
-  import { colors } from '@/globals';
-  import { parseColors, getFlag } from './utils.js';
-  import { selected, toggleItemSelected, toggleStorageSelected } from './selected.js';
+  import api from "$/api";
+  import heimdall from "$/heimdall";
+  import { readUid } from "%/uid";
+  import { colors } from "@/globals";
+  import { selected, toggleItemSelected, toggleStorageSelected } from "./selected.js";
+  import { getFlag, parseColors } from "./utils.js";
 
-  import Icon from '$c/Icon.svelte';
-  import Tooltip from '$c/Tooltip.svelte';
+  import Icon from "$c/Icon.svelte";
+  import Tooltip from "$c/Tooltip.svelte";
 
   export let items;
   export let company;
 
   let expanded = new Set();
   $: flags = (() => {
-    const { check, todo, inprogress, done, cut, rejected } = company.api_flags;
+    const { rejected, cut, check, todo, edit, inprogress, done } = company.api_flags;
     return {
-      _default: { text: '' },
-      rejected: { text: '❌ Odrzucony', items: rejected || [] },
-      cut: { text: '♻️ Ma zamiennik', items: cut || [] },
-      check: { text: '🔍 Hmm', items: check || [] },
-      todo: { text: '💼 Do dodania', items: todo || [] },
-      inprogress: { text: '🔧 W budowie', items: inprogress || [] },
-      done: { text: '✅ Gotowy', items: done || [] }
+      _default: { text: "" },
+      rejected: { text: "❌ Odrzucony", items: rejected || [] },
+      cut: { text: "♻️ Ma zamiennik", items: cut || [] },
+      check: { text: "🔍 Hmm", items: check || [] },
+      todo: { text: "💼 Do dodania", items: todo || [] },
+      edit: { text: "✏️ Do edycji", items: edit || [] },
+      inprogress: { text: "🔧 W budowie", items: inprogress || [] },
+      done: { text: "✅ Gotowy", items: done || [] },
     };
   })();
 
-  async function handleStatus(e, item) {
+  async function handleStatusChange(e, item) {
     // get previous flag
     const flag = getFlag(flags, item._uid);
     // get selected flag
     const options = Array.from(e.target.children);
-    const newFlag = options.find(o => o.selected).value;
+    const newFlag = options.find((o) => o.selected).value;
     // move uid to the selected flag
-    if (flag != '_default') flags[flag].items = flags[flag].items.filter(uid => uid != item._uid); // remove from previous flag
-    if (newFlag != '_default') flags[newFlag].items.push(item._uid); // add to new flag
+    if (flag != "_default") flags[flag].items = flags[flag].items.filter((uid) => uid != item._uid); // remove from previous flag
+    if (newFlag != "_default") flags[newFlag].items.push(item._uid); // add to new flag
     // update company data, only upload flags that have items, { flag: [uid, uid, ...] }
     const api_flags = Object.fromEntries(
       Object.entries(flags)
         .filter(([key, { items }]) => items?.length)
-        .map(([key, { items }]) => [key, items])
+        .map(([key, { items }]) => [key, items]),
     );
     // update company
-    await api.items('companies').updateOne(company.id, { api_flags });
-    heimdall.emit('companies', company.id);
+    await api.items("companies").updateOne(company.id, { api_flags });
+    heimdall.emit("companies", company.id);
   }
 
   function toggleExpanded(uid) {
@@ -53,68 +54,68 @@
 
   async function removeItem(item) {
     if (confirm(`OPERACJA NIEODWRACALNA!\nUsunąć produkt ${item._uid}?`)) {
-      await api.items('products').deleteOne(item.id);
-      heimdall.emit('products', item.id);
+      await api.items("products").deleteOne(item.id);
+      heimdall.emit("products", item.id);
     }
   }
   async function removeStorage(item, storage) {
     if (confirm(`OPERACJA NIEODWRACALNA!\nUsunąć kolor ${storage._uid}?`)) {
-      await api.items('products').updateOne(item.id, {
+      await api.items("products").updateOne(item.id, {
         // filter out 1) the storage being deleted 2) all storages not in db
         // and reindex the storages
-        storage: item.storage.filter(s => s.id && s.id != storage.id).map((s, i) => ({ ...s, index: i }))
+        storage: item.storage.filter((s) => s.id && s.id != storage.id).map((s, i) => ({ ...s, index: i })),
       });
-      heimdall.emit('products', item.id);
+      heimdall.emit("products", item.id);
     }
   }
 
   function getCompanySpecificCode(uid) {
     const { productCode, colorCode } = readUid(uid);
     switch (company.name) {
-      case 'PAR':
-        return `${productCode}${colorCode ? `.${colorCode}` : ''}`;
-      case 'MidOcean':
-      case 'BlueCollection':
-        return `${productCode}${colorCode ? `-${colorCode}` : ''}`;
-      case 'EasyGifts':
-      case 'Macma':
-      case 'Promotionway':
-      case 'AXPOL':
-        return `${productCode}${colorCode ? colorCode : ''}`;
+      case "PAR":
+        return `${productCode}${colorCode ? `.${colorCode}` : ""}`;
+      case "MidOcean":
+      case "BlueCollection":
+        return `${productCode}${colorCode ? `-${colorCode}` : ""}`;
+      case "EasyGifts":
+      case "Macma":
+      case "Promotionway":
+      case "AXPOL":
+        return `${productCode}${colorCode ? colorCode : ""}`;
       default:
-        throw new Error('Company code not supported');
+        throw new Error("Company code not supported");
     }
   }
 
   function getApiUrl(uid) {
     const code = getCompanySpecificCode(uid);
     switch (company.name) {
-      case 'PAR':
+      case "PAR":
         return `https://www.par.com.pl/products?search=${code}`;
-      case 'MidOcean':
+      case "MidOcean":
         return `https://www.midocean.com/INTERSHOP/web/WFS/midocean-PL-Site/pl_PL/-/PLN/ViewParametricSearchBySearchIndex-Browse?SearchTerm=${code}`;
-      case 'BlueCollection':
-        const productCode = code.split('-')[0];
+      case "BlueCollection":
+        const productCode = code.split("-")[0];
         return `https://bluecollection.gifts/pl/${productCode}.html`;
-      case 'EasyGifts':
+      case "EasyGifts":
         return `https://www.easygifts.com.pl/search.php?dosearch=1&query=${code}`;
-      case 'Macma':
+      case "Macma":
         return `https://macma.pl/search.php?dosearch=1&query=${code}`;
-      case 'Promotionway':
+      case "Promotionway":
         return `https://promotionway.pl/search.php?query=${code}`;
-      case 'AXPOL':
+      case "AXPOL":
         return `https://axpol.com.pl/pl/search/?search=product&string=${code}`;
       default:
-        throw new Error('Company code not supported');
+        throw new Error("Company code not supported");
     }
   }
 </script>
 
 <table>
   {#each items as item}
-    {@const getDbUrl = slug => `/admin/produkty/${slug}`}
-    {@const itemNotAllInApi = item.storage.some(s => !s._api)}
-    {@const itemNotInApi = item.storage.every(s => !s._api) || !item._api}
+    {@const getDbUrl = (slug) => `/admin/produkty/${slug}`}
+    {@const itemNotAllInApi = item.storage.some((s) => !s._api)}
+    {@const itemNotInApi = item.storage.every((s) => !s._api) || !item._api}
     {@const itemSelected = $selected.has(item._uid)}
     {@const itemExpanded = expanded.has(item._uid)}
     {@const itemCompatible = !item?._incompatible}
@@ -122,7 +123,7 @@
     <tr class:selected={itemSelected}>
       <td class="flag">
         {#if flags}
-          <select class={flag} on:change={e => handleStatus(e, item)}>
+          <select class={flag} on:change={(e) => handleStatusChange(e, item)}>
             {#each Object.entries(flags) as [key, { text }]}
               <option value={key} selected={flag == key}>{text}</option>
             {/each}
@@ -135,7 +136,7 @@
       <td class="mono expand">
         {#if item.storage.length}
           <button on:click={() => toggleExpanded(item._uid)}>
-            {itemExpanded ? '-' : `+${item.storage.length}`}
+            {itemExpanded ? "-" : `+${item.storage.length}`}
           </button>
         {/if}
       </td>
@@ -143,10 +144,10 @@
         {getCompanySpecificCode(item._uid)}
       </td>
       <td class="mono selection">
-        {#if itemCompatible && !item.storage.every(s => s._db)}
-          {@const all = item.storage.every(s => $selected.has(s._uid))}
-          {@const some = item.storage.some(s => $selected.has(s._uid))}
-          <button on:click={() => toggleItemSelected(item)}>{all ? '-' : some ? '/' : '+'}</button>
+        {#if itemCompatible && !item.storage.every((s) => s._db)}
+          {@const all = item.storage.every((s) => $selected.has(s._uid))}
+          {@const some = item.storage.some((s) => $selected.has(s._uid))}
+          <button on:click={() => toggleItemSelected(item)}>{all ? "-" : some ? "/" : "+"}</button>
         {/if}
       </td>
       <td class="name">
@@ -206,7 +207,7 @@
           <td class="selection">
             {#if storageCompatible && !storage._db}
               <button on:click={() => toggleStorageSelected(item, storage)}>
-                {storageSelected ? '-' : '+'}
+                {storageSelected ? "-" : "+"}
               </button>
             {/if}
           </td>
@@ -406,6 +407,9 @@
   }
   select.todo {
     background-color: var(--yellow);
+  }
+  select.edit {
+    background-color: var(--orange);
   }
   select.inprogress {
     background-color: var(--blue);
