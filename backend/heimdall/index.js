@@ -1,9 +1,8 @@
-import polka from 'polka';
-import bodyParser from 'body-parser';
-import { Server as socketio } from 'socket.io';
-import 'dotenv/config';
-
-import api from './api/index.js';
+import bodyParser from "body-parser";
+import "dotenv/config";
+import polka from "polka";
+import { Server as socketio } from "socket.io";
+import api from "./api/index.js";
 
 const doLog = true;
 function log(string) {
@@ -21,9 +20,9 @@ const io = new socketio(app.server, { cors });
 function getCompanyEnv(company) {
   // API_<company.name>_<key>: value -> { <key>: value }
   // API_GOOGLE_TOKEN: '123' -> { token: '123' }
-  const keys = Object.keys(process.env).filter(arg => arg.startsWith(`API_${company.name.toUpperCase()}`));
+  const keys = Object.keys(process.env).filter((arg) => arg.startsWith(`API_${company.name.toUpperCase()}`));
   return keys.reduce((acc, arg) => {
-    const key = arg.split('_').pop().toLowerCase();
+    const key = arg.split("_").pop().toLowerCase();
     const value = process.env[arg];
     acc[key] = value;
     return acc;
@@ -35,31 +34,32 @@ async function fetchAPI(company) {
   return await api[company.name].fetch({ company, env: getCompanyEnv(company) });
 }
 
-app.get('/', (req, res) => {
-  res.end('Greetings. I am a vigilant watcher of this realm. My name is Heimdall Odinson.');
+app.get("/", (req, res) => {
+  res.end("Greetings. I am a vigilant watcher of this realm. My name is Heimdall Odinson.");
 });
 
-io.on('connection', socket => {
+io.on("connection", (socket) => {
   log(`🔌 New connection (${socket.id})`);
-  socket.on('disconnect', reason => {
+  socket.on("disconnect", (reason) => {
     log(`❌ Socket disconnected (${socket.id})`);
     log(`   - reason: ${reason}`);
   });
 
-  socket.on('changes', data => {
+  socket.on("changes", (data) => {
     log(`   - changes: ${JSON.stringify(data, null, 2)}`);
-    socket.broadcast.emit('changes', data);
-    if (data.selfBroadcast) socket.emit('changes', data);
+    socket.broadcast.emit("changes", data);
+    if (data.selfBroadcast) socket.emit("changes", data);
   });
 
-  socket.on('fetch', async ({ company }) => {
+  socket.on("fetch", async ({ company }) => {
     log(`📡 Fetching data (${socket.id})`);
     log(`   - api: ${company.name}`);
     try {
       const data = await fetchAPI(company);
-      socket.emit('fetch', data);
+      socket.emit("fetch", data);
       log(`   - success`);
     } catch (err) {
+      // TODO: emit 'error' event with error message
       log(`   - error ${err}`);
     }
   });

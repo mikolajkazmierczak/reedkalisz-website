@@ -82,7 +82,7 @@ function parse(products, stocks) {
 }
 
 export class PAR extends Api {
-  async fetch({ env: { username, password } }) {
+  fetch = async ({ env: { username, password } }) => {
     const auth = "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
     const options = { headers: { Authorization: auth } };
     const [resProducts, resStocks] = await Promise.all([
@@ -94,5 +94,5 @@ export class PAR extends Api {
 
     const items = parse(products, stocks);
     return { items, lastScan: getISODate() };
-  }
+  };
 }
