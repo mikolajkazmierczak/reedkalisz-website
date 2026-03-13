@@ -41,9 +41,9 @@
   // _swap: id, // item that will be swapped with this one when deleted
 
   let saving = false;
-  let changedOverride = null; // populated when saving to avoid misleading rerenders
+  let changedCopy = null; // populated when saving to avoid misleading rerenders
   $: changed = getChanged(items, itemsOriginal);
-  $: unsaved = changedOverride ? changedOverride.length > 0 : changed.length > 0;
+  $: unsaved = changedCopy ? changedCopy.length > 0 : changed.length > 0;
 
   async function trySave() {
     if (saving) return; // prevent double click
@@ -52,10 +52,10 @@
     const labelingIDs = [];
     const productIDs = [];
     if (tryCleanItems(items)) {
-      changedOverride = deep.copy(changed);
+      changedCopy = deep.copy(changed);
 
-      for await (const { uid, ids } of save(changedOverride)) {
-        changedOverride = changedOverride.filter((c) => c._uid !== uid);
+      for await (const { uid, ids } of save(changedCopy)) {
+        changedCopy = changedCopy.filter((c) => c._uid !== uid);
         labelingIDs.push(...ids.labelings);
         productIDs.push(...ids.products);
       }
@@ -63,7 +63,7 @@
       if (labelingIDs.length) heimdall.emit("labelings", labelingIDs);
       if (productIDs.length) heimdall.emit("products", productIDs);
 
-      changedOverride = null;
+      changedCopy = null;
     }
 
     items = items;
@@ -224,7 +224,7 @@
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
     </div>
-    {#each changedOverride ? changedOverride : changed as { code, name, type }}
+    {#each changedCopy ? changedCopy : changed as { code, name, type }}
       <small>{code || name || type || "???"}</small>
     {/each}
   </div>

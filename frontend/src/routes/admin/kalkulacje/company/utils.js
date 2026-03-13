@@ -1,14 +1,14 @@
-import api from '$/api';
-import { read as fields, defaults } from '%/fields/labelings';
-import { deep, diffSync, uid } from '%/utils';
-import { globals } from '@/globals';
-import { recalculateProducts } from '@/calculations';
+import api from "$/api";
+import { defaults, read as fields } from "%/fields/labelings";
+import { deep, diffSync, uid } from "%/utils";
+import { recalculateProducts } from "@/calculations";
+import { globals } from "@/globals";
 
-const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
+const fieldsToIgnore = ["user_created", "date_created", "user_updated", "date_updated"];
 
 function getAmounts(items) {
   // based on the first item
-  return items.length ? items[0].prices.map(p => p.amount) : [];
+  return items.length ? items[0].prices.map((p) => p.amount) : [];
 }
 
 export function createNewLabeling(company, items) {
@@ -33,8 +33,8 @@ export function createNewLabeling(company, items) {
 }
 
 export function getChanged(items, itemsOriginal) {
-  return items.filter(item => {
-    const original = itemsOriginal.find(o => o._uid == item._uid);
+  return items.filter((item) => {
+    const original = itemsOriginal.find((o) => o._uid == item._uid);
     if (!original) return true;
     const { changed } = diffSync(item, original, { fieldsToIgnore });
     if (changed) return true;
@@ -53,11 +53,11 @@ export function reindex(items) {
 
 function tryRemoveEmptyAmounts(items) {
   // Check if there are empty amounts, ask the user if he wants to continue, remove empty ones.
-  if (items.some(item => item.prices.some(p => !p.amount))) {
+  if (items.some((item) => item.prices.some((p) => !p.amount))) {
     const prompt = `Nie zdefiniowano nakładów w niektórych kolumnach. Jeśli kontynuujesz, zostaną usunięte!`;
     if (!confirm(prompt)) return false;
     for (const item of items) {
-      item.prices = item.prices.filter(p => p.amount);
+      item.prices = item.prices.filter((p) => p.amount);
     }
   }
   return true;
@@ -77,8 +77,7 @@ function tryRemoveDuplicateAmounts(items) {
     }
   }
   if (duplicates.length) {
-    const prompt =
-      `Wykryto powtarzające się nakłady: "${duplicates.join(', ')}". ` +
+    const prompt = `Wykryto powtarzające się nakłady: "${duplicates.join(", ")}". ` +
       `Jeśli kontynuujesz zostaną zachowane tylko pierwsze wystąpienia.`;
     if (!confirm(prompt)) return false;
     for (const item of items) {
@@ -95,7 +94,7 @@ export function tryCleanItems(items) {
 async function saveItem(item) {
   if (item._new) {
     // CREATE
-    const created = await api.items('labelings').createOne(item, { fields });
+    const created = await api.items("labelings").createOne(item, { fields });
     return { labelings: [created.id], products: [] };
   } else if (item._remove) {
     // DELETE
@@ -104,15 +103,15 @@ async function saveItem(item) {
     const swapLabelings = new Map([[item.id, item._swap]]); // will delete the labeling if swapID is null
     const { ids } = await recalculateProducts(filter, { swapLabelings, emit: false });
 
-    await api.items('labelings').deleteOne(item.id);
+    await api.items("labelings").deleteOne(item.id);
 
     return { labelings: [item.id], products: ids };
   } else {
     // UPDATE
-    const updated = await api.items('labelings').updateOne(item.id, item, { fields });
+    const updated = await api.items("labelings").updateOne(item.id, item, { fields });
 
     // TODO: global needs to be updated for recalculation, but it also confusingly rerenders the labelings
-    await globals.update('labelings', { ids: [updated.id] }); // global needs to be updated for recalculation
+    await globals.update("labelings", { ids: [updated.id] }); // global needs to be updated for recalculation
 
     // TODO: check if the item changed prices or amounts, if not, skip recalculation
     const filter = { labelings: { labeling: { _eq: updated.id } } };

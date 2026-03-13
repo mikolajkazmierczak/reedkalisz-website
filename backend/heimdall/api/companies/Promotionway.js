@@ -36,7 +36,7 @@ function parse(company, offer, prices, stocks) {
     const stock = getStock(stocks, $?.baseinfo?.codeFull, "codeFull");
 
     return {
-      _incompatible: productCode === null,
+      _incompatible: productCode === null || !!price?.priceFrom1,
       name,
       code: productCode,
       slug: slugify([productCode, name], { key: true }),
