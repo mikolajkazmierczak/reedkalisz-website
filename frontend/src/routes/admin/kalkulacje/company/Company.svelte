@@ -1,28 +1,32 @@
 <script>
-  import { deep, uid } from '%/utils';
-  import { globals, globalMargins, priceViews, labelings } from '@/globals';
-  import Labelings from './Labelings.svelte';
+  import { deep, uid } from "%/utils";
+  import { globalMargins, globals, labelings, priceViews } from "@/globals";
+  import Labelings from "./Labelings.svelte";
 
   export let unsaved;
   export let company;
+
+  let saving = false;
 
   let itemsOriginal;
   let items;
   $: updateItems($labelings, company);
 
   function parseLabelings(labelings, company) {
-    // Filtered by company, sort and add unique IDs.
+    // filter by company, sort and add unique IDs.
     return labelings
-      .filter(l => l.company === company.id)
+      .filter((l) => l.company === company.id)
       .sort((a, b) => a.index - b.index)
-      .map(l => ({ ...l, _uid: uid(10), prices: l.prices.map(p => ({ ...p, _uid: uid(10) })) }));
+      .map((l) => ({
+        ...l,
+        _uid: uid(10),
+        prices: l.prices.sort((a, b) => a.amount - b.amount).map((p) => ({ ...p, _uid: uid(10) })),
+      }));
   }
 
   function updateItems(labelings, company) {
-    // `itemsCurrent` can change when some other company's labelings are updated,
-    // which would trigger items to be updated causing trouble, so first we check
-    // if anything even changed from the "originals" before updating `items`
     if (!labelings) return;
+    if (saving) return; // blocks updates when saving
     const parsed = parseLabelings(labelings, company);
     itemsOriginal = deep.copy(parsed);
     items = deep.copy(parsed);
@@ -44,7 +48,7 @@
       {/if}
     </div>
 
-    <Labelings bind:unsaved {company} {itemsOriginal} {items} />
+    <Labelings bind:unsaved bind:saving {company} {itemsOriginal} {items} />
   </div>
 {/if}
 

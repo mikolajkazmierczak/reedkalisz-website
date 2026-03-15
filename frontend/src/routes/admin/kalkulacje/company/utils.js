@@ -91,7 +91,7 @@ export function tryCleanItems(items) {
   return tryRemoveEmptyAmounts(items) && tryRemoveDuplicateAmounts(items);
 }
 
-async function saveItem(item) {
+async function saveItem(item, itemsOriginal) {
   if (item._new) {
     // CREATE
     const created = await api.items("labelings").createOne(item, { fields });
@@ -110,18 +110,31 @@ async function saveItem(item) {
     // UPDATE
     const updated = await api.items("labelings").updateOne(item.id, item, { fields });
 
-    // TODO: global needs to be updated for recalculation, but it also confusingly rerenders the labelings
-    await globals.update("labelings", { ids: [updated.id] }); // global needs to be updated for recalculation
+    // global needs to be updated for recalculations
+    await globals.update("labelings", { ids: [updated.id] });
 
-    // TODO: check if the item changed prices or amounts, if not, skip recalculation
-    const filter = { labelings: { labeling: { _eq: updated.id } } };
-    const { ids } = await recalculateProducts(filter, { emit: false });
+    // check if the item should be recalculated
+    const original = itemsOriginal.find((o) => o.id === item.id);
+    // prices
+    const oldPricesSorted = original.prices.filter((p) => p.price).sort((a, b) => a.amount - b.amount);
+    const newPricesSorted = item.prices.filter((p) => p.price).sort((a, b) => a.amount - b.amount);
+    const pricesChanged = oldPricesSorted.length !== newPricesSorted.length ||
+      oldPricesSorted.some((p, i) => p.amount !== newPricesSorted[i].amount || p.price !== newPricesSorted[i].price);
+    // other fields
+    const calculationFields = ["prepress", "transport", "transport_threshold", "margin", "minimum"];
+    const calculationFieldsChanged = calculationFields.some((field) => item[field] !== original[field]);
+    // if prices or calculation fields changed, recalculate products
+    if (pricesChanged || calculationFieldsChanged) {
+      const filter = { labelings: { labeling: { _eq: updated.id } } };
+      const { ids } = await recalculateProducts(filter, { emit: false });
+      return { labelings: [updated.id], products: ids };
+    }
 
-    return { labelings: [updated.id], products: ids };
+    return { labelings: [updated.id], products: [] };
   }
 }
 
-export async function* save(changed) {
+export async function* save(changed, itemsOriginal) {
   // First existing items are updated, and new ones are created.
   // Then items marked for removal are deleted, and some are swapped (that's why updating and creating is first).
   const copy = deep.copy(changed).sort((a, b) => (a._remove ? 1 : b._remove ? -1 : 0)); // remove items last
@@ -132,7 +145,7 @@ export async function* save(changed) {
       delete item[field];
     }
 
-    const ids = await saveItem(item);
+    const ids = await saveItem(item, itemsOriginal);
     yield { uid: item._uid, ids };
   }
 }

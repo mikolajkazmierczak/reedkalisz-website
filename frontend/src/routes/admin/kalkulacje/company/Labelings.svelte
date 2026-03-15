@@ -12,38 +12,19 @@
   import { createNewLabeling, getChanged, save, tryCleanItems } from "./utils";
 
   export let unsaved;
+  export let saving;
 
   export let company;
   export let itemsOriginal;
-  export let items; // TODO: confusing rerenders happen while saving
+  export let items;
 
-  // Items state needs to be tracked for changes. We also need to track if the item is new,
-  // whether it will be deleted (and whether it will swapped).
-  // The easiest way seems to be to add props (as in _prop) to the objects when "actions" take place,
-  // then when saving perform all these actions, and then remove the props after saving.
-  // This way checking if there are changes is as simple as checking if the whole array of items is
-  // different from the original one, and displaying what will be changed is just going through the array and checking
-  // for the props and displaying their "parents".
-
-  // Changing the order of items should be done by writing down the new index for an item (instead of the arrows),
-  // then other indexes should be updated accordingly, then the items should be sorted.
-  // This way we don't need to track the indexes separately, all will be saved at the end.
-  // The problem is with items that will be deleted. They could just be displayed at the end, through INFINITE indexes.
-
-  // Editing the amounts (order of the columns) should happen automatically by sorting them by amount.
-  // The "Ryczałt" column is problematic, as it does not allow for editing the amount. But that could be handled
-  // by still displaying the text as floating above the input field and hiding it when the user hover over it,
-  // thus still allowing the editing.
-
-  // props:
-  // _new: false, // whether the item is new (must be tracked since ids are reused)
-  // _remove: false, // whether the item will be deleted
+  // anonymous props for tracking changes:
+  // _new: true, // whether the item is new (must be tracked since ids are reused)
+  // _remove: true, // item marked for deletion
   // _swap: id, // item that will be swapped with this one when deleted
 
-  let saving = false;
-  let changedCopy = null; // populated when saving to avoid misleading rerenders
   $: changed = getChanged(items, itemsOriginal);
-  $: unsaved = changedCopy ? changedCopy.length > 0 : changed.length > 0;
+  $: unsaved = changed.length > 0;
 
   async function trySave() {
     if (saving) return; // prevent double click
@@ -52,21 +33,15 @@
     const labelingIDs = [];
     const productIDs = [];
     if (tryCleanItems(items)) {
-      changedCopy = deep.copy(changed);
-
-      for await (const { uid, ids } of save(changedCopy)) {
-        changedCopy = changedCopy.filter((c) => c._uid !== uid);
+      for await (const { uid, ids } of save(changed, itemsOriginal)) {
+        changed = changed.filter((c) => c._uid !== uid);
         labelingIDs.push(...ids.labelings);
         productIDs.push(...ids.products);
       }
-
       if (labelingIDs.length) heimdall.emit("labelings", labelingIDs);
       if (productIDs.length) heimdall.emit("products", productIDs);
-
-      changedCopy = null;
     }
 
-    items = items;
     saving = false;
   }
 
@@ -224,7 +199,7 @@
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
     </div>
-    {#each changedCopy ? changedCopy : changed as { code, name, type }}
+    {#each changed as { code, name, type }}
       <small>{code || name || type || "???"}</small>
     {/each}
   </div>
@@ -232,7 +207,6 @@
     <small>
       <b>Zapisywanie może (bardzo) długo potrwać.</b><br />
       Czas zapisywania zależy od ilości powiązanych produktów.<br />
-      Podczas zapisywania dane w tabeli mogą ulegać zmianom.
     </small>
   </div>
 {:else}
