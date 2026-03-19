@@ -251,7 +251,13 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
   await api.items("products").updateOne(product.id, updates);
 }
 
-export async function recalculateProducts(api, filter, globals, { newPriceView = null, swapLabelings = null } = {}) {
+/** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
+export async function* recalculateProductsGenerator(
+  api,
+  filter,
+  globals,
+  { newPriceView = null, swapLabelings = null } = {},
+) {
   // Uses `recalculateProduct()` to update all products that match the filter.
   // A new priceView can be set, and labelings can be swapped or deleted.
   //
@@ -269,8 +275,6 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
   const batchSize = 20;
   let queue = [];
   for (const [i, product] of products.entries()) {
-    console.log(`Updating product ${i + 1}/${products.length} (id: ${product.id})...`);
-
     if (newPriceView != null) product.price_view = newPriceView;
     const priceView = globals.priceViews.find((pv) => pv.id == product.price_view);
     const promise = recalculateProduct(
@@ -282,16 +286,35 @@ export async function recalculateProducts(api, filter, globals, { newPriceView =
       product,
       { swapLabelings },
     );
-    queue.push(promise);
+    queue.push({ promise, product });
 
     if (queue.length >= batchSize || i == products.length - 1) {
-      await Promise.all(queue);
+      await Promise.all(queue.map((q) => q.promise));
+      const productsBatch = queue.map((q) => q.product);
+      yield {
+        products: productsBatch,
+        ids: productsBatch.map((q) => q.id),
+        index: i,
+      };
       queue = [];
     }
   }
+}
+
+/** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
+export async function recalculateProducts(
+  api,
+  filter,
+  globals,
+  { newPriceView = null, swapLabelings = null } = {},
+) {
+  const results = await Array.fromAsync(
+    recalculateProductsGenerator(api, filter, globals, { newPriceView, swapLabelings }),
+  );
 
   return {
-    products,
-    ids: products.map((p) => p.id),
+    products: results.flatMap((r) => r.products),
+    ids: results.flatMap((r) => r.ids),
+    index: results[results.length - 1]?.index,
   };
 }

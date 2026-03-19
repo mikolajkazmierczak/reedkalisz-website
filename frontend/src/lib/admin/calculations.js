@@ -1,12 +1,14 @@
 import api from "$/api";
 import heimdall from "$/heimdall";
-import { recalculateProducts as recalculate } from "%/calculations";
+import { recalculateProductsGenerator as recalculate } from "%/calculations";
 import { companies, globalMargins, labelings, priceViews } from "@/globals";
 import { get } from "svelte/store";
 
-export async function recalculateProducts(filter, { newPriceView = null, swapLabelings = null, emit = true } = {}) {
-  // Uses `recalculateProducts()` from shared folder to update all products that match the filter.
-
+/** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
+export async function* recalculateProductsGenerator(
+  filter,
+  { newPriceView = null, swapLabelings = null, emit = true } = {},
+) {
   const stores = {
     globalMargins: get(globalMargins),
     priceViews: get(priceViews),
@@ -14,8 +16,18 @@ export async function recalculateProducts(filter, { newPriceView = null, swapLab
     companies: get(companies),
   };
 
-  const results = await recalculate(api, filter, stores, { newPriceView, swapLabelings });
+  for await (const results of recalculate(api, filter, stores, { newPriceView, swapLabelings })) {
+    if (emit) heimdall.emit("products", results.ids);
+    yield results;
+  }
+}
 
-  if (emit) heimdall.emit("products", results.ids);
-  return results;
+/** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
+export async function recalculateProducts(
+  filter,
+  { newPriceView = null, swapLabelings = null, emit = true } = {},
+) {
+  return await Array.fromAsync(
+    recalculateProductsGenerator(filter, { newPriceView, swapLabelings, emit }),
+  );
 }

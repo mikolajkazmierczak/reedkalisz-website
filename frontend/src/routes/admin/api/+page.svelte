@@ -6,7 +6,7 @@
   import { defaults } from "%/fields/products";
   import { getUid } from "%/uid";
   import { capitalize } from "%/utils";
-  import { recalculateProducts } from "@/calculations";
+  import { recalculateProducts, recalculateProductsGenerator } from "@/calculations";
   import { colors, companies, globalMargins, globals, labelings, priceViews } from "@/globals";
   import { header } from "@/stores";
   import { dequal } from "dequal";
@@ -66,6 +66,8 @@
   let fetching = false;
   let fetchingPhase = 1;
   let uploading = false;
+
+  let statusLog = null;
 
   let dbItems;
   let apiItems;
@@ -320,10 +322,14 @@
     // await Promise.all(updates);
     // run updates sequentially to avoid overloading the server
     // TODO: batch updates instead of running them one by one
+    statusLog = `Postęp: 0/${updates.length}`;
     for (const [i, update] of updates.entries()) {
-      console.log(`Update ${i + 1}/${updates.length} completed`);
       await update();
+      const log = `Postęp: ${i + 1}/${updates.length}`;
+      console.log(log);
+      statusLog = log;
     }
+    statusLog = null;
 
     return { ...updatedItemsIds, all: new Set(Object.values(updatedItemsIds).flat()) };
   }
@@ -332,7 +338,14 @@
     // recalculate labeling prices for all items with the given ids
     fetchingPhase = 3;
     if (ids.length === 0) return;
-    await recalculateProducts({ id: { _in: ids } });
+
+    statusLog = `Postęp: 0/${ids.length}`;
+    for await (const results of recalculateProductsGenerator({ id: { _in: ids } })) {
+      const log = `Postęp: ${results.index + 1}/${ids.length}`;
+      console.log(log);
+      statusLog = log;
+    }
+    statusLog = null;
   }
 
   async function updateDb() {
@@ -505,13 +518,14 @@
       <p class="aligned"><Loader dark /> Pobieranie danych</p>
     {:else if fetchingPhase === 1}
       <p class="aligned"><Loader dark /> Pobieranie zewnętrznych danych (1/3)</p>
-      <small>Pobierana jest duża ilość danych, może to zająć kilka minut.</small>
+      <small class="indent">Pobierana jest duża ilość danych, może to zająć kilka minut.</small>
     {:else if fetchingPhase === 2}
       <p class="aligned"><Loader dark /> Aktualizacja cen jednostkowych oraz stanów magazynowych (2/3)</p>
-      <small>Może to zająć kilka minut.</small>
     {:else if fetchingPhase === 3}
       <p class="aligned"><Loader dark /> Aktualizacja cenników (3/3)</p>
-      <small>Może to zająć kilka minut.</small>
+    {/if}
+    {#if statusLog}
+      <small class="indent">{statusLog}</small>
     {/if}
   {/if}
 
@@ -589,6 +603,9 @@
     align-items: center;
     gap: 0.5rem;
   }
+  .indent {
+    margin-left: 2rem;
+  }
 
   .actions {
     display: flex;
@@ -624,7 +641,7 @@
     font-weight: normal;
   }
 
-  .warning {
+  /* .warning {
     position: fixed;
     z-index: 5;
     top: 1rem;
@@ -641,5 +658,5 @@
   .warning span {
     font-weight: bold;
     color: var(--main);
-  }
+  } */
 </style>

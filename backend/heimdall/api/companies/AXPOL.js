@@ -95,8 +95,7 @@ async function fetchApi(method, { jwt = null, searchparams = null, formdata = nu
   if (formdata) options.body = parseFormData(formdata);
   if (apiAgent) options.agent = apiAgent; // use the custom https agent with the intermediate certificate
 
-  const res = await fetch(`https://axpol.com.pl/api/b2b-api/${params}`, options);
-  console.log(res);
+  const res = await fetch(`https://axpol.com/api/b2b-api/${params}`, options);
   return await res.json();
 }
 
