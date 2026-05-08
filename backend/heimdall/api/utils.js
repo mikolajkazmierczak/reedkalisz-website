@@ -32,6 +32,9 @@ function replaceTextKeyObjects(obj) {
   if (obj.hasOwnProperty("_text")) {
     return obj._text;
   }
+  if (obj.hasOwnProperty("_cdata")) {
+    return obj._cdata;
+  }
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       obj[key] = replaceTextKeyObjects(obj[key]);

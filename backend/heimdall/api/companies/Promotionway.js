@@ -30,7 +30,7 @@ function parse(company, offer, prices, stocks) {
   return parseItems(offer.map(($) => {
     const { productCode, colorCode } = parseCode($?.baseinfo?.codeShort, $?.baseinfo?.codeFull);
     const name = $?.baseinfo?.name || "";
-    const description = $?.baseinfo?.intro?.cdata || "";
+    const description = $?.baseinfo?.intro || "";
     const size = parseSize($?.attributes?.size);
     const price = getPrice(prices, $?.baseinfo?.codeFull, "codeFull");
     const stock = getStock(stocks, $?.baseinfo?.codeFull, "codeFull");

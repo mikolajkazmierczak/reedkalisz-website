@@ -33,6 +33,7 @@ export function parsePrice(company, price, applyDiscount = false) {
 export function parseSize(size) {
   // (2,5 - 3,5) cm -> { x: null, y: null, z: null } // variable size not supported
   // Ø 2,5 mm / &#216;2,5 mm -> { x: 2.5, y: null, z: null } // diameter symbol not supported
+  // 2,5 cm / 3,5 cm -> { x: 25, y: null, z: null } // only first size supported
   // 2,5 mm. -> { x: 2.5, y: null, z: null } // trailing dot
   // 2,5 mm -> { x: 2.5, y: null, z: null }
   // 2,5 cm -> { x: 25, y: null, z: null }
@@ -41,6 +42,7 @@ export function parseSize(size) {
   // 2,5 x 2,5 x 2,5 cm -> { x: 25, y: 25, z: 25 }
   const variableSize = size?.includes("(") || size?.includes(")");
   if (!size || variableSize) return { x: null, y: null, z: null };
+  size = size.split("/")[0]; // only first size supported
   size = size.replace(/\.$/, ""); // remove trailing dot (after unit)
   size = size.replaceAll(" ", ""); // remove spaces
   size = size.replaceAll("⌀", "").replaceAll("Ø", "").replaceAll("&#216;", ""); // remove diameter symbol
