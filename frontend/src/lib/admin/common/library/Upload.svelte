@@ -27,7 +27,7 @@
       } else {
         const filesData = (await api.files.createMany(form)).data;
         const filesArray = Array.isArray(filesData) ? filesData : [filesData];
-        const filesIds = filesArray.map(f => f.id);
+        const filesIds = filesArray.map((f) => f.id);
         heimdall.emit('directus_files', filesIds);
       }
       dispatch('upload');
@@ -54,8 +54,7 @@
     on:input={handleInput}
     on:dragenter={() => (highlighted = true)}
     on:dragleave={() => (highlighted = false)}
-    bind:this={input}
-  />
+    bind:this={input} />
 </div>
 
 <style>

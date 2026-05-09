@@ -51,8 +51,7 @@
   title={item?.name}
   collection="commercial_details"
   bind:item
-  bind:itemOriginal
->
+  bind:itemOriginal>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
@@ -99,8 +98,7 @@
                 type="textarea"
                 bind:value={item.content}
                 rows={15}
-                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..."
-              />
+                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..." />
             </div>
             <div class="ui-texteditor__render">
               {#if item.content}

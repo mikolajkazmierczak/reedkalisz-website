@@ -45,9 +45,9 @@
       if (string === undefined) string = value === null ? '' : value.join(';');
       const array = string
         .split(';')
-        .map(v => v.trim())
-        .filter(v => v !== '')
-        .map(v => (isNaN(v) ? v : Number(v)));
+        .map((v) => v.trim())
+        .filter((v) => v !== '')
+        .map((v) => (isNaN(v) ? v : Number(v)));
       // check if values are allowed
       for (const v of array) {
         if (listDisallowNumbers && !isNaN(v)) throw new TypeError('Wartości nie mogą być liczbowe');
@@ -99,9 +99,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
-      on:click={e => dispatch('click', { e })}
-      on:input={e => dispatch('input', { e })}
-    />
+      on:click={(e) => dispatch('click', { e })}
+      on:input={(e) => dispatch('input', { e })} />
   {:else if type == 'textarea'}
     <textarea
       {id}
@@ -113,9 +112,8 @@
       {rows}
       class:resize
       class:json={format === 'json'}
-      on:click={e => dispatch('click', { e })}
-      on:input={e => dispatch('input', { e })}
-    />
+      on:click={(e) => dispatch('click', { e })}
+      on:input={(e) => dispatch('input', { e })} />
   {:else if type == 'email'}
     <input
       {id}
@@ -127,9 +125,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
-      on:click={e => dispatch('click', { e })}
-      on:input={e => dispatch('input', { e })}
-    />
+      on:click={(e) => dispatch('click', { e })}
+      on:input={(e) => dispatch('input', { e })} />
   {:else if type == 'password'}
     <input
       {id}
@@ -141,9 +138,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
-      on:click={e => dispatch('click', { e })}
-      on:input={e => dispatch('input', { e })}
-    />
+      on:click={(e) => dispatch('click', { e })}
+      on:input={(e) => dispatch('input', { e })} />
   {:else if type == 'date'}
     <input
       {id}
@@ -155,9 +151,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
-      on:click={e => dispatch('click', { e })}
-      on:input={e => dispatch('input', { e })}
-    />
+      on:click={(e) => dispatch('click', { e })}
+      on:input={(e) => dispatch('input', { e })} />
   {:else if type == 'time'}
     <input
       {id}
@@ -169,10 +164,9 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
-      on:click={e => dispatch('click', { e })}
-      on:input={e => dispatch('input', { e })}
-      {step}
-    />
+      on:click={(e) => dispatch('click', { e })}
+      on:input={(e) => dispatch('input', { e })}
+      {step} />
   {:else if type == 'color'}
     <input
       {id}
@@ -183,9 +177,8 @@
       class:error
       class:borderless
       style:border-radius={borderRadius}
-      on:click={e => dispatch('click', { e })}
-      on:input={e => dispatch('input', { e })}
-    />
+      on:click={(e) => dispatch('click', { e })}
+      on:input={(e) => dispatch('input', { e })} />
   {:else if type == 'checkbox'}
     <div class="checkbox" class:error on:click={() => (value = !value)} on:keydown={() => {}}>
       <input {id} type="checkbox" bind:checked={value} bind:this={input} {disabled} />
@@ -200,8 +193,7 @@
       {disabled}
       class:error
       class:borderless
-      style:border-radius={borderRadius}
-    >
+      style:border-radius={borderRadius}>
       {#each options as option}
         <option value={option.id}>{option.text}</option>
       {/each}
@@ -218,8 +210,7 @@
           {disabled}
           class:error
           class:borderless
-          style:border-radius={borderRadius}
-        />
+          style:border-radius={borderRadius} />
         <!-- <button class="list__tidy" on:click={() => (list = value.join(';'))} title="Uporządkuj">
           <Icon fill name="broom" />
         </button> -->
@@ -233,8 +224,7 @@
                 value.splice(i, 1);
                 list = value.join(';');
                 value = value;
-              }}
-            >
+              }}>
               {v}
               <div class="icon"><Icon fill name="close" /></div>
             </button>
@@ -260,9 +250,8 @@
           {min}
           {max}
           {step}
-          on:click={e => dispatch('click', { e })}
-          on:input={e => dispatch('input', { e })}
-        />
+          on:click={(e) => dispatch('click', { e })}
+          on:input={(e) => dispatch('input', { e })} />
         {#if error}<span class="error-info">{error}</span>{/if}
       </div>
       {#if buttons}<Button onclick={plus} disabled={value >= max}>&nbsp;+&nbsp;</Button>{/if}

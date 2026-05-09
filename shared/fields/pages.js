@@ -9,7 +9,7 @@ export const search = [
   'slug',
   'seo_title',
   'seo_description',
-  'content'
+  'content',
 ];
 export const show = [...search];
 
@@ -27,7 +27,7 @@ export const defaults = () => ({
   slug: '',
   seo_title: '',
   seo_description: '',
-  content: ''
+  content: '',
 });
 
 export default { search, show, read, edit, defaults };

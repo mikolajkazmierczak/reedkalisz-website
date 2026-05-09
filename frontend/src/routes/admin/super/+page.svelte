@@ -25,7 +25,7 @@
       code: data.data.code,
       date_updated: data.data.date_updated,
       data: data.data,
-      delta: data.delta
+      delta: data.delta,
     };
   }
 
@@ -37,7 +37,7 @@
       api_color_id: data.data.api_color_id,
       date_updated: data.data.date_updated,
       data: data.data,
-      delta: data.delta
+      delta: data.delta,
     };
   }
 
@@ -53,50 +53,50 @@
         _and: [
           {
             collection: {
-              _eq: collection
-            }
-          }
-        ]
+              _eq: collection,
+            },
+          },
+        ],
       },
-      limit: -1
+      limit: -1,
     });
     console.log(data);
 
-    const items = data.data.map(d => mapping(d));
+    const items = data.data.map((d) => mapping(d));
     console.log(items);
 
     let filtered = [];
     if (collection === 'products') {
-      filtered = items.filter(item => {
+      filtered = items.filter((item) => {
         return isDateBetween(item.date_updated, start, end) && item.company === 10;
       });
       console.log(filtered);
 
-      const filteredIds = filtered.map(item => item.id);
+      const filteredIds = filtered.map((item) => item.id);
 
       await api.items('products').updateMany(filteredIds, {
-        enabled: true
+        enabled: true,
       });
     } else if (collection === 'products_storage') {
       const axpolProducts = (
         await api.items('products').readByQuery({
           filter: { company: { _eq: 10 } },
           fields: ['id', 'storage', 'company'],
-          limit: -1
+          limit: -1,
         })
       ).data;
       console.log('axpol products', axpolProducts);
-      const axpolProductsIds = axpolProducts.map(p => p.id);
+      const axpolProductsIds = axpolProducts.map((p) => p.id);
       console.log('axpol products ids', axpolProductsIds);
-      const axpolStoragesIds = axpolProducts.map(p => p.storage).flat();
+      const axpolStoragesIds = axpolProducts.map((p) => p.storage).flat();
       console.log('axpol storages ids', axpolStoragesIds);
 
-      filtered = items.filter(item => {
+      filtered = items.filter((item) => {
         return isDateBetween(item.date_updated, start, end) && axpolProductsIds.includes(item.product);
       });
       console.log(filtered);
 
-      const filteredIds = filtered.map(item => item.id);
+      const filteredIds = filtered.map((item) => item.id);
       console.log('filtered ids', filteredIds);
 
       // const diff = {
@@ -105,10 +105,10 @@
       // };
       // console.log('diff', diff);
 
-      const doubleFiltered = filtered.filter(item => !item.api_color_code.startsWith('/A-'));
+      const doubleFiltered = filtered.filter((item) => !item.api_color_code.startsWith('/A-'));
       console.log('double filtered', doubleFiltered);
 
-      const doubleFilteredIds = doubleFiltered.map(item => item.id);
+      const doubleFilteredIds = doubleFiltered.map((item) => item.id);
 
       // await api.items('products_storage').updateMany(doubleFilteredIds, {
       //   amount: null,
@@ -121,7 +121,7 @@
     const randomId = Math.floor(Math.random() * 100);
     return await api.items('test').createOne({
       name: 'Test ' + randomId,
-      count: randomId
+      count: randomId,
     });
   }
   async function createItems(count) {
@@ -134,14 +134,14 @@
   function itemUpdates() {
     return {
       count: Math.floor(Math.random() * 100),
-      deep: { count_deep: Math.floor(Math.random() * 100) }
+      deep: { count_deep: Math.floor(Math.random() * 100) },
     };
   }
 
   async function updateBatch(n) {
     const start = performance.now();
 
-    const items = Array.from(Array(n).keys()).map(i => ({ id: i + 1, ...itemUpdates() }));
+    const items = Array.from(Array(n).keys()).map((i) => ({ id: i + 1, ...itemUpdates() }));
 
     await api.items('test').updateBatch(items);
 

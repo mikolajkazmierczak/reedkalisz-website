@@ -17,5 +17,5 @@ export default {
   MidOcean: new MidOcean(),
   PAR: new PAR(),
   Promotionway: new Promotionway(),
-  USBSystem: new USBSystem()
+  USBSystem: new USBSystem(),
 };

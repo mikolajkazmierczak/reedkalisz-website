@@ -20,12 +20,12 @@
   $: $companies?.sort((a, b) => a.name.localeCompare(b.name));
   $: pages = $companies && [
     { label: 'Marże i Widoki', value: null },
-    ...$companies.map(c => ({ label: c.name, value: c }))
+    ...$companies.map((c) => ({ label: c.name, value: c })),
   ];
   $: pages && selectPage(company); // may cause problems when editing calculations and a company updates
 
   function selectPage(id) {
-    selectedCompany = $companies.find(c => c.id === id) || null;
+    selectedCompany = $companies.find((c) => c.id === id) || null;
     searchParams.set({ c: selectedCompany?.id || null });
   }
 
@@ -33,7 +33,7 @@
     if (leaving()) selectPage(e.detail.value?.id);
   }
 
-  beforeNavigate(navigation => {
+  beforeNavigate((navigation) => {
     if (!leaving()) navigation.cancel();
   });
 

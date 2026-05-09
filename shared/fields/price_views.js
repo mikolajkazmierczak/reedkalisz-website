@@ -12,7 +12,7 @@ export const defaults = () => ({
   date_updated: null,
   name: '',
   default: false,
-  amounts: []
+  amounts: [],
 });
 
 export default { search, show, read, edit, defaults };

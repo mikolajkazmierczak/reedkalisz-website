@@ -53,7 +53,7 @@
         const products = (await api.items('products').readByQuery(options)).data;
         item.product = products.length ? products[0] : null;
       } else if (slug && type == 'category') {
-        const c = categories.find(c => c.slug == slug);
+        const c = categories.find((c) => c.slug == slug);
         item.category = c ? { id: c.id, slug: c.slug, name: c.name } : null; // get only needed fields
       } else if (slug && (type == 'page' || type == '?')) {
         const pages = (await api.items('pages').readByQuery(options)).data;

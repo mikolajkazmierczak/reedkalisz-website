@@ -62,8 +62,7 @@
             <Input
               type="select"
               bind:value={item.company}
-              options={$companies.map(({ id, name }) => ({ id, text: name }))}
-            >
+              options={$companies.map(({ id, name }) => ({ id, text: name }))}>
               Firma
             </Input>
           </div>

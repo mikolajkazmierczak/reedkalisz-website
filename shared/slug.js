@@ -17,7 +17,7 @@ function getWholeCharAndI(str, i) {
         i +
         ' out of range for string "' +
         str +
-        '"; please open an issue at https://github.com/Trott/slug/issues/new'
+        '"; please open an issue at https://github.com/Trott/slug/issues/new',
     );
   }
   if (code < 0xd800 || code > 0xdfff) {
@@ -56,7 +56,7 @@ function getWholeCharAndI(str, i) {
   throw new Error(
     'String "' +
       str +
-      '" reaches code believed to be unreachable; please open an issue at https://github.com/Trott/slug/issues/new'
+      '" reaches code believed to be unreachable; please open an issue at https://github.com/Trott/slug/issues/new',
   );
 }
 
@@ -89,7 +89,7 @@ const locales = {
   // Need a reference URL for Serbian.
   sr: { đ: 'dj', Đ: 'DJ' },
   // https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/864314/ROMANIZATION_OF_UKRAINIAN.pdf
-  uk: { И: 'Y', и: 'y', Й: 'Y', й: 'y', Ц: 'Ts', ц: 'ts', Х: 'Kh', х: 'kh', Щ: 'Shch', щ: 'shch', Г: 'H', г: 'h' }
+  uk: { И: 'Y', и: 'y', Й: 'Y', й: 'y', Ц: 'Ts', ц: 'ts', Х: 'Kh', х: 'kh', Щ: 'Shch', щ: 'shch', Г: 'H', г: 'h' },
 };
 
 let defaultLocale = {};
@@ -206,7 +206,7 @@ const initialMulticharmap = {
   חֱ: 'e',
   חֲ: 'a',
   חֳ: 'o',
-  בִ: 'i'
+  בִ: 'i',
 };
 
 // https://github.com/django/django/blob/master/django/contrib/admin/static/admin/js/urlify.js
@@ -816,7 +816,7 @@ const initialCharmap = {
   ק: 'k',
   ר: 'r',
   תּ: 't',
-  ת: 't'
+  ת: 't',
 };
 
 slug.charmap = Object.assign({}, initialCharmap);
@@ -831,7 +831,7 @@ slug.defaults = {
       lower: true,
       charmap: slug.charmap,
       multicharmap: slug.multicharmap,
-      trim: true
+      trim: true,
     },
     pretty: {
       replacement: '-',
@@ -839,11 +839,11 @@ slug.defaults = {
       lower: true,
       charmap: slug.charmap,
       multicharmap: slug.multicharmap,
-      trim: true
-    }
+      trim: true,
+    },
   },
   multicharmap: slug.multicharmap,
-  fallback: true
+  fallback: true,
 };
 
 slug.reset = function () {

@@ -12,7 +12,7 @@
 
   let lightbox = { open: false, img: null };
 
-  const openLightbox = i => (lightbox = { open: true, img: imgs[i] });
+  const openLightbox = (i) => (lightbox = { open: true, img: imgs[i] });
   const closeLightbox = () => (lightbox.open = false);
 </script>
 

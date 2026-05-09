@@ -29,8 +29,7 @@
         height="400"
         style="border: 0;"
         src="https://www.openstreetmap.org/export/embed.html?bbox=18.06013941764832%2C51.75668907327362%2C18.063679933547977%2C51.75816671026607&amp;layer=mapnik&amp;marker=51.75742789781386%2C18.061909675598145"
-        loading="lazy"
-      />
+        loading="lazy" />
       <br />
       <small>
         <a href="https://www.openstreetmap.org/?mlat=51.757428&amp;mlon=18.061910#map=19/51.757428/18.061910">

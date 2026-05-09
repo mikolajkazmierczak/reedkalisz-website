@@ -12,25 +12,25 @@
         { title: 'Kolory', icon: 'colors', href: '/admin/kolory' },
         { title: 'Kategorie', icon: 'categories', href: '/admin/kategorie' },
         { title: 'Informacje handlowe', icon: 'commercial_details', href: '/admin/informacje-handlowe' },
-        { title: 'Kalkulacje', icon: 'calculator', href: '/admin/kalkulacje' }
-      ]
+        { title: 'Kalkulacje', icon: 'calculator', href: '/admin/kalkulacje' },
+      ],
     },
     {
       title: 'Zawartość',
       buttons: [
         { title: 'Menu', icon: 'menu', href: '/admin/menu' },
         { title: 'Strony', icon: 'pages', href: '/admin/strony' },
-        { title: 'Fragmenty', icon: 'fragments', href: '/admin/fragmenty' }
-      ]
+        { title: 'Fragmenty', icon: 'fragments', href: '/admin/fragmenty' },
+      ],
     },
     {
       title: 'Inne',
       buttons: [
         { title: 'Biblioteka', icon: 'library', href: '/admin/biblioteka' },
         { title: 'Zapytania', icon: 'questions', href: '/admin/zapytania' },
-        { title: 'API', icon: 'api', href: '/admin/api' }
-      ]
-    }
+        { title: 'API', icon: 'api', href: '/admin/api' },
+      ],
+    },
   ];
 </script>
 

@@ -14,7 +14,7 @@
     [{ id: null, text: '---' }].concat(
       $colors.map(({ id, enabled, name, color }) => {
         return { id, text: `${color} | ${enabled ? '' : '[Ukryty] '}${name}` };
-      })
+      }),
     );
 
   function pushStorage() {
@@ -26,7 +26,7 @@
       api_color_id: '',
       color_first: null,
       color_second: null,
-      multicolored: false
+      multicolored: false,
     });
     product = product;
   }
@@ -42,7 +42,7 @@
     product.storage[i].img.push({
       img: null,
       enabled: true,
-      show_in_gallery: true
+      show_in_gallery: true,
     });
     product = product;
   }

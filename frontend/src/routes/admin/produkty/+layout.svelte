@@ -24,7 +24,7 @@
   let products;
 
   async function read(limit, page, query, category) {
-    if (category !== null && category !== -1 && !$categories.find(c => c.id == category)) {
+    if (category !== null && category !== -1 && !$categories.find((c) => c.id == category)) {
       // TODO: doesn't work after deleting a category you're in
       searchParams.set({ c: null });
       return;
@@ -60,7 +60,7 @@
             <Button on:click={() => goto(`/admin/produkty/+`)} icon="add">Dodaj</Button>
           {:else}
             <Button on:click={() => goto(`/admin/produkty/+?c=${category}`)} icon="add">
-              <span>Dodaj w <small>{$categories.find(c => c.id == category).name}</small></span>
+              <span>Dodaj w <small>{$categories.find((c) => c.id == category).name}</small></span>
             </Button>
           {/if}
         </div>
@@ -80,9 +80,9 @@
           { label: 'Kod' },
           { label: 'Nazwa' },
           { blame: true, label: 'Utworzenie' },
-          { blame: true, label: 'Aktualizacja' }
+          { blame: true, label: 'Aktualizacja' },
         ]}
-        mapper={$ => ({
+        mapper={($) => ({
           href: `/admin/produkty/${$.slug}`,
           values: [
             $.enabled,
@@ -93,13 +93,12 @@
             $.code,
             $.name,
             { user: $.user_created, datetime: $.date_created },
-            { user: $.user_updated, datetime: $.date_updated }
-          ]
+            { user: $.user_updated, datetime: $.date_updated },
+          ],
         })}
         {searchParams}
         {limit}
-        {page}
-      />
+        {page} />
     </div>
   {/if}
 </div>

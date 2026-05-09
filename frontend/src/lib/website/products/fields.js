@@ -40,5 +40,5 @@ export const fields = [
   'storage.img.show_in_gallery',
 
   'gallery.enabled',
-  'gallery.img'
+  'gallery.img',
 ];

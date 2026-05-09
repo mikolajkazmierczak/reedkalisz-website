@@ -90,7 +90,7 @@
     item.slug = slugify([item?.code, item?.name], {
       key: true,
       partsOriginal: [itemOriginal?.code, itemOriginal?.name],
-      slugOriginal: itemOriginal?.slug
+      slugOriginal: itemOriginal?.slug,
     });
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
@@ -113,8 +113,7 @@
   collection="products"
   bind:item
   bind:itemOriginal
-  {save}
->
+  {save}>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
@@ -139,8 +138,7 @@
               <Input
                 type="select"
                 bind:value={item.company}
-                options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}
-              >
+                options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}>
                 Producent&nbsp;<small style="opacity:0.65">API</small>
               </Input>
               <!-- {/if} -->
@@ -156,10 +154,9 @@
                       type="select"
                       bind:value={category}
                       options={treeFlatten(tree).map(({ id, name, _meta }) => {
-                        const path = _meta.path.map(p => p + 1).join('.');
+                        const path = _meta.path.map((p) => p + 1).join('.');
                         return { id, text: `${path} ${name}` };
-                      })}
-                    />
+                      })} />
                   </div>
                 {/await}
                 <Button icon="arrow_up" on:click={() => moveCategory(i, -1)} square disabled={i == 0} />
@@ -167,8 +164,7 @@
                   icon="arrow_down"
                   on:click={() => moveCategory(i, 1)}
                   square
-                  disabled={i == item.categories.length - 1}
-                />
+                  disabled={i == item.categories.length - 1} />
                 <Button icon="delete" on:click={() => removeCategory(i)} dangerous square />
               </div>
             {/each}
@@ -240,14 +236,13 @@
                 type="textarea"
                 bind:value={item.description}
                 rows={15}
-                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..."
-              />
+                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..." />
             </div>
             <div class="ui-texteditor__render">
               {#if item.description}
                 {@const post =
                   item.commercial_details !== null &&
-                  $commercialDetails.find(c => c.id === item.commercial_details).content}
+                  $commercialDetails.find((c) => c.id === item.commercial_details).content}
                 {@html marked.parse(item.description + (post ? '\n' + post : ''))}
               {/if}
             </div>
@@ -271,8 +266,7 @@
               placeholder="np. stal;plastik"
               bind:value={item.materials}
               bind:error={errors.materials}
-              listDisallowNumbers
-            >
+              listDisallowNumbers>
               Materiały
             </Input>
           </div>

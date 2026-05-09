@@ -86,7 +86,7 @@ async function remove(collection, id, { root, prompt = null, parent = null, inde
         const filters = [{ parent: parent ? { _eq: parent } : { _null: true } }];
         const options = {
           fields: ['id', 'index'],
-          filter: { _and: menu ? [...filters, { menu: { _eq: menu } }] : filters }
+          filter: { _and: menu ? [...filters, { menu: { _eq: menu } }] : filters },
         };
         const itemsToUpdate = (await api.items(collection).readByQuery(options)).data;
         for (const { id, index: i } of itemsToUpdate) {

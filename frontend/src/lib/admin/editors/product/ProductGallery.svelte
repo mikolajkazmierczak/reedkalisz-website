@@ -10,7 +10,7 @@
     gallery.push({
       img: null,
       enabled: true,
-      main: false
+      main: false,
     });
     gallery = gallery;
   }
@@ -23,7 +23,7 @@
   }
 
   function setMain() {
-    gallery.forEach(g => (g.main = false));
+    gallery.forEach((g) => (g.main = false));
     gallery[0].main = true;
     gallery[0].enabled = true;
     gallery = gallery;
@@ -39,8 +39,12 @@
       <div class="ui-box ui-box--element" class:ui-box--uneditable={!img.enabled} class:main={i == 0}>
         <div class="actions">
           <div>
-            {#if !i == 0} <Button icon="arrow_left" on:click={() => moveImg(i, -1)} square /> {/if}
-            {#if i < gallery.length - 1} <Button icon="arrow_right" on:click={() => moveImg(i, 1)} square /> {/if}
+            {#if !i == 0}
+              <Button icon="arrow_left" on:click={() => moveImg(i, -1)} square />
+            {/if}
+            {#if i < gallery.length - 1}
+              <Button icon="arrow_right" on:click={() => moveImg(i, 1)} square />
+            {/if}
           </div>
           <Button icon="delete" on:click={() => removeImg(i)} dangerous />
         </div>

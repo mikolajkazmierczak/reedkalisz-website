@@ -21,13 +21,13 @@
       pathname: '/produkty',
       label: 'Edytuj produkt',
       icon: 'products',
-      url: '/admin/produkty/' + pathname.split('/')[2]
+      url: '/admin/produkty/' + pathname.split('/')[2],
     },
     {
       pathname: '/kategorie',
       label: 'Edytuj kategorię',
       icon: 'categories',
-      url: '/admin/kategorie/' + pathname.split('/')[2]
+      url: '/admin/kategorie/' + pathname.split('/')[2],
     },
     {
       pathname: '/',
@@ -36,11 +36,11 @@
       data: layout,
       editing: layoutEditing,
       modified: layoutModified,
-      save: layoutSave
-    }
+      save: layoutSave,
+    },
   ];
 
-  $: edit = edits.find(e => pathname.startsWith(e.pathname));
+  $: edit = edits.find((e) => pathname.startsWith(e.pathname));
 
   // stores
   $: data = edit?.data;

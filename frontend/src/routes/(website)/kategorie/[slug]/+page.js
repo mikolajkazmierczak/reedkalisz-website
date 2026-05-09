@@ -16,7 +16,7 @@ async function getFilter(query, category, categoriesTree) {
   }
   // by category
   if (category) {
-    const getIDs = c => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
+    const getIDs = (c) => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
     return { categories: { category: { _in: getIDs(category.id) } } };
   }
   // all products
@@ -28,7 +28,7 @@ export async function load({ url, parent, params }) {
 
   const { l, p, q } = parseSearchToParams(url.search);
 
-  const category = categoriesItems.find(c => c.slug === params.slug);
+  const category = categoriesItems.find((c) => c.slug === params.slug);
   if (params.slug !== '_' && !category) throw error(404, '404');
 
   const filter = await getFilter(q, category, categoriesTree);
@@ -52,8 +52,8 @@ export async function load({ url, parent, params }) {
   if (params.slug === 'kalendarze-Bf4TIYjf') {
     const calendars = (await api.items('fragments').readOne(11)).data;
     products = [
-      ...calendars.map((c, i) => ({ ...c, id: calendars.length - i - 1, alt: c.title })).filter(p => p.show),
-      ...products
+      ...calendars.map((c, i) => ({ ...c, id: calendars.length - i - 1, alt: c.title })).filter((p) => p.show),
+      ...products,
     ];
   }
 

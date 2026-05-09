@@ -54,11 +54,11 @@
         { id: true, label: 'ID' },
         { label: 'Nazwa' },
         { blame: true, label: 'Utworzenie' },
-        { blame: true, label: 'Aktualizacja' }
+        { blame: true, label: 'Aktualizacja' },
       ]}
-      mapper={$ => {
+      mapper={($) => {
         const treeItem = treeGetItem(itemsTree, $.id);
-        const itemLabel = treeItem._meta.path.map(p => p + 1).join('.') + ' ' + $.name;
+        const itemLabel = treeItem._meta.path.map((p) => p + 1).join('.') + ' ' + $.name;
         return {
           href: '/admin/kategorie/' + $.slug,
           hrefNew: `/admin/kategorie/+?parent=${$.id}&index=${treeItem.children.length}`,
@@ -67,15 +67,14 @@
             $.id,
             itemLabel,
             { user: $.user_created, datetime: $.date_created },
-            { user: $.user_updated, datetime: $.date_updated }
-          ]
+            { user: $.user_updated, datetime: $.date_updated },
+          ],
         };
       }}
       {searchParams}
       {limit}
       {page}
-      order={!query}
-    />
+      order={!query} />
   </div>
 {/if}
 

@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "vite dev --port 5000 --host",
     "build": "vite build",
-    "preview": "vite preview --port 5000 --host"
+    "preview": "vite preview --port 5000 --host",
+    "fmt": "prettier ../. --write --config ../.prettierrc --ignore-path ../.prettierignore"
   },
   "dependencies": {
     "@directus/sdk": "^10.3.1",
@@ -21,8 +22,8 @@
     "marked": "^14.1.1",
     "nanoid": "^5.0.7",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.3.3",
-    "prettier-plugin-svelte": "^3.2.6",
+    "prettier": "^3.8.3",
+    "prettier-plugin-svelte": "^3.5.1",
     "reedkalisz-shared": "file:../shared",
     "socket.io-client": "^4.7.5",
     "striptags": "^3.2.0",

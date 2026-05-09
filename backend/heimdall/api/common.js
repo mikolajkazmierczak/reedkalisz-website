@@ -12,7 +12,7 @@ function parseStorage($) {
     color_first,
     _color_first_hex,
     color_second,
-    _color_second_hex
+    _color_second_hex,
   };
 }
 
@@ -35,7 +35,7 @@ function parseMain($) {
     price,
     handling_cost,
     gallery: gallery || [],
-    storage: [parseStorage($)]
+    storage: [parseStorage($)],
   };
 }
 
@@ -44,7 +44,7 @@ export function parseItems(items) {
   // The first encountered item dictates the product's properties.
   const parsed = [];
   for (const item of items) {
-    const main = parsed.find(p => p.code == item.code);
+    const main = parsed.find((p) => p.code == item.code);
     if (!main) parsed.push(parseMain(item));
     else main.storage.push(parseStorage(item));
   }

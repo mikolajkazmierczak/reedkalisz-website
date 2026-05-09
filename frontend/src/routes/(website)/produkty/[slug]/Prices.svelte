@@ -22,7 +22,7 @@
   </small>
 {/if}
 <div class="prices">
-  <PricesTable prices={prices.filter(p => p.enabled)} pricesSale={pricesSale.filter(p => p.enabled)} />
+  <PricesTable prices={prices.filter((p) => p.enabled)} pricesSale={pricesSale.filter((p) => p.enabled)} />
   {#if pricesWithLabeling}
     <div class="prices-with-labeling">Ceny ze znakowaniem</div>
   {/if}

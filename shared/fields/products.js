@@ -14,7 +14,7 @@ export const search = [
   'coming_soon',
   'out_of_stock',
   'api_enabled',
-  'categories'
+  'categories',
 ];
 export const show = [];
 
@@ -115,7 +115,7 @@ export const edit = [
   'gallery.img',
   'recommendations.id',
   'recommendations.index',
-  'recommendations.recommendation'
+  'recommendations.recommendation',
 ];
 
 export const calculate = [
@@ -155,7 +155,7 @@ export const calculate = [
   'full_minimum',
   'global_product_margin',
   'product_margin',
-  'product_minimum'
+  'product_minimum',
 ];
 
 export const defaults = () => ({
@@ -206,7 +206,7 @@ export const defaults = () => ({
   product_minimum: 0,
   storage: [],
   gallery: [],
-  recommendations: []
+  recommendations: [],
 });
 
 export default { search, show, read, edit, defaults };

@@ -11,7 +11,7 @@ export const defaults = () => ({
   user_updated: null,
   date_updated: null,
   name: '',
-  content: ''
+  content: '',
 });
 
 export default { search, show, read, edit, defaults };

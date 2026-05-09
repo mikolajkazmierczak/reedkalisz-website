@@ -1,15 +1,15 @@
 <script>
-  import heimdall from "$/heimdall";
-  import { deep, uid } from "%/utils";
-  import { tick } from "svelte";
+  import heimdall from '$/heimdall';
+  import { deep, uid } from '%/utils';
+  import { tick } from 'svelte';
 
-  import HoverCircle from "$c/HoverCircle.svelte";
-  import Icon from "$c/Icon.svelte";
-  import Tooltip from "$c/Tooltip.svelte";
-  import Button from "@c/Button.svelte";
-  import Input from "@c/Input.svelte";
-  import Labeling from "./Labeling.svelte";
-  import { createNewLabeling, getChanged, save, tryCleanItems } from "./utils";
+  import HoverCircle from '$c/HoverCircle.svelte';
+  import Icon from '$c/Icon.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
+  import Button from '@c/Button.svelte';
+  import Input from '@c/Input.svelte';
+  import Labeling from './Labeling.svelte';
+  import { createNewLabeling, getChanged, save, tryCleanItems } from './utils';
 
   export let unsaved;
   export let saving;
@@ -38,15 +38,15 @@
         labelingIDs.push(...ids.labelings);
         productIDs.push(...ids.products);
       }
-      if (labelingIDs.length) heimdall.emit("labelings", labelingIDs);
-      if (productIDs.length) heimdall.emit("products", productIDs);
+      if (labelingIDs.length) heimdall.emit('labelings', labelingIDs);
+      if (productIDs.length) heimdall.emit('products', productIDs);
     }
 
     saving = false;
   }
 
   function cancel() {
-    if (confirm("Jesteś pewny? Ta akcja jest nieodwracalna.")) {
+    if (confirm('Jesteś pewny? Ta akcja jest nieodwracalna.')) {
       items = deep.copy(itemsOriginal);
     }
   }
@@ -166,8 +166,7 @@
                 step={1}
                 value={p.amount}
                 on:click={handleAmountClick}
-                on:input={(e) => handleAmountInput(e, i)}
-              />
+                on:input={(e) => handleAmountInput(e, i)} />
             </th>
           {/each}
 
@@ -200,7 +199,7 @@
       </Button>
     </div>
     {#each changed as { code, name, type }}
-      <small>{code || name || type || "???"}</small>
+      <small>{code || name || type || '???'}</small>
     {/each}
   </div>
   <div class="edit-info">

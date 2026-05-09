@@ -23,9 +23,9 @@
   $: filter && fetchRecommended(limit, page);
 
   function getFilter(slug, filterIds) {
-    const category = categoriesItems.find(c => c.slug === slug)?.id;
+    const category = categoriesItems.find((c) => c.slug === slug)?.id;
     if (!category) throw Error('Category not found');
-    const getIds = c => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
+    const getIds = (c) => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
     let filter = { categories: { category: { _in: getIds(category) } } };
     if (filterIds.length) {
       filter = { ...filter, id: { _nin: filterIds } }; // exclude some products

@@ -490,8 +490,7 @@
       <Filters
         filters={supportedCompanies.map((c) => ({ label: c.name, value: c }))}
         selected={selectedCompany}
-        on:change={handleCompanyChange}
-      />
+        on:change={handleCompanyChange} />
 
       <p><b>Ostatni skan:</b>&nbsp;{lastScan}</p>
 
@@ -503,8 +502,7 @@
             min="0"
             max="100"
             value={discount}
-            on:input={handleDiscountChange}
-          />&nbsp;%
+            on:input={handleDiscountChange} />&nbsp;%
         </p>
       {/if}
     </div>

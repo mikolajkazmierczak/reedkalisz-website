@@ -7,7 +7,7 @@ export const search = [
   'name',
   'color',
   'enabled',
-  'company'
+  'company',
 ];
 export const show = [...search];
 
@@ -22,7 +22,7 @@ export const defaults = () => ({
   date_updated: null,
   name: '',
   color: '',
-  enabled: true
+  enabled: true,
 });
 
 export default { search, show, read, edit, defaults };

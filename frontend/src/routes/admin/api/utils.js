@@ -9,8 +9,8 @@ export function round(num) {
 
 function findColor(color) {
   return typeof color == 'string'
-    ? get(colors).find(c => slugify(c.name) == slugify(color))
-    : get(colors).find(c => c.id == color);
+    ? get(colors).find((c) => slugify(c.name) == slugify(color))
+    : get(colors).find((c) => c.id == color);
 }
 export function findColorId(str) {
   if (!str) return null;
@@ -26,7 +26,7 @@ function parseColor(color) {
 export function parseColors(color1, color2) {
   if (!color1 && !color2) return '[BRAK]';
   return [color1, color2]
-    .map(c => parseColor(c))
+    .map((c) => parseColor(c))
     .filter(Boolean)
     .join(' / ');
 }

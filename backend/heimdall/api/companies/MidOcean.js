@@ -1,13 +1,13 @@
-import fetch from "node-fetch";
-import { getISODate } from "reedkalisz-shared/datetime.js";
-import { slugify } from "reedkalisz-shared/utils.js";
-import { Api } from "../base.js";
+import fetch from 'node-fetch';
+import { getISODate } from 'reedkalisz-shared/datetime.js';
+import { slugify } from 'reedkalisz-shared/utils.js';
+import { Api } from '../base.js';
 
 function parseCode(code) {
   // formats: 'XXXXXX', 'XXXXXX-XX', 'XXXXXX-XX-XX', ...?
-  const [productCode, ...tail] = code.split("-"); // code: 'XXXXXX-XX'
+  const [productCode, ...tail] = code.split('-'); // code: 'XXXXXX-XX'
   // TODO: for now colorCode includes the code for textile size (e.g. 'WH-XL' for white color, XL size)
-  const colorCode = tail ? tail.join("-") : null; // colorCode: '', 'XX', 'XX-XX'
+  const colorCode = tail ? tail.join('-') : null; // colorCode: '', 'XX', 'XX-XX'
   return { productCode, colorCode, hasLongTail: tail.length > 1 };
 }
 
@@ -15,23 +15,23 @@ function parseSize(size, unit) {
   // size: int, unit: str (e.g. 'mm', 'cm', 'm')
   // return size in mm
   size = Number(size);
-  if (unit == "mm") return size;
-  if (unit == "cm") return size * 10;
-  if (unit == "m") return size * 1000;
+  if (unit == 'mm') return size;
+  if (unit == 'cm') return size * 10;
+  if (unit == 'm') return size * 1000;
 }
 
 function parseColorDescription(colorDescription) {
   // color: str (e.g. 'White', 'Black', 'Red/Black')
   // return [color1, color2] - null if empty
   if (!colorDescription) return [null, null];
-  const colors = colorDescription.split("/").map((c) => c.trim());
+  const colors = colorDescription.split('/').map((c) => c.trim());
   if (colors.length === 1) {
     if (!colors[0]) return [null, null]; // ['']
     return [colors[0], null];
   } else if (colors.length === 2) {
     return colors;
   } else {
-    console.log("Too many colors in MidOcean product, cutting excess...");
+    console.log('Too many colors in MidOcean product, cutting excess...');
     return [colors[0], colors[1]];
   }
 }
@@ -39,7 +39,7 @@ function parseColorDescription(colorDescription) {
 function parse(printpricelist, pricelist, printdata, products, stock) {
   pricelist = pricelist.price.map((p) => ({
     sku: p.sku,
-    price: Number(p.price.replace(",", ".")),
+    price: Number(p.price.replace(',', '.')),
   }));
   printdata = printdata.products.map((p) => ({
     productCode: p.master_code,
@@ -48,7 +48,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
       const a = pos.max_print_size_height;
       const b = pos.max_print_size_width;
       const areaType = pos.print_position_type;
-      const area = areaType === "Rectangle" ? a * b : areaType === "Ellipse" ? Math.PI * a * b : null;
+      const area = areaType === 'Rectangle' ? a * b : areaType === 'Ellipse' ? Math.PI * a * b : null;
       return {
         techniques: pos.printing_techniques.map((t) => t.id),
         label: pos.position_id,
@@ -64,7 +64,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
   }));
 
   const handlingCosts = printpricelist.print_manipulations.map((m) => ({
-    price: Number(m.price.replace(",", ".")),
+    price: Number(m.price.replace(',', '.')),
     code: m.code,
     name: m.description,
   }));
@@ -73,9 +73,10 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
   const items = products.map(($) => {
     const { productCode } = parseCode($.master_code);
 
-    const price = pricelist.find((p) => {
-      return parseCode(p.sku).productCode === productCode; // TODO: are prices same for all variants (probably not for textiles)
-    })?.price || null;
+    const price =
+      pricelist.find((p) => {
+        return parseCode(p.sku).productCode === productCode; // TODO: are prices same for all variants (probably not for textiles)
+      })?.price || null;
 
     const handlingCostCode = printdata.find((p) => p.productCode === productCode)?.manipulation || null;
     const handling_cost = handlingCosts.find((h) => h.code === handlingCostCode)?.price || null;
@@ -86,7 +87,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
       // only define fields that are both:
       // - different from defaults
       // - pertain to the MidOcean api (e.g. enabled, api_enabled will be defined later)
-      name: $.product_name ?? "",
+      name: $.product_name ?? '',
       code: productCode,
       slug: slugify([productCode, $.product_name], { key: true }),
       seo_title: $.product_name,
@@ -105,7 +106,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
         const vImages = v?.digital_assets ?? [];
         const vColor = parseColorDescription(v.color_description);
         const data = {
-          img: vImages.filter((a) => a.type === "image").map((a) => a.url),
+          img: vImages.filter((a) => a.type === 'image').map((a) => a.url),
           amount: vStock ? vStock.amount : null,
           api_color_code: colorCode,
           api_color_id: v.variant_id,
@@ -129,11 +130,11 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
 
 export class MidOcean extends Api {
   fetch = async ({ env: { token } }) => {
-    const endpoints = ["printpricelist/2.0", "pricelist/2.0", "printdata/1.0", "products/2.0", "stock/2.0"];
+    const endpoints = ['printpricelist/2.0', 'pricelist/2.0', 'printdata/1.0', 'products/2.0', 'stock/2.0'];
     const responses = await Promise.all(
       endpoints.map((endpoint) => {
         const url = (endpoint) => `https://api.midocean.com/gateway/${endpoint}?language=pl`;
-        const options = { headers: { "x-Gateway-APIKey": token } };
+        const options = { headers: { 'x-Gateway-APIKey': token } };
         return fetch(url(endpoint), options);
       }),
     );

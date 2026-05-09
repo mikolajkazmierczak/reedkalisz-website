@@ -9,7 +9,7 @@ export const defaults = () => ({
   first_name: '',
   last_name: '',
   email: '',
-  avatar: null
+  avatar: null,
 });
 
 export default { search, show, read, edit, defaults };

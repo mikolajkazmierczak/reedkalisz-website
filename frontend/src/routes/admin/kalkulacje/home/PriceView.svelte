@@ -27,7 +27,7 @@
 
   let inputError;
 
-  beforeNavigate(navigation => {
+  beforeNavigate((navigation) => {
     if (unsaved) {
       const prompt = `Zmiany w widoku "${item.name} (${item.amounts})" nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
       if (confirm(prompt)) {
@@ -68,7 +68,7 @@
   }
 
   async function setDefault() {
-    const oldDefault = items.find(i => i.default);
+    const oldDefault = items.find((i) => i.default);
     item.default = true;
     oldDefault.default = false;
     await api.items('price_views').updateOne(item.id, { default: true });
@@ -80,9 +80,9 @@
   function removeStart() {
     if (deleting) return; // prevent double click
     if (item.id === '+') {
-      items = items.filter(i => i.id !== item.id);
+      items = items.filter((i) => i.id !== item.id);
     } else {
-      const defaultID = items.find(i => i.default).id;
+      const defaultID = items.find((i) => i.default).id;
       swapID = defaultID === item.id ? items[0].id : defaultID;
       deleting = true;
     }
@@ -98,7 +98,7 @@
     const wasDefault = item.default;
     if (wasDefault) {
       const newDefaultID = swapID;
-      const newDefaultItem = items.find(i => i.id == newDefaultID);
+      const newDefaultItem = items.find((i) => i.id == newDefaultID);
       newDefaultItem.default = true;
       await api.items('price_views').updateOne(newDefaultID, { default: wasDefault });
     }
@@ -111,7 +111,7 @@
     await api.items('price_views').deleteOne(item.id);
     const ids = swapID ? [item.id, swapID] : [item.id];
     heimdall.emit('price_views', ids);
-    items = items.filter(i => i.id !== item.id);
+    items = items.filter((i) => i.id !== item.id);
 
     deletingSaving = false;
     removeFinish();
@@ -132,8 +132,7 @@
         bind:error={inputError}
         listDisallowString
         listDisallowNegative
-        listDisallowZero
-      />
+        listDisallowZero />
     </div>
 
     {#if unsaved && correct}
@@ -160,16 +159,14 @@
   title="Jesteś pewny, że chcesz usunąć ten widok?"
   maxWidth={'300px'}
   bind:opened={deleting}
-  on:close={removeFinish}
->
+  on:close={removeFinish}>
   <small>Produkty, które korzystają z tego widoku potrzebują zamiennika.</small>
   <Input
     type="select"
     bind:value={swapID}
     options={items
       .filter(({ id }) => id !== '+' && id !== item.id)
-      .map(i => ({ id: i.id, text: `${i.default ? '(Domyślny) ' : ''}${i.name} [${i.amounts}]` }))}
-  >
+      .map((i) => ({ id: i.id, text: `${i.default ? '(Domyślny) ' : ''}${i.name} [${i.amounts}]` }))}>
     Widok zastępczy
   </Input>
   <div class="ui-pair popup-actions">

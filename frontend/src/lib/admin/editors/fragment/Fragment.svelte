@@ -63,8 +63,7 @@
   collection="fragments"
   bind:item
   bind:itemOriginal
-  {save}
->
+  {save}>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
@@ -100,8 +99,7 @@
                 type="textarea"
                 bind:value={item.content}
                 rows={15}
-                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..."
-              />
+                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..." />
             </div>
             <div class="ui-texteditor__render">
               {#if item.content}
@@ -120,16 +118,14 @@
           <div
             class="ui-pair ui-texteditor"
             style:background-color={dataParsingError ? 'var(--main-0)' : 'var(--light)'}
-            style:padding-bottom={dataParsingError ? '0.5rem' : 0}
-          >
+            style:padding-bottom={dataParsingError ? '0.5rem' : 0}>
             <div class="ui-texteditor__draft code">
               <Input
                 type="textarea"
                 format="json"
                 bind:value={data}
                 rows={30}
-                error={dataParsingError ? `<b>SYNTAX ERROR</b>&nbsp; ${dataParsingError}` : false}
-              />
+                error={dataParsingError ? `<b>SYNTAX ERROR</b>&nbsp; ${dataParsingError}` : false} />
             </div>
           </div>
         </div>

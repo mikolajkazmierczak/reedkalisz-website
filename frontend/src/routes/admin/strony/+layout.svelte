@@ -46,22 +46,21 @@
         { id: true, label: 'ID' },
         { label: 'Nazwa' },
         { blame: true, label: 'Utworzenie' },
-        { blame: true, label: 'Aktualizacja' }
+        { blame: true, label: 'Aktualizacja' },
       ]}
-      mapper={$ => ({
+      mapper={($) => ({
         href: `/admin/strony/${$.slug}`,
         values: [
           $.enabled,
           $.id,
           $.name,
           { user: $.user_created, datetime: $.date_created },
-          { user: $.user_updated, datetime: $.date_updated }
-        ]
+          { user: $.user_updated, datetime: $.date_updated },
+        ],
       })}
       {searchParams}
       {limit}
-      {page}
-    />
+      {page} />
   </div>
 {/if}
 <slot />

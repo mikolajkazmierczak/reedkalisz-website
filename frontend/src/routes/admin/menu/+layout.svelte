@@ -29,7 +29,7 @@
 
   let items;
   let itemsCount;
-  $: itemsTree = $menus && $menuItems ? makeTree($menuItems.filter(item => item.menu === menu)) : [];
+  $: itemsTree = $menus && $menuItems ? makeTree($menuItems.filter((item) => item.menu === menu)) : [];
   $: categoriesItemsTree = $categories ? makeTree($categories) : [];
 
   async function read(limit, page, query, menu) {
@@ -77,16 +77,16 @@
           { checkbox: true, icon: 'pages', label: 'Prowadzi do: Strona' },
           { label: 'Prowadzi do' },
           { blame: true, label: 'Utworzenie' },
-          { blame: true, label: 'Aktualizacja' }
+          { blame: true, label: 'Aktualizacja' },
         ]}
-        mapper={$ => {
+        mapper={($) => {
           const getCategoryLabel = () => {
             const categoryPath = $.category ? treeGetItem(categoriesItemsTree, $.category.id)._meta.path : null;
-            return categoryPath.map(p => p + 1).join('.') + ' ' + $.category.name;
+            return categoryPath.map((p) => p + 1).join('.') + ' ' + $.category.name;
           };
           const treeItem = treeGetItem(itemsTree, $.id);
           // TODO: investigate why is treeItem undefined at first when moving an item from children to parent
-          const itemLabel = treeItem?._meta.path.map(p => p + 1).join('.') + ' ' + $.name;
+          const itemLabel = treeItem?._meta.path.map((p) => p + 1).join('.') + ' ' + $.name;
           const resource = $.product ? $.product.name : $.page ? $.page.name : $.category ? getCategoryLabel() : $.url;
           return {
             href: '/admin/menu/' + $.id,
@@ -101,15 +101,14 @@
               !!$.page,
               resource,
               { user: $.user_created, datetime: $.date_created },
-              { user: $.user_updated, datetime: $.date_updated }
-            ]
+              { user: $.user_updated, datetime: $.date_updated },
+            ],
           };
         }}
         {searchParams}
         {limit}
         {page}
-        order={!query}
-      />
+        order={!query} />
     {/if}
   </div>
 {/if}

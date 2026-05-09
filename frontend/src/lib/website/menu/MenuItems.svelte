@@ -25,7 +25,7 @@
 <!-- out:fly={{ y: -15, duration: 150 }} -->
 <div class="menu" class:lvl0 class:lvl1 in:slide={{ duration: 300 }}>
   {#each items as { id, href, name }, i (id)}
-    {@const children = items.find(c => c.id === id)?.children}
+    {@const children = items.find((c) => c.id === id)?.children}
     {@const childActive = deepFindItemByCategorySlug(children, $page.params.slug)}
     {@const active = href === $page.url.pathname || childActive}
     <a {href} class="item" class:active in:fly={{ y: -15, duration: 300, delay: 50 * i }}>

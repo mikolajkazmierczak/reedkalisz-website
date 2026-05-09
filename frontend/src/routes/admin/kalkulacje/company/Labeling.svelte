@@ -15,16 +15,16 @@
   let removing = false;
   let swapID = null;
 
-  $: removingIDs = items.filter(item => item._remove).map(item => item.id);
+  $: removingIDs = items.filter((item) => item._remove).map((item) => item.id);
 
   $: swappable = items.filter(({ id }) => !removingIDs.includes(id));
   $: swapOptions = [
     { id: null, text: 'Bez zamiennika' },
-    ...swappable.map(({ id, name, code, type }) => ({ id, text: code || name || type || '???' }))
+    ...swappable.map(({ id, name, code, type }) => ({ id, text: code || name || type || '???' })),
   ];
 
   function setDefault(i) {
-    const old = items.find(old => old.default);
+    const old = items.find((old) => old.default);
     if (old) old.default = false;
     if (items.length > 0) {
       items[i].default = true;
@@ -40,7 +40,7 @@
     // Validate the input (setting the index to 0 if incorrect) and fixes the new order.
     const input = parseInt(e.detail.e.target.value);
     const itemIndex = isNaN(input) || input < 0 ? 0 : input; // item property (with basic validation)
-    const orderIndex = itemIndex + items.filter(i => i.index === -1).length; // order in the array (with removing items)
+    const orderIndex = itemIndex + items.filter((i) => i.index === -1).length; // order in the array (with removing items)
     items.splice(index, 1); // remove the item from the array
     items.splice(orderIndex, 0, { ...item, index: itemIndex }); // insert at the new index
     items = reindex(items);
@@ -88,8 +88,7 @@
       step={1}
       value={item.index}
       on:click={handleIndexClick}
-      on:input={handleIndexInput}
-    />
+      on:input={handleIndexInput} />
   </th>
 
   <td class="input action default" class:default={item.default}>

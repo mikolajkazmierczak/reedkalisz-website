@@ -39,14 +39,13 @@
       itemsCount={items.meta.filter_count}
       items={items.data}
       head={[{ id: true, label: 'ID' }, { label: 'Nazwa' }, { blame: true, label: 'Aktualizacja' }]}
-      mapper={$ => ({
+      mapper={($) => ({
         href: `/admin/fragmenty/${$.id}`,
-        values: [$.id, $.name, { user: $.user_updated, datetime: $.date_updated }]
+        values: [$.id, $.name, { user: $.user_updated, datetime: $.date_updated }],
       })}
       {searchParams}
       {limit}
-      {page}
-    />
+      {page} />
   </div>
 {/if}
 <slot />

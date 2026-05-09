@@ -18,7 +18,7 @@ export async function readme() {
       // unathorized
     } else {
       // unexpected error
-      errors.update(e => e.concat(err));
+      errors.update((e) => e.concat(err));
     }
     auth.set(false);
     return null;

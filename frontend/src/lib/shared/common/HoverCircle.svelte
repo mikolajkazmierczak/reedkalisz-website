@@ -23,7 +23,7 @@
       x: parentRect.left,
       y: parentRect.top,
       w: parentRect.width,
-      h: parentRect.height
+      h: parentRect.height,
     };
   }
 
@@ -43,11 +43,11 @@
     // this might seem 'unsvelty' but it allows this component to be put as a child of any element and it will just work
     parent = elem.parentNode;
     update({ x: 0, y: 0 }, getRect());
-    parent.addEventListener('mouseenter', e => {
+    parent.addEventListener('mouseenter', (e) => {
       update(getMouse(e), getRect());
       visible = true;
     });
-    parent.addEventListener('mouseleave', e => {
+    parent.addEventListener('mouseleave', (e) => {
       update(getMouse(e), getRect());
       visible = false;
     });
@@ -63,8 +63,7 @@
   style:width={size + 'px'}
   style:height={size + 'px'}
   style:left={x + '%'}
-  style:top={y + '%'}
-/>
+  style:top={y + '%'} />
 
 <style>
   .circle {

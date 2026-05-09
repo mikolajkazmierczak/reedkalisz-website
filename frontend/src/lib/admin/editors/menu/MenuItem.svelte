@@ -22,7 +22,7 @@
   let item;
   let itemOriginal;
 
-  $: hasChildren = $menuItems?.find(m => m.parent == item?.id);
+  $: hasChildren = $menuItems?.find((m) => m.parent == item?.id);
 
   async function read() {
     await globals.update(menus);
@@ -45,7 +45,7 @@
       root: '/admin/menu',
       parent: item.parent,
       index: item.index,
-      menu: item.menu
+      menu: item.menu,
     });
   }
 
@@ -101,8 +101,8 @@
                 <a href="/produkty/{item.product.slug}" target="_blank" rel="noreferrer">{item.product.name}</a>
               </div>
             {:else if item.category}
-              {@const category = categoriesTreeFlattened.find(c => c.id == item.category.id)}
-              {@const categoryLabel = category._meta.path.map(p => p + 1).join('.') + ' ' + category.name}
+              {@const category = categoriesTreeFlattened.find((c) => c.id == item.category.id)}
+              {@const categoryLabel = category._meta.path.map((p) => p + 1).join('.') + ' ' + category.name}
               <div class="type">
                 <small>KATEGORIA</small>
                 <a href="/kategorie/{item.category.slug}" target="_blank" rel="noreferrer">{categoryLabel}</a>

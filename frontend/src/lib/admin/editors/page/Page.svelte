@@ -39,7 +39,7 @@
     item.slug = slugify(item?.name, {
       key: true,
       partsOriginal: itemOriginal?.name,
-      slugOriginal: itemOriginal?.slug
+      slugOriginal: itemOriginal?.slug,
     });
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
@@ -115,8 +115,7 @@
                 type="textarea"
                 bind:value={item.content}
                 rows={15}
-                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..."
-              />
+                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..." />
             </div>
             <div class="ui-texteditor__render">
               {#if item.content}

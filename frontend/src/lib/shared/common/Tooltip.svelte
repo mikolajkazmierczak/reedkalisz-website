@@ -35,8 +35,7 @@
   style:border
   style:background-color={backgroundColor}
   style:top="{$mouse.y}px"
-  style:left="{$mouse.x}px"
->
+  style:left="{$mouse.x}px">
   <slot />
 </div>
 

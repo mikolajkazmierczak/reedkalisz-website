@@ -9,17 +9,17 @@
 
   export let count;
 
-  const setLimit = l => {
+  const setLimit = (l) => {
     searchParams?.set({ l });
     limit = l;
   };
-  const setPage = p => {
+  const setPage = (p) => {
     searchParams?.set({ p });
     page = p;
   };
 
   const limits = [1, 5, 25, 50, 100];
-  let selectedLimit = limits.findIndex(l => l === limit) ?? 0;
+  let selectedLimit = limits.findIndex((l) => l === limit) ?? 0;
   $: limitValue = limits[selectedLimit];
   $: limitValue != limit && setLimit(limitValue); // only set if different from the given from above
 

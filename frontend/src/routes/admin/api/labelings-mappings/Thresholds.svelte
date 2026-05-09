@@ -8,7 +8,7 @@
 
   const types = [
     { id: 'gte', text: '>=' },
-    { id: 'gt', text: '>' }
+    { id: 'gt', text: '>' },
   ];
 
   export let apiCompany;
@@ -23,18 +23,18 @@
         type: 'gt',
         threshold: 0,
         company: 4, // REED
-        code: ''
-      }
+        code: '',
+      },
     ];
   }
 
   function remove(uid) {
     // Remove the item and reindex the rest.
-    thresholds = thresholds.filter(t => t._uid !== uid).map((t, i) => ({ ...t, _index: i }));
+    thresholds = thresholds.filter((t) => t._uid !== uid).map((t, i) => ({ ...t, _index: i }));
   }
 
   async function handleInput(e, uid) {
-    const threshold = thresholds.find(t => t._uid === uid);
+    const threshold = thresholds.find((t) => t._uid === uid);
     await handleIndexInput(e, thresholds, threshold);
     thresholds = thresholds;
   }
@@ -43,7 +43,13 @@
 {#each thresholds as { _uid, _index: i, type, threshold, company, code } (_uid)}
   <div class="ui-box ui-box--optional threshold">
     <Button dangerous square icon="delete" on:click={() => remove(_uid)} />
-    <Input type="number" min={0} step={1} value={i} on:click={handleIndexClick} on:input={e => handleInput(e, _uid)} />
+    <Input
+      type="number"
+      min={0}
+      step={1}
+      value={i}
+      on:click={handleIndexClick}
+      on:input={(e) => handleInput(e, _uid)} />
     <div class="icon">|</div>
     <Input type="select" bind:value={type} options={types} />
     <Input type="number" min={0} step={0.01} bind:value={threshold} />

@@ -27,8 +27,7 @@
   class:edited
   {disabled}
   style:border-radius={borderRadius}
-  style:width
->
+  style:width>
   {#if !disabled}
     <HoverCircle color={hoverColor} />
   {/if}

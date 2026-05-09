@@ -9,7 +9,7 @@
   const types = [
     { id: 'direct', text: 'Bezpośrednio' },
     { id: 'price', text: 'Zależy od ceny produktu' },
-    { id: 'area', text: 'Zależy od powierzchni' }
+    { id: 'area', text: 'Zależy od powierzchni' },
   ];
 
   export let apiCompany;
@@ -25,7 +25,7 @@
 
   function remove() {
     // Remove the item and reindex the rest.
-    mappings = mappings.filter(m => m._uid !== mapping._uid).map((m, i) => ({ ...m, _index: i }));
+    mappings = mappings.filter((m) => m._uid !== mapping._uid).map((m, i) => ({ ...m, _index: i }));
   }
 
   async function handleInput(e) {

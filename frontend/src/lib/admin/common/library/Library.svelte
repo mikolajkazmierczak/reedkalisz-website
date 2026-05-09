@@ -1,17 +1,17 @@
 <script>
-  import { goto } from "$app/navigation";
-  import { createEventDispatcher } from "svelte";
-  import { slide } from "svelte/transition";
+  import { goto } from '$app/navigation';
+  import { createEventDispatcher } from 'svelte';
+  import { slide } from 'svelte/transition';
 
-  import api from "$/api";
-  import heimdall from "$/heimdall";
+  import api from '$/api';
+  import heimdall from '$/heimdall';
 
-  import { read as fields } from "%/fields/directus_files";
-  import Button from "@c/Button.svelte";
-  import File from "@c/library/File.svelte";
-  import Upload from "@c/library/Upload.svelte";
-  import Pagination from "@c/Pagination.svelte";
-  import Search from "@c/Search.svelte";
+  import { read as fields } from '%/fields/directus_files';
+  import Button from '@c/Button.svelte';
+  import File from '@c/library/File.svelte';
+  import Upload from '@c/library/Upload.svelte';
+  import Pagination from '@c/Pagination.svelte';
+  import Search from '@c/Search.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -30,18 +30,14 @@
     const res = await api.files.readByQuery({
       filter: query
         ? {
-          _or: [
-            { id: { _eq: query } },
-            { filename_download: { _contains: query } },
-            { title: { _contains: query } },
-          ],
-        }
+            _or: [{ id: { _eq: query } }, { filename_download: { _contains: query } }, { title: { _contains: query } }],
+          }
         : {},
       fields,
       limit,
       page,
-      sort: "-uploaded_on",
-      meta: "*",
+      sort: '-uploaded_on',
+      meta: '*',
     });
     files = res.data;
     filesMeta = res.meta;
@@ -64,7 +60,7 @@
   function fileClick(e, file) {
     if (picker) {
       selected = file.id;
-      dispatch("select", file);
+      dispatch('select', file);
     } else if (e.ctrlKey || e.shiftKey || marked) {
       if (e.shiftKey) {
         const start = files.indexOf(marked);
@@ -88,7 +84,7 @@
     if (ids.length) {
       if (confirm(`Czy na pewno chcesz usunąć ${ids.length} plików?`)) {
         await api.files.deleteMany(ids);
-        heimdall.emit("directus_files", ids);
+        heimdall.emit('directus_files', ids);
         // read(limit, page, query); <- not needed because of heimdall
       }
     }
@@ -100,7 +96,7 @@
   $: marked = files?.find((f) => f.marked);
 
   heimdall.listen(({ match }) => {
-    if (match("directus_files")) read(limit, page, query);
+    if (match('directus_files')) read(limit, page, query);
   });
 </script>
 
@@ -127,9 +123,9 @@
 
     {#if files?.length}
       {#each files as file (file.id)}
-        {@const       data = (({ id, title, type, filesize, uploaded_on, modified_on, marked }) => {
-        return { id, title, type, filesize, uploaded_on, modified_on, marked };
-      })(file)}
+        {@const data = (({ id, title, type, filesize, uploaded_on, modified_on, marked }) => {
+          return { id, title, type, filesize, uploaded_on, modified_on, marked };
+        })(file)}
         <File {...data} on:click={(e) => fileClick(e, file)} />
       {/each}
     {/if}

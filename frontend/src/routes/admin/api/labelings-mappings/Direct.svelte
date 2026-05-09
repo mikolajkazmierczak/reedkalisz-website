@@ -9,8 +9,8 @@
   export let code;
 
   $: options = $companies
-    .filter(c => [4, apiCompany.id].includes(c.id)) // only allow REED (4) and the current company
-    .map(c => ({ id: c.id, text: c.name }));
+    .filter((c) => [4, apiCompany.id].includes(c.id)) // only allow REED (4) and the current company
+    .map((c) => ({ id: c.id, text: c.name }));
 </script>
 
 <div class="wrapper">

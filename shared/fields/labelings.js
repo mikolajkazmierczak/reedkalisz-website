@@ -18,7 +18,7 @@ export const search = [
   'transport',
   'transport_threshold',
   'margin',
-  'minimum'
+  'minimum',
 ];
 export const show = [...search];
 
@@ -42,7 +42,7 @@ export const defaults = () => ({
   transport: null,
   transport_threshold: null,
   margin: null,
-  minimum: null
+  minimum: null,
 });
 
 export default { search, show, read, edit, defaults };

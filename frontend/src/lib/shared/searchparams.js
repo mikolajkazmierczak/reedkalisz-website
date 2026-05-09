@@ -14,12 +14,12 @@ export const searchparams = writable(
     ['/admin/kalkulacje', { values, defaults: { c: null } }], // company
     ['/admin/biblioteka', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
     ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/api', { values, defaults: { l: 25, p: 1, q: null, c: null } }] // limit, page, query, company
-  ])
+    ['/admin/api', { values, defaults: { l: 25, p: 1, q: null, c: null } }], // limit, page, query, company
+  ]),
 );
 
 function update(pathname, func) {
-  searchparams.update(store => {
+  searchparams.update((store) => {
     const item = store.get(pathname);
     func(item);
     store.set(pathname, item);
@@ -73,7 +73,7 @@ export class SearchParams {
     const item = get(searchparams).get(this.pathname);
     if (!item) throw new Error(`No searchparams for "${this.pathname}"`);
     if (!Object.hasOwn(item, 'params') || refresh) {
-      update(this.pathname, item => {
+      update(this.pathname, (item) => {
         item.params = { ...item.defaults };
       });
     }
@@ -100,7 +100,7 @@ export class SearchParams {
     // const unsetByDefault = Object.values(defaults).every(v => v == null);
     const unset = Object.keys(newParams).length === 0; // newParams == {}
     if (unset) {
-      const paramsUnset = Object.values(params).filter(v => v != null).length === 0;
+      const paramsUnset = Object.values(params).filter((v) => v != null).length === 0;
       if (paramsUnset) return; // ? -> ?
       this.writeURL(params); // ? -> ?p=1
     } else {

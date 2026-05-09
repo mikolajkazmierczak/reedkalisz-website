@@ -2,8 +2,7 @@
 .DS_Store
 
 # common
-.env
-.env.*
+.env*
 node_modules
 
 # directus

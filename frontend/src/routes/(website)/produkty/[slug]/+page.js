@@ -72,7 +72,7 @@ const fields = [
 
   'storage.img.enabled',
   'storage.img.img',
-  'storage.img.show_in_gallery'
+  'storage.img.show_in_gallery',
 ];
 
 export async function load({ params }) {

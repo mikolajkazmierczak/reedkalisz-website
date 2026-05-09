@@ -150,8 +150,7 @@
   class:empty={_empty}
   class:editing={$editing}
   class:greyscale={tile.hide}
-  style="grid-row: {tile.row} / span {tile.height}; grid-column: {tile.column} / span {tile.width};"
->
+  style="grid-row: {tile.row} / span {tile.height}; grid-column: {tile.column} / span {tile.width};">
   {#if _empty && $editing}
     <div class="add">
       <Button icon="add" onclick={handleAdd} width="2rem" height="2rem" />
@@ -221,8 +220,7 @@
         class="tile"
         class:red
         class:white={!red && !tile.img}
-        class:href={$editing ? false : tile.uri}
-      >
+        class:href={$editing ? false : tile.uri}>
         {#if tile.img}
           <img src={parseImg(tile.img)} alt="" />
         {/if}

@@ -15,14 +15,14 @@ function newProductLabeling(selectedCompany, apiLabeling, index, labelingID) {
     labeling: labelingID,
     labeling_field_x: width,
     labeling_field_y: height,
-    labeling_place: label
+    labeling_place: label,
   };
   delete labeling.id;
   return labeling;
 }
 
 function findLabeling(company, code) {
-  const labeling = get(labelings).find(l => l.company === company && l.code === code);
+  const labeling = get(labelings).find((l) => l.company === company && l.code === code);
   if (labeling) return labeling;
   console.warn(`Labeling ${companyName}/${code} not found.`);
 }
@@ -70,7 +70,7 @@ export function createLabelings(selectedCompany, apiItem) {
 
     let index = 0;
     for (const apiCode of techniques) {
-      const mapping = mappings.find(m => m.code === apiCode);
+      const mapping = mappings.find((m) => m.code === apiCode);
       if (!mapping) {
         console.warn(`No mapping for "${apiCode}".`);
         continue;
@@ -96,7 +96,7 @@ export function createLabelings(selectedCompany, apiItem) {
         ({ company, code } = threshold);
       }
 
-      const companyName = get(companies).find(c => c.id === company)?.name;
+      const companyName = get(companies).find((c) => c.id === company)?.name;
 
       const labeling = findLabeling(company, code);
       if (!labeling) continue;

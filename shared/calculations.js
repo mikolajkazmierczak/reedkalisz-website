@@ -1,6 +1,6 @@
-import { cleanupPrices, getMinMaxPrices, repairPrices } from "./calculationsPrices";
-import { calculate as productFields } from "./fields/products";
-import { reuseIDs } from "./utils";
+import { cleanupPrices, getMinMaxPrices, repairPrices } from './calculationsPrices';
+import { calculate as productFields } from './fields/products';
+import { reuseIDs } from './utils';
 
 // TODO: this whole file should be a class Calculator
 
@@ -19,7 +19,7 @@ function sanitize(data) {
   // resursively replace falsy values with 0 in a nested object
   // e.g. { a: null, b: { c: null }, d: [{ e: null }], f: [] }
   //      { a: 0,    b: { c: 0    }, d: [{ e: 0    }], f: [] }
-  if (typeof data == "object" && data != null) {
+  if (typeof data == 'object' && data != null) {
     if (Array.isArray(data)) {
       for (let [i, val] of data.entries()) {
         data[i] = sanitize(val);
@@ -56,23 +56,14 @@ function formula(amount, product, labeling, full, prepress, extra, transport, tr
   // transportThreshold // number -- not sanitized because 0 means free transport
 
   const productPrice = amount * product.price;
-  const productPriceWithMargin = Math.max(
-    productPrice * fraction(product.margin),
-    productPrice + product.minimum,
-  );
+  const productPriceWithMargin = Math.max(productPrice * fraction(product.margin), productPrice + product.minimum);
 
   const range = matchLabelingPriceRange(amount, labeling.prices);
   const labelingPrice = (range.isLumpsum ? range.price : amount * range.price) + prepress;
-  const labelingPriceWithMargin = Math.max(
-    labelingPrice * fraction(labeling.margin),
-    labelingPrice + labeling.minimum,
-  );
+  const labelingPriceWithMargin = Math.max(labelingPrice * fraction(labeling.margin), labelingPrice + labeling.minimum);
 
   const price = productPriceWithMargin + labelingPriceWithMargin;
-  const singlePrice = Math.max(
-    price * fraction(full.margin),
-    price + full.minimum,
-  );
+  const singlePrice = Math.max(price * fraction(full.margin), price + full.minimum);
 
   const transportPrice = transportThreshold != null && productPrice > transportThreshold ? 0 : transport;
   const fullPrice = singlePrice + extra + transportPrice;
@@ -101,10 +92,7 @@ function updateCustomPrices(amounts, product, someLabelingsEnabled) {
     prices1: [...product.custom_prices],
     prices2: [...product.custom_prices_sale],
   };
-  [product.custom_prices, product.custom_prices_sale] = repairPrices(
-    product.custom_prices,
-    product.custom_prices_sale,
-  );
+  [product.custom_prices, product.custom_prices_sale] = repairPrices(product.custom_prices, product.custom_prices_sale);
   [product.custom_prices, product.custom_prices_sale] = cleanupPrices(
     amounts,
     product.custom_prices,
@@ -248,7 +236,7 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
     price_min_sale: minSale,
     price_max_sale: maxSale,
   };
-  await api.items("products").updateOne(product.id, updates);
+  await api.items('products').updateOne(product.id, updates);
 }
 
 /** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
@@ -266,11 +254,11 @@ export async function* recalculateProductsGenerator(
   // globals: { globalMargins, priceViews, labelings, companies }
   // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
 
-  console.log("Fetching files to recalculate... Filter: ", filter);
-  const products = (await api.items("products").readByQuery({ fields: productFields, filter, limit: -1 })).data;
+  console.log('Fetching files to recalculate... Filter: ', filter);
+  const products = (await api.items('products').readByQuery({ fields: productFields, filter, limit: -1 })).data;
 
   // recalculate all products in batches to avoid Directus rate limiting
-  console.log(products.length ? `Recalculating ${products.length} products...` : "Nothing to recalculate", filter);
+  console.log(products.length ? `Recalculating ${products.length} products...` : 'Nothing to recalculate', filter);
 
   const batchSize = 20;
   let queue = [];
@@ -302,12 +290,7 @@ export async function* recalculateProductsGenerator(
 }
 
 /** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
-export async function recalculateProducts(
-  api,
-  filter,
-  globals,
-  { newPriceView = null, swapLabelings = null } = {},
-) {
+export async function recalculateProducts(api, filter, globals, { newPriceView = null, swapLabelings = null } = {}) {
   const results = await Array.fromAsync(
     recalculateProductsGenerator(api, filter, globals, { newPriceView, swapLabelings }),
   );

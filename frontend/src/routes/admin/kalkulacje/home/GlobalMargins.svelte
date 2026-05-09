@@ -18,7 +18,7 @@
   let unsaved = false;
   let saving = false;
 
-  beforeNavigate(navigation => {
+  beforeNavigate((navigation) => {
     if (unsaved) {
       const prompt = `Zmiany w marżach nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
       if (confirm(prompt)) {
@@ -44,8 +44,8 @@
     await recalculateProducts({
       _and: [
         { _or: [{ global_full_margin: { _eq: true } }, { global_product_margin: { _eq: true } }] },
-        { 'count(labelings)': { _neq: 0 } }
-      ]
+        { 'count(labelings)': { _neq: 0 } },
+      ],
     });
 
     saving = false;

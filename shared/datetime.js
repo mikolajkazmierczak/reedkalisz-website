@@ -22,7 +22,7 @@ export function parseDatetime(datetime, seconds = false) {
 
 export function getISODate() {
   // returns date (now) in format: yyyy-mm-ddThh:mm:ss
-  const padZero = num => num.toString().padStart(2, '0');
+  const padZero = (num) => num.toString().padStart(2, '0');
   const datetime = new Date();
   const yyyy = datetime.getFullYear();
   const mm = padZero(datetime.getMonth() + 1);

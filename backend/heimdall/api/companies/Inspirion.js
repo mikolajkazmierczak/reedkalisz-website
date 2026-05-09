@@ -1,6 +1,6 @@
-import fetch from "node-fetch";
-import { getISODate } from "reedkalisz-shared/datetime.js";
-import { Api } from "../base.js";
+import fetch from 'node-fetch';
+import { getISODate } from 'reedkalisz-shared/datetime.js';
+import { Api } from '../base.js';
 
 function parse(products, pricelist, stock) {
   // pricelist = pricelist.price.map((p) => ({
@@ -75,11 +75,11 @@ function parse(products, pricelist, stock) {
 
 export class Inspirion extends Api {
   fetch = async ({ env: { token } }) => {
-    const baseUrl = "https://leoapi.inspirion.eu/api/v1/";
-    const options = { headers: { "X-Gateway-API-Key": token } };
+    const baseUrl = 'https://leoapi.inspirion.eu/api/v1/';
+    const options = { headers: { 'X-Gateway-API-Key': token } };
 
     const fetchUrl = async (endpoint, paramsObject = null) => {
-      const params = paramsObject ? "&" + new URLSearchParams(paramsObject) : "";
+      const params = paramsObject ? '&' + new URLSearchParams(paramsObject) : '';
       const url = `${baseUrl}${endpoint}?language=pl${params}`;
       const res = await fetch(url, options);
       return res.json();
@@ -89,7 +89,7 @@ export class Inspirion extends Api {
       let lastPage = Infinity; // true value determined after first request
       const items = [];
       for (let page = 1; page <= lastPage; page += 1) {
-        console.log(`   - fetching /${endpoint}: page ${page}/${lastPage === Infinity ? "?" : lastPage} (${limit})`);
+        console.log(`   - fetching /${endpoint}: page ${page}/${lastPage === Infinity ? '?' : lastPage} (${limit})`);
         const { data: chunk, last_page } = await fetchUrl(endpoint, { page, perPage: limit });
         if (lastPage === Infinity) lastPage = last_page;
         items.push(...chunk);
@@ -97,9 +97,9 @@ export class Inspirion extends Api {
       return items;
     };
 
-    const products = await fetchPaged("products");
-    const pricelist = await fetchPaged("pricelist");
-    const stock = await fetchUrl("stock");
+    const products = await fetchPaged('products');
+    const pricelist = await fetchPaged('pricelist');
+    const stock = await fetchUrl('stock');
     const items = parse(company, products, pricelist, stock);
     return { items, lastScan: getISODate() };
   };

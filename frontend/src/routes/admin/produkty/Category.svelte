@@ -33,8 +33,7 @@
       class:disabled={!enabled}
       class:active
       title="{depth} {name}"
-      on:click|stopPropagation={() => select(id)}
-    >
+      on:click|stopPropagation={() => select(id)}>
       <span class="depth">{depth}</span>
       <span class="name">{name}</span>
       {#if hasChildren}<div class="line" />{/if}
@@ -60,9 +59,8 @@
           {enabled}
           {children}
           depth="{depth}.{i + 1}"
-          on:select={e => select(e.detail)}
-          bind:selected
-        />
+          on:select={(e) => select(e.detail)}
+          bind:selected />
       {/each}
     </div>
   {/if}

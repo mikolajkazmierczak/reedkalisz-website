@@ -10,8 +10,8 @@ export default {
       '@c': path.resolve(__dirname, './src/lib/admin/common'),
       '#': path.resolve(__dirname, './src/lib/website'),
       '#c': path.resolve(__dirname, './src/lib/website/common'),
-      '%': 'reedkalisz-shared'
-    }
+      '%': 'reedkalisz-shared',
+    },
   },
-  plugins: [sveltekit()]
+  plugins: [sveltekit()],
 };

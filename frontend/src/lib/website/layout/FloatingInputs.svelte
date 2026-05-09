@@ -70,8 +70,7 @@
     class="floater"
     style:top={$position.y + 'px'}
     style:left={$position.x + 'px'}
-    transition:fly={{ duration: 100, y: -5 }}
-  >
+    transition:fly={{ duration: 100, y: -5 }}>
     <div class="bar">
       <button class="drag" style:cursor={dragging ? 'grabbing' : 'grab'} on:mousedown={dragStart}>
         <Icon name="re_order_dots_vertical" height="80%" color="var(--main-2)" />

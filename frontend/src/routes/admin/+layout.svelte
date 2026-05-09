@@ -17,7 +17,7 @@
   import Header from '@/Header.svelte';
   import Loader from '$c/Loader.svelte';
 
-  beforeNavigate(navigation => {
+  beforeNavigate((navigation) => {
     if ($unsaved) {
       if (confirm('Zmiany nie zostały zapisane. Czy na pewno chcesz opuścić stronę?')) {
         $unsaved = false;
@@ -30,8 +30,8 @@
     await readme();
     ready = true;
     // catch all errors
-    window.addEventListener('error', e => ($errors = [...$errors, e?.reason?.message]));
-    window.addEventListener('unhandledrejection', e => ($errors = [...$errors, e?.reason?.message]));
+    window.addEventListener('error', (e) => ($errors = [...$errors, e?.reason?.message]));
+    window.addEventListener('unhandledrejection', (e) => ($errors = [...$errors, e?.reason?.message]));
   });
 
   $: if ($me) globals.update('directus_users');

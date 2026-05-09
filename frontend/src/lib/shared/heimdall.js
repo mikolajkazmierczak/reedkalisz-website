@@ -30,7 +30,7 @@ class Socket {
       ids,
       user: get(me).id,
       selfBroadcast,
-      refresh
+      refresh,
     };
     this.socket.emit('changes', data);
   }
@@ -55,9 +55,9 @@ class Heimdall {
     this.socket.emitChanges(collection, ids, options);
   }
   listen(func, root = false) {
-    const listener = data => {
+    const listener = (data) => {
       const match = (collection, ids) => this.match(data, collection, ids);
-      const filter = ids => this.filter(data, ids);
+      const filter = (ids) => this.filter(data, ids);
       const isMe = get(me).id == data.user;
       func({ match, filter, me: isMe, data });
     };
@@ -85,7 +85,7 @@ class Heimdall {
   filter(data, ids = null) {
     // get ids from `data.ids` that are in `ids`
     if (ids && !Array.isArray(ids)) ids = [ids];
-    return ids ? data.ids.filter(id => ids.includes(id)) : [];
+    return ids ? data.ids.filter((id) => ids.includes(id)) : [];
   }
   match(data, collection, ids = null) {
     // check if:

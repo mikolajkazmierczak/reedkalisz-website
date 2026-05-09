@@ -24,7 +24,7 @@
   let item;
   let itemOriginal;
 
-  $: hasChildren = $categories?.find(category => category.parent == item?.id);
+  $: hasChildren = $categories?.find((category) => category.parent == item?.id);
 
   let deletingOpen = false;
   let deleting = false; // prevent double click
@@ -59,14 +59,14 @@
     const filter = { categories: { category: { _eq: item.id } } };
     const fields = ['id', 'categories.id', 'categories.category'];
     const products = (await api.items('products').readByQuery({ fields, filter, limit: -1 })).data;
-    const productsIds = products.map(p => p.id);
-    const categoriesIds = products.map(p => p.categories.map(c => c.category)).flat();
+    const productsIds = products.map((p) => p.id);
+    const categoriesIds = products.map((p) => p.categories.map((c) => c.category)).flat();
 
     // remove category (and it's occurrences in products)
     const confirmed = await editing.remove('categories', item.id, {
       root: '/admin/kategorie',
       parent: item.parent,
-      index: item.index
+      index: item.index,
     });
 
     if (confirmed && productsIds) {
@@ -91,7 +91,7 @@
     item.slug = slugify(item?.name, {
       key: true,
       partsOriginal: itemOriginal?.name,
-      slugOriginal: itemOriginal?.slug
+      slugOriginal: itemOriginal?.slug,
     });
   $: correctSlug = item && !['+', ''].includes(item.slug);
 
@@ -115,11 +115,10 @@
     options={[
       { id: null, text: 'Brak zamiennika' },
       ...treeFlatten(makeTree($categories)).map(({ id, name, _meta }) => {
-        const path = _meta.path.map(p => p + 1).join('.');
+        const path = _meta.path.map((p) => p + 1).join('.');
         return { id, text: `${path} ${name}` };
-      })
-    ]}
-  >
+      }),
+    ]}>
     Możesz wybrać zamiennik
   </Input>
   <div class="ui-pair popup-actions">
@@ -136,8 +135,7 @@
   title={item?.name}
   collection="categories"
   bind:item
-  bind:itemOriginal
->
+  bind:itemOriginal>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
@@ -214,8 +212,7 @@
                 type="textarea"
                 bind:value={item.description}
                 rows={15}
-                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..."
-              />
+                placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..." />
             </div>
             <div class="ui-texteditor__render">
               {#if item.description}

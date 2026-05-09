@@ -13,7 +13,7 @@ export const defaults = () => ({
   name: '',
   description: '',
   content: '',
-  data: null
+  data: null,
 });
 
 export default { search, show, read, edit, defaults };

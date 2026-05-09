@@ -7,7 +7,7 @@
 
   const columnCount = 4; // arbitrary
   $: tiles = element.tiles;
-  $: rowCount = tiles.length ? Math.max(...tiles.map(t => t.row - 1 + t.height)) : $editing ? 1 : 0;
+  $: rowCount = tiles.length ? Math.max(...tiles.map((t) => t.row - 1 + t.height)) : $editing ? 1 : 0;
   $: matrix = getOccupancyMatrix(tiles, columnCount, rowCount); // track which cells are occupied (0 or tile)
   $: matrixTiles = parseMatrix(matrix);
 
@@ -34,7 +34,7 @@
         if (cell) {
           const sameSize = (t, c) => t.width === c.width && t.height === c.height;
           const samePosition = (t, c) => t.row === c.row && t.column === c.column;
-          const isDuplicate = tiles.some(tile => sameSize(tile, cell) && samePosition(tile, cell));
+          const isDuplicate = tiles.some((tile) => sameSize(tile, cell) && samePosition(tile, cell));
           if (!isDuplicate) tiles.push(cell);
         } else {
           tiles.push(create.tile({ _empty: true, row: i + 1, column: j + 1, width: 1, height: 1 }));
@@ -45,11 +45,11 @@
   }
 
   function handleDelete(id) {
-    element.tiles = element.tiles.filter(t => t._id !== id);
+    element.tiles = element.tiles.filter((t) => t._id !== id);
   }
 
   function handleAdd(id) {
-    const tile = matrixTiles.find(t => t._id === id);
+    const tile = matrixTiles.find((t) => t._id === id);
     element.tiles = [...element.tiles, { ...tile, _empty: false }];
   }
 </script>
@@ -57,8 +57,7 @@
 <div
   class="tiles"
   style:grid-template-rows="repeat({rowCount}, 1fr)"
-  style:aspect-ratio={`${columnCount} / ${rowCount}`}
->
+  style:aspect-ratio={`${columnCount} / ${rowCount}`}>
   {#each matrixTiles as tile}
     {@const { _id: id } = tile}
     <Tile {matrix} bind:element bind:tile on:delete={() => handleDelete(id)} on:add={() => handleAdd(id)} />

@@ -4,11 +4,11 @@ function queryItems(items, query = null) {
   // query items name, code, storage color names and storage color code
   if (!query) return items;
   query = decodeURIComponent(query).toLowerCase(); // decode query
-  return items.filter(item => {
+  return items.filter((item) => {
     // constructs a long string of item data to search in, not pretty but functional
-    const str = value => (value ? String(value) : '');
+    const str = (value) => (value ? String(value) : '');
     const storageString = item.storage
-      .map(s => str(s.color_first) + str(s.color_second) + str(s.api_color_code ?? '???'))
+      .map((s) => str(s.color_first) + str(s.color_second) + str(s.api_color_code ?? '???'))
       .join('');
     const itemString = str(item.name) + str(item.code ?? '???') + storageString;
     return itemString.toLowerCase().includes(query);
@@ -36,7 +36,7 @@ function sortItems(items, sort) {
 
   if (sort.notInApiFirst) {
     // bubble items that are not in the api, or that have storage that is not in the api
-    const removed = item => !item._api || item.storage.some(s => !s._api);
+    const removed = (item) => !item._api || item.storage.some((s) => !s._api);
     items.sort((a, b) => {
       if (removed(a) && !removed(b)) return -1;
       if (!removed(a) && removed(b)) return 1;
@@ -52,12 +52,12 @@ function mergeStorages(dbStorage, apiStorage) {
 
   // check if storages are still in the api
   for (const db of dbStorage) {
-    const api = apiStorage.find(s => s.api_color_code == db.api_color_code);
+    const api = apiStorage.find((s) => s.api_color_code == db.api_color_code);
     storages.push({ ...db, _db: true, _api: !!api });
   }
 
   // add storages that are only in the api
-  const dbCodes = dbStorage.map(s => s.api_color_code);
+  const dbCodes = dbStorage.map((s) => s.api_color_code);
   for (const api of apiStorage) {
     if (dbCodes.includes(api.api_color_code)) continue; // skip storages already in db
     storages.push({ ...api, _db: false, _api: true });
@@ -73,16 +73,16 @@ export function merge(company, dbItems, apiItems, { sort, query = null }) {
   // check if items are still in the api
   // and add storages that are only in the api
   for (const db of dbItems) {
-    const api = apiItems.find(i => i.code === db.code);
+    const api = apiItems.find((i) => i.code === db.code);
     const storage = mergeStorages(db.storage, api?.storage ?? []);
     mergedItems.push({ ...db, _db: true, _api: !!api, storage });
   }
 
   // add items that are only in the api (and their storages)
-  const dbCodes = dbItems.map(i => i.code);
+  const dbCodes = dbItems.map((i) => i.code);
   for (const api of apiItems) {
     if (dbCodes.includes(api.code)) continue; // skip items already in db
-    const storage = api.storage.map(s => ({ ...s, _db: false, _api: true }));
+    const storage = api.storage.map((s) => ({ ...s, _db: false, _api: true }));
     mergedItems.push({ ...api, _db: false, _api: true, storage });
   }
 
@@ -95,7 +95,7 @@ export function merge(company, dbItems, apiItems, { sort, query = null }) {
     storage: item.storage.map((s, j) => ({
       ...s,
       _uid: getUid(company.name, item, s),
-      _index: j
-    }))
+      _index: j,
+    })),
   }));
 }

@@ -16,7 +16,7 @@
 
   export let order = false;
 
-  $: tree = items.some(item => item.children); // has children
+  $: tree = items.some((item) => item.children); // has children
   $: itemsFlat = tree ? treeFlatten(items) : items;
   $: maxDepth = tree ? itemsFlat.reduce((max, item) => Math.max(max, item._meta.path.length), 0) - 1 : 0;
   let expandedItems = []; // ids
@@ -41,8 +41,7 @@
           {maxDepth}
           {widths}
           bind:expandedItems
-          bind:dropzone
-        />
+          bind:dropzone />
       {/each}
     {:else}
       <div class="empty">Brak elementów o podanych parametrach</div>

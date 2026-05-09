@@ -1,8 +1,8 @@
 <script>
-  import Icon from "$c/Icon.svelte";
-  import Button from "@c/Button.svelte";
-  import Input from "@c/Input.svelte";
-  import { fly } from "svelte/transition";
+  import Icon from '$c/Icon.svelte';
+  import Button from '@c/Button.svelte';
+  import Input from '@c/Input.svelte';
+  import { fly } from 'svelte/transition';
 
   export let searchParams = null;
   export let query;
@@ -25,7 +25,7 @@
 <svelte:window
   on:keydown={(e) => {
     // check if ctrl+f is pressed
-    if (e.ctrlKey && e.key == "q") {
+    if (e.ctrlKey && e.key == 'q') {
       e.preventDefault();
       e.stopPropagation();
       // focus on input
@@ -33,8 +33,7 @@
       // select all text
       input.select();
     }
-  }}
-/>
+  }} />
 
 <div class="wrapper">
   {#if !!query}
@@ -46,16 +45,14 @@
   <div
     class="search"
     on:keypress={(e) => {
-      if (e.key === "Enter") search();
-    }}
-  >
+      if (e.key === 'Enter') search();
+    }}>
     <div class="input-wrapper">
       <Input
         bind:value
         bind:input
         placeholder="Szukaj..."
-        borderRadius="var(--border-radius) 0 0 var(--border-radius)"
-      />
+        borderRadius="var(--border-radius) 0 0 var(--border-radius)" />
       {#if !value}
         <div class="shortcut-info" in:fly={{ x: 50, duration: 500 }}>Ctrl+Q</div>
       {/if}

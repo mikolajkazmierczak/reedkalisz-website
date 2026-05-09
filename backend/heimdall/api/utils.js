@@ -1,5 +1,5 @@
-import { getISODate } from "reedkalisz-shared/datetime.js";
-import convert from "xml-js";
+import { getISODate } from 'reedkalisz-shared/datetime.js';
+import convert from 'xml-js';
 
 function camelCase(str) {
   // Transforms a string (snake_case, SNAKE_CASE, kebab-case, PascalCase, camelCase) to camelCase.
@@ -19,20 +19,20 @@ export function arraysToJson(arrays) {
     header.reduce((acc, key, i) => {
       acc[camelCase(key)] = row[i];
       return acc;
-    }, {})
+    }, {}),
   );
 }
 
 function replaceTextKeyObjects(obj) {
   // Recursively find all objects with "_text" key and replace them with the value of that key.
   // Other keys of the node with "_text" key will be discarded.
-  if (typeof obj !== "object" || obj === null) {
+  if (typeof obj !== 'object' || obj === null) {
     return obj;
   }
-  if (obj.hasOwnProperty("_text")) {
+  if (obj.hasOwnProperty('_text')) {
     return obj._text;
   }
-  if (obj.hasOwnProperty("_cdata")) {
+  if (obj.hasOwnProperty('_cdata')) {
     return obj._cdata;
   }
   for (const key in obj) {
@@ -45,7 +45,7 @@ function replaceTextKeyObjects(obj) {
 
 function transformKeysToCamelCase(obj) {
   // Recursively transform all keys of an object to camelCase.
-  if (typeof obj !== "object" || obj === null) {
+  if (typeof obj !== 'object' || obj === null) {
     return obj;
   }
   const newObj = Array.isArray(obj) ? [] : {};
@@ -74,7 +74,7 @@ export function parseSearchParams(params) {
   for (const [key, value] of Object.entries(params)) {
     searchParams.set(key, value);
   }
-  return "?" + searchParams.toString();
+  return '?' + searchParams.toString();
 }
 
 export function parseFormData(data) {
@@ -90,7 +90,7 @@ export function parseFormData(data) {
 export async function fetchSimpleApi({ company, routes, url, parse }) {
   const responses = await Promise.all(routes.map((route) => fetch(url(route))));
 
-  const isXml = url("test").includes("xml"); // a bit crude, but does the job
+  const isXml = url('test').includes('xml'); // a bit crude, but does the job
   const data = await Promise.all(responses.map((res) => (isXml ? res.text() : res.json())));
 
   const items = parse(company, ...data);

@@ -21,13 +21,13 @@
               item.data = item.data.map((data, j) => ({
                 _uid: uid(10),
                 _index: j,
-                ...data
+                ...data,
               }));
             }
             return {
               _uid: uid(10),
               _index: i,
-              ...item
+              ...item,
             };
           })
         : null;
@@ -55,8 +55,8 @@
         _index: mappings.length,
         code: '',
         type: 'direct', // default type
-        data: { company: 4, code: '' } // REED
-      }
+        data: { company: 4, code: '' }, // REED
+      },
     ];
   }
 </script>

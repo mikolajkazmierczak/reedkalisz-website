@@ -67,8 +67,8 @@ The project was developed using agile methodology, with iterative feedback from 
 
 Technologically, the project leverages Directus (a Backend-as-a-Service solution) for database and API management, ensuring scalability and ease of maintenance. The frontend is built using SvelteKit, chosen for its performance and developer-friendly approach. WebSockets were also introduced (via a custom server aptly named "Heimdall") to enable real-time updates for the admin panel.
 
-| Architecture Diagram                                                                | Use Case Diagram                                                                 |
-| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Architecture Diagram                                                                                                                                   | Use Case Diagram                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | <img src="https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/architektura.png" alt="architektura" style="width: 390px;" /> | <img src="https://github.com/mikolajkazmierczak/engineering-thesis/blob/main/screenshots/usecase.jpg" alt="usecase diagram" style="width: 420px;" > |
 
 ### Feedback and Results
@@ -86,7 +86,7 @@ The admin panel is using a REST API that runs as a node server. Powered by [Dire
 
 #### <small>`/backend/directus`</small> — Directus turns an SQL database into a REST API.
 
-`npm run start` 
+`npm run start`
 
 #### <small>`/backend/heimdall`</small> — Heimdall is a custom socket server and external API middleman.
 
@@ -94,7 +94,7 @@ The admin panel is using a REST API that runs as a node server. Powered by [Dire
 
 #### <small>`/frontend`</small> — SvelteKit is a highly performant and developer friendly frontend framework.
 
-`npm run dev` 
+`npm run dev`
 
 <br/>
 

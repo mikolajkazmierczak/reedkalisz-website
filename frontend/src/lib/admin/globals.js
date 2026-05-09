@@ -28,18 +28,18 @@ const collections = [
   { collection: 'categories', store: categories },
   { collection: 'colors', store: colors },
   { collection: 'menus', store: menus },
-  { collection: 'menu_items', store: menuItems }
+  { collection: 'menu_items', store: menuItems },
 ];
 
 async function updateItemsWithIDs(store, collection, ids, sortingKey, fields) {
   // only update specified ids
   const updated = (await api.items(collection).readMany(ids, { fields })).data;
-  const deletedIDs = ids.filter(id => !updated.find(item => item.id == id));
-  store.update(items => {
+  const deletedIDs = ids.filter((id) => !updated.find((item) => item.id == id));
+  store.update((items) => {
     let needsSorting = false;
     // update existing items and add new ones
     for (const u of updated) {
-      const index = items.findIndex(i => i.id == u.id);
+      const index = items.findIndex((i) => i.id == u.id);
       if (index != -1) {
         items[index] = u;
       } else {
@@ -49,7 +49,7 @@ async function updateItemsWithIDs(store, collection, ids, sortingKey, fields) {
     }
     // filter items that were deleted
     const itemsLength = items.length;
-    items = items.filter(i => !deletedIDs.includes(i.id));
+    items = items.filter((i) => !deletedIDs.includes(i.id));
     if (items.length != itemsLength) needsSorting = true;
     // sort by the given key
     if (needsSorting) items.sort((a, b) => a[sortingKey] - b[sortingKey]);
@@ -65,8 +65,8 @@ async function updateAllItems(store, collection, fields) {
 
 class Globals {
   constructor() {
-    this.collections = collections.map(c => c.collection);
-    this.stores = collections.map(c => c.store);
+    this.collections = collections.map((c) => c.collection);
+    this.stores = collections.map((c) => c.store);
     // this.queue = []; // TODO: queue of the updates requested, to avoid unnecessary multiple updates
   }
 
@@ -77,7 +77,7 @@ class Globals {
     // `refresh`: update all items if POPULATED already
     // `sortingKey`: key to sort the items by after updating (when needed)
 
-    const store = typeof global === 'string' ? collections.find(c => c.collection === global).store : global;
+    const store = typeof global === 'string' ? collections.find((c) => c.collection === global).store : global;
 
     const isPopulated = get(store) != null;
     const shouldRead = !isPopulated && !ids && !refresh; // not populated AND neither ids nor refresh given
@@ -85,7 +85,7 @@ class Globals {
     // console.log('$globals update:', global, { ids, refresh, sortingKey }, shouldRead, shouldUpdate);
     if (!(shouldRead || shouldUpdate)) return;
 
-    const { collection, singleton } = collections.find(c => c.store === store);
+    const { collection, singleton } = collections.find((c) => c.store === store);
 
     // console.log('$globals read:', collection, singleton);
     if (singleton) {

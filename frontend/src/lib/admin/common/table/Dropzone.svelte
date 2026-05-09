@@ -91,10 +91,9 @@
         class="slot"
         class:hover={hoverParent}
         style:width={parentWidth + 'rem'}
-        on:drop={e => drop(e, 'P')}
-        on:dragover={e => dragover(e, 'P')}
-        on:dragleave={dragleave}
-      >
+        on:drop={(e) => drop(e, 'P')}
+        on:dragover={(e) => dragover(e, 'P')}
+        on:dragleave={dragleave}>
         <div class="icon"><Icon fill name="arrow_left" color={'var(--primary)'} /></div>
       </div>
     {/if}
@@ -104,10 +103,9 @@
         class="slot"
         class:hover={hoverSibling}
         style:width={siblingWidth + 'rem'}
-        on:drop={e => drop(e, 'S')}
-        on:dragover={e => dragover(e, 'S')}
-        on:dragleave={dragleave}
-      />
+        on:drop={(e) => drop(e, 'S')}
+        on:dragover={(e) => dragover(e, 'S')}
+        on:dragleave={dragleave} />
     {:else}
       <div class="blank" style:width={siblingWidth + 'rem'} />
     {/if}
@@ -117,10 +115,9 @@
         class="slot"
         class:hover={hoverChild}
         style:width={childWidth + 'rem'}
-        on:drop={e => drop(e, 'C')}
-        on:dragover={e => dragover(e, 'C')}
-        on:dragleave={dragleave}
-      >
+        on:drop={(e) => drop(e, 'C')}
+        on:dragover={(e) => dragover(e, 'C')}
+        on:dragleave={dragleave}>
         <div class="icon"><Icon fill name="arrow_right" color={'var(--primary)'} /></div>
       </div>
     {/if}

@@ -93,8 +93,7 @@
         <img
           src="{baseUrl}/assets/{file.id}#{modified_on ? modified_on : uploaded_on}"
           alt=""
-          on:error={() => (imgError = true)}
-        />
+          on:error={() => (imgError = true)} />
         {#if imgError}
           <div class="error">Nie można wyświetlić obrazka</div>
         {/if}

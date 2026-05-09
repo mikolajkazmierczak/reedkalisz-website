@@ -12,8 +12,7 @@
   <title>Gadżety reklamowe | REED Kalisz</title>
   <meta
     name="description"
-    content="Firma Reed przedstawia gadżety dla firm, takie jak długopisy reklamowe, kalendarze czy kubki. Oferujemy również cyfrowy druk niskonakładowy i grawerowanie laserowe."
-  />
+    content="Firma Reed przedstawia gadżety dla firm, takie jak długopisy reklamowe, kalendarze czy kubki. Oferujemy również cyfrowy druk niskonakładowy i grawerowanie laserowe." />
 </svelte:head>
 
 <div class="wrapper">

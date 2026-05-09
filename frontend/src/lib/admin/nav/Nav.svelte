@@ -18,18 +18,18 @@
       { href: '/kolory', icon: 'colors', name: 'Kolory' },
       { href: '/kategorie', icon: 'categories', name: 'Kategorie' },
       { href: '/informacje-handlowe', icon: 'commercial_details', name: 'Informacje handlowe' },
-      { href: '/kalkulacje', icon: 'calculator', name: 'Kalkulacje' }
+      { href: '/kalkulacje', icon: 'calculator', name: 'Kalkulacje' },
     ],
     [
       { href: '/menu', icon: 'menu', name: 'Menu' },
       { href: '/strony', icon: 'pages', name: 'Strony' },
-      { href: '/fragmenty', icon: 'fragments', name: 'Fragmenty' }
+      { href: '/fragmenty', icon: 'fragments', name: 'Fragmenty' },
     ],
     [
       { href: '/biblioteka', icon: 'library', name: 'Biblioteka' },
       { href: '/zapytania', icon: 'questions', name: 'Zapytania' },
-      { href: '/api', icon: 'api', name: 'API' }
-    ]
+      { href: '/api', icon: 'api', name: 'API' },
+    ],
   ];
 
   $: path = $page.url.pathname.replace('/admin', '/').replace('//', '/');

@@ -27,5 +27,5 @@ export default {
   menus,
   menu_items,
   fragments,
-  questions
+  questions,
 };

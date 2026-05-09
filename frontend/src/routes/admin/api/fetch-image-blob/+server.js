@@ -15,8 +15,8 @@ export const GET = async ({ url }) => {
       method: 'GET',
       headers: {
         Accept: '*/*', // for some reason, the api works with this and not 'Content-Type'
-        'User-Agent': fakeBrowserAgent
-      }
+        'User-Agent': fakeBrowserAgent,
+      },
     });
 
     if (!res.ok) throw error(res.status, `failed to fetch image blob: ${res.statusText}`);

@@ -51,9 +51,9 @@
         { label: 'Email' },
         { label: 'Telefon' },
         { blame: true, label: 'Utworzenie' },
-        { blame: true, label: 'Aktualizacja' }
+        { blame: true, label: 'Aktualizacja' },
       ]}
-      mapper={$ => ({
+      mapper={($) => ({
         href: `/admin/zapytania/${$.id}`,
         values: [
           $.from_contact,
@@ -65,13 +65,12 @@
           $.email,
           $.phone ?? '',
           { user: $.user_created, datetime: $.date_created },
-          { user: $.user_updated, datetime: $.date_updated }
-        ]
+          { user: $.user_updated, datetime: $.date_updated },
+        ],
       })}
       {searchParams}
       {limit}
-      {page}
-    />
+      {page} />
   </div>
 {/if}
 <slot />

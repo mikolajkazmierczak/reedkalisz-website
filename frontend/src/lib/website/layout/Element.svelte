@@ -13,8 +13,8 @@
   export let type;
 
   $: type = element.type;
-  $: label = types.find(l => l.type === type).label;
-  $: icon = types.find(l => l.type === type).icon;
+  $: label = types.find((l) => l.type === type).label;
+  $: icon = types.find((l) => l.type === type).icon;
 
   $: greyscale = !!element.hide;
 

@@ -40,8 +40,7 @@
   on:click={handleClick}
   on:mouseenter={() => (hover = true)}
   on:mouseleave={() => (hover = false)}
-  style:font-size={fontSize}
->
+  style:font-size={fontSize}>
   {#if arrow && arrowLeft}
     <div class="icon-wrapper" class:arrowLeft>
       <Icon name="arrow_left" color={hover ? 'var(--white)' : 'var(--main)'} height={arrowHeight} />

@@ -41,7 +41,7 @@
       library: 'images',
       api: 'bolt-alt',
       notifications: 'bell',
-      logout: 'signout'
+      logout: 'signout',
     },
     google: { TBD: 'TBD' },
     microsoft: {
@@ -85,8 +85,8 @@
       library: 'library',
       api: 'bot',
       notifications: 'alert',
-      logout: 'sign_out'
-    }
+      logout: 'sign_out',
+    },
   };
 
   export let name;
@@ -95,7 +95,7 @@
 
   const colors = {
     dark: '#000',
-    light: 'var(--light)'
+    light: 'var(--light)',
   };
   const defaultColor = colors.dark;
 
@@ -126,8 +126,7 @@
     stroke-width={strokeWidth}
     stroke={chosenColor}
     fill={chosenColor}
-    style="width:{getSize(width, height)}; height:{getSize(height, width)}; {style}"
-  >
+    style="width:{getSize(width, height)}; height:{getSize(height, width)}; {style}">
     <use href="/icons/{source}/{icon}.svg#svg" />
   </svg>
 {/if}

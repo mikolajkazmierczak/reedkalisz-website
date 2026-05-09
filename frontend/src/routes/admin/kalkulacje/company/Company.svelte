@@ -1,7 +1,7 @@
 <script>
-  import { deep, uid } from "%/utils";
-  import { globalMargins, globals, labelings, priceViews } from "@/globals";
-  import Labelings from "./Labelings.svelte";
+  import { deep, uid } from '%/utils';
+  import { globalMargins, globals, labelings, priceViews } from '@/globals';
+  import Labelings from './Labelings.svelte';
 
   export let unsaved;
   export let company;

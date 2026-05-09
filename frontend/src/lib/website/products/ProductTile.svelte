@@ -30,7 +30,7 @@
     custom_prices_sale,
     labelings,
     storage,
-    gallery
+    gallery,
   } = product);
 
   function getPriceType(price, custom_prices, custom_prices_sale, labelings) {
@@ -99,8 +99,7 @@
   class:bestseller
   class:coming_soon
   class:out_of_stock
-  in:fly={{ y: -20, duration: 100 }}
->
+  in:fly={{ y: -20, duration: 100 }}>
   <AdminOnlyOverlay show={!enabled} />
 
   <div class="img-wrapper">
@@ -132,8 +131,7 @@
               {second}
               {amount}
               notooltip
-              onhoverchange={hover => handleHoverChange(hover, i)}
-            />
+              onhoverchange={(hover) => handleHoverChange(hover, i)} />
           {/each}
         </div>
       {/if}

@@ -1,7 +1,7 @@
-import fetch from "node-fetch";
-import { getISODate } from "reedkalisz-shared/datetime.js";
-import { slugify } from "reedkalisz-shared/utils.js";
-import { Api } from "../base.js";
+import fetch from 'node-fetch';
+import { getISODate } from 'reedkalisz-shared/datetime.js';
+import { slugify } from 'reedkalisz-shared/utils.js';
+import { Api } from '../base.js';
 
 function parseStorage(item, colorCode) {
   const { imgs, amount, id, colors } = item;
@@ -17,8 +17,8 @@ function parseStorage(item, colorCode) {
 }
 
 function parseMain(item, code, colorCode) {
-  const name = item.name.split(",")[0].trim();
-  const sizes = item.size.split("x").map(Number);
+  const name = item.name.split(',')[0].trim();
+  const sizes = item.size.split('x').map(Number);
   const { desc, materials, price } = item;
   return {
     // only define fields that are both:
@@ -42,9 +42,9 @@ function parseMain(item, code, colorCode) {
 
 function parseCode(code) {
   // formats: 'XXXXXX', 'XXXXXX.XX', 'XXXXXX.XX.XX', ...?
-  const [productCode, ...tail] = code.split(".");
+  const [productCode, ...tail] = code.split('.');
   // TODO: for now colorCode includes the code for quality (e.g. '00.QII' for transparent color, second hand quality)
-  const colorCode = tail.join("."); // colorCode: '', 'XX', 'XX.XX'
+  const colorCode = tail.join('.'); // colorCode: '', 'XX', 'XX.XX'
   return { productCode, colorCode };
 }
 
@@ -83,11 +83,11 @@ function parse(products, stocks) {
 
 export class PAR extends Api {
   fetch = async ({ env: { username, password } }) => {
-    const auth = "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
+    const auth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
     const options = { headers: { Authorization: auth } };
     const [resProducts, resStocks] = await Promise.all([
-      fetch("https://www.par.com.pl/api/products.json", options),
-      fetch("https://www.par.com.pl/api/stocks.json", options),
+      fetch('https://www.par.com.pl/api/products.json', options),
+      fetch('https://www.par.com.pl/api/stocks.json', options),
     ]);
     const products = await resProducts.json();
     const stocks = await resStocks.json();

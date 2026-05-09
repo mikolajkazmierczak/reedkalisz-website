@@ -18,14 +18,14 @@
     return query ? `&q=${query}` : '';
   };
 
-  const setLimit = l => {
+  const setLimit = (l) => {
     if (noSearchParams) {
       limit = l;
     } else {
       browser && goto(`?l=${l}&p=1${q()}`);
     }
   };
-  const setPage = p => {
+  const setPage = (p) => {
     if (noSearchParams) {
       page = p;
     } else {
@@ -35,7 +35,7 @@
 
   const limits = [25, 50, 100];
 
-  $: selectedLimit = limits.findIndex(l => l === limit);
+  $: selectedLimit = limits.findIndex((l) => l === limit);
   $: limitValue = limitLocked ? limit : limits[selectedLimit === -1 ? 0 : selectedLimit];
   $: limitValue !== limit && setLimit(limitValue); // only set if different from the given from above
 

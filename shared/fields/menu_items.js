@@ -20,7 +20,7 @@ export const search = [
   'category.id',
   'category.slug',
   'category.name',
-  'img'
+  'img',
 ];
 export const show = [...search];
 
@@ -43,7 +43,7 @@ export const defaults = () => ({
   page: null,
   product: null,
   category: null,
-  img: null
+  img: null,
 });
 
 export default { search, show, read, edit, defaults };

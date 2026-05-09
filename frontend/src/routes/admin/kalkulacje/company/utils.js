@@ -1,10 +1,10 @@
-import api from "$/api";
-import { defaults, read as fields } from "%/fields/labelings";
-import { deep, diffSync, uid } from "%/utils";
-import { recalculateProducts } from "@/calculations";
-import { globals } from "@/globals";
+import api from '$/api';
+import { defaults, read as fields } from '%/fields/labelings';
+import { deep, diffSync, uid } from '%/utils';
+import { recalculateProducts } from '@/calculations';
+import { globals } from '@/globals';
 
-const fieldsToIgnore = ["user_created", "date_created", "user_updated", "date_updated"];
+const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
 function getAmounts(items) {
   // based on the first item
@@ -77,7 +77,8 @@ function tryRemoveDuplicateAmounts(items) {
     }
   }
   if (duplicates.length) {
-    const prompt = `Wykryto powtarzające się nakłady: "${duplicates.join(", ")}". ` +
+    const prompt =
+      `Wykryto powtarzające się nakłady: "${duplicates.join(', ')}". ` +
       `Jeśli kontynuujesz zostaną zachowane tylko pierwsze wystąpienia.`;
     if (!confirm(prompt)) return false;
     for (const item of items) {
@@ -94,7 +95,7 @@ export function tryCleanItems(items) {
 async function saveItem(item, itemsOriginal) {
   if (item._new) {
     // CREATE
-    const created = await api.items("labelings").createOne(item, { fields });
+    const created = await api.items('labelings').createOne(item, { fields });
     return { labelings: [created.id], products: [] };
   } else if (item._remove) {
     // DELETE
@@ -103,25 +104,26 @@ async function saveItem(item, itemsOriginal) {
     const swapLabelings = new Map([[item.id, item._swap]]); // will delete the labeling if swapID is null
     const { ids } = await recalculateProducts(filter, { swapLabelings, emit: false });
 
-    await api.items("labelings").deleteOne(item.id);
+    await api.items('labelings').deleteOne(item.id);
 
     return { labelings: [item.id], products: ids };
   } else {
     // UPDATE
-    const updated = await api.items("labelings").updateOne(item.id, item, { fields });
+    const updated = await api.items('labelings').updateOne(item.id, item, { fields });
 
     // global needs to be updated for recalculations
-    await globals.update("labelings", { ids: [updated.id] });
+    await globals.update('labelings', { ids: [updated.id] });
 
     // check if the item should be recalculated
     const original = itemsOriginal.find((o) => o.id === item.id);
     // prices
     const oldPricesSorted = original.prices.filter((p) => p.price).sort((a, b) => a.amount - b.amount);
     const newPricesSorted = item.prices.filter((p) => p.price).sort((a, b) => a.amount - b.amount);
-    const pricesChanged = oldPricesSorted.length !== newPricesSorted.length ||
+    const pricesChanged =
+      oldPricesSorted.length !== newPricesSorted.length ||
       oldPricesSorted.some((p, i) => p.amount !== newPricesSorted[i].amount || p.price !== newPricesSorted[i].price);
     // other fields
-    const calculationFields = ["prepress", "transport", "transport_threshold", "margin", "minimum"];
+    const calculationFields = ['prepress', 'transport', 'transport_threshold', 'margin', 'minimum'];
     const calculationFieldsChanged = calculationFields.some((field) => item[field] !== original[field]);
     // if prices or calculation fields changed, recalculate products
     if (pricesChanged || calculationFieldsChanged) {

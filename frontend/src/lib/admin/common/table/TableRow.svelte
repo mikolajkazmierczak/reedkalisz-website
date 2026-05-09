@@ -31,7 +31,7 @@
   }
   function tryCollapse(item) {
     const collapsed = !expandedItems.includes(item.id);
-    if (!collapsed) expandedItems = expandedItems.filter(id => id !== item.id);
+    if (!collapsed) expandedItems = expandedItems.filter((id) => id !== item.id);
     return collapsed;
   }
   function toggle(item) {
@@ -104,8 +104,7 @@
         on:click={() => {
           goto(row.hrefNew);
           expand(item);
-        }}
-      >
+        }}>
         <div><div class="icon"><div><Icon fill name="add" dark /></div></div></div>
       </div>
     {/if}
@@ -119,8 +118,7 @@
           class:border-left={meta.depth != 0}
           draggable={order}
           on:dragstart={dragstart}
-          on:dragend={dragend}
-        >
+          on:dragend={dragend}>
           {#if expandable}
             <div class="icon"><div><Icon fill name={expanded ? 'chevron_down' : 'chevron_right'} dark /></div></div>
           {:else}
@@ -141,7 +139,7 @@
         on:click={() => {
           if (row.href) goto(row.href, { noScroll: true });
         }}
-        on:mouseenter={e => {
+        on:mouseenter={(e) => {
           const table = e.target.parentNode.parentNode;
           const tableRect = table.getBoundingClientRect();
           const content = e.target.children[0];
@@ -152,12 +150,11 @@
             content.style.right = '0';
           }
         }}
-        on:mouseleave={e => {
+        on:mouseleave={(e) => {
           const content = e.target.children[0];
           content.style.left = '0';
           content.style.right = 'auto';
-        }}
-      >
+        }}>
         <div>
           {#if checkbox}
             {#if value}
@@ -187,8 +184,7 @@
     {tryCollapse}
     bind:dropzone
     bind:dragging
-    id={headRow ? -1 : item.id}
-  />
+    id={headRow ? -1 : item.id} />
 {/if}
 
 {#if !headRow && tree && expanded}
@@ -204,8 +200,7 @@
       {maxDepth}
       {widths}
       bind:expandedItems
-      bind:dropzone
-    />
+      bind:dropzone />
   {/each}
 {/if}
 

@@ -51,8 +51,7 @@
   title={item?.name + (item?.name && item?.email ? ' | ' : '') + item?.email}
   collection="questions"
   bind:item
-  bind:itemOriginal
->
+  bind:itemOriginal>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">

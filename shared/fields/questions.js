@@ -11,7 +11,7 @@ export const search = [
   'phone',
   'email',
   'content',
-  'file'
+  'file',
 ];
 export const show = [...search];
 
@@ -30,7 +30,7 @@ export const defaults = () => ({
   phone: '',
   email: '',
   content: '',
-  file: null
+  file: null,
 });
 
 export default { search, show, read, edit, defaults };

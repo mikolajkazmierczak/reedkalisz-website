@@ -7,20 +7,20 @@ import slug from './slug.js';
 export const range = (start = 0, stop, step = 1) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
-export const capitalize = str => str.substring(0, 1).toUpperCase() + str.substring(1);
+export const capitalize = (str) => str.substring(0, 1).toUpperCase() + str.substring(1);
 
 export const deep = {
-  copy: obj => klona(obj),
-  same: (obj1, obj2) => dequal(obj1, obj2)
+  copy: (obj) => klona(obj),
+  same: (obj1, obj2) => dequal(obj1, obj2),
 };
 
-export const uid = keyLength => nanoid(keyLength);
+export const uid = (keyLength) => nanoid(keyLength);
 
 export const slugify = (parts, { key = false, keyLength = 8, partsOriginal = null, slugOriginal = null } = {}) => {
   if (!Array.isArray(parts)) parts = [parts];
   if (!Array.isArray(partsOriginal)) partsOriginal = [partsOriginal];
-  const text = parts.filter(p => p).join('-');
-  const textOriginal = partsOriginal.filter(p => p).join('-');
+  const text = parts.filter((p) => p).join('-');
+  const textOriginal = partsOriginal.filter((p) => p).join('-');
   if (text == textOriginal) return slugOriginal;
   return slug(text) + (key ? `-${nanoid(keyLength)}` : '');
 };
@@ -29,11 +29,11 @@ function filtersToRegex(filters) {
   // Individual filter formats: a / a.b / *.a / a.*.b (where * means any level of nesting)
   // Acceptable either: "a,*.b" / ["a", "*.b"]
   if (!Array.isArray(filters)) filters = filters.split(',');
-  const individual = filters.map(filter =>
+  const individual = filters.map((filter) =>
     filter
       .split('.')
-      .map(part => (part == '*' ? '.*' : '\\b' + part + '\\b'))
-      .join('\\.')
+      .map((part) => (part == '*' ? '.*' : '\\b' + part + '\\b'))
+      .join('\\.'),
   );
   return new RegExp(individual.join('|'));
 }
@@ -81,7 +81,7 @@ export async function deleteFields(object, filters) {
 function diffToHtml(diff) {
   if (!diff) return null;
   return diff
-    .map(part => {
+    .map((part) => {
       if (part.added) {
         return `<span style="font-weight: bold;">${part.value}</span>`;
       } else if (part.removed) {
@@ -93,7 +93,7 @@ function diffToHtml(diff) {
 
 export function diff(item, itemOriginal, { editorPreset = false, fieldsToIgnore = [] } = {}) {
   if (editorPreset) fieldsToIgnore.push(...['user_created', 'date_created', 'user_updated', 'date_updated']);
-  return new Promise(async resolve => {
+  return new Promise(async (resolve) => {
     if (!item) return resolve({ diff: null, changed: null, html: null });
     const itemCopy = deep.copy(item);
     const itemOriginalCopy = deep.copy(itemOriginal);
@@ -104,8 +104,8 @@ export function diff(item, itemOriginal, { editorPreset = false, fieldsToIgnore 
     const diff = diffJson(itemOriginalCopy, itemCopy);
     return resolve({
       diff: diff,
-      changed: diff.some(part => part.added || part.removed),
-      html: diffToHtml(diff)
+      changed: diff.some((part) => part.added || part.removed),
+      html: diffToHtml(diff),
     });
   });
 }
@@ -116,8 +116,8 @@ export function diffSync(item, itemOriginal) {
   const diff = diffJson(itemOriginalCopy, itemCopy);
   return {
     diff: diff,
-    changed: diff.some(part => part.added || part.removed),
-    html: diffToHtml(diff)
+    changed: diff.some((part) => part.added || part.removed),
+    html: diffToHtml(diff),
   };
 }
 
@@ -142,8 +142,8 @@ export function reuseIDs(items, reusableIDs = []) {
   // e.g.: 2 _ 1 3 ; 3 1 _ 2  (items ; reusableIDs)
   //       1 2 3 _
   //             ^ delete previous ids if there were not enough new ones to avoid duplication
-  const oldIds = items.map(item => item.id);
-  const newIds = reusableIDs.concat(oldIds).filter(id => id);
+  const oldIds = items.map((item) => item.id);
+  const newIds = reusableIDs.concat(oldIds).filter((id) => id);
   const ids = newIds.filter((id, i, self) => self.indexOf(id) === i); // remove duplicates
   ids.sort((a, b) => a - b);
   items.forEach((item, i) => {
@@ -161,7 +161,7 @@ export function makeTree(items, _parent = null, _depth = 0, _path = []) {
       tree.push({
         ...item,
         _meta: { depth: _depth, path, isFirst: false, isLast: false },
-        children: makeTree(items, item.id, _depth + 1, path)
+        children: makeTree(items, item.id, _depth + 1, path),
       });
     }
   }
@@ -261,12 +261,12 @@ export function treeRemoveMarked(tree) {
 export function treeGetItemAtPath(tree, path) {
   // Find item using it's path.
   if (path.length === 0) return tree;
-  if (path.length === 1) return tree.find(item => item.index == path[0]);
-  return treeGetItemAtPath(tree.find(item => item.index == path[0]).children, path.slice(1));
+  if (path.length === 1) return tree.find((item) => item.index == path[0]);
+  return treeGetItemAtPath(tree.find((item) => item.index == path[0]).children, path.slice(1));
 }
 export function treePushItemAtPath(tree, path, item) {
   // Insert item at path.
-  const parent = tree.find(item => item.index == path[0]);
+  const parent = tree.find((item) => item.index == path[0]);
   if (path.length === 1) {
     tree.splice(path[0], 0, item); // if path[0] is bigger then the array, it will still be added at the end
   } else treePushItemAtPath(parent.children, path.slice(1), item);
@@ -275,7 +275,7 @@ export function treePushItemAtPath(tree, path, item) {
 export function treeMoveItemToPath(tree, oldPath, newPath) {
   // Move item at oldPath to newPath.
   if (oldPath.join() === newPath.join()) return;
-  const getData = item => ({ id: item.id, parent: item.parent, index: item.index });
+  const getData = (item) => ({ id: item.id, parent: item.parent, index: item.index });
   const oldItem = treeGetItemAtPath(tree, oldPath);
   const oldItemData = getData(oldItem);
   const newItem = deep.copy(oldItem);

@@ -27,8 +27,7 @@
           src="{baseUrl}/assets/{id}?key=thumb#{modified_on ? modified_on : uploaded_on}"
           alt=""
           on:error={() => (imgError = true)}
-          on:load={() => (loading = false)}
-        />
+          on:load={() => (loading = false)} />
         {#if loading}
           <Icon fill name="img" dark />
         {/if}

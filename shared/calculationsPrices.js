@@ -10,7 +10,7 @@ function pushCounterparts(prices1, prices2) {
   //       out  2 1 4 3 ; 1 3 2 4
   for (const p1 of prices1) {
     const amount = p1.amount;
-    const amountExists = prices2.some(p2 => p2.amount == amount);
+    const amountExists = prices2.some((p2) => p2.amount == amount);
     if (!amountExists) pushPrice(prices2, { amount });
   }
 }
@@ -19,7 +19,7 @@ function removeDuplicates(prices) {
   // e.g.: in   2 3 3 4
   //       out  2 3 4
   return prices.reduce((acc, p) => {
-    const amountExists = acc.some(a => a.amount == p.amount);
+    const amountExists = acc.some((a) => a.amount == p.amount);
     return amountExists ? acc : [...acc, p];
   }, []);
 }
@@ -29,7 +29,7 @@ function removeUnused(amounts, prices) {
   // e.g.: amounts = [1, 2, 3]
   //       in   2 5 1
   //       out  2 1
-  return prices.filter(p => amounts.includes(p.amount));
+  return prices.filter((p) => amounts.includes(p.amount));
 }
 function pushMissing(amounts, prices) {
   // Pushes each amount from `amounts` that is not in the `prices` array.
@@ -37,7 +37,7 @@ function pushMissing(amounts, prices) {
   //       in   1 3 5
   //       out  1 3 5 4
   for (const amount of amounts) {
-    const p = prices.some(p => p.amount == amount);
+    const p = prices.some((p) => p.amount == amount);
     if (!p) pushPrice(prices, { amount });
   }
 }
@@ -50,13 +50,13 @@ function reusePrices(prices, reusablePrices) {
   // Uses THE FIRST ENCOUNTERED PRICE in `reusablePrices` for each amount.
   for (let price of prices) {
     const amount = price.amount;
-    const reusablePrice = reusablePrices.find(p => p.amount == amount);
+    const reusablePrice = reusablePrices.find((p) => p.amount == amount);
     if (reusablePrice) price.price = reusablePrice.price;
   }
 }
 function reuse(prices, reusable) {
   if (reusable.length) {
-    const reusableIDs = reusable.map(p => p.id);
+    const reusableIDs = reusable.map((p) => p.id);
     const reusablePrices = reusable.map(({ amount, price }) => ({ amount, price }));
     reuseIDs(prices, reusableIDs);
     reusePrices(prices, reusablePrices);
@@ -99,7 +99,7 @@ export function getMinMaxPrices(product) {
     min: null,
     max: null,
     minSale: null,
-    maxSale: null
+    maxSale: null,
   };
 
   if (product.show_price === false) {
@@ -107,7 +107,7 @@ export function getMinMaxPrices(product) {
   }
 
   const setMinMax = (pricePerAmounts, min = 'min', max = 'max') => {
-    for (const { price } of pricePerAmounts.filter(p => p.enabled && p.price)) {
+    for (const { price } of pricePerAmounts.filter((p) => p.enabled && p.price)) {
       if (prices[min] === null || price < prices[min]) prices[min] = price;
       if (prices[max] === null || price > prices[max]) prices[max] = price;
     }
@@ -120,7 +120,7 @@ export function getMinMaxPrices(product) {
   if (product.sale) {
     const salePricePerAmounts = [
       product.custom_prices_sale,
-      ...product.labelings.map(({ prices_sale }) => prices_sale)
+      ...product.labelings.map(({ prices_sale }) => prices_sale),
     ].flat();
     // console.log('salePricePerAmounts', salePricePerAmounts);
     setMinMax(salePricePerAmounts, 'minSale', 'maxSale');

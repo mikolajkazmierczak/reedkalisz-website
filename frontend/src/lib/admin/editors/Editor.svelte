@@ -12,10 +12,10 @@
   function spin(node, { duration }) {
     return {
       duration,
-      css: t => {
+      css: (t) => {
         const eased = cubicOut(t);
         return `transform: rotate(${eased * 360}deg);`;
-      }
+      },
     };
   }
 
@@ -30,9 +30,9 @@
   export let itemOriginal = null;
 
   // can be provided by parent
-  export let save = async action => await action();
-  export let cancel = async action => await action();
-  export let remove = async action => await action();
+  export let save = async (action) => await action();
+  export let cancel = async (action) => await action();
+  export let remove = async (action) => await action();
 
   function checkCollection() {
     if (collection == null) throw new Error('Collection name was not provided to the Editor instance');

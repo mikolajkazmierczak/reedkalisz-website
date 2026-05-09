@@ -38,8 +38,7 @@
   style:left={floats.left ? `${offset}px` : ''}
   style:center={floats.left ? `${offset}px` : ''}
   on:click={onclick}
-  on:mousedown={onmousedown}
->
+  on:mousedown={onmousedown}>
   <Icon width="80%" name={icon} color={bold ? 'var(--main)' : 'var(--main-4)'} strokeWidth={bold ? 0.5 : 0.3} />
 </button>
 

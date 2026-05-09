@@ -48,13 +48,13 @@
     custom_prices_sale,
     labelings,
     storage,
-    gallery
+    gallery,
   } = data.product);
 
   $: mainGalleryImgs = getMainGalleryImgs(gallery, storage);
-  $: showCustomPrices = custom_prices && custom_prices.some(p => p.enabled);
-  $: showLabelingsPrices = labelings && labelings.some(l => l.prices.some(p => p.enabled));
-  $: size = [size_x, size_y, size_z].filter(s => s).join(' x ') + 'mm';
+  $: showCustomPrices = custom_prices && custom_prices.some((p) => p.enabled);
+  $: showLabelingsPrices = labelings && labelings.some((l) => l.prices.some((p) => p.enabled));
+  $: size = [size_x, size_y, size_z].filter((s) => s).join(' x ') + 'mm';
 
   $: breadcrumbs = getBreadcrumbs(categories);
   $: lastBreadcrumb = breadcrumbs.length ? breadcrumbs[breadcrumbs.length - 1] : null;
@@ -177,8 +177,7 @@
               place={labeling_place}
               prices={custom_prices}
               pricesSale={custom_prices_sale}
-              pricesWithLabeling={custom_prices_with_labeling}
-            />
+              pricesWithLabeling={custom_prices_with_labeling} />
           </div>
         {/if}
 
@@ -198,8 +197,7 @@
                 place={labeling.labeling_place}
                 prices={labeling.prices}
                 pricesSale={labeling.prices_sale}
-                pricesWithLabeling
-              />
+                pricesWithLabeling />
               <AdminOnlyOverlay show={!labeling.enabled} />
             </div>
           {/each}
