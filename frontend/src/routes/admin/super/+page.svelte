@@ -180,7 +180,18 @@
   async function recalculateAll() {
     const start = performance.now();
 
-    await recalculateProducts(undefined, { emit: false });
+    await recalculateProducts({ id: { _between: [0, 500] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [501, 1000] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [1001, 1500] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [1501, 2000] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [2001, 2500] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [2501, 3000] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [3001, 3500] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [3501, 4000] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [4001, 4500] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [4501, 5000] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [5001, 5500] } }, { emit: false });
+    await recalculateProducts({ id: { _between: [5501, 6000] } }, { emit: false });
 
     const end = performance.now();
     console.log('recalculateAll time', end - start);
