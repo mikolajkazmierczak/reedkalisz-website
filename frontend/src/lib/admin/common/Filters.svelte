@@ -31,6 +31,6 @@
   .filters {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.25rem;
   }
 </style>

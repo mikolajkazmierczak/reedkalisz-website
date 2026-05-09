@@ -46,11 +46,11 @@
     place-items: center;
     border-radius: var(--radius);
     border: var(--border);
-    padding: 0.2rem 0.75rem;
+    padding: 0.2rem 0.5rem;
     transition:
       background-color 100ms,
       color 100ms;
-    font-size: 0.9em;
+    font-size: 0.8em;
     background-color: var(--light);
   }
   .filter:hover {
