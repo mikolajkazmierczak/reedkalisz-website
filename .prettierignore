@@ -1,15 +1,14 @@
-# OS
-.DS_Store
-
-# common
-package-lock.json
 node_modules
+.DS_Store
+*.log
+
+package-lock.json
 
 # directus
-data.db
 uploads
+*.db
 
 # sveltekit
 .svelte-kit
+.vite
 build
-package

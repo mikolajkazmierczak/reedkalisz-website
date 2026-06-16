@@ -1,16 +1,16 @@
-# OS
-.DS_Store
-
-# common
-.env*
 node_modules
+.DS_Store
+*.log
+
+.env*
+!!.env*
 
 # directus
-data.db
 uploads
+*.db
 
 # sveltekit
 .svelte-kit
+.vite
 build
-package
 
