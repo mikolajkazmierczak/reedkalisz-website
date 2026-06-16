@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-# Toggle the daily 3:00 AM cron job for cleanup.sh.
-
 cd "$(dirname "$0")"
+
+#
+# Toggle the daily 3:00 AM cron job for cleanup.sh.
+#
+
 DIR="$(pwd)"
 JOB="0 3 * * * /usr/bin/env bash $DIR/cleanup.sh >> $DIR/cleanup.log 2>&1"
 
