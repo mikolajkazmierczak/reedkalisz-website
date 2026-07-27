@@ -4,21 +4,24 @@ import { reuseIDs } from './utils';
 
 // TODO: this whole file should be a class Calculator
 
+/** Convert percentage to fraction (25% -> 1.25; 0% -> 1) */
 function fraction(percent) {
-  // convert percentage to fraction
-  // e.g. 25% -> 1.25; 0% -> 1
   return percent / 100 + 1;
 }
 
+/** Round to two decimal places */
 function round(num) {
-  // round to two decimal places
   return Math.round((num + Number.EPSILON) * 100) / 100;
 }
 
+/**
+ * Resursively replace falsy values with 0 in a nested object
+ * ```
+ * { a: null, b: { c: null }, d: [{ e: null }], f: [] } // in
+ * { a: 0,    b: { c: 0    }, d: [{ e: 0    }], f: [] } // out
+ * ```
+ */
 function sanitize(data) {
-  // resursively replace falsy values with 0 in a nested object
-  // e.g. { a: null, b: { c: null }, d: [{ e: null }], f: [] }
-  //      { a: 0,    b: { c: 0    }, d: [{ e: 0    }], f: [] }
   if (typeof data == 'object' && data != null) {
     if (Array.isArray(data)) {
       for (let [i, val] of data.entries()) {
@@ -156,10 +159,13 @@ function calculatePrices(amounts, global, labeling, company, product, productLab
   };
 }
 
+/**
+ * Recalculates labelings prices and pricesSale.
+ * Toggles state (enabled) of each pricePerAmount appropriately.
+ *
+ * `productLabelingsReusable: [{ id: int, pricesIDs: [int], pricesSaleIDs: [int] }, ... }` - reusable prices ids
+ */
 export function recalculateLabelings(amounts, global, labelings, companies, product, productLabelingsReusable = null) {
-  // Recalculates labelings prices and pricesSale.
-  //   Toggles state (enabled) of each pricePerAmount appropriately.
-  // `productLabelingsReusable`: [{ id: int, pricesIDs: [int], pricesSaleIDs: [int] }, ... } - reusable prices ids
   if (!product?.labelings) return;
 
   let r = 0;
@@ -197,14 +203,15 @@ export function recalculateLabelings(amounts, global, labelings, companies, prod
   product.labelings.forEach((l, i) => (l.index = i));
 }
 
+/**
+ * Swaps and/or deletes labelings (updates indexes).
+ * Recalculates customPrices, customPricesSale and each labelings prices and pricesSale.
+ * Toggles state (enabled) of each pricePerAmount appropriately.
+ * Updates the product in the database.
+ *
+ * swapLabelings: { oldID => newID, ... }  <-- newID can be null to remove the labeling
+ */
 async function recalculateProduct(api, amounts, global, labelings, companies, product, { swapLabelings = null } = {}) {
-  // Swaps and/or deletes labelings (updates indexes).
-  // Recalculates customPrices, customPricesSale and each labelings prices and pricesSale.
-  //   Toggles state (enabled) of each pricePerAmount appropriately.
-  // Updates the product in the database.
-  //
-  // swapLabelings: { oldID => newID, ... }  <-- newID can be null to remove the labeling
-
   if (swapLabelings) {
     for (const [oldID, newID] of swapLabelings) {
       const i = product.labelings.findIndex((l) => l.labeling === oldID);
@@ -215,7 +222,7 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
       }
     }
   }
-  // indexes are not updated here, they are updated in recalculateLabelings()
+  // indexes are not updated here - see recalculateLabelings()
 
   recalculateLabelings(amounts, global, labelings, companies, product);
   const someLabelingsEnabled = product?.labelings.some((l) => l.enabled);
@@ -239,21 +246,18 @@ async function recalculateProduct(api, amounts, global, labelings, companies, pr
   await api.items('products').updateOne(product.id, updates);
 }
 
-/** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
+/**
+ * Uses `recalculateProduct()` to update all products that match the filter.
+ * A new priceView can be set, and labelings can be swapped or deleted.
+ *
+ * `{ swapLabelings: { oldId: newId, ... } }` - newId can be null to remove the labeling
+ */
 export async function* recalculateProductsGenerator(
   api,
   filter,
   globals,
   { newPriceView = null, swapLabelings = null } = {},
 ) {
-  // Uses `recalculateProduct()` to update all products that match the filter.
-  // A new priceView can be set, and labelings can be swapped or deleted.
-  //
-  // api - an API instance
-  // filter - directus filter for products
-  // globals: { globalMargins, priceViews, labelings, companies }
-  // options.swapLabelings: { oldID: newID, ... }  <-- newID can be null to remove the labeling
-
   console.log('Fetching files to recalculate... Filter: ', filter);
   const products = (await api.items('products').readByQuery({ fields: productFields, filter, limit: -1 })).data;
 
@@ -289,15 +293,16 @@ export async function* recalculateProductsGenerator(
   }
 }
 
-/** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
-export async function recalculateProducts(api, filter, globals, { newPriceView = null, swapLabelings = null } = {}) {
-  const results = await Array.fromAsync(
-    recalculateProductsGenerator(api, filter, globals, { newPriceView, swapLabelings }),
-  );
-
+/** Drains a `recalculateProductsGenerator()`, merging its batches into a single result. */
+export async function collectRecalculated(generator) {
+  const results = await Array.fromAsync(generator);
   return {
     products: results.flatMap((r) => r.products),
     ids: results.flatMap((r) => r.ids),
-    index: results[results.length - 1]?.index,
+    index: results.at(-1)?.index,
   };
 }
+
+/** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
+export const recalculateProducts = (api, filter, globals, { newPriceView = null, swapLabelings = null } = {}) =>
+  collectRecalculated(recalculateProductsGenerator(api, filter, globals, { newPriceView, swapLabelings }));

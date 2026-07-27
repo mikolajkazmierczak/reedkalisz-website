@@ -1,6 +1,6 @@
 import api from '$/api';
 import heimdall from '$/heimdall';
-import { recalculateProductsGenerator as recalculate } from '%/calculations';
+import { collectRecalculated, recalculateProductsGenerator as recalculate } from '%/calculations';
 import { companies, globalMargins, labelings, priceViews } from '@/globals';
 import { get } from 'svelte/store';
 
@@ -23,6 +23,5 @@ export async function* recalculateProductsGenerator(
 }
 
 /** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
-export async function recalculateProducts(filter, { newPriceView = null, swapLabelings = null, emit = true } = {}) {
-  return await Array.fromAsync(recalculateProductsGenerator(filter, { newPriceView, swapLabelings, emit }));
-}
+export const recalculateProducts = (filter, { newPriceView = null, swapLabelings = null, emit = true } = {}) =>
+  collectRecalculated(recalculateProductsGenerator(filter, { newPriceView, swapLabelings, emit }));
