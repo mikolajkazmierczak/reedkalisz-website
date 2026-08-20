@@ -1,0 +1,42 @@
+# scripts/provision.sh to install to /etc/caddy/Caddyfile
+# scripts/deploy.sh --caddy to reinstall
+
+(app) {
+	encode zstd gzip
+
+	request_body {
+		max_size 500MB
+	}
+
+	# redirect to Directus
+	handle_path /api/* {
+		reverse_proxy localhost:8055
+	}
+
+	# redirect to Heimdall
+	handle_path /heimdall/* {
+		reverse_proxy localhost:9999
+	}
+
+	# socket.io expects this exact path
+	handle /socket.io* {
+		reverse_proxy localhost:9999
+	}
+
+	# redirect to SvelteKit
+	handle {
+		reverse_proxy localhost:5000
+	}
+}
+
+prod.reed.kalisz.pl {
+	import app
+}
+
+reed.kalisz.pl {
+	import app
+}
+
+www.reed.kalisz.pl, new.reed.kalisz.pl {
+	redir https://reed.kalisz.pl{uri} permanent
+}

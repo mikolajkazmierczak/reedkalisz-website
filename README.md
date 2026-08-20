@@ -100,22 +100,39 @@ The admin panel is using a REST API that runs as a node server. Powered by [Dire
 
 ## `Deploy 🏃`
 
-Setup [nginx](https://nginx.org/).\
-Consider running everything with [pm2](https://github.com/Unitech/pm2).
+The server is provisioned by a script and fronted by [Caddy](https://caddyserver.com/).
+Processes run under [pm2](https://github.com/Unitech/pm2).
 
-Serve SvelteKit on port **80**.\
-Serve Directus on port **8055**.\
-Serve Heimdall on port **999**.
+SvelteKit listens on **5000**, Directus on **8055**, Heimdall on **9999**.
+Caddy is the only thing bound to 80/443 and routes by path.
 
-#### <small>`/backend/directus`</small>
+#### Provisioning a fresh server
 
-`npm run start` — run Directus
+Ubuntu 24.04, as a normal user with sudo:
 
-#### <small>`/backend/heimdall`</small>
+```bash
+sudo apt update && sudo apt install -y git
+git clone <repo-url> ~/reedkalisz-website
+~/reedkalisz-website/scripts/provision.sh
+```
 
-`npm run start` — run Heimdall, a custom socket server and external API middleman
+That installs Node, pm2 (with log rotation and a boot unit), Caddy, ufw and
+unattended security upgrades, then installs and validates `Caddyfile`.
 
-#### <small>`/frontend`</small>
+Node is pinned by `NODE_VERSION` at the top of the script.
 
-`npm run build` — build SvelteKit for Node\
-`node ./build` — run Node server
+Then, by hand, because they need secrets and data:
+
+1. Create the three `.env` files from their `!.env` templates
+2. Copy `backend/directus/data.db` and `backend/directus/uploads/` from the old server
+3. `./scripts/deploy.sh --install`
+4. `./scripts/cleanup-cron.sh`
+
+#### Deploying
+
+```bash
+./scripts/deploy.sh             # pull, build, reload sveltekit
+./scripts/deploy.sh --full      # ...and reload heimdall + directus
+./scripts/deploy.sh --install   # ...and npm ci everything first
+./scripts/deploy.sh --caddy     # reinstall Caddyfile, reload Caddy
+```

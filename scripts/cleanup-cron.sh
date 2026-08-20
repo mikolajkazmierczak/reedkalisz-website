@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 #
 
 DIR="$(pwd)"
-JOB="0 3 * * * /usr/bin/env bash $DIR/cleanup.sh >> $DIR/cleanup.log 2>&1"
+JOB="30 3 * * * /usr/bin/env bash $DIR/cleanup.sh >> $DIR/cleanup.log 2>&1"
 
 current="$(crontab -l 2>/dev/null || true)"
 
@@ -16,5 +16,5 @@ if grep -qF "$DIR/cleanup.sh" <<<"$current"; then
   echo "❌ Cron job disabled."
 else
   printf '%s\n%s\n' "$current" "$JOB" | crontab -
-  echo "✅ Cron job enabled — runs daily at 3:00 AM."
+  echo "✅ Cron job enabled — runs daily at 3:30 AM."
 fi
