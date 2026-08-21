@@ -42,7 +42,8 @@ set -a
 # shellcheck disable=SC1091
 source scripts/.env
 set +a
-[[ -n "${BETA_AUTH_PASSWORD:-}" ]] || fail "BETA_AUTH_PASSWORD is empty in scripts/.env"
+[[ -n "${BETA_AUTH_USER:-}" && -n "${BETA_AUTH_PASSWORD:-}" ]] \
+  || fail "BETA_AUTH_USER/BETA_AUTH_PASSWORD not set in scripts/.env"
 
 # Caddyfile references these, so validation fails without them
 ORIGIN_CRT=/etc/caddy/origin.crt
