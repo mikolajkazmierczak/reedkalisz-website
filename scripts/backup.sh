@@ -25,7 +25,7 @@ echo "Backing up $DB -> $BACKUP"
 sqlite3 "$DB" ".backup '$BACKUP'" || fail "sqlite3 .backup"
 
 # one file per day
-ls -1t "$DB_DIR"/data-backup-*.db | tail -n +$(( ${LOCAL_KEEP:-14} + 1 )) | xargs -r rm -f
+ls -1t "$DB_DIR"/data-backup-*.db | tail -n +$(( ${LOCAL_KEEP_DAILY:-14} + 1 )) | xargs -r rm -f
 success "local snapshot complete"
 
 if [[ -z "${RESTIC_REPOSITORY:-}" || -z "${RESTIC_PASSWORD:-}" ]]; then
