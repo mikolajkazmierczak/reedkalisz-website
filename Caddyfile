@@ -1,7 +1,14 @@
 # scripts/provision.sh installs this to /etc/caddy/Caddyfile
 # scripts/deploy.sh --caddy reinstalls it
 
-beta.reed.kalisz.pl {
+# Cloudflare Origin CA certificate
+(tls) {
+	tls /etc/caddy/origin.crt /etc/caddy/origin.key
+}
+
+(app) {
+	import tls
+
 	encode zstd gzip
 
 	request_body {
@@ -13,8 +20,6 @@ beta.reed.kalisz.pl {
 		X-Content-Type-Options nosniff
 		# full URL as referrer only to ourselves, bare origin cross-site
 		Referrer-Policy strict-origin-when-cross-origin
-		# keep the pre-cutover site out of search results
-		X-Robots-Tag "noindex, nofollow"
 	}
 
 	# Directus
@@ -31,15 +36,32 @@ beta.reed.kalisz.pl {
 	handle /socket.io* {
 		reverse_proxy localhost:9999
 	}
+}
 
-	# SvelteKit with basic auth guard
+beta.reed.kalisz.pl {
+	import app
+
+	header {
+		X-Robots-Tag "noindex, nofollow"
+	}
+
 	handle {
+		# basic auth guard
 		import /etc/caddy/beta-auth.conf
 		reverse_proxy localhost:5000
 	}
 }
 
-# VPS hostname
-prod.reed.kalisz.pl {
-	redir https://beta.reed.kalisz.pl{uri} permanent
+reed.kalisz.pl {
+	import app
+
+	handle {
+		reverse_proxy localhost:5000
+	}
+}
+
+www.reed.kalisz.pl {
+	import tls
+
+	redir https://reed.kalisz.pl{uri} permanent
 }

@@ -44,6 +44,10 @@ source scripts/.env
 set +a
 [[ -n "${BETA_AUTH_PASSWORD:-}" ]] || fail "BETA_AUTH_PASSWORD is empty in scripts/.env"
 
+# Caddyfile references these, so validation fails without them
+ORIGIN_CRT=/etc/caddy/origin.crt
+ORIGIN_KEY=/etc/caddy/origin.key
+
 [[ $EUID -ne 0 ]] || fail "run as your normal user, not root (it will sudo where needed)"
 
 banner "Provisioning $(hostname)"
@@ -134,6 +138,11 @@ else
 fi
 
 step "Installing Caddyfile"
+sudo test -f "$ORIGIN_CRT" && sudo test -f "$ORIGIN_KEY" \
+  || fail "Cloudflare Origin CA cert missing — see README, put it at $ORIGIN_CRT / $ORIGIN_KEY"
+# done here, not by hand: the caddy group does not exist until Caddy is installed
+sudo chown root:caddy "$ORIGIN_CRT" "$ORIGIN_KEY"
+sudo chmod 640 "$ORIGIN_CRT" "$ORIGIN_KEY"
 install_caddyfile "$CADDYFILE"
 success "Caddyfile installed and validated"
 
