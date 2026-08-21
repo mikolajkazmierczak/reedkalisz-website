@@ -103,8 +103,8 @@ The admin panel is using a REST API that runs as a node server. Powered by [Dire
 The server is provisioned by a script and fronted by [Caddy](https://caddyserver.com/).
 Processes run under [pm2](https://github.com/Unitech/pm2).
 
-SvelteKit listens on **5000**, Directus on **8055**, Heimdall on **9999**.
-Caddy is the only thing bound to 80/443 and routes by path.
+SvelteKit listens on **5000**, Directus on **8055**, Heimdall on **9999**.\
+Only Caddy is bound to 80/443 and routes by path.
 
 #### Provisioning a fresh server
 
@@ -116,17 +116,17 @@ git clone <repo-url> ~/reedkalisz-website
 ~/reedkalisz-website/scripts/provision.sh
 ```
 
-That installs Node, pm2 (with log rotation and a boot unit), Caddy, ufw and
-unattended security upgrades, then installs and validates `Caddyfile`.
-
-Node is pinned by `NODE_VERSION` at the top of the script.
+That installs Node, a 2GB swapfile, pm2 (with log rotation and a boot unit), Caddy,
+restic, ufw, unattended security upgrades and gum (renders all script output).
+Then writes the beta credentials and installs and validates `Caddyfile`.
 
 Then, by hand, because they need secrets and data:
 
-1. Create the three `.env` files from their `!.env` templates
+1. Create the `.env` files from their `!.env` templates
 2. Copy `backend/directus/data.db` and `backend/directus/uploads/` from the old server
 3. `./scripts/deploy.sh --install`
-4. `./scripts/cleanup-cron.sh`
+4. `./scripts/cron.sh --enable`
+5. `./scripts/harden-ssh.sh`
 
 #### Deploying
 
@@ -136,3 +136,32 @@ Then, by hand, because they need secrets and data:
 ./scripts/deploy.sh --install   # ...and npm ci everything first
 ./scripts/deploy.sh --caddy     # reinstall Caddyfile, reload Caddy
 ```
+
+#### Backups
+
+`./scripts/backup.sh`
+
+Takes an SQLite snapshot (safe while Directus runs), keeps the 3 newest locally,
+then restic pushes the database, `uploads/` and the `.env` files to Cloudflare R2.
+Encrypted and deduplicated: keeps 14 dailies, 4 weeklies and 6 monthlies.
+
+Cheaper than it looks: one backup is ~1.9 GB, but restic deduplicates by content, so all backups together sit at around 2-2.5 GB, well inside R2's free tier.
+
+Configure `scripts/.env` or it degrades to local-only snapshots and says so.
+**Keep `RESTIC_PASSWORD` in a password manager** or the backups will be unrecoverable.
+
+##### Restore from backup
+
+Load the credentials first:
+
+```bash
+set -a; source scripts/.env; set +a
+restic snapshots
+restic restore <id> --target /tmp/restore
+```
+
+#### The nightly job
+
+`./scripts/cron.sh --enable | --disable | --status`
+
+Runs `cleanup.sh` at 03:00, which takes a backup first, then cleans up the database.

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")/.."
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+cd "$REPO"
 
 #
 # Deploy the latest commit.
@@ -21,77 +22,74 @@ for arg in "$@"; do
   esac
 done
 
-# Colors
-RED='\033[0;31m'; GREEN='\033[0;32m'; BLUE='\033[0;34m'
-BOLD='\033[1m'; RESET='\033[0m'
+# ports must match the Caddyfile upstreams
+SVELTEKIT_URL=http://127.0.0.1:5000/
+HEIMDALL_URL=http://127.0.0.1:9999/
+DIRECTUS_URL=http://127.0.0.1:8055/server/health
 
-STEP=0
-TOTAL=$(( 4 + INSTALL * 4 + FULL * 2 + CADDY * 1 ))
+# fetch, pull, build, reload+verify sveltekit, pm2 save
+TOTAL=$(( 5 + INSTALL * 4 + FULL * 2 + CADDY ))
 
-step() {
-  STEP=$((STEP + 1))
-  echo -e "\n${BLUE}${BOLD}[${STEP}/${TOTAL}]${RESET} ${BOLD}$1${RESET}"
-}
-success() { echo -e "${GREEN}✔ $1${RESET}"; }
-fail()    { echo -e "${RED}✖ Error during: $1${RESET}\n${RED}Deployment aborted.${RESET}"; exit 1; }
+banner "Deploying $(git rev-parse --short HEAD 2>/dev/null || echo "")"
 
-echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-echo -e "${BOLD}       Deployment Starting...          ${RESET}"
-echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+# sudo prompt now instead of blocking halfway through a deploy
+if [[ "$CADDY" == "1" ]]; then
+  sudo -v
+fi
 
 step "Pruning remote-tracking branches"
-git fetch --prune || fail "git fetch --prune"
+git fetch --prune
 success "Fetch complete"
 
 step "Pulling latest changes"
-git pull || fail "git pull"
+# --ff-only: local changes on the server should stop the deploy
+git pull --ff-only || fail "git pull --ff-only (local commits or edits on the server?)"
 success "Now at $(git rev-parse --short HEAD)"
 
 if [[ "$INSTALL" == "1" ]]; then
-  step "Installing shared/";           (cd shared           && npm ci) || fail "npm ci shared"
+  step "Installing shared/";           (cd shared           && npm ci)
   success "shared ready"
-  step "Installing backend/directus";  (cd backend/directus && npm ci) || fail "npm ci directus"
+  step "Installing backend/directus";  (cd backend/directus && npm ci)
   success "directus ready"
-  step "Installing backend/heimdall";  (cd backend/heimdall && npm ci) || fail "npm ci heimdall"
+  step "Installing backend/heimdall";  (cd backend/heimdall && npm ci)
   success "heimdall ready"
-  step "Installing frontend";          (cd frontend         && npm ci) || fail "npm ci frontend"
+  step "Installing frontend";          (cd frontend         && npm ci)
   success "frontend ready"
 fi
 
 step "Building frontend"
-(cd frontend && npm run build) || fail "npm run build"
+(cd frontend && npm run build)
 success "Build complete"
 
 if [[ "$CADDY" == "1" ]]; then
   step "Reloading Caddy"
-  sudo install -m 644 -o root -g root Caddyfile /etc/caddy/Caddyfile || fail "install Caddyfile"
-  sudo caddy validate --config /etc/caddy/Caddyfile >/dev/null || fail "caddy validate"
-  sudo systemctl reload caddy || fail "systemctl reload caddy"
+  install_caddyfile Caddyfile
   success "Caddyfile applied"
 fi
 
 step "Reloading sveltekit"
-pm2 startOrReload ecosystem.config.cjs --only sveltekit || fail "pm2 reload sveltekit"
-success "sveltekit reloaded"
+pm2 startOrReload ecosystem.config.cjs --only sveltekit
+wait_http "$SVELTEKIT_URL" || fail "sveltekit did not answer at $SVELTEKIT_URL (pm2 logs sveltekit)"
+success "sveltekit reloaded and answering"
 
 if [[ "$FULL" == "1" ]]; then
   step "Reloading heimdall"
-  pm2 startOrReload ecosystem.config.cjs --only heimdall || fail "pm2 reload heimdall"
-  success "heimdall reloaded"
+  pm2 startOrReload ecosystem.config.cjs --only heimdall
+  wait_http "$HEIMDALL_URL" || fail "heimdall did not answer at $HEIMDALL_URL (pm2 logs heimdall)"
+  success "heimdall reloaded and answering"
 
   step "Restarting directus"
   # restart, not reload: Directus holds SQLite and does not reload cleanly
-  pm2 restart directus --update-env || pm2 start ecosystem.config.cjs --only directus || fail "pm2 restart directus"
-  success "directus restarted"
+  pm2 restart directus --update-env || pm2 start ecosystem.config.cjs --only directus
+  wait_http "$DIRECTUS_URL" 60 || fail "directus did not answer at $DIRECTUS_URL (pm2 logs directus)"
+  success "directus restarted and healthy"
 fi
 
 step "Saving pm2 process list"
-pm2 save --force >/dev/null || fail "pm2 save"
+pm2 save --force >/dev/null
 success "process list saved for boot"
 
 echo ""
 pm2 status
 
-echo -e "\n${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-echo -e "${GREEN}${BOLD}       Deployment Successful! ✔        ${RESET}"
-echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}\n"
+banner "Deployment Successful ✔" 2

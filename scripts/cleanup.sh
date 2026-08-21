@@ -1,48 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")"
-export PATH="/usr/local/bin:/usr/bin:/bin:$PATH" # for cron env
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+cd "$REPO"
 
 #
-# Cleanup Directus revisions and activity logs to reduce database size.
+# Empty Directus revisions and activity logs to reduce database size.
 #
 
-DB="../backend/directus/data.db"
+[[ -f "$DB" ]] || fail "$DB not found"
 
-DB_PATH="$(realpath "$DB" 2>/dev/null || true)"
-if [[ -z "$DB_PATH" || ! -f "$DB_PATH" ]]; then
-  echo "Error: data.db not found at $DB"
-  exit 1
-fi
+./scripts/backup.sh || fail "backup"
 
-echo "Running backup..."
-bash backup.sh
+counts() { sqlite3 "$DB" 'SELECT (SELECT COUNT(*) FROM directus_revisions)||" revisions, "||(SELECT COUNT(*) FROM directus_activity)||" activity"'; }
 
-UP=0
-pm2 pid directus >/dev/null 2>&1 && [[ "$(pm2 pid directus)" != "0" ]] && UP=1
+echo "Before: $(counts)"
 
-if [[ "$UP" == "1" ]]; then
-  echo "Stopping Directus..."
-  pm2 stop directus
-fi
+pm2 stop directus || fail "pm2 stop directus"
+# whatever happens next, Directus comes back
+trap 'pm2 start directus' EXIT
 
-echo "Before: $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM directus_revisions') revisions, $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM directus_activity') activity"
-
-echo "Cleaning up revisions and activity tables..."
-sqlite3 "$DB_PATH" <<'SQL'
+sqlite3 "$DB" <<'SQL'
 PRAGMA foreign_keys = OFF;
 DELETE FROM directus_revisions;
 DELETE FROM directus_activity;
 VACUUM;
 SQL
 
-echo "After:  $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM directus_revisions') revisions, $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM directus_activity') activity"
-
-echo "Tables emptied and database vacuumed."
-
-if [[ "$UP" == "1" ]]; then
-  echo "Starting Directus..."
-  pm2 start directus
-fi
-
-echo "✅ Cleanup complete"
+echo "After:  $(counts)"
+success "Cleanup complete"

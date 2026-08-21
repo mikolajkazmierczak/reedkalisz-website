@@ -1,26 +1,46 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")"
-export PATH="/usr/local/bin:/usr/bin:/bin:$PATH" # for cron env
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+cd "$REPO"
 
 #
-# Create a dated backup next to the original DB, keeping only the 3 newest.
+# Snapshot the db locally, then push db + uploads + secrets to Cloudflare R2 (encrypted, via restic).
+# Configured in scripts/.env - otherwise local only.
 #
 
-DB="../backend/directus/data.db"
+[[ -f "$DB" ]] || fail "$DB not found"
 
-[[ -f "$DB" ]] || { echo "Error: $DB not found." >&2; exit 1; }
-
-DB_DIR="$(cd "$(dirname "$DB")" && pwd)"
-STAMP="$(date +%d-%m-%Y)"
-BACKUP="$DB_DIR/data-backup-${STAMP}.db"
+DB_DIR="$(dirname "$DB")"
+BACKUP="$DB_DIR/data-backup-$(date +%Y-%m-%d).db"
 
 echo "Backing up $DB -> $BACKUP"
-sqlite3 "$DB" ".backup '$BACKUP'"
+# .backup is a consistent online copy - safe while Directus is running
+sqlite3 "$DB" ".backup '$BACKUP'" || fail "sqlite3 .backup"
 
-ls -1t "$DB_DIR"/data-backup-*.db 2>/dev/null | tail -n +4 | while read -r old; do
-  echo "Removing old backup: $old"
-  rm -f -- "$old"
-done
+ls -1t "$DB_DIR"/data-backup-*.db | tail -n +4 | xargs -r rm -f
+success "local snapshot complete"
 
-echo "✅ Backup complete"
+if [[ ! -f scripts/.env ]]; then
+  warn "scripts/.env missing — local backup only (see scripts/!.env)"
+  exit 0
+fi
+
+set -a
+# shellcheck disable=SC1091
+source scripts/.env
+set +a
+
+# scripts/.env is deliberately not backed up: it holds RESTIC_PASSWORD,
+# (a password sealed inside the archive it unlocks is useless)
+restic cat config >/dev/null 2>&1 || restic init || fail "restic init (check bucket and token)"
+
+restic backup --tag daily \
+  "$BACKUP" "$UPLOADS" backend/directus/.env backend/heimdall/.env frontend/.env \
+  || fail "restic backup"
+
+restic forget --tag daily --prune \
+  --keep-daily   "${RESTIC_KEEP_DAILY:-14}" \
+  --keep-weekly  "${RESTIC_KEEP_WEEKLY:-4}" \
+  --keep-monthly "${RESTIC_KEEP_MONTHLY:-6}"
+
+success "off-site backup complete"

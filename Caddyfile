@@ -1,19 +1,28 @@
-# scripts/provision.sh to install to /etc/caddy/Caddyfile
-# scripts/deploy.sh --caddy to reinstall
+# scripts/provision.sh installs this to /etc/caddy/Caddyfile
+# scripts/deploy.sh --caddy reinstalls it
 
-(app) {
+beta.reed.kalisz.pl {
 	encode zstd gzip
 
 	request_body {
 		max_size 500MB
 	}
 
-	# redirect to Directus
+	header {
+		# stop browsers guessing a content type other than the one we send
+		X-Content-Type-Options nosniff
+		# full URL as referrer only to ourselves, bare origin cross-site
+		Referrer-Policy strict-origin-when-cross-origin
+		# keep the pre-cutover site out of search results
+		X-Robots-Tag "noindex, nofollow"
+	}
+
+	# Directus
 	handle_path /api/* {
 		reverse_proxy localhost:8055
 	}
 
-	# redirect to Heimdall
+	# Heimdall
 	handle_path /heimdall/* {
 		reverse_proxy localhost:9999
 	}
@@ -23,20 +32,14 @@
 		reverse_proxy localhost:9999
 	}
 
-	# redirect to SvelteKit
+	# SvelteKit with basic auth guard
 	handle {
+		import /etc/caddy/beta-auth.conf
 		reverse_proxy localhost:5000
 	}
 }
 
+# VPS hostname
 prod.reed.kalisz.pl {
-	import app
-}
-
-reed.kalisz.pl {
-	import app
-}
-
-www.reed.kalisz.pl, new.reed.kalisz.pl {
-	redir https://reed.kalisz.pl{uri} permanent
+	redir https://beta.reed.kalisz.pl{uri} permanent
 }
