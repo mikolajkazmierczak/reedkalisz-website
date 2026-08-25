@@ -26,13 +26,17 @@
   let files;
   let filesMeta;
 
+  // filter out files with the "hidden" tag
+  const notHidden = {
+    _or: [{ tags: { _null: true } }, { tags: { _nicontains: '"hidden"' } }],
+  };
+
   async function read(limit, page, query) {
+    const search = {
+      _or: [{ id: { _eq: query } }, { filename_download: { _contains: query } }, { title: { _contains: query } }],
+    };
     const res = await api.files.readByQuery({
-      filter: query
-        ? {
-            _or: [{ id: { _eq: query } }, { filename_download: { _contains: query } }, { title: { _contains: query } }],
-          }
-        : {},
+      filter: { _and: query ? [search, notHidden] : [notHidden] },
       fields,
       limit,
       page,

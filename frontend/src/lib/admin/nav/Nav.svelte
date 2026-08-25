@@ -7,7 +7,6 @@
   import Icon from '$c/Icon.svelte';
   import Loader from '$c/Loader.svelte';
   import Tooltip from '$c/Tooltip.svelte';
-  import Notifications from '@/nav/Notifications.svelte';
   import NavButton from './NavButton.svelte';
   import { goto } from '$app/navigation';
 
@@ -34,11 +33,6 @@
 
   $: path = $page.url.pathname.replace('/admin', '/').replace('//', '/');
 
-  let showNotifications = false;
-  function toggleNotifications() {
-    showNotifications = !showNotifications;
-  }
-
   let awaitingLogout = false;
   async function handleLogout() {
     awaitingLogout = true;
@@ -61,7 +55,6 @@
       {/each}
     </div>
     <div class="buttons">
-      <NavButton round icon="notifications" label="Notyfikacje" on:click={toggleNotifications} />
       <NavButton round label="Wyloguj" on:click={handleLogout}>
         {#if awaitingLogout}
           <Loader />
@@ -76,8 +69,6 @@
     </div>
   </nav>
 {/if}
-
-<Notifications show={showNotifications} />
 
 <style>
   nav {
