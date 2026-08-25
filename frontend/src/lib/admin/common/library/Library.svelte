@@ -26,10 +26,8 @@
   let files;
   let filesMeta;
 
-  // filter out files with the "hidden" tag
-  const notHidden = {
-    _or: [{ tags: { _null: true } }, { tags: { _nicontains: '"hidden"' } }],
-  };
+  // tagged files are hidden from the library
+  const notHidden = { tags: { _null: true } };
 
   async function read(limit, page, query) {
     const search = {
