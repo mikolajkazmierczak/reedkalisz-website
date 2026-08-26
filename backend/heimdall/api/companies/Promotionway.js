@@ -15,13 +15,14 @@ function parseMaterials(materials) {
 function parseStock(stock) {
   // stock is always an object with stock1 and stock2 being a string ('0' if not in stock)
   if (!stock) return null; // "ask about stock"
-  return (Number(stock?.stock1) || 0) + (Number(stock?.stock2) || 0) || null; // 24h + 5-7 days
+  const amount = (Number(stock?.stock1) || 0) + (Number(stock?.stock2) || 0); // 24h + 5-7 days
+  return amount || (Number(stock?.onRequest) ? null : amount);
 }
 
 function parseImages(images) {
   // images: { image1: str, image2: str, ... } -> [str, str, ...]
   if (!images) return [];
-  return Object.values(images).filter((img) => img);
+  return Object.values(images).filter(Boolean);
 }
 
 function parse(company, offer, prices, stocks) {

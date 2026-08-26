@@ -7,6 +7,7 @@
   export let second = null;
 
   export let amount = null;
+  export let available = false;
 
   export let size = '20px';
   export let notooltip = false;
@@ -21,7 +22,7 @@
 
 <div class="wrapper" style:height={size} on:pointerenter={handleHoverChange} on:pointerleave={handleHoverChange}>
   {#if !notooltip}
-    <ProductColorTooltip {label} {amount} />
+    <ProductColorTooltip {label} {amount} {available} />
   {/if}
 
   {#if multicolored}

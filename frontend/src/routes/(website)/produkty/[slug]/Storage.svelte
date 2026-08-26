@@ -2,13 +2,15 @@
   import AdminOnlyOverlay from '#c/AdminOnlyOverlay.svelte';
   import Color from '#c/Color.svelte';
   import Gallery from './Gallery.svelte';
+  import { parseAmount, AMOUNT, NONE } from '$/storage';
 
   export let company;
   $: codeSeparator = getCodeSeparator(company);
 
   export let code;
   export let storage;
-  $: ({ enabled, amount, multicolored, api_color_code, color_first, color_second, img } = storage);
+  $: ({ enabled, amount, available, multicolored, api_color_code, color_first, color_second, img } = storage);
+  $: state = parseAmount({ available, amount });
 
   function getCodeSeparator(company) {
     switch (company?.name) {
@@ -27,7 +29,7 @@
 
   <div class="badge">
     <div class="swatch">
-      <Color {multicolored} first={color_first} second={color_second} {amount} size="2rem" />
+      <Color {multicolored} first={color_first} second={color_second} {amount} {available} size="2rem" />
     </div>
     <h3>
       <small class="code">{code}{api_color_code ? codeSeparator : ''}{api_color_code}</small>
@@ -49,12 +51,10 @@
 
   <div class="amount">
     <small>Dostępność:</small>
-    {#if amount == 0}
-      <b><small class="empty">BRAK</small></b>
-    {:else if amount}
-      {amount}
+    {#if state.state === AMOUNT}
+      {state.label}
     {:else}
-      <b><small>ZAPYTAJ</small></b>
+      <b><small class:empty={state.state === NONE}>{state.label}</small></b>
     {/if}
   </div>
 

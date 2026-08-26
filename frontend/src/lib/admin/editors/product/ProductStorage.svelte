@@ -1,6 +1,7 @@
 <script>
   import { globals, colors } from '@/globals';
   import { moveItem } from '%/utils';
+  import { parseAmount, AMOUNT } from '$/storage';
   import Tooltip from '$c/Tooltip.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
@@ -20,6 +21,7 @@
   function pushStorage() {
     product.storage.push({
       enabled: true,
+      available: false,
       img: [],
       amount: null,
       api_color_code: '',
@@ -60,9 +62,13 @@
     <h2 class="ui-h2">Kolory</h2>
     <div class="ui-section__row">
       {#each product.storage as storage, i (storage)}
+        {@const state = parseAmount({ available: storage.available, amount: storage.amount })}
         <div class="ui-box ui-box--element" class:ui-box--uneditable={!storage.enabled}>
           <div class="ui-pair storage-actions">
-            <Input type="checkbox" bind:value={storage.enabled}>Włączone</Input>
+            <div class="toggles">
+              <Input type="checkbox" bind:value={storage.enabled}>Włączone</Input>
+              <Input type="checkbox" bind:value={storage.available}>Dostępny</Input>
+            </div>
             <div>
               {#if !i == 0}
                 <Button icon="arrow_left" on:click={() => moveStorage(i, -1)} square />
@@ -75,7 +81,11 @@
           </div>
 
           <div class="ui-pair">
-            <Input type="number" bind:value={storage.amount} api={product.api_enabled}>Ilość</Input>
+            <div class="amount" class:amount--overridden={storage.available}>
+              <Input type="number" bind:value={storage.amount} api={product.api_enabled}>
+                Ilość{#if state.state !== AMOUNT}&nbsp;<small style="opacity:0.65">{state.label}</small>{/if}
+              </Input>
+            </div>
             <div class="ui-pair">
               <Input bind:value={storage.api_color_code}>
                 Kod{#if product.api_enabled}&nbsp;<small style="opacity:0.65">API</small>{/if}
@@ -164,10 +174,18 @@
     outline: var(--outline-dashed);
   }
 
-  .storage-actions div {
+  .storage-actions > div:last-child {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
+  }
+  .toggles {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .amount--overridden :global(.number-wrapper) {
+    opacity: 0.4;
   }
 
   .img-actions {

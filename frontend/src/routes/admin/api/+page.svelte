@@ -255,9 +255,11 @@
 
     for (const dbItem of dbItems) {
       const disableAndZeroStorage = (s) => {
-        // disable and zero the amount of the storage (if not true already)
-        if (s.enabled || s.amount !== 0) {
-          updates.push(() => api.items('products_storage').updateOne(s.id, { enabled: false, amount: 0 }));
+        // disable and zero the amount of the storage (if not true already) and clear `available` flag
+        if (s.enabled || s.amount !== 0 || s.available) {
+          updates.push(() =>
+            api.items('products_storage').updateOne(s.id, { enabled: false, amount: 0, available: false }),
+          );
           updatedItemsIds.changedStorage.add(dbItem.id);
         }
       };
@@ -377,6 +379,7 @@
       'storage.id',
       'storage.enabled',
       'storage.amount',
+      'storage.available',
       'storage.api_color_code',
       'storage.color_first',
       'storage.color_second',

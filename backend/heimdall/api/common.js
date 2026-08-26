@@ -1,11 +1,12 @@
 function parseStorage($) {
   const { _incompatible, _storage } = $;
-  const { img, amount, api_color_code, api_color_id, multicolored } = _storage;
+  const { img, amount, available, api_color_code, api_color_id, multicolored } = _storage;
   const { color_first, _color_first_hex, color_second, _color_second_hex } = _storage;
   return {
     _incompatible,
     img,
     amount,
+    available: available || false,
     api_color_code,
     api_color_id,
     multicolored: multicolored || false,

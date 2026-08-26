@@ -62,8 +62,8 @@ function parse(products, stocks) {
       materials: [$.material_wykonania, $.material_dodatkowy].filter(Boolean),
       colors: [$.kolor_podstawowy, $.kolor_dodatkowy].filter(Boolean),
       imgs: $.zdjecia.map((item) => `https://www.par.com.pl${item.zdjecie}`),
-      amount: Number(s.stan_magazynowy),
-      price: Number(s.cena_po_rabacie),
+      amount: s ? Number(s.stan_magazynowy) : null,
+      price: s ? Number(s.cena_po_rabacie) : null,
     };
   });
 

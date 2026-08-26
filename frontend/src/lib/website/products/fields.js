@@ -27,6 +27,7 @@ export const fields = [
 
   'storage.enabled',
   'storage.amount',
+  'storage.available',
   'storage.color_first.enabled',
   'storage.color_first.name',
   'storage.color_first.color',

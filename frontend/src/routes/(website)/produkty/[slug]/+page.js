@@ -61,6 +61,7 @@ const fields = [
 
   'storage.enabled',
   'storage.amount',
+  'storage.available',
   'storage.multicolored',
   'storage.api_color_code',
 

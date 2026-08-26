@@ -70,8 +70,8 @@
   $: imgs = getImgs(gallery, storage);
   $: imgs && setImg(0);
 
-  $: colors = storage.map(({ multicolored, color_first, color_second, amount, enabled }) => {
-    return { multicolored, first: color_first, second: color_second, amount, enabled };
+  $: colors = storage.map(({ multicolored, color_first, color_second, amount, available, enabled }) => {
+    return { multicolored, first: color_first, second: color_second, amount, available, enabled };
   });
   $: colorsHovers = colors.map(() => false);
 
@@ -85,9 +85,9 @@
 
 <!-- workaround for tooltips not working because of transform property on .tile -->
 {#if colors.length}
-  {#each colors as { multicolored, first, second, amount }, i}
+  {#each colors as { multicolored, first, second, amount, available }, i}
     {@const { label } = parseColor(multicolored, first, second)}
-    <ProductColorTooltip {label} {amount} show={colorsHovers[i]} />
+    <ProductColorTooltip {label} {amount} {available} show={colorsHovers[i]} />
   {/each}
 {/if}
 
@@ -124,12 +124,13 @@
     <div class="info__bottom">
       {#if colors.length}
         <div class="colors">
-          {#each colors as { multicolored, first, second, amount }, i}
+          {#each colors as { multicolored, first, second, amount, available }, i}
             <Color
               {multicolored}
               {first}
               {second}
               {amount}
+              {available}
               notooltip
               onhoverchange={(hover) => handleHoverChange(hover, i)} />
           {/each}

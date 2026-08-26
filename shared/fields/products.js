@@ -98,6 +98,7 @@ export const edit = [
   'storage.index',
   'storage.enabled',
   'storage.amount',
+  'storage.available',
   'storage.color_first',
   'storage.color_second',
   'storage.multicolored',
