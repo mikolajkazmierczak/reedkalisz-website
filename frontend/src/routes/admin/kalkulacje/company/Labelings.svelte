@@ -237,7 +237,7 @@
     position: sticky;
     /* left: 4rem; */
     left: 0;
-    z-index: 1;
+    z-index: 2;
   }
   .col-code {
     /* left: calc(4rem + 60px); */
