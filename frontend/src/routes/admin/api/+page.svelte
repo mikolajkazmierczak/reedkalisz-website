@@ -69,9 +69,8 @@
   let fetchingPhase = 1;
   let uploading = false;
 
-  $: scanning = fetching && fetchingPhase > 0;
   beforeNavigate((navigation) => {
-    if (scanning && !confirm('Skanowanie API jest w toku. Jeśli opuścisz stronę baza danych może zostać skoruptowana.'))
+    if (fetching && !confirm('Skanowanie API jest w toku. Jeśli opuścisz stronę baza danych może zostać skoruptowana.'))
       navigation.cancel();
   });
 
@@ -512,7 +511,7 @@
             {uploading ? 'Dodawanie...' : 'Dodaj'}
           </Button>
         {/if}
-        <Button icon="cloud" on:click={fetchApi}>Skanuj API</Button>
+        <Button disabled={fetching} icon="cloud" on:click={fetchApi}>Skanuj API</Button>
       </div>
 
       <!-- locked while fetching -->
@@ -544,6 +543,10 @@
 
 <div class="content">
   {#if fetching}
+    <small class="careful">
+      <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
+    </small>
+
     {#if fetchingPhase === 0}
       <p class="aligned"><Loader dark /> Pobieranie danych</p>
     {:else if fetchingPhase === 1}
@@ -554,13 +557,9 @@
     {:else if fetchingPhase === 3}
       <p class="aligned"><Loader dark /> Aktualizacja cenników (3/3)</p>
     {/if}
+
     {#if statusLog}
       <small class="indent">{statusLog}</small>
-    {/if}
-    {#if scanning}
-      <small class="aligned warning">
-        Nie zamykaj przeglądarki i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
-      </small>
     {/if}
   {/if}
 
@@ -646,9 +645,10 @@
   .indent {
     margin-left: 2rem;
   }
+  .careful {
+    margin-bottom: 2rem;
+  }
   .warning {
-    margin-top: 1rem;
-    font-weight: bold;
     color: var(--main);
   }
 
