@@ -1,4 +1,5 @@
 <script>
+  import { beforeNavigate } from '$app/navigation';
   import api, { baseUrl } from '$/api';
   import heimdall from '$/heimdall';
   import { SearchParams, searchparams } from '$/searchparams';
@@ -67,6 +68,12 @@
   let fetching = false;
   let fetchingPhase = 1;
   let uploading = false;
+
+  $: scanning = fetching && fetchingPhase > 0;
+  beforeNavigate((navigation) => {
+    if (scanning && !confirm('Skanowanie API jest w toku. Jeśli opuścisz stronę baza danych może zostać skoruptowana.'))
+      navigation.cancel();
+  });
 
   let statusLog = null;
 
@@ -251,7 +258,12 @@
     // update the price and storage amounts if they changed
     fetchingPhase = 2;
     const updates = [];
-    const updatedItemsIds = { disabled: new Set(), changedPrice: new Set(), changedStorage: new Set() };
+    const updatedItemsIds = {
+      disabled: new Set(),
+      enabled: new Set(),
+      changedPrice: new Set(),
+      changedStorage: new Set(),
+    };
 
     for (const dbItem of dbItems) {
       const disableAndZeroStorage = (s) => {
@@ -271,18 +283,23 @@
       if (apiItem) {
         // item exists in the api
         // update the price if it changed (or if manipulation from MidOcean changed)
+        const productUpdates = {};
         const apiPrice = round(apiItem.price);
         const priceChanged = dbItem.price !== apiPrice;
         const handlingCostChanged = dbItem.handling_cost !== apiItem.handling_cost;
         if (priceChanged || handlingCostChanged) {
-          const productUpdates = { price: apiPrice, handling_cost: apiItem.handling_cost };
-          // re-enable the item if it was marked as done
-          if (isDone && !dbItem.enabled) {
-            productUpdates.enabled = true;
-          }
-          // apply updates
-          updates.push(() => api.items('products').updateOne(dbItem.id, productUpdates));
+          productUpdates.price = apiPrice;
+          productUpdates.handling_cost = apiItem.handling_cost;
           updatedItemsIds.changedPrice.add(dbItem.id);
+        }
+        // re-enable the item if it was marked as done
+        if (isDone && !dbItem.enabled) {
+          productUpdates.enabled = true;
+          updatedItemsIds.enabled.add(dbItem.id);
+        }
+        // apply updates
+        if (Object.keys(productUpdates).length > 0) {
+          updates.push(() => api.items('products').updateOne(dbItem.id, productUpdates));
         }
 
         for (const dbStorage of dbItem.storage) {
@@ -414,8 +431,16 @@
   // triggered by fetchApi (heimdall.ask)
   heimdall.get(async (data) => {
     if (!data || data?.error) {
-      alert('Wystąpił błąd podczas skanowania API, spróbuj ponownie. Jeśli problem się powtarza, daj znać.');
-      window.location.reload(); // refresh window, might just be an expired token
+      fetching = false;
+      throw Error(
+        `Skanowanie API nie powiodło się: ${data?.error ?? 'brak odpowiedzi'}. Odśwież stronę i spróbuj ponownie. Jeśli problem się powtarza, zgłoś to naszemu ogromnemu działowi IT.`,
+      );
+    }
+
+    // only apply to the company the scan was requested for
+    if (data.company !== selectedCompany?.id) {
+      fetching = false;
+      alert(`Wynik skanowania nie pasuje do wybranej firmy. Baza danych nie została zmodyfikowana.`);
       return;
     }
 
@@ -490,10 +515,13 @@
         <Button icon="cloud" on:click={fetchApi}>Skanuj API</Button>
       </div>
 
-      <Filters
-        filters={supportedCompanies.map((c) => ({ label: c.name, value: c }))}
-        selected={selectedCompany}
-        on:change={handleCompanyChange} />
+      <!-- locked while fetching -->
+      <fieldset disabled={fetching}>
+        <Filters
+          filters={supportedCompanies.map((c) => ({ label: c.name, value: c }))}
+          selected={selectedCompany}
+          on:change={handleCompanyChange} />
+      </fieldset>
 
       <p><b>Ostatni skan:</b>&nbsp;{lastScan}</p>
 
@@ -528,6 +556,11 @@
     {/if}
     {#if statusLog}
       <small class="indent">{statusLog}</small>
+    {/if}
+    {#if scanning}
+      <small class="aligned warning">
+        Nie zamykaj przeglądarki i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
+      </small>
     {/if}
   {/if}
 
@@ -588,6 +621,11 @@
     font-size: 1rem;
     text-align: left;
   }
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
   input[type='radio'] {
     cursor: pointer;
     width: 1rem;
@@ -607,6 +645,11 @@
   }
   .indent {
     margin-left: 2rem;
+  }
+  .warning {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: var(--main);
   }
 
   .actions {

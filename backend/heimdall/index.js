@@ -56,11 +56,11 @@ io.on('connection', (socket) => {
     log(`   - api: ${company.name}`);
     try {
       const data = await fetchAPI(company);
-      socket.emit('fetch', data);
+      socket.emit('fetch', { ...data, company: company.id });
       log(`   - success`);
     } catch (err) {
-      // TODO: emit 'error' event with error message
       log(`   - error ${err}`);
+      socket.emit('fetch', { error: String(err), company: company.id });
     }
   });
 });
