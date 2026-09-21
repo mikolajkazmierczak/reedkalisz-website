@@ -646,6 +646,7 @@
     margin-left: 2rem;
   }
   .careful {
+    display: block;
     margin-bottom: 2rem;
   }
   .warning {
