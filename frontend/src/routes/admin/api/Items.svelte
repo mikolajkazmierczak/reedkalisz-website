@@ -121,148 +121,150 @@
   }
 </script>
 
-<table>
-  {#each items as item}
-    {@const getDbUrl = (slug) => `/admin/produkty/${slug}`}
-    {@const itemNotAllInApi = item.storage.some((s) => !s._api)}
-    {@const itemNotInApi = item.storage.every((s) => !s._api) || !item._api}
-    {@const itemSelected = $selected.has(item._uid)}
-    {@const itemExpanded = expanded.has(item._uid)}
-    {@const itemCompatible = !item?._incompatible}
-    {@const flag = flags && getFlag(flags, item._uid)}
-    {@const code = getCompanySpecificCode(item._uid)}
-    <tr class:selected={itemSelected}>
-      <td class="flag">
-        {#if flags}
-          <select class={flag} on:change={(e) => handleStatusChange(e, item)}>
-            {#each Object.entries(flags) as [key, { text }]}
-              <option value={key} selected={flag == key}>{text}</option>
-            {/each}
-          </select>
-        {/if}
-      </td>
-      <td class="mono index">
-        <b>{item._index + 1}</b>
-      </td>
-      <td class="mono expand">
-        {#if item.storage.length}
-          <button on:click={() => toggleExpanded(item._uid)}>
-            {itemExpanded ? '-' : `+${item.storage.length}`}
-          </button>
-        {/if}
-      </td>
-      <td class="code">
-        <div class="codeContent" title={code}>{code}</div>
-      </td>
-      <td class="mono selection">
-        {#if itemCompatible && !item.storage.every((s) => s._db)}
-          {@const all = item.storage.every((s) => $selected.has(s._uid))}
-          {@const some = item.storage.some((s) => $selected.has(s._uid))}
-          <button on:click={() => toggleItemSelected(item)}>{all ? '-' : some ? '/' : '+'}</button>
-        {/if}
-      </td>
-      <td class="name">
-        {item.name}
-        {#if item._db && !item.enabled}
-          <div class="icon">
-            <Icon height="15px" name="eye_off" />
-            <Tooltip><small>Ukryty</small></Tooltip>
-          </div>
-        {/if}
-      </td>
-      <td class="remove">
-        {#if item._db}
-          <button class="remove" on:click={() => removeItem(item)}>
-            <Icon height="16px" name="delete" color="var(--main)" />
-          </button>
-        {/if}
-      </td>
-      <td class="tags db">
-        {#if item._db}
-          <a class="tag in-db" href={getDbUrl(item.slug)} target="_blank" rel="noreferrer">
-            <Icon height="15px" name="products" />Zaimportowany
-          </a>
-        {/if}
-      </td>
-      <td class="tags api">
-        {#if itemNotInApi}
-          <div class="tag not-in-api"><Icon height="18px" name="cloud_off" />Wycofany</div>
-        {:else if itemNotAllInApi}
-          <a class="tag not-all-in-api" href={getApiUrl(item._uid, item.name)} target="_blank" rel="noreferrer">
-            <Icon height="18px" name="cloud" />Wycofane kolory
-          </a>
-        {:else}
-          <a class="tag in-api" href={getApiUrl(item._uid, item.name)} target="_blank" rel="noreferrer">
-            <Icon height="18px" name="cloud" />Dostępny
-          </a>
-        {/if}
-        {#if !itemCompatible}
-          <div class="tag not-in-api"><Icon height="18px" name="cloud_dismiss" />Niekompatybilny</div>
-        {/if}
-      </td>
-    </tr>
+<div class="scroll">
+  <table>
+    {#each items as item}
+      {@const getDbUrl = (slug) => `/admin/produkty/${slug}`}
+      {@const itemNotAllInApi = item.storage.some((s) => !s._api)}
+      {@const itemNotInApi = item.storage.every((s) => !s._api) || !item._api}
+      {@const itemSelected = $selected.has(item._uid)}
+      {@const itemExpanded = expanded.has(item._uid)}
+      {@const itemCompatible = !item?._incompatible}
+      {@const flag = flags && getFlag(flags, item._uid)}
+      {@const code = getCompanySpecificCode(item._uid)}
+      <tr class:selected={itemSelected}>
+        <td class="flag">
+          {#if flags}
+            <select class={flag} on:change={(e) => handleStatusChange(e, item)}>
+              {#each Object.entries(flags) as [key, { text }]}
+                <option value={key} selected={flag == key}>{text}</option>
+              {/each}
+            </select>
+          {/if}
+        </td>
+        <td class="mono index">
+          <b>{item._index + 1}</b>
+        </td>
+        <td class="mono expand">
+          {#if item.storage.length}
+            <button on:click={() => toggleExpanded(item._uid)}>
+              {itemExpanded ? '-' : `+${item.storage.length}`}
+            </button>
+          {/if}
+        </td>
+        <td class="code">
+          <div class="codeContent" title={code}>{code}</div>
+        </td>
+        <td class="mono selection">
+          {#if itemCompatible && !item.storage.every((s) => s._db)}
+            {@const all = item.storage.every((s) => $selected.has(s._uid))}
+            {@const some = item.storage.some((s) => $selected.has(s._uid))}
+            <button on:click={() => toggleItemSelected(item)}>{all ? '-' : some ? '/' : '+'}</button>
+          {/if}
+        </td>
+        <td class="name">
+          {item.name}
+          {#if item._db && !item.enabled}
+            <div class="icon">
+              <Icon height="15px" name="eye_off" />
+              <Tooltip><small>Ukryty</small></Tooltip>
+            </div>
+          {/if}
+        </td>
+        <td class="remove">
+          {#if item._db}
+            <button class="remove" on:click={() => removeItem(item)}>
+              <Icon height="16px" name="delete" color="var(--main)" />
+            </button>
+          {/if}
+        </td>
+        <td class="tags db">
+          {#if item._db}
+            <a class="tag in-db" href={getDbUrl(item.slug)} target="_blank" rel="noreferrer">
+              <Icon height="15px" name="products" />Zaimportowany
+            </a>
+          {/if}
+        </td>
+        <td class="tags api">
+          {#if itemNotInApi}
+            <div class="tag not-in-api"><Icon height="18px" name="cloud_off" />Wycofany</div>
+          {:else if itemNotAllInApi}
+            <a class="tag not-all-in-api" href={getApiUrl(item._uid, item.name)} target="_blank" rel="noreferrer">
+              <Icon height="18px" name="cloud" />Wycofane kolory
+            </a>
+          {:else}
+            <a class="tag in-api" href={getApiUrl(item._uid, item.name)} target="_blank" rel="noreferrer">
+              <Icon height="18px" name="cloud" />Dostępny
+            </a>
+          {/if}
+          {#if !itemCompatible}
+            <div class="tag not-in-api"><Icon height="18px" name="cloud_dismiss" />Niekompatybilny</div>
+          {/if}
+        </td>
+      </tr>
 
-    {#if $colors && itemExpanded}
-      {#each item.storage as storage}
-        {@const storageSelected = $selected.has(storage._uid)}
-        {@const storageCompatible = !storage?._incompatible}
-        {@const storageCode = getCompanySpecificCode(storage._uid)}
-        <tr class:selected={storageSelected}>
-          <td class="flag" />
-          <td class="index">
-            <span style:opacity={0.65}>{storage._index + 1}</span>
-          </td>
-          <td class="expand" />
-          <td class="code">
-            <div class="codeContent" title={storageCode}>{storageCode}</div>
-          </td>
-          <td class="selection">
-            {#if storageCompatible && !storage._db}
-              <button on:click={() => toggleStorageSelected(item, storage)}>
-                {storageSelected ? '-' : '+'}
-              </button>
-            {/if}
-          </td>
-          <td class="name">
-            {$colors && parseColors(storage.color_first, storage.color_second)}
-            {#if storage._db && !storage.enabled}
-              <div class="icon">
-                <Icon height="15px" name="eye_off" />
-                <Tooltip><small>Ukryty</small></Tooltip>
-              </div>
-            {/if}
-          </td>
-          <td class="remove">
-            {#if storage._db}
-              <button class="remove" on:click={() => removeStorage(item, storage)}>
-                <Icon height="16px" name="delete" color="var(--main)" />
-              </button>
-            {/if}
-          </td>
-          <td class="tags db">
-            {#if storage._db}
-              <a class="tag in-db" href={getDbUrl(item.slug)} target="_blank" rel="noreferrer">
-                <Icon height="15px" name="products" />Zaimportowany
-              </a>
-            {/if}
-          </td>
-          <td class="tags api">
-            {#if storage._api}
-              <a class="tag in-api" href={getApiUrl(storage._uid, item.name)} target="_blank" rel="noreferrer">
-                <Icon height="18px" name="cloud" />Dostępny
-              </a>
-            {:else}
-              <div class="tag not-in-api"><Icon height="18px" name="cloud_off" />Wycofany</div>
-            {/if}
-            {#if !storageCompatible}
-              <div class="tag not-in-api"><Icon height="18px" name="cloud_dismiss" />Niekompatybilny</div>
-            {/if}
-          </td>
-        </tr>
-      {/each}
-    {/if}
-  {/each}
-</table>
+      {#if $colors && itemExpanded}
+        {#each item.storage as storage}
+          {@const storageSelected = $selected.has(storage._uid)}
+          {@const storageCompatible = !storage?._incompatible}
+          {@const storageCode = getCompanySpecificCode(storage._uid)}
+          <tr class:selected={storageSelected}>
+            <td class="flag" />
+            <td class="index">
+              <span style:opacity={0.65}>{storage._index + 1}</span>
+            </td>
+            <td class="expand" />
+            <td class="code">
+              <div class="codeContent" title={storageCode}>{storageCode}</div>
+            </td>
+            <td class="selection">
+              {#if storageCompatible && !storage._db}
+                <button on:click={() => toggleStorageSelected(item, storage)}>
+                  {storageSelected ? '-' : '+'}
+                </button>
+              {/if}
+            </td>
+            <td class="name">
+              {$colors && parseColors(storage.color_first, storage.color_second)}
+              {#if storage._db && !storage.enabled}
+                <div class="icon">
+                  <Icon height="15px" name="eye_off" />
+                  <Tooltip><small>Ukryty</small></Tooltip>
+                </div>
+              {/if}
+            </td>
+            <td class="remove">
+              {#if storage._db}
+                <button class="remove" on:click={() => removeStorage(item, storage)}>
+                  <Icon height="16px" name="delete" color="var(--main)" />
+                </button>
+              {/if}
+            </td>
+            <td class="tags db">
+              {#if storage._db}
+                <a class="tag in-db" href={getDbUrl(item.slug)} target="_blank" rel="noreferrer">
+                  <Icon height="15px" name="products" />Zaimportowany
+                </a>
+              {/if}
+            </td>
+            <td class="tags api">
+              {#if storage._api}
+                <a class="tag in-api" href={getApiUrl(storage._uid, item.name)} target="_blank" rel="noreferrer">
+                  <Icon height="18px" name="cloud" />Dostępny
+                </a>
+              {:else}
+                <div class="tag not-in-api"><Icon height="18px" name="cloud_off" />Wycofany</div>
+              {/if}
+              {#if !storageCompatible}
+                <div class="tag not-in-api"><Icon height="18px" name="cloud_dismiss" />Niekompatybilny</div>
+              {/if}
+            </td>
+          </tr>
+        {/each}
+      {/if}
+    {/each}
+  </table>
+</div>
 
 <style>
   :root {
@@ -307,11 +309,17 @@
     font-weight: bold;
   }
 
+  .scroll {
+    overflow-x: auto;
+  }
   table {
     border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
   }
-
   tr {
+    /* keeps inline-flex cells on the same line */
+    white-space: nowrap;
     border: var(--border-light);
     background-color: var(--light);
   }

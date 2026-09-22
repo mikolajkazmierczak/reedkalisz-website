@@ -18,11 +18,12 @@ function parseStorage($) {
 }
 
 function parseMain($) {
-  const { _incompatible } = $;
+  const { _incompatible, _labelings } = $;
   const { name, code, slug, seo_title, seo_description, description } = $;
   const { size_x, size_y, size_z, materials, price, handling_cost, gallery } = $;
   return {
     _incompatible,
+    _labelings, // undefined for apis without labelings
     name,
     code,
     slug,
@@ -46,8 +47,15 @@ export function parseItems(items) {
   const parsed = [];
   for (const item of items) {
     const main = parsed.find((p) => p.code == item.code);
-    if (!main) parsed.push(parseMain(item));
-    else main.storage.push(parseStorage(item));
+    if (!main) {
+      parsed.push(parseMain(item));
+    } else {
+      main.storage.push(parseStorage(item));
+      // some variants lack labelings, take them from the first variant that has any
+      if (main._labelings?.length === 0 && item._labelings?.length) {
+        main._labelings = item._labelings;
+      }
+    }
   }
   return parsed;
 }

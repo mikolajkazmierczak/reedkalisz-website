@@ -6,6 +6,7 @@
   import Button from '@c/Button.svelte';
 
   import { globals, companies, globalMargins, priceViews, labelings } from '@/globals';
+  import { labelingText } from '@/labelings';
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
   import LabelingField from './LabelingField.svelte';
@@ -245,9 +246,9 @@
                       if (!company) return true; // all labelings
                       return [company.id, 4].includes(cid); // also include REED labelings
                     })
-                    .map(({ id, company: cid, code, type, name }) => {
-                      const { name: cname } = $companies.find((c) => c.id == cid);
-                      return { id, text: `${cname} ${code || '-'} ${type || '-'} ${name || '-'}` };
+                    .map((l) => {
+                      const { name: cname } = $companies.find((c) => c.id == l.company);
+                      return { id: l.id, text: labelingText(l, cname) };
                     })} />
 
                 {#if company?.api_handling_costs && product.handling_cost}

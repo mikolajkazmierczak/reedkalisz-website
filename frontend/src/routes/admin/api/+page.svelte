@@ -44,6 +44,7 @@
     'AXPOL',
     'USBSystem',
   ];
+  const labelingsCompanyNames = ['MidOcean', 'BlueCollection']; // apis that provide `_labelings`
   $: supportedCompanies = $companies?.filter((c) => supportedCompanyNames.includes(c.name));
   $: supportedCompanies && selectCompany();
 
@@ -92,6 +93,9 @@
   $: mergedItems = merge(selectedCompany, dbItems, apiItems, { sort, query });
 
   $: lastScan = parseDatetime(selectedCompany?.api_last_scan).str() ?? 'Nie skanowano';
+  $: apiLabelingCodes = [
+    ...new Set((apiItems ?? []).flatMap((i) => (i._labelings ?? []).flatMap((l) => l.techniques))),
+  ].sort();
   $: selectedCount = $selected && countSelected(mergedItems); // { items: 1, storages: 2, all: 3 }
 
   // TODO: add api_handling_costs the same way that api_discount works,
@@ -506,35 +510,41 @@
 {#if supportedCompanies}
   <div class="actions">
     <div>
-      <div>
-        {#if selectedCount.all}
-          <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
-            {uploading ? 'Dodawanie...' : 'Dodaj'}
-          </Button>
+      {#if fetching}
+        <small class="careful">
+          <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
+        </small>
+      {:else}
+        <div>
+          {#if selectedCount.all}
+            <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
+              {uploading ? 'Dodawanie...' : 'Dodaj'}
+            </Button>
+          {/if}
+          <Button disabled={fetching} icon="cloud" on:click={fetchApi}>Skanuj API</Button>
+        </div>
+
+        <!-- locked while fetching -->
+        <fieldset disabled={fetching}>
+          <Filters
+            filters={supportedCompanies.map((c) => ({ label: c.name, value: c }))}
+            selected={selectedCompany}
+            on:change={handleCompanyChange} />
+        </fieldset>
+
+        <p><b>Ostatni skan:</b>&nbsp;{lastScan}</p>
+
+        {#if selectedCompany.api_discount !== null}
+          <p>
+            <b>Rabat:</b>&nbsp;<input
+              class="discount"
+              type="number"
+              min="0"
+              max="100"
+              value={discount}
+              on:input={handleDiscountChange} />&nbsp;%
+          </p>
         {/if}
-        <Button disabled={fetching} icon="cloud" on:click={fetchApi}>Skanuj API</Button>
-      </div>
-
-      <!-- locked while fetching -->
-      <fieldset disabled={fetching}>
-        <Filters
-          filters={supportedCompanies.map((c) => ({ label: c.name, value: c }))}
-          selected={selectedCompany}
-          on:change={handleCompanyChange} />
-      </fieldset>
-
-      <p><b>Ostatni skan:</b>&nbsp;{lastScan}</p>
-
-      {#if selectedCompany.api_discount !== null}
-        <p>
-          <b>Rabat:</b>&nbsp;<input
-            class="discount"
-            type="number"
-            min="0"
-            max="100"
-            value={discount}
-            on:input={handleDiscountChange} />&nbsp;%
-        </p>
       {/if}
     </div>
 
@@ -544,10 +554,6 @@
 
 <div class="content">
   {#if fetching}
-    <small class="careful">
-      <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
-    </small>
-
     {#if fetchingPhase === 0}
       <p class="aligned"><Loader dark /> Pobieranie danych</p>
     {:else if fetchingPhase === 1}
@@ -596,7 +602,10 @@
 {/if}
 
 {#if !fetching && selectedCompany}
-  <LabelingsMappings apiCompany={selectedCompany} />
+  <LabelingsMappings
+    apiCompany={selectedCompany}
+    supported={labelingsCompanyNames.includes(selectedCompany.name)}
+    apiCodes={apiLabelingCodes} />
 {/if}
 
 <!-- <div class="warning">
@@ -647,8 +656,7 @@
     margin-left: 2rem;
   }
   .careful {
-    display: block;
-    margin-bottom: 2rem;
+    margin-left: 1rem;
   }
   .warning {
     color: var(--main);

@@ -8,6 +8,7 @@
   export let secondary = false;
   export let dangerous = false;
   export let square = false;
+  export let small = false;
 
   export let edited = false;
   export let disabled = false;
@@ -24,6 +25,7 @@
   class:secondary
   class:dangerous
   class:square
+  class:small
   class:edited
   {disabled}
   style:border-radius={borderRadius}
@@ -31,7 +33,7 @@
   {#if !disabled}
     <HoverCircle color={hoverColor} />
   {/if}
-  <div class="content" class:label={$$slots.default} class:square>
+  <div class="content" class:label={$$slots.default} class:square class:small>
     {#if icon}<Icon height="58%" name={icon} light={!secondary} dark={secondary} />{/if}
     {#if $$slots.default}<slot />{/if}
   </div>
@@ -49,6 +51,9 @@
   }
   button.square {
     aspect-ratio: 1 / 1;
+  }
+  button.small {
+    height: 1.5rem;
   }
   .dangerous {
     background-color: var(--primary-dark);
@@ -70,6 +75,14 @@
   }
   .content.square {
     padding: 0;
+  }
+  .content.small {
+    gap: 0.25rem;
+    font-size: 0.85rem;
+  }
+  .content.small:not(.square) {
+    /* `:not` so it doesn't override the square padding and squeeze the icon sideways */
+    padding: 0 0.5rem;
   }
   .secondary .content {
     color: var(--accent-text);

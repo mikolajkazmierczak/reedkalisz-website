@@ -1,87 +1,128 @@
 <script>
-  import { handleIndexClick, handleIndexInput } from './utils';
   import Icon from '$c/Icon.svelte';
+  import { labelings } from '@/globals';
+  import { findLabeling } from '@/labelings';
+  import { newTarget } from './utils';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import Direct from './Direct.svelte';
+  import Target from './Target.svelte';
   import Thresholds from './Thresholds.svelte';
 
   const types = [
     { id: 'direct', text: 'Bezpośrednio' },
-    { id: 'price', text: 'Zależy od ceny produktu' },
-    { id: 'area', text: 'Zależy od powierzchni' },
+    { id: 'price', text: 'Według ceny' },
+    { id: 'area', text: 'Według powierzchni' },
+    { id: 'ignore', text: 'Nie importuj' },
   ];
 
   export let apiCompany;
+  export let apiCodes = []; // labeling codes found in the api snapshot
   export let mappings;
   export let mapping;
 
-  // will switch the mapping from object to list just once
-  $: if (mapping.type === 'direct' && Array.isArray(mapping.data)) {
-    mapping.data = { company: 4, code: '' }; // Default to REED
+  // the code is set when the rule is added (from the list of api codes) and never edited afterwards
+  $: codeMissing = !apiCodes.includes(mapping.code);
+  $: targets = mapping.type === 'ignore' ? [] : Array.isArray(mapping.data) ? mapping.data : [mapping.data];
+  $: broken = [
+    ...(apiCodes.length && codeMissing ? [`kodu "${mapping.code || '—'}" nie ma w API`] : []),
+    ...targets
+      // an unset target is not an error yet - the rule was just added, or `prune` will drop it
+      .filter((t) => t.code && !findLabeling($labelings, t.company, t.code))
+      .map((t) => `nie mamy znakowania "${t.code}"`),
+  ];
+  // a rule pointing at our labeling with the very same code does what the import does on its own
+  $: useless =
+    !broken.length &&
+    targets.length > 0 &&
+    targets.every((t) => t.company === apiCompany.id && t.code === mapping.code);
+
+  const isTarget = (data) => !!data && !Array.isArray(data);
+
+  // will switch the mapping data to the shape the type needs, just once
+  $: if (mapping.type === 'ignore') {
+    if (mapping.data !== null) mapping.data = null;
+  } else if (mapping.type === 'direct' && !isTarget(mapping.data)) {
+    mapping.data = newTarget(apiCompany, $labelings);
   } else if (['price', 'area'].includes(mapping.type) && !Array.isArray(mapping.data)) {
     mapping.data = [];
   }
 
   function remove() {
-    // Remove the item and reindex the rest.
-    mappings = mappings.filter((m) => m._uid !== mapping._uid).map((m, i) => ({ ...m, _index: i }));
-  }
-
-  async function handleInput(e) {
-    await handleIndexInput(e, mappings, mapping);
-    mappings = mappings;
+    mappings = mappings.filter((m) => m._uid !== mapping._uid);
   }
 </script>
 
-<div class="ui-box ui-box--element wrapper">
-  <div class="left">
-    <Button dangerous square icon="delete" on:click={remove} />
-    <Input type="number" min={0} step={1} value={mapping._index} on:click={handleIndexClick} on:input={handleInput} />
-    <div class="icon">|</div>
-    <Input bind:value={mapping.code} placeholder="Kod u producenta" />
-    <Input type="select" bind:value={mapping.type} options={types} />
-    <div class="icon">
-      <Icon name="arrow_import" />
-    </div>
-  </div>
+<div class="mapping">
+  {#if broken.length}
+    <small class="warning">Reguła nie zadziała: {[...new Set(broken)].join(', ')}.</small>
+  {:else if useless}
+    <small class="useless">Zbędna reguła: znakowanie zaimportuje się według kodu.</small>
+  {/if}
 
-  <div class="right">
-    {#if mapping.type === 'direct' && !Array.isArray(mapping.data)}
-      <Direct {apiCompany} bind:company={mapping.data.company} bind:code={mapping.data.code} />
-    {:else if ['price', 'area'].includes(mapping.type) && Array.isArray(mapping.data)}
-      <Thresholds {apiCompany} bind:thresholds={mapping.data} />
-    {/if}
-  </div>
+  <div class="c-remove"><Button small dangerous square icon="delete" on:click={remove} /></div>
+  <div class="c-code" class:missing={apiCodes.length && codeMissing}>{mapping.code || '—'}</div>
+  <div class="c-type"><Input type="select" bind:value={mapping.type} options={types} /></div>
+
+  {#if mapping.type === 'ignore'}
+    <div class="c-condition">&mdash;</div>
+    <div class="c-target ignored">znakowanie zostanie pominięte</div>
+  {:else if mapping.type === 'direct' && isTarget(mapping.data)}
+    <div class="c-condition">&mdash;</div>
+    <div class="c-arrow"><Icon name="arrow_import" /></div>
+    <Target {apiCompany} bind:company={mapping.data.company} bind:code={mapping.data.code} />
+  {:else if ['price', 'area'].includes(mapping.type) && Array.isArray(mapping.data)}
+    <Thresholds {apiCompany} unit={mapping.type === 'price' ? 'zł' : 'mm²'} bind:thresholds={mapping.data} />
+  {/if}
 </div>
 
 <style>
-  .wrapper {
-    --index-w: 4rem;
-    --code-w: 10rem;
-    --type-w: 15rem;
-    --icon-w: 2rem;
-    --gap: 0.5rem;
+  .mapping {
     display: grid;
-    grid-template-columns: auto auto;
-    padding: var(--gap);
-    width: auto;
-  }
-
-  .left {
-    align-self: start;
-    display: grid;
-    grid-template-columns: auto var(--index-w) var(--icon-w) var(--code-w) var(--type-w) var(--icon-w);
+    grid-template-columns: var(--columns);
     gap: var(--gap);
+    align-items: center;
+    padding: var(--gap) 0;
+    border-bottom: var(--border-light);
   }
-  .icon {
+  .warning,
+  .useless {
+    grid-column: 1 / -1;
+  }
+  .warning {
+    color: var(--main);
+  }
+  .useless {
+    color: #b26a00;
+  }
+  .c-remove {
+    grid-column: 1;
+  }
+  .c-code {
+    grid-column: 2;
+    /* the column fits the widest code, so the padding keeps it off its neighbours */
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    font-weight: bold;
+  }
+  .c-code.missing {
+    color: var(--main);
+    text-decoration: line-through;
+  }
+  .c-type {
+    grid-column: 3;
+  }
+  .c-condition {
+    grid-column: 4 / span 2;
+    font-size: 0.9rem;
+    color: var(--accent);
+  }
+  .c-arrow {
+    grid-column: 6;
     place-self: center;
   }
-
-  .right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--gap);
+  .c-target.ignored {
+    grid-column: 7;
+    font-size: 0.9rem;
+    color: var(--accent-dark);
   }
 </style>

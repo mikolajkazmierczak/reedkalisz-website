@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "directus",
+      "cwd": "backend/directus",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["directus", "start"],
+      "port": 8055
+    },
+    {
+      "name": "heimdall",
+      "cwd": "backend/heimdall",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["./index.js"],
+      "port": 9999
+    },
+    {
+      "name": "frontend",
+      "cwd": "frontend",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "dev", "--port", "5000", "--host"],
+      "port": 5000
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { defaults } from '%/fields/labelings';
 import { labelings, companies } from '@/globals';
+import { findLabeling } from '@/labelings';
 
 function newProductLabeling(selectedCompany, apiLabeling, index, labelingID) {
   // Create a new labeling object with the given parameters.
@@ -21,26 +22,41 @@ function newProductLabeling(selectedCompany, apiLabeling, index, labelingID) {
   return labeling;
 }
 
-function findLabeling(company, code) {
-  const labeling = get(labelings).find((l) => l.company === company && l.code === code);
-  if (labeling) return labeling;
-  console.warn(`Labeling ${companyName}/${code} not found.`);
+function companyName(id) {
+  return get(companies).find((c) => c.id === id)?.name ?? id;
 }
 
-function chooseThreshold(value, thresholds) {
-  // Choose the appropriate threshold based on the value and the defined thresholds.
+export function chooseThreshold(value, thresholds) {
+  // Choose the matching threshold with the highest bound, so the order of thresholds doesn't matter.
   let chosen = null;
   for (const threshold of thresholds) {
-    console.log(threshold);
-
     const { threshold: v, type: t } = threshold;
-    if ((t === 'gte' && value >= v) || (t === 'gt' && value > v)) {
-      console.log('chosen');
-
-      chosen = threshold;
-    }
+    const matches = (t === 'gte' && value >= v) || (t === 'gt' && value > v);
+    if (matches && (!chosen || v >= chosen.threshold)) chosen = threshold;
   }
   return chosen;
+}
+
+function resolveMapping(selectedCompany, mappings, apiCode, apiItem, area) {
+  // Find the labeling to import for the given api code: either through a rule, or - if there is no
+  // rule for the code - through our own labeling of that company with the very same code.
+  const mapping = mappings.find((m) => m.code === apiCode);
+  if (!mapping) return { company: selectedCompany.id, code: apiCode, fallback: true };
+
+  const { type, data } = mapping;
+  if (type === 'ignore') {
+    console.log(`Skipping "${apiCode}" (rule says not to import it).`);
+    return null;
+  }
+  if (type === 'direct') return { company: data.company, code: data.code };
+
+  const value = type === 'price' ? apiItem.price : area;
+  const threshold = chooseThreshold(value, data);
+  if (!threshold) {
+    console.warn(`No threshold for "${apiCode}" (for ${type} "${value}").`);
+    return null;
+  }
+  return { company: threshold.company, code: threshold.code };
 }
 
 function clearDuplicates(labelings) {
@@ -59,49 +75,25 @@ export function createLabelings(selectedCompany, apiItem) {
   // Create product labelings based on the data fetched from the API, and the mapping defined above.
   // data: [{ techniques: ['CODE',...], label: 'top side', height: 0, width: 0, area: 0 }, ...]
   const productLabelings = [];
-  const mappings = selectedCompany.api_labelings_mappings;
-  if (!mappings) {
-    console.warn('No labelings mappings found for the company.');
-    return productLabelings;
-  }
+  const mappings = selectedCompany.api_labelings_mappings ?? [];
 
   for (const apiLabeling of apiItem._labelings) {
     const { techniques, area } = apiLabeling;
 
     let index = 0;
     for (const apiCode of techniques) {
-      const mapping = mappings.find((m) => m.code === apiCode);
-      if (!mapping) {
-        console.warn(`No mapping for "${apiCode}".`);
+      const resolved = resolveMapping(selectedCompany, mappings, apiCode, apiItem, area);
+      if (!resolved) continue;
+
+      const { company, code, fallback } = resolved;
+      const labeling = findLabeling(get(labelings), company, code);
+      if (!labeling) {
+        const reason = fallback ? 'no rule and no labeling with the same code' : 'labeling not found';
+        console.warn(`Skipping "${apiCode}" (${reason}: ${companyName(company)}/${code}).`);
         continue;
       }
 
-      let company, code;
-      const { type, data } = mapping;
-      if (type === 'direct') {
-        ({ company, code } = data);
-      } else if (type === 'price') {
-        const threshold = chooseThreshold(apiItem.price, data);
-        if (!threshold) {
-          console.warn(`No threshold for "${apiCode}" (for price "${item.price}").`);
-          continue;
-        }
-        ({ company, code } = threshold);
-      } else if (type === 'area') {
-        const threshold = chooseThreshold(area, data);
-        if (!threshold) {
-          console.warn(`No threshold for "${apiCode}" (for area "${area}").`);
-          continue;
-        }
-        ({ company, code } = threshold);
-      }
-
-      const companyName = get(companies).find((c) => c.id === company)?.name;
-
-      const labeling = findLabeling(company, code);
-      if (!labeling) continue;
-
-      console.log(`Labeling created (${companyName}/${code}).`);
+      console.log(`Labeling created (${companyName(company)}/${code}${fallback ? ', by code' : ''}).`);
       productLabelings.push(newProductLabeling(selectedCompany, apiLabeling, index++, labeling.id));
     }
   }
