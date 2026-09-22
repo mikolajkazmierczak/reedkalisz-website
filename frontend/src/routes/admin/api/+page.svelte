@@ -406,9 +406,10 @@
   }
 
   async function fetchApiItemsSnapshot() {
-    const snapshotFileId = selectedCompany.api_snapshot;
-    if (snapshotFileId) {
-      const download = await fetch(`${baseUrl}/assets/${snapshotFileId}`);
+    const { api_snapshot: snapshot, api_last_scan: version } = selectedCompany;
+    if (snapshot) {
+      // version to avoid cache
+      const download = await fetch(`${baseUrl}/assets/${snapshot}?v=${version}`);
       return await download.json();
     }
     return null;
