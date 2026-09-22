@@ -110,17 +110,16 @@ function parse(company, products) {
     normalizeEmptyObjects(item);
   }
 
-  const slugCounts = new Map();
-  const uniqueSlug = (base) => {
-    const count = slugCounts.get(base) ?? 0;
-    slugCounts.set(base, count + 1);
-    return count === 0 ? base : `${base}-${count}`;
-  };
+  // no code and an empty SKU, but the link's last path segment is unique
+  const linkCode = (link) =>
+    String(link || '')
+      .split('/')
+      .findLast(Boolean) || null;
 
   return parseItems(
     items.map(($) => {
       const name = $?.name || '';
-      const slug = uniqueSlug(slugify(name));
+      const code = linkCode($?.link) ?? slugify(name);
       const description = buildProductDescription($);
       const size = parseSize($?.productAttributeWymiary);
       const colors = splitCsv($?.productAttributeKolor);
@@ -130,8 +129,8 @@ function parse(company, products) {
 
       return {
         name: fullName,
-        code: slug,
-        slug,
+        code,
+        slug: slugify([code, name], { key: true }),
         seo_title: name,
         seo_description: $?.description || name,
         description,
@@ -142,7 +141,7 @@ function parse(company, products) {
         _storage: {
           img: $?.imageUrl,
           amount: null, // ask for stock
-          api_color_code: slug,
+          api_color_code: code,
           multicolored,
           color_first: multicolored ? null : (colors[0] ?? null),
           color_second: multicolored ? null : (colors[1] ?? null),

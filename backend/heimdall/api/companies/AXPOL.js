@@ -32,51 +32,79 @@ function parseStock(stock, order, delivery) {
 }
 
 export function parseCode(code) {
-  // occurence of any symbol other than a letter or a number is the start of the color code
-  // test.x -> { productCode: 'test', colorCode: '.x' }
-  // test   -> { productCode: 'test', colorCode: '' }
-  const match = code.match(/[^\w\d]/);
-  const index = match ? match.index : code.length;
-  const productCode = code.slice(0, index);
-  const colorCode = code.slice(index);
-  return { productCode, colorCode };
+  // AXPOL uses three schemes
+  // the separator alone does not tell them apart
+  // two of them start with a dot, so the segment count decides
+  //
+  // 'T9200.001.XL' -> { productCode: 'T9200',   colorCode: '.001.XL' } // apparel: colour + size
+  // 'P437.3001'    -> { productCode: 'P437.30', colorCode: '.01' }     // 2-digit product, 2-digit colour
+  // 'P322.081'     -> { productCode: 'P322.08', colorCode: '.1' }      // ...or 1-digit colour
+  // 'V2329/A-03'   -> { productCode: 'V2329/A', colorCode: '-03' }     // '/A' is part of the product
+  // 'V3452-08'     -> { productCode: 'V3452',   colorCode: '-08' }
+  // 'V0001'        -> { productCode: 'V0001',   colorCode: '' }
+  //
+  // in the dot scheme the first two digits belong to the product and the rest is the color,
+  // 1-digit colors have elided 2-digit codes (1 -> 01)
+  // colors past 09 need the second digit, which is why the 4-digit form exists at all
+  // (treating the whole suffix as color would merge every sub-product)
+  //
+  // ...what a mess
+
+  const c = String(code || '').trim();
+  if (!c) return null; // codeless rows
+  const dot = c.indexOf('.');
+  if (dot >= 0) {
+    const segments = c.slice(dot + 1).split('.');
+    if (segments.length > 1) return { productCode: c.slice(0, dot), colorCode: `.${segments.join('.')}` };
+    if (/^\d{3,4}$/.test(segments[0])) {
+      return { productCode: c.slice(0, dot + 3), colorCode: `.${segments[0].slice(2)}` };
+    }
+    return { productCode: c.slice(0, dot), colorCode: c.slice(dot) };
+  }
+  // last dash, not the first symbol, so a '/A' sub-variant stays in the product code
+  const dash = c.lastIndexOf('-');
+  if (dash > 0) return { productCode: c.slice(0, dash), colorCode: c.slice(dash) };
+  return { productCode: c, colorCode: '' };
 }
 
 function parse(company, products) {
   const handlingCosts = company?.api_handling_costs ?? [];
 
   return parseItems(
-    products.map(($) => {
-      const { productCode, colorCode } = parseCode($.CodeERP);
-      const name = $.TitlePL || '';
-      const description = $.DescriptionPL || '';
-      const size = parseSize($.Dimensions);
-      const price = parsePrice(company, $.NetPricePLN, !$.Sale); // apply discount if the product is not on sale
-      const amount = parseStock($.InStock, $.onOrder, $.nextDelivery);
-      const colors = parseColor($.ColorPL);
-      return {
-        name,
-        code: productCode,
-        slug: slugify([productCode, name], { key: true }),
-        seo_title: name,
-        seo_description: description,
-        description,
-        size_x: size.x,
-        size_y: size.y,
-        size_z: size.z,
-        materials: $.MaterialPL?.split(',').map((m) => m.trim()),
-        price,
-        handling_cost: handlingCosts.find((h) => h.code === $.HandlingCost)?.price || null,
-        _storage: {
-          img: $.Foto,
-          amount,
-          api_color_code: colorCode,
-          api_color_id: $.productId,
-          color_first: colors.first, // str
-          color_second: colors.second, // str
-        },
-      };
-    }),
+    products
+      // leftover header row and codeless banner rows
+      .filter(($) => $.CodeERP && $.CodeERP !== 'symbol')
+      .map(($) => {
+        const { productCode, colorCode } = parseCode($.CodeERP);
+        const name = $.TitlePL || '';
+        const description = $.DescriptionPL || '';
+        const size = parseSize($.Dimensions);
+        const price = parsePrice(company, $.NetPricePLN, !$.Sale); // apply discount if the product is not on sale
+        const amount = parseStock($.InStock, $.onOrder, $.nextDelivery);
+        const colors = parseColor($.ColorPL);
+        return {
+          name,
+          code: productCode,
+          slug: slugify([productCode, name], { key: true }),
+          seo_title: name,
+          seo_description: description,
+          description,
+          size_x: size.x,
+          size_y: size.y,
+          size_z: size.z,
+          materials: $.MaterialPL?.split(',').map((m) => m.trim()),
+          price,
+          handling_cost: handlingCosts.find((h) => h.code === $.HandlingCost)?.price || null,
+          _storage: {
+            img: $.Foto,
+            amount,
+            api_color_code: colorCode,
+            api_color_id: $.productId,
+            color_first: colors.first, // str
+            color_second: colors.second, // str
+          },
+        };
+      }),
   );
 }
 
