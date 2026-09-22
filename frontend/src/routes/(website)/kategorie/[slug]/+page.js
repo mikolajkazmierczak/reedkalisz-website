@@ -4,7 +4,7 @@ import { writable, get } from 'svelte/store';
 import api from '$/api';
 import { parseSearchToParams } from '$/searchparams';
 import { treeGetAllChildrenIDs } from '%/utils';
-import { fields } from '#/products/fields';
+import { fields, enabledFilter } from '#/products/fields';
 
 const countStore = writable();
 const filterStore = writable();
@@ -12,15 +12,15 @@ const filterStore = writable();
 async function getFilter(query, category, categoriesTree) {
   // by search query
   if (query) {
-    return { _or: [{ name: { _contains: query } }, { code: { _contains: query } }] };
+    return { ...enabledFilter, _or: [{ name: { _contains: query } }, { code: { _contains: query } }] };
   }
   // by category
   if (category) {
     const getIDs = (c) => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
-    return { categories: { category: { _in: getIDs(category.id) } } };
+    return { ...enabledFilter, categories: { category: { _in: getIDs(category.id) } } };
   }
   // all products
-  return {};
+  return { ...enabledFilter };
 }
 
 export async function load({ url, parent, params }) {
@@ -28,7 +28,8 @@ export async function load({ url, parent, params }) {
 
   const { l, p, q } = parseSearchToParams(url.search);
 
-  const category = categoriesItems.find((c) => c.slug === params.slug);
+  // `enabled` so it 404s for admins too
+  const category = categoriesItems.find((c) => c.slug === params.slug && c.enabled);
   if (params.slug !== '_' && !category) throw error(404, '404');
 
   const filter = await getFilter(q, category, categoriesTree);

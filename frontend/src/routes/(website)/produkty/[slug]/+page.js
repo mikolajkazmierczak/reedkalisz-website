@@ -47,6 +47,7 @@ const fields = [
   'labelings.labeling.code',
   'labelings.labeling.type',
   'labelings.labeling.name',
+  'labelings.labeling.company.name',
 
   'labelings.prices.enabled',
   'labelings.prices.amount',

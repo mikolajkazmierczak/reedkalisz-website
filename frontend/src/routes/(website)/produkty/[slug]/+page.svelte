@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
 
   import { treeGetItem, treeGetItemsFromPath } from '%/utils';
+  import { me } from '$/auth';
   import AdminOnlyOverlay from '#c/AdminOnlyOverlay.svelte';
   import AdminBadge from '#c/badges/AdminBadge.svelte';
   import SaleBadge from '#c/badges/SaleBadge.svelte';
@@ -183,11 +184,14 @@
 
         {#if showLabelingsPrices}
           {#each labelings as labeling}
-            {@const { code, type, name } = labeling.labeling}
+            {@const { code, type, name, company } = labeling.labeling}
             <div class="pricing">
               <h3 class="pricing-title">
                 <span class="pricing-name">{name}</span>
                 <span class="pricing-info">
+                  {#if $me && company?.name}
+                    <span class="pricing-company">{company.name}</span>
+                  {/if}
                   <span class="pricing-code">{code ?? ''}</span>
                   <span class="pricing-type">{type ?? ''}</span>
                 </span>
@@ -321,9 +325,17 @@
     gap: 0.4rem;
     margin-left: 0.5rem;
     font-size: 0.75em;
+  }
+  .pricing-code,
+  .pricing-type {
     opacity: 0.6;
   }
   .pricing-type {
+    font-weight: bold;
+  }
+  /* admin only */
+  .pricing-company {
+    color: red;
     font-weight: bold;
   }
 

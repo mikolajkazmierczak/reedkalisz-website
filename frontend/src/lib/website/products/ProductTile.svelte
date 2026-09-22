@@ -4,7 +4,6 @@
   import { baseUrl } from '$/api';
   import { parseColor } from '#/utils';
   import Color from '#c/Color.svelte';
-  import AdminOnlyOverlay from '#c/AdminOnlyOverlay.svelte';
   import SaleBadge from '#c/badges/SaleBadge.svelte';
   import NewBadge from '#c/badges/NewBadge.svelte';
   import BestsellerBadge from '#c/badges/BestsellerBadge.svelte';
@@ -17,7 +16,6 @@
     name,
     code,
     slug,
-    enabled,
     new: isNew,
     sale,
     bestseller,
@@ -53,7 +51,7 @@
     for (const { enabled, img } of gallery) {
       if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=medium` });
     }
-    for (const s of storage) {
+    for (const s of storage.filter((s) => s.enabled)) {
       for (const { enabled, img } of s.img) {
         if (enabled) imgs.push({ enabled, src: `${baseUrl}/assets/${img}?key=medium` });
       }
@@ -70,9 +68,12 @@
   $: imgs = getImgs(gallery, storage);
   $: imgs && setImg(0);
 
-  $: colors = storage.map(({ multicolored, color_first, color_second, amount, available, enabled }) => {
-    return { multicolored, first: color_first, second: color_second, amount, available, enabled };
-  });
+  // disabled variants are hidden even from admins
+  $: colors = storage
+    .filter((s) => s.enabled)
+    .map(({ multicolored, color_first, color_second, amount, available }) => {
+      return { multicolored, first: color_first, second: color_second, amount, available };
+    });
   $: colorsHovers = colors.map(() => false);
 
   $: priceType = getPriceType(price_min, custom_prices, custom_prices_sale, labelings);
@@ -100,8 +101,6 @@
   class:coming_soon
   class:out_of_stock
   in:fly={{ y: -20, duration: 100 }}>
-  <AdminOnlyOverlay show={!enabled} />
-
   <div class="img-wrapper">
     {#if img}
       <img src={img.src} alt={img.alt} />

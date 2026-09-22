@@ -1,3 +1,5 @@
+export const enabledFilter = { enabled: { _eq: true } };
+
 export const fields = [
   'id',
   'name',
