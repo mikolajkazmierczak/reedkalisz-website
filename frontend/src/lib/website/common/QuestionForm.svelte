@@ -62,7 +62,7 @@
 <form class="qf" bind:this={form} on:submit|preventDefault={handleSend} novalidate>
   {#if product}
     <p class="qf__about">
-      Pytasz o <strong>{product.name}</strong> <span class="code">{product.code}</span> — dołączymy kod do wiadomości.
+      Pytasz o <strong>{product.name}</strong> <span class="code">{product.code}</span>.
     </p>
   {/if}
 
@@ -98,7 +98,7 @@
         rows="5"
         bind:value={content}
         aria-required="true"
-        placeholder="Np. potrzebuję 250 sztuk z nadrukiem logo w dwóch kolorach — na kiedy i za ile?"
+        placeholder="Np. Potrzebuję 250 sztuk z nadrukiem logo w dwóch kolorach. Jaki byłby czas realizacji i cena?"
         aria-invalid={errors.content ? 'true' : undefined}
         aria-describedby={errors.content ? 'qf-content' : undefined}
         class:invalid={errors.content}></textarea>
@@ -136,9 +136,7 @@
     </button>
 
     {#if alreadySent}
-      <p class="qf__note qf__note--ok" role="status">
-        Dziękujemy — odezwiemy się z ceną i terminem. Zmień treść, żeby wysłać kolejne pytanie.
-      </p>
+      <p class="qf__note qf__note--ok" role="status">Dziękujemy, przyjęliśmy wiadomość!</p>
     {:else if !consent}
       <p class="qf__note">Zaznacz zgodę, żeby wysłać.</p>
     {/if}

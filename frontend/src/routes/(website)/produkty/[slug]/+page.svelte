@@ -279,7 +279,7 @@
               </div>
 
               <div class="buy__ask" id="zapytaj" bind:this={askEl}>
-                <h2 class="buy__ask-title" tabindex="-1">Zapytaj o wycenę</h2>
+                <h2 class="buy__ask-title" tabindex="-1">Zapytanie</h2>
                 <QuestionForm source="product" product={{ code, name, slug }} />
               </div>
             </div>
