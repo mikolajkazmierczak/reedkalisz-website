@@ -42,6 +42,19 @@ install_caddyfile() {
   sudo systemctl reload caddy 2>/dev/null || sudo systemctl restart caddy
 }
 
+# basic auth for beta.reed.kalisz.pl
+# only bcrypt hash (NOT the password) reaches the server config
+write_beta_auth() {
+  local conf=/etc/caddy/beta-auth.conf
+  [[ -n "${BETA_AUTH_USER:-}" && -n "${BETA_AUTH_PASSWORD:-}" ]] \
+    || fail "BETA_AUTH_USER/BETA_AUTH_PASSWORD not set in scripts/.env"
+  printf 'basic_auth {\n\t%s %s\n}\n' \
+    "$BETA_AUTH_USER" "$(caddy hash-password --plaintext "$BETA_AUTH_PASSWORD")" \
+    | sudo tee "$conf" >/dev/null
+  sudo chown root:caddy "$conf"
+  sudo chmod 640 "$conf"
+}
+
 # poll an endpoint until it answers 2xx/3xx; returns 1 on timeout
 wait_http() {
   local url="$1" tries="${2:-30}" i

@@ -48,7 +48,14 @@ beta.reed.kalisz.pl {
 	handle {
 		# basic auth guard
 		import /etc/caddy/beta-auth.conf
-		reverse_proxy localhost:5000
+
+		# the "beta" branch (see deploy.sh)
+		reverse_proxy localhost:5001
+	}
+
+	# no beta branch
+	handle_errors 502 {
+		respond "Brak wersji beta" 404
 	}
 }
 

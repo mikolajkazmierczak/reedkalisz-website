@@ -34,7 +34,6 @@ TIMEZONE="${TIMEZONE:-Europe/Warsaw}"
 SWAP_SIZE="${SWAP_SIZE:-2G}"
 
 CADDYFILE="$REPO/Caddyfile"
-BETA_AUTH_CONF=/etc/caddy/beta-auth.conf
 
 # fail here rather than seven steps in
 [[ -f scripts/.env ]] || fail "scripts/.env missing — copy scripts/!.env and fill it in first"
@@ -126,17 +125,8 @@ fi
 success "$(caddy version | head -1)"
 
 step "Setting up beta.reed.kalisz.pl basic auth"
-# only the bcrypt hash (NOT the password) reaches the server config
-if sudo test -f "$BETA_AUTH_CONF"; then
-  success "already configured — delete $BETA_AUTH_CONF to change the password"
-else
-  printf 'basic_auth {\n\t%s %s\n}\n' \
-    "$BETA_AUTH_USER" "$(caddy hash-password --plaintext "$BETA_AUTH_PASSWORD")" \
-    | sudo tee "$BETA_AUTH_CONF" >/dev/null
-  sudo chown root:caddy "$BETA_AUTH_CONF"
-  sudo chmod 640 "$BETA_AUTH_CONF"
-  success "basic auth configured for user $BETA_AUTH_USER"
-fi
+write_beta_auth
+success "basic auth configured for user $BETA_AUTH_USER (change it in scripts/.env, then deploy.sh --caddy)"
 
 step "Installing Caddyfile"
 sudo test -f "$ORIGIN_CRT" && sudo test -f "$ORIGIN_KEY" \

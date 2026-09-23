@@ -134,8 +134,13 @@ Then, by hand, because they need secrets and data:
 ./scripts/deploy.sh             # pull, build, reload sveltekit
 ./scripts/deploy.sh --full      # ...and reload heimdall + directus
 ./scripts/deploy.sh --install   # ...and npm ci everything first
-./scripts/deploy.sh --caddy     # reinstall Caddyfile, reload Caddy
+./scripts/deploy.sh --caddy     # rewrite beta auth, reinstall Caddyfile, reload Caddy
 ```
+
+Production always builds from `main` (deploy stops if on another branch).
+
+`beta.reed.kalisz.pl` (behind basic auth, never indexed) shows the `beta` branch if it exists.
+Both sites share one Directus, so content edited on beta is live.
 
 #### Backups
 
