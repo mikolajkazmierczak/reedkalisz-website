@@ -32,6 +32,13 @@
   let tileInputsOpen = false;
   let buttonInputsOpen = false;
 
+  // Each <br>-separated line becomes its own element, so its blur fits it; blank lines are dropped.
+  const lines = (html) =>
+    html
+      .split(/<br\s*\/?>/i)
+      .map((line) => line.trim())
+      .filter((line) => line && line !== '&nbsp;');
+
   function toggleButtonInputs() {
     buttonInputsOpen = !buttonInputsOpen;
   }
@@ -239,10 +246,14 @@
               </p>
             {:else}
               {#if tile.title}
-                <h2 class="title" class:dark>{@html tile.title}</h2>
+                <h2 class="title" class:dark>
+                  {#each lines(tile.title) as line}<span class="line">{@html line}</span>{' '}{/each}
+                </h2>
               {/if}
               {#if tile.subtitle}
-                <p class="subtitle" class:dark>{@html tile.subtitle}</p>
+                <p class="subtitle" class:dark>
+                  {#each lines(tile.subtitle) as line}<span class="line">{@html line}</span>{' '}{/each}
+                </p>
               {/if}
             {/if}
           </div>
@@ -403,35 +414,26 @@
     line-height: 1.25;
     overflow-wrap: break-word;
   }
-  /* Hard outline in the opposite tone over photos: a ring of 16 shadows (a text stroke spikes on M, V, W). */
+  .line {
+    display: block;
+  }
+  /* Over a photo every line sits on its own blur, fitted to it: legible on a busy picture, invisible on a calm
+     one. In the editor the whole field gets it (contenteditable must stay a single block). */
   .photo .title,
   .photo .subtitle {
-    --ol: var(--ink);
-    --w: 0.1em;
-    text-shadow:
-      calc(var(--w) * 1) 0 0 var(--ol),
-      calc(var(--w) * 0.924) calc(var(--w) * 0.383) 0 var(--ol),
-      calc(var(--w) * 0.707) calc(var(--w) * 0.707) 0 var(--ol),
-      calc(var(--w) * 0.383) calc(var(--w) * 0.924) 0 var(--ol),
-      0 calc(var(--w) * 1) 0 var(--ol),
-      calc(var(--w) * -0.383) calc(var(--w) * 0.924) 0 var(--ol),
-      calc(var(--w) * -0.707) calc(var(--w) * 0.707) 0 var(--ol),
-      calc(var(--w) * -0.924) calc(var(--w) * 0.383) 0 var(--ol),
-      calc(var(--w) * -1) 0 0 var(--ol),
-      calc(var(--w) * -0.924) calc(var(--w) * -0.383) 0 var(--ol),
-      calc(var(--w) * -0.707) calc(var(--w) * -0.707) 0 var(--ol),
-      calc(var(--w) * -0.383) calc(var(--w) * -0.924) 0 var(--ol),
-      0 calc(var(--w) * -1) 0 var(--ol),
-      calc(var(--w) * 0.383) calc(var(--w) * -0.924) 0 var(--ol),
-      calc(var(--w) * 0.707) calc(var(--w) * -0.707) 0 var(--ol),
-      calc(var(--w) * 0.924) calc(var(--w) * -0.383) 0 var(--ol);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
   }
-  .photo .title.dark,
-  .photo .subtitle.dark {
-    --ol: #fdfdfc;
-  }
-  .photo .subtitle {
-    --w: 0.15em;
+  /* The blur reaches past the text rather than pushing it in: title, subtitle and button share one left edge. */
+  .photo .line,
+  .photo .editing :global([contenteditable]) {
+    margin-inline: -0.375rem;
+    padding: 0.0625rem 0.375rem;
+    border-radius: 0.25rem;
+    -webkit-backdrop-filter: blur(0.75rem);
+    backdrop-filter: blur(0.75rem);
   }
   .button {
     cursor: pointer;
@@ -442,10 +444,10 @@
     border-radius: var(--r-pill);
     corner-shape: squircle;
     padding: 0.4em 0.9em;
-    /* Frosted fill so the button holds up over busy photos. */
-    background-color: rgba(17, 17, 16, 0.28);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
+    /* Blur without a fill, so the outline and label hold up over busy photos. */
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(0.5rem);
+    backdrop-filter: blur(0.5rem);
     font-size: clamp(0.75rem, 3.2cqw, 1rem);
     font-weight: 600;
     white-space: nowrap;
@@ -464,7 +466,6 @@
   }
   .button.dark {
     border-color: var(--text);
-    background-color: rgba(253, 253, 252, 0.6);
   }
 
   .dark {

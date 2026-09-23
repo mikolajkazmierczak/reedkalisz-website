@@ -1,15 +1,18 @@
+import { dev } from '$app/environment';
 import api from '$/api';
 import { makeTree } from '%/utils';
 import { enabledFilter } from '#/products/fields';
 
 /**
- * Counts and price-from per top-level section. Reads the whole catalogue (~1 s), so it runs on the server only,
+ * Item counts per top-level section. Reads the whole catalogue (~1 s), so it runs on the server only,
  * cached and refreshed in the background: the browser gets the result, never the sweep.
  */
 const SUMMARY_TTL = 10 * 60 * 1000;
 let summaryCache = null;
 
 async function catalogueSummary() {
+  // in dev, CMS edits show on the next load
+  if (dev) return computeSummary();
   const fresh = summaryCache && Date.now() - summaryCache.at < SUMMARY_TTL;
   if (fresh) return summaryCache.value;
   if (summaryCache) {
@@ -28,7 +31,7 @@ async function computeSummary() {
   const [{ data: categories }, { data: rows }] = await Promise.all([
     // the same query as the layout's, so the sections come in the rail's order
     api.items('categories').readByQuery({ fields: ['id', 'enabled', 'parent', 'index', 'name', 'slug'], limit: -1 }),
-    api.items('products').readByQuery({ filter: enabledFilter, fields: ['price_min', 'categories.category'], limit: -1 }),
+    api.items('products').readByQuery({ filter: enabledFilter, fields: ['categories.category'], limit: -1 }),
   ]);
   const tree = makeTree(categories.filter((c) => c.enabled));
 
@@ -39,14 +42,8 @@ async function computeSummary() {
   const sections = tree
     .map((node) => {
       const own = new Set(ids(node));
-      let count = 0;
-      let from = null;
-      for (const row of rows) {
-        if (!row.categories?.some((c) => own.has(c.category))) continue;
-        count++;
-        if (row.price_min && (from === null || row.price_min < from)) from = row.price_min;
-      }
-      return { ...branch(node), href: `/kategorie/${node.slug}`, count, from };
+      const count = rows.filter((row) => row.categories?.some((c) => own.has(c.category))).length;
+      return { ...branch(node), href: `/kategorie/${node.slug}`, count };
     })
     .filter((s) => s.count > 0);
 

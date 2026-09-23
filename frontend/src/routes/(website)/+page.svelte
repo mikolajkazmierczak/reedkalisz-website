@@ -11,6 +11,8 @@
   import Title from '#/layout/elements/Title.svelte';
   import Tiles from '#/layout/elements/tiles/Tiles.svelte';
   import Category from '#/layout/elements/Category.svelte';
+  import SectionIcon from '#c/SectionIcon.svelte';
+  import { plural } from '#/utils';
   import { SITE, jsonLd, business } from '#/seo';
 
   const cities = ['Kalisz', 'Ostrów Wielkopolski', 'Pleszew', 'Jarocin', 'Turek', 'Krotoszyn', 'Konin', 'Sieradz'];
@@ -163,13 +165,11 @@
         <div class="sections__grid">
           {#each summary.sections as s (s.id)}
             <a class="sec" href={s.href}>
-              <h2 class="sec__name">{s.name}</h2>
-              <div class="sec__foot">
-                {#if s.from}
-                  <span class="sec__price"
-                    ><span class="sec__from">od</span> <b class="tnum">{s.from.toFixed(2)} zł</b></span>
-                {/if}
-                <span class="sec__count tnum">{s.count} pozycji</span>
+              <div class="sec__icon"><SectionIcon name={s.name} /></div>
+              <div class="sec__text">
+                <!-- the drawing replaces the CMS emoji -->
+                <h2 class="sec__name">{s.name.replace(/^[^\p{L}\p{N}]+/u, '')}</h2>
+                <span class="sec__count tnum">{s.count} {plural(s.count, ['pozycja', 'pozycje', 'pozycji'])}</span>
               </div>
             </a>
           {/each}
@@ -413,8 +413,8 @@
   }
   .sec {
     display: flex;
-    flex-direction: column;
-    gap: var(--sp-3);
+    align-items: center;
+    gap: var(--sp-4);
     -webkit-user-select: none;
     user-select: none;
     padding: var(--sp-4) var(--gutter);
@@ -428,29 +428,30 @@
     background-color: var(--paper-2);
     color: var(--red);
   }
+  .sec__icon {
+    flex: none;
+    width: 3.25rem;
+    color: var(--ink);
+    transition: transform var(--dur) var(--ease);
+  }
+  .sec:hover .sec__icon {
+    transform: translateY(-0.1875rem);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sec:hover .sec__icon {
+      transform: none;
+    }
+  }
+  .sec__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    min-width: 0;
+  }
   .sec__name {
     font-size: var(--fs-h3);
     font-weight: 700;
-  }
-  .sec__foot {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--sp-3);
-    margin-top: auto;
-  }
-  .sec__price {
-    font-size: 1.0625rem;
-    letter-spacing: -0.02em;
-  }
-  .sec__price b {
-    color: var(--red);
-    font-weight: 700;
-  }
-  .sec__from {
-    color: var(--ink-400);
-    font-size: var(--fs-xs);
-    letter-spacing: 0;
+    line-height: 1.15;
   }
   .sec__count {
     color: var(--ink-400);
