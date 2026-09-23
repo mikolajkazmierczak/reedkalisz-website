@@ -80,60 +80,62 @@
 
   <div class="shell__main">
     <div class="wrap content">
-      <div class="crumbs-slot">
-        {#if breadcrumbs.length > 1}
-          <nav class="crumbs label" aria-label="Ścieżka nawigacji">
-            {#each breadcrumbs as { name, slug }, i}
-              {#if i > 0}<span aria-hidden="true">/</span>{/if}
-              <a
-                href={`/kategorie/${slug}`}
-                class:last={i === breadcrumbs.length - 1}
-                aria-current={i === breadcrumbs.length - 1 ? 'page' : undefined}>{name}</a>
-            {/each}
-          </nav>
-        {/if}
-      </div>
+      <div class="intro">
+        <div class="crumbs-slot">
+          {#if breadcrumbs.length > 1}
+            <nav class="crumbs label" aria-label="Ścieżka nawigacji">
+              {#each breadcrumbs as { name, slug }, i}
+                {#if i > 0}<span aria-hidden="true">/</span>{/if}
+                <a
+                  href={`/kategorie/${slug}`}
+                  class:last={i === breadcrumbs.length - 1}
+                  aria-current={i === breadcrumbs.length - 1 ? 'page' : undefined}>{name}</a>
+              {/each}
+            </nav>
+          {/if}
+        </div>
 
-      <header class="head">
-        <h1 class="head__title">{title}</h1>
-        {#if data.category?.description}
-          <div class="desc">
-            <div
-              class="prose head__desc"
-              id="category-desc"
-              class:open={descOpen}
-              use:clamp={data.category.description}>
-              {@html marked.parse(data.category.description)}
+        <header class="head">
+          <h1 class="head__title">{title}</h1>
+          {#if data.category?.description}
+            <div class="desc">
+              <div
+                class="prose head__desc"
+                id="category-desc"
+                class:open={descOpen}
+                use:clamp={data.category.description}>
+                {@html marked.parse(data.category.description)}
+              </div>
+              {#if descOverflows}
+                <button
+                  class="desc__more"
+                  type="button"
+                  aria-expanded={descOpen}
+                  aria-controls="category-desc"
+                  on:click={() => (descOpen = !descOpen)}>
+                  {descOpen ? 'Zwiń opis' : 'Czytaj dalej'}
+                </button>
+              {/if}
             </div>
-            {#if descOverflows}
-              <button
-                class="desc__more"
-                type="button"
-                aria-expanded={descOpen}
-                aria-controls="category-desc"
-                on:click={() => (descOpen = !descOpen)}>
-                {descOpen ? 'Zwiń opis' : 'Czytaj dalej'}
-              </button>
-            {/if}
-          </div>
-        {/if}
-      </header>
+          {/if}
+        </header>
 
-      <div class="toolbar">
-        {#if data.products?.length}
-          <div class="toolbar__pager">
-            <Pagination limit={data.limit} page={data.page} count={data.count} limitLocked label="Paginacja — góra" />
-          </div>
-        {/if}
-        <p class="toolbar__count tnum">{countLabel}</p>
-        <label class="select toolbar__sort">
-          <span class="visually-hidden">Sortuj</span>
-          <select value={data.sort} on:change={(e) => setSort(e.currentTarget.value)}>
-            {#each sorts as s}
-              <option value={s.id}>{s.label}</option>
-            {/each}
-          </select>
-        </label>
+        <div class="toolbar">
+          {#if data.products?.length}
+            <div class="toolbar__pager">
+              <Pagination limit={data.limit} page={data.page} count={data.count} limitLocked label="Paginacja — góra" />
+            </div>
+          {/if}
+          <p class="toolbar__count tnum">{countLabel}</p>
+          <label class="select toolbar__sort">
+            <span class="visually-hidden">Sortuj</span>
+            <select value={data.sort} on:change={(e) => setSort(e.currentTarget.value)}>
+              {#each sorts as s}
+                <option value={s.id}>{s.label}</option>
+              {/each}
+            </select>
+          </label>
+        </div>
       </div>
 
       {#if data.products && data.products.length}
@@ -155,8 +157,22 @@
 </div>
 
 <style>
+  /* On desktop the toolbar's rule lines up with the foot of the rail's navy contact block. */
+  .intro {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--sp-8);
+  }
+  @media (min-width: 61.25rem) {
+    .intro {
+      min-height: calc(var(--rail-head) - var(--sp-5));
+    }
+  }
+
+  /* The trail's space is kept on every category, so the title never moves. */
   .crumbs-slot {
     min-height: 1.75rem;
+    margin-bottom: var(--sp-3);
   }
 
   .content {
@@ -164,14 +180,12 @@
     padding-bottom: var(--sp-16);
   }
 
-  /* Reserved so the title doesn't shift when a trail appears. */
   .crumbs {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--sp-2);
     min-height: 1.75rem;
-    margin-bottom: var(--sp-3);
   }
   .crumbs a {
     color: var(--ink-400);
@@ -233,7 +247,8 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--sp-3) var(--sp-5);
-    margin: var(--sp-6) 0 var(--sp-8);
+    margin-top: auto;
+    padding-top: var(--sp-6);
     padding-bottom: var(--sp-3);
     border-bottom: var(--rule);
   }
@@ -254,7 +269,6 @@
     font-weight: 600;
   }
 
-  /* Native arrow removed; the chevron is ours. */
   .pager {
     margin-top: var(--sp-8);
     padding-top: var(--sp-5);

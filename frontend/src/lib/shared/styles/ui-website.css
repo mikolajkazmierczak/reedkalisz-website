@@ -89,6 +89,8 @@
   --page: 97.5rem;
   --gutter: clamp(0.875rem, 0.4rem + 1.8vw, 2rem);
   --rail: 16.5rem;
+  /* the desktop rail's navy contact block; category toolbars line up with its foot */
+  --rail-head: 13.1875rem;
   --topbar-h: 3.25rem;
   /* only visible on overscroll */
   --surround: #fdfdfc;
@@ -559,6 +561,9 @@ textarea {
   flex: none;
   padding: var(--sp-5) var(--sp-5) var(--sp-3);
   background-color: var(--navy);
+}
+.shell__rail .rail__contact {
+  min-height: var(--rail-head);
 }
 .rail__search {
   flex: none;
