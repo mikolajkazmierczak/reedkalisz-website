@@ -28,6 +28,8 @@ PROD_BRANCH=main
 BETA_BRANCH=beta
 BETA_DIR="$REPO-beta" # must match ecosystem.config.cjs
 BETA_ORIGIN=https://beta.reed.kalisz.pl
+# beta calls the live API
+API_ORIGIN=https://reed.kalisz.pl
 
 # ports must match the Caddyfile upstreams
 SVELTEKIT_URL=http://127.0.0.1:5000/
@@ -106,7 +108,7 @@ if git rev-parse -q --verify "origin/$BETA_BRANCH" >/dev/null; then
     (cd "$BETA_DIR/shared" && npm ci)
     (cd "$BETA_DIR/frontend" && npm ci)
   fi
-  (cd "$BETA_DIR/frontend" && PUBLIC_BASE_URL="$BETA_ORIGIN" PUBLIC_API_URL="$BETA_ORIGIN/api" PUBLIC_HEIMDALL_URL="$BETA_ORIGIN" npm run build)
+  (cd "$BETA_DIR/frontend" && PUBLIC_BASE_URL="$BETA_ORIGIN" PUBLIC_API_URL="$API_ORIGIN/api" PUBLIC_HEIMDALL_URL="$API_ORIGIN" npm run build)
   pm2 startOrReload ecosystem.config.cjs --only sveltekit-beta
   wait_http "$SVELTEKIT_BETA_URL" || fail "sveltekit-beta did not answer at $SVELTEKIT_BETA_URL (pm2 logs sveltekit-beta)"
   success "beta at $(git -C "$BETA_DIR" rev-parse --short HEAD), reloaded and answering"

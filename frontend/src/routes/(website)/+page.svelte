@@ -23,6 +23,7 @@
 
   export let data;
 
+  let loadedLayout = null;
   let originalLayout = [];
   let parsedLayout = [];
 
@@ -60,11 +61,11 @@
   });
 
   function refresh(data) {
-    const loadLayout = deep.copy(data.layout);
-    if (!deep.same(originalLayout, loadLayout)) {
-      originalLayout = loadLayout;
-      parsedLayout = parseLayout(deep.copy(loadLayout));
-    }
+    if (deep.same(loadedLayout, data.layout)) return;
+    loadedLayout = deep.copy(data.layout);
+    parsedLayout = parseLayout(deep.copy(loadedLayout));
+    // Compare edits against the layout as it would be saved, so blocks parseLayout drops don't count as changes.
+    originalLayout = parseBack(deep.copy(parsedLayout));
   }
 
   function handleDelete(id) {
