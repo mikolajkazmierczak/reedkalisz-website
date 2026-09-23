@@ -24,33 +24,35 @@
 </FloatingInputs>
 
 <div class="wrapper">
-  <div class="text">
+  <div class="head">
     {#if $editing}
-      <h1 class="title editing" class:greyscale={!element.title}>
+      <h2 class="title editing" class:greyscale={!element.title}>
         <Contenteditable bind:html={element.title} />
-      </h1>
-      <p class="subtitle editing" class:greyscale={!element.subtitle}>
-        <Contenteditable bind:html={element.subtitle} />
-      </p>
+      </h2>
     {:else}
-      <h1 class="title">{@html element.title}</h1>
-      {#if element.subtitle}
-        <p class="subtitle">{@html element.subtitle}</p>
-      {/if}
+      <h2 class="title">{@html element.title}</h2>
     {/if}
+
+    <div class="button">
+      {#if $editing}
+        {@const hide = !element.button || !element.uri}
+        <div class="editing" class:greyscale={hide}>
+          <Button icon="edit" onclick={toggleInputsOpen} float="top left" />
+          <GoButton text={element.button} {href} {target} />
+        </div>
+      {:else if element.button && element.uri}
+        <GoButton text={element.button} {href} {target} />
+      {/if}
+    </div>
   </div>
 
-  <div class="button">
-    {#if $editing}
-      {@const hide = !element.button || !element.uri}
-      <div class="editing" class:greyscale={hide}>
-        <Button icon="edit" onclick={toggleInputsOpen} float="top left" />
-        <GoButton text={element.button} {href} {target} />
-      </div>
-    {:else if element.button && element.uri}
-      <GoButton text={element.button} {href} {target} />
-    {/if}
-  </div>
+  {#if $editing}
+    <p class="subtitle editing" class:greyscale={!element.subtitle}>
+      <Contenteditable bind:html={element.subtitle} />
+    </p>
+  {:else if element.subtitle}
+    <p class="subtitle">{@html element.subtitle}</p>
+  {/if}
 </div>
 
 <style>
@@ -63,21 +65,34 @@
   }
 
   .wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
     width: 100%;
   }
 
+  /* Centre the button on the heading's line box, not its baseline. */
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3) var(--sp-8);
+  }
+
   .title {
-    font-size: 3rem;
+    font-size: var(--fs-hero);
+    letter-spacing: -0.028em;
   }
   .subtitle {
-    margin: 0;
-    font-size: 1.5rem;
+    margin-top: var(--sp-3);
+    max-width: 60ch;
+    color: var(--text-muted);
+    font-size: clamp(1rem, 0.93rem + 0.35vw, 1.1875rem);
+    line-height: 1.55;
   }
   .title.editing,
   .subtitle.editing {
     min-width: 5ch;
+  }
+
+  .button {
+    flex: none;
   }
 </style>

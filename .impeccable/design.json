@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-22T00:00:00.000Z",
+  "title": "Design System: REED Kalisz — Public Website",
+  "extensions": {
+    "colorMeta": {
+      "brand-red": {
+        "role": "primary",
+        "displayName": "REED Red",
+        "canonical": "#bf0417",
+        "tonalRamp": ["#260004", "#4c0109", "#72020d", "#980312", "#bf0417", "#cb3343", "#d7636f", "#e3939b", "#efc2c7", "#fbf2f3"]
+      },
+      "brand-wash": {
+        "role": "primary",
+        "displayName": "Brand Wash",
+        "canonical": "#fbf2f3",
+        "tonalRamp": ["#260004", "#4c0109", "#72020d", "#980312", "#bf0417", "#cb3343", "#d7636f", "#e3939b", "#efc2c7", "#fbf2f3"]
+      },
+      "instock-green": {
+        "role": "secondary",
+        "displayName": "Stock Green",
+        "canonical": "#14652a",
+        "tonalRamp": ["#04180a", "#0a3316", "#14652a", "#1c8c3a", "#2bb44f", "#57cc78", "#8ddfa4", "#bdeecb", "var(--instock-bg)", "#f3fbf5"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#141821",
+        "tonalRamp": ["#0b0e14", "#141821", "#252b36", "#39404e", "#4d5565", "#666d7d", "#959cad", "#c3c8d3", "#dde0e7", "#eceef2", "#f6f7f9", "#fbfbfc", "#ffffff"]
+      },
+      "ink-muted": { "role": "neutral", "displayName": "Muted Ink", "canonical": "#4d5565" },
+      "ink-subtle": {
+        "role": "neutral",
+        "displayName": "Subtle Ink",
+        "canonical": "#666d7d",
+        "tonalRamp": ["#0b0e14", "#141821", "#252b36", "#39404e", "#4d5565", "#666d7d", "#959cad", "#c3c8d3", "#dde0e7", "#eceef2"]
+      },
+      "border-hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "#dde0e7" },
+      "border-strong": { "role": "neutral", "displayName": "Strong Hairline", "canonical": "#c3c8d3" },
+      "page-white": { "role": "neutral", "displayName": "Page White", "canonical": "#ffffff" },
+      "surface-subtle": { "role": "neutral", "displayName": "Subtle Surface", "canonical": "#f6f7f9" },
+      "surface-sunken": { "role": "neutral", "displayName": "Sunken", "canonical": "#eceef2" },
+      "status-new-bg": { "role": "tertiary", "displayName": "Catalog Blue Ground", "canonical": "#e8f1fb" },
+      "status-new-fg": { "role": "tertiary", "displayName": "Catalog Blue", "canonical": "#17548f" },
+      "status-best-bg": { "role": "tertiary", "displayName": "Signal Amber Ground", "canonical": "#fdf2d6" },
+      "status-best-fg": { "role": "tertiary", "displayName": "Signal Amber", "canonical": "#7d5200" },
+      "status-soon-bg": { "role": "tertiary", "displayName": "Quiet Violet Ground", "canonical": "#f4ecfd" },
+      "status-soon-fg": { "role": "tertiary", "displayName": "Quiet Violet", "canonical": "#63359b" },
+      "status-out-bg": { "role": "tertiary", "displayName": "Cool Grey Ground", "canonical": "#eef0f4" },
+      "status-out-fg": { "role": "tertiary", "displayName": "Cool Grey", "canonical": "#4d5565" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The homepage lead title set by the CMS title block." },
+      "headline": { "displayName": "Headline", "purpose": "Page-level h1: category name, product name, Kontakt." },
+      "title": { "displayName": "Title", "purpose": "Product-page section heads, each underlined by a hairline rule." },
+      "subtitle": { "displayName": "Subtitle", "purpose": "Pricing-block heads, footer column heads, empty-state heads." },
+      "body": { "displayName": "Body", "purpose": "Default prose; CMS prose runs 1.7 line-height capped at 68ch." },
+      "body-small": { "displayName": "Body Small", "purpose": "The catalog's working size: nav, breadcrumbs, fields, tables, pagination." },
+      "label": { "displayName": "Label", "purpose": "Status pills and functional field captions only. Never a kicker above a heading." },
+      "code": { "displayName": "Code", "purpose": "Product and supplier codes, in the platform mono stack." }
+    },
+    "shadows": [
+      { "name": "contact", "value": "0 1px 2px rgba(20,24,33,0.06), 0 1px 3px rgba(20,24,33,0.08)", "purpose": "Sticky header once the page has scrolled past 4px." },
+      { "name": "lift", "value": "0 2px 4px rgba(20,24,33,0.05), 0 8px 20px rgba(20,24,33,0.09)", "purpose": "Product card, promo tile and CMS tile on hover, paired with a -2/-3px translate." },
+      { "name": "float", "value": "0 4px 8px rgba(20,24,33,0.06), 0 16px 40px rgba(20,24,33,0.12)", "purpose": "The mobile drawer, which genuinely overlays the page." },
+      { "name": "focus-halo", "value": "0 0 0 3px color-mix(in srgb, #bf0417 16%, transparent)", "purpose": "Translucent red halo on a focused input or the search shell." },
+      { "name": "focus-ring", "value": "outline: 2px solid #bf0417; outline-offset: 2px", "purpose": "Global :focus-visible ring; the product card moves it onto the card, not the text." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The single easing curve for every transition in the system." },
+      { "name": "dur-fast", "value": "120ms", "purpose": "Micro state changes: pagination, category rail hover, burger bar fade." },
+      { "name": "dur", "value": "200ms", "purpose": "Default: buttons, borders, card lift, arrow slide." },
+      { "name": "dur-slow", "value": "340ms", "purpose": "Drawer and sidebar disclosure, animated on grid-template-rows 0fr to 1fr." },
+      { "name": "reduced-motion", "value": "@media (prefers-reduced-motion: reduce) { animation-duration: 0.01ms; transition-duration: 0.01ms }", "purpose": "Global clamp; hover translates are additionally cancelled per component." }
+    ],
+    "breakpoints": [
+      { "name": "card", "value": "560px" },
+      { "name": "form", "value": "640px" },
+      { "name": "footer", "value": "720px" },
+      { "name": "desktop", "value": "900px" },
+      { "name": "wide", "value": "1100px" }
+    ],
+    "layout": [
+      { "name": "container", "value": "1400px" },
+      { "name": "gutter", "value": "clamp(1rem, 0.4rem + 2.2vw, 2.5rem)" },
+      { "name": "header-h", "value": "60px (68px from 900px up)" },
+      { "name": "category-rail", "value": "16rem at 900px, 18rem at 1100px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The page's single primary action: submit a search, open the inquiry, send it.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\"><span>Zapytaj o ten produkt</span><svg class=\"ds-btn-primary__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 42px; padding: 0 1.25rem; border: none; border-radius: 6px; background-color: var(--accent, #bf0417); color: #fff; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 200ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary__icon { width: 16px; height: 16px; transition: transform 200ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary:hover { background-color: #980312; } .ds-btn-primary:hover .ds-btn-primary__icon { transform: translateX(3px); } .ds-btn-primary:active { background-color: #72020d; } .ds-btn-primary:focus-visible { outline: 2px solid #bf0417; outline-offset: 2px; } .ds-btn-primary:disabled { background-color: #c3c8d3; cursor: not-allowed; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "The quiet bordered control: the mobile burger and the category filters toggle.",
+      "html": "<button class=\"ds-btn-outline\" type=\"button\">Menu<span class=\"ds-btn-outline__glyph\" aria-hidden=\"true\"><span></span><span></span><span></span></span></button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.5rem 0.5rem 0.75rem; border: 1px solid #dde0e7; border-radius: 6px; background-color: #fff; color: #141821; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: border-color 200ms cubic-bezier(0.16,1,0.3,1), background-color 200ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-outline:hover { border-color: #c3c8d3; background-color: #f6f7f9; } .ds-btn-outline:focus-visible { outline: 2px solid #bf0417; outline-offset: 2px; } .ds-btn-outline__glyph { position: relative; display: block; width: 18px; height: 12px; } .ds-btn-outline__glyph span { position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px; background-color: currentColor; } .ds-btn-outline__glyph span:nth-child(1) { top: 0; } .ds-btn-outline__glyph span:nth-child(2) { top: 5px; } .ds-btn-outline__glyph span:nth-child(3) { top: 10px; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "The header's search shell: icon, borderless input and a compact red submit inside one bordered box.",
+      "html": "<form class=\"ds-search\" role=\"search\"><svg class=\"ds-search__icon\" viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"6\" stroke=\"currentColor\" stroke-width=\"1.7\"/><path d=\"m13.5 13.5 3.5 3.5\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\"/></svg><input type=\"search\" placeholder=\"Szukaj produktu lub kodu\" aria-label=\"Szukaj produktu lub kodu\"><button type=\"submit\">Szukaj</button></form>",
+      "css": ".ds-search { position: relative; display: flex; align-items: center; gap: 0.5rem; width: 100%; max-width: 30rem; padding: 0 0.25rem 0 0.75rem; border: 1px solid #dde0e7; border-radius: 6px; background-color: #fff; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; transition: border-color 200ms cubic-bezier(0.16,1,0.3,1), box-shadow 200ms cubic-bezier(0.16,1,0.3,1); } .ds-search:hover { border-color: #c3c8d3; } .ds-search:focus-within { border-color: #bf0417; box-shadow: 0 0 0 3px color-mix(in srgb, #bf0417 16%, transparent); } .ds-search__icon { flex: none; width: 18px; height: 18px; color: #666d7d; } .ds-search input { flex: 1 1 auto; min-width: 0; height: 38px; border: none; outline: none; background: none; font: inherit; font-size: 0.875rem; color: #141821; } .ds-search input::placeholder { color: #666d7d; } .ds-search button { flex: none; height: 30px; padding: 0 0.75rem; border: none; border-radius: 4px; background-color: #bf0417; color: #fff; font: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background-color 200ms cubic-bezier(0.16,1,0.3,1); } .ds-search button:hover { background-color: #980312; } .ds-search button:active { background-color: #72020d; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "The inquiry form's field: label above, red asterisk when required, red border plus wash when invalid.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field__label\">E-mail <span class=\"ds-field__req\" aria-hidden=\"true\">*</span></span><input type=\"email\" autocomplete=\"email\" placeholder=\"biuro@firma.pl\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; max-width: 22rem; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-field__label { font-size: 0.875rem; font-weight: 600; color: #141821; } .ds-field__req { color: #bf0417; } .ds-field input { width: 100%; padding: 0.75rem; border: 1px solid #dde0e7; border-radius: 6px; background-color: #fff; font: inherit; font-size: 0.875rem; color: #141821; outline: none; transition: border-color 200ms cubic-bezier(0.16,1,0.3,1), box-shadow 200ms cubic-bezier(0.16,1,0.3,1); } .ds-field input::placeholder { color: #666d7d; } .ds-field input:hover { border-color: #c3c8d3; } .ds-field input:focus { border-color: #bf0417; box-shadow: 0 0 0 3px color-mix(in srgb, #bf0417 16%, transparent); } .ds-field input[aria-invalid='true'] { border-color: #bf0417; background-color: #fbf2f3; }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "card-product",
+      "description": "The catalog's unit: square media well with status pills, two-line clamped name, mono code, swatches and an 'od' price.",
+      "html": "<article class=\"ds-card\"><a class=\"ds-card__link\" href=\"#\"><div class=\"ds-card__media\"><div class=\"ds-card__badges\"><span class=\"ds-badge ds-badge--new\">Nowość</span></div><div class=\"ds-card__ph\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"m3 16 5-5 4 4 3-3 6 6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"9\" cy=\"8.5\" r=\"1.3\"/></svg></div></div><div class=\"ds-card__body\"><h3 class=\"ds-card__name\">Długopis metalowy COSMO</h3><div class=\"ds-card__code\">R-COSMO</div></div></a><div class=\"ds-card__foot\"><div class=\"ds-card__colors\"><span class=\"ds-swatch\" style=\"background:#141821\"></span><span class=\"ds-swatch\" style=\"background:#bf0417\"></span><span class=\"ds-swatch\" style=\"background:#17548f\"></span><span class=\"ds-card__more\">+3</span></div><div class=\"ds-card__price\"><span class=\"ds-card__from\">od</span> <strong class=\"ds-card__now\">1.06 zł</strong><span class=\"ds-card__note\">ze znakowaniem</span></div></div></article>",
+      "css": ".ds-card { position: relative; display: flex; flex-direction: column; width: 220px; border: 1px solid #dde0e7; border-radius: 10px; background-color: #fff; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; color: #141821; transition: border-color 200ms cubic-bezier(0.16,1,0.3,1), box-shadow 200ms cubic-bezier(0.16,1,0.3,1), transform 200ms cubic-bezier(0.16,1,0.3,1); } .ds-card:hover { border-color: #c3c8d3; box-shadow: 0 2px 4px rgba(20,24,33,0.05), 0 8px 20px rgba(20,24,33,0.09); transform: translateY(-2px); } .ds-card:focus-within { border-color: #bf0417; } .ds-card__link { display: flex; flex-direction: column; color: inherit; text-decoration: none; } .ds-card__media { position: relative; aspect-ratio: 1 / 1; padding: 1rem; border-bottom: 1px solid #dde0e7; } .ds-card__badges { position: absolute; top: 0.5rem; left: 0.5rem; display: flex; gap: 4px; } .ds-card__ph { display: grid; place-items: center; width: 100%; height: 100%; color: #c3c8d3; } .ds-card__ph svg { width: 34%; } .ds-card__body { padding: 1rem 1rem 0.5rem; } .ds-card__name { margin: 0; font-size: 0.9375rem; font-weight: 600; line-height: 1.35; letter-spacing: -0.008em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } .ds-card__code { margin-top: 0.25rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8125rem; letter-spacing: 0.01em; color: #666d7d; } .ds-card__foot { display: flex; flex-direction: column; gap: 0.75rem; margin-top: auto; padding: 0.5rem 1rem 1rem; } .ds-card__colors { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; } .ds-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); } .ds-card__more { font-size: 0.8125rem; color: #666d7d; font-variant-numeric: tabular-nums; } .ds-card__price { display: grid; gap: 2px; } .ds-card__from { font-size: 0.8125rem; color: #666d7d; } .ds-card__now { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.015em; font-variant-numeric: tabular-nums; } .ds-card__note { font-size: 0.8125rem; line-height: 1.3; color: #666d7d; }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "badge-new",
+      "description": "Static product status markers over the card's media well; each a measured tinted-ground / same-hue-foreground pair.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-badge ds-badge--new\">Nowość</span><span class=\"ds-badge ds-badge--sale\">Promocja</span><span class=\"ds-badge ds-badge--best\">Bestseller</span><span class=\"ds-badge ds-badge--soon\">Wkrótce</span><span class=\"ds-badge ds-badge--out\">Brak</span></div>",
+      "css": ".ds-badges { display: flex; flex-wrap: wrap; gap: 4px; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-badge { display: inline-flex; align-items: center; padding: 0.1875rem 0.5rem; border-radius: 999px; font-size: 0.6875rem; font-weight: 700; line-height: 1.3; letter-spacing: 0.03em; text-transform: uppercase; white-space: nowrap; } .ds-badge--new { background-color: #e8f1fb; color: #17548f; } .ds-badge--sale { background-color: #fbf2f3; color: #980312; } .ds-badge--best { background-color: #fdf2d6; color: #7d5200; } .ds-badge--soon { background-color: #f4ecfd; color: #63359b; } .ds-badge--out { background-color: #eef0f4; color: #4d5565; }"
+    },
+    {
+      "name": "Primary Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Desktop header nav: muted at rest, ink on a grey ground on hover, red with a 2px underline when current.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Menu główne\"><a class=\"ds-nav__item ds-nav__item--active\" href=\"#\" aria-current=\"page\">Gadżety reklamowe</a><a class=\"ds-nav__item\" href=\"#\">Drukarnia</a><a class=\"ds-nav__item\" href=\"#\">Kalendarze</a><a class=\"ds-nav__item\" href=\"#\">Pieczątki</a><a class=\"ds-nav__item\" href=\"#\">Kontakt</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 2px; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-nav__item { position: relative; display: inline-flex; align-items: center; padding: 0.5rem 0.75rem; border-radius: 6px; color: #4d5565; font-size: 0.875rem; font-weight: 600; white-space: nowrap; text-decoration: none; transition: color 200ms cubic-bezier(0.16,1,0.3,1), background-color 200ms cubic-bezier(0.16,1,0.3,1); } .ds-nav__item:hover { color: #141821; background-color: #f6f7f9; } .ds-nav__item:focus-visible { outline: 2px solid #bf0417; outline-offset: 2px; } .ds-nav__item--active { color: #bf0417; } .ds-nav__item--active::after { content: ''; position: absolute; left: 0.75rem; right: 0.75rem; bottom: -2px; height: 2px; border-radius: 2px; background-color: #bf0417; }"
+    },
+    {
+      "name": "Category Rail",
+      "kind": "nav",
+      "refersTo": "menu-item-current",
+      "description": "The recursive category menu: nested levels indent behind a hairline rail; the exact current page goes red on brand wash.",
+      "html": "<ul class=\"ds-rail\"><li><a class=\"ds-rail__item ds-rail__item--lvl0\" href=\"#\">Nowości 2026</a></li><li><a class=\"ds-rail__item ds-rail__item--lvl0 ds-rail__item--ancestor\" href=\"#\">Gadżety reklamowe</a><ul class=\"ds-rail ds-rail--nested\"><li><a class=\"ds-rail__item ds-rail__item--current\" href=\"#\" aria-current=\"page\">Artykuły piśmiennicze</a></li><li><a class=\"ds-rail__item\" href=\"#\">Breloki</a></li></ul></li><li><a class=\"ds-rail__item ds-rail__item--lvl0\" href=\"#\">Drukarnia</a></li></ul>",
+      "css": ".ds-rail { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; width: 16rem; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-rail--nested { margin-left: 0.75rem; padding-left: 0.75rem; border-left: 1px solid #dde0e7; width: auto; } .ds-rail__item { display: block; padding: 0.5rem 0.75rem; border-radius: 6px; color: #4d5565; font-size: 0.875rem; line-height: 1.4; text-decoration: none; transition: color 120ms cubic-bezier(0.16,1,0.3,1), background-color 120ms cubic-bezier(0.16,1,0.3,1); } .ds-rail__item:hover { color: #141821; background-color: #f6f7f9; } .ds-rail__item:focus-visible { outline: 2px solid #bf0417; outline-offset: 2px; } .ds-rail__item--lvl0 { font-size: 1rem; font-weight: 600; color: #141821; } .ds-rail__item--ancestor { color: #141821; font-weight: 600; } .ds-rail__item--current { color: #bf0417; background-color: #fbf2f3; font-weight: 600; }"
+    },
+    {
+      "name": "Pagination",
+      "kind": "custom",
+      "refersTo": "page-number-active",
+      "description": "36px square page buttons with an ellipsis gap; current page takes a red border, brand wash and red text.",
+      "html": "<nav class=\"ds-pag\" aria-label=\"Paginacja\"><button class=\"ds-pag__nav\" type=\"button\" aria-label=\"Poprzednia strona\" disabled><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m15 5-7 7 7 7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button><button class=\"ds-pag__num ds-pag__num--active\" type=\"button\" aria-current=\"page\">1</button><button class=\"ds-pag__num\" type=\"button\">2</button><button class=\"ds-pag__num\" type=\"button\">3</button><span class=\"ds-pag__gap\" aria-hidden=\"true\">…</span><button class=\"ds-pag__num\" type=\"button\">23</button><button class=\"ds-pag__nav\" type=\"button\" aria-label=\"Następna strona\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 5 7 7-7 7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button></nav>",
+      "css": ".ds-pag { display: flex; align-items: center; gap: 0.25rem; user-select: none; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-pag__num, .ds-pag__nav { display: grid; place-items: center; min-width: 36px; height: 36px; padding: 0 0.5rem; border: 1px solid transparent; border-radius: 6px; background: none; color: #4d5565; font: inherit; font-size: 0.875rem; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; transition: background-color 120ms cubic-bezier(0.16,1,0.3,1), color 120ms cubic-bezier(0.16,1,0.3,1), border-color 120ms cubic-bezier(0.16,1,0.3,1); } .ds-pag__num:hover:not(.ds-pag__num--active), .ds-pag__nav:hover:not(:disabled) { background-color: #f6f7f9; color: #141821; } .ds-pag__num:focus-visible, .ds-pag__nav:focus-visible { outline: 2px solid #bf0417; outline-offset: 2px; } .ds-pag__num--active { border-color: #bf0417; background-color: #fbf2f3; color: #bf0417; cursor: default; } .ds-pag__nav svg { width: 16px; height: 16px; } .ds-pag__nav:disabled { opacity: 0.35; cursor: not-allowed; } .ds-pag__gap { padding: 0 0.25rem; color: #666d7d; }"
+    },
+    {
+      "name": "Colour Swatch",
+      "kind": "custom",
+      "refersTo": "card-product",
+      "description": "The system's one custom primitive: a ringed circle carrying a single fill, a diagonal two-colour split, or an unknown mark.",
+      "html": "<div class=\"ds-sw-row\"><div class=\"ds-sw\"><div class=\"ds-sw__bg\" style=\"background-color:#141821\"></div></div><div class=\"ds-sw\"><div class=\"ds-sw__bg\" style=\"background-color:#bf0417\"></div><div class=\"ds-sw__fg\" style=\"background-color:#ffffff\"></div></div><div class=\"ds-sw\"><div class=\"ds-sw__none\">?</div></div></div>",
+      "css": ".ds-sw-row { display: flex; align-items: center; gap: 6px; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-sw { position: relative; overflow: hidden; width: 20px; height: 20px; aspect-ratio: 1 / 1; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); cursor: help; } .ds-sw__bg { width: 100%; height: 100%; } .ds-sw__fg { position: absolute; top: 50%; left: 50%; width: 50%; height: 100%; transform: translateY(-50%) rotate(45deg); transform-origin: center left; } .ds-sw__none { display: grid; place-items: center; width: 100%; height: 100%; opacity: 0.5; font-size: 0.75rem; color: #141821; }"
+    },
+    {
+      "name": "Inquiry Success",
+      "kind": "custom",
+      "refersTo": "button-submit",
+      "description": "The terminal confirmation state after an inquiry is sent — deliberately green, never brand red.",
+      "html": "<div class=\"ds-done\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m8 12 3 3 5-6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><div><h3>Zapytanie wysłane</h3><p>Odpowiadamy zwykle w ciągu jednego dnia roboczego.</p></div></div>",
+      "css": ".ds-done { display: flex; align-items: flex-start; gap: 0.75rem; max-width: 30rem; padding: 1rem; border: 1px solid color-mix(in srgb, #14652a 28%, transparent); border-radius: 6px; background-color: var(--instock-bg); color: #14652a; font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif; } .ds-done svg { flex: none; width: 22px; height: 22px; } .ds-done h3 { margin: 0; color: inherit; font-size: 1rem; font-weight: 700; line-height: 1.15; } .ds-done p { margin: 0.25rem 0 0; font-size: 0.875rem; line-height: 1.55; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Well-Run Catalog",
+    "overview": "This is the arrangement a B2B catalog buyer already knows — sticky header with search, category rail on the left, a grid of product cards, a product page that ends in a question — executed to a finish the category rarely reaches. Nothing here is trying to be novel. The system's ambition lives entirely in the finish: one cool neutral ramp doing all the structural work, a single red that earns its rarity, an optical type ramp that fluidly narrows between phone and desktop, and a 4px spacing rhythm that never guesses. Density is catalog-grade: two product cards across on a phone, four beside the rail on a desktop, cards tight enough to compare and loose enough to read.\n\nThe world is white-ground and hairline-drawn. Surfaces separate by a 1px cool border before they separate by shadow; shadow is the response to a pointer, not a permanent property of a card. Colour is deliberately scarce — the catalog's own product photography is the only saturated thing on most screens, which is why the chrome around it stays a cool grey and the brand red never becomes a surface fill.\n\nTwo contextual facts belong in the record. First: the previous site carried exactly one @media rule in its entire source tree and had no mobile layout at all, which is why this system states its responsive rules explicitly and at named breakpoints rather than leaving them to be inferred. Second: the admin panel at /admin is a separate system — navy palette, Fira Sans, its own ui-admin.css — and nothing in this document applies to it.",
+    "keyCharacteristics": [
+      "White ground, one cool neutral ramp (--n-0 … --n-950), hairline borders before shadows",
+      "One red, reserved: primary action, active state, focus, required marks, errors, sale",
+      "Archivo variable, self-hosted in two subsets; system mono for product and supplier codes",
+      "Fluid clamp() type ramp; 4px spacing scale; radii of 4/6/10px and a pill",
+      "Explicit responsive rules at 560 / 640 / 720 / 900 / 1100px",
+      "Inquiry is the terminal action on every product surface; no cart affordances exist anywhere"
+    ],
+    "rules": [
+      { "name": "The Reserved Red Rule", "body": "Red means act, here or this is current. Primary action, active nav/category, focus ring, required mark, error, sale. That is the whole list. A surface, a heading, a divider or a decorative panel never takes red, and no second accent hue is introduced beside it.", "section": "colors" },
+      { "name": "The Green Is Not A Discount Rule", "body": "Availability and confirmation use Stock Green, never the brand red. A buyer must never read 'in stock' as 'on sale'.", "section": "colors" },
+      { "name": "The Measured Pair Rule", "body": "Every status pill is a tinted ground with a same-hue foreground, measured at ≥6:1. A new status colour ships only after its pair is measured, and subtle ink never goes lighter than #666d7d.", "section": "colors" },
+      { "name": "The One Family Rule", "body": "Archivo carries every text role. The mono stack exists for one job — codes — and no third family is added.", "section": "typography" },
+      { "name": "The Tabular Number Rule", "body": "Any number that sits in a column or compares against a neighbour (prices, page numbers, quantity breaks, colour counts) takes tabular figures via .tnum. Prices align down a card row or they are not aligned at all.", "section": "typography" },
+      { "name": "The Two-Line Clamp Rule", "body": "Product names in a card clamp to two lines with an ellipsis, so every card in a row shares a footer baseline regardless of name length.", "section": "typography" },
+      { "name": "The Catalog Never Single-Columns Rule", "body": "The product grid is two columns on the narrowest phone. One column turns twenty-five products into a mile of scroll, so the fixed two-column floor holds below 560px and auto-fill takes over above it.", "section": "layout" },
+      { "name": "The Authored Placement Rule", "body": "The CMS tile grid honours REED's authored 4-column placement from 900px up, untouched. Below that it linearises to two columns (one below 560px) via a max-width query using !important, because Tile.svelte writes grid placement as an inline style and nothing weaker can override it. The override lives in the narrow query so desktop is never 'undone'.", "section": "layout" },
+      { "name": "The Tile Sizes Itself Rule", "body": "A CMS tile spans one to four columns, so its text scales to the tile via container queries (cqw), not to the viewport. Tile titles run clamp(1.125rem, 8.5cqw, 2.5rem) and tile padding clamp(0.75rem, 4cqw, 1.75rem).", "section": "layout" },
+      { "name": "The Flat-At-Rest Rule", "body": "A surface is a hairline and a tonal step. Shadow is a response — scroll, hover, or genuine overlay — and every hover lift is cancelled under prefers-reduced-motion.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do spend red only on action, current state, focus, required marks, errors and sale — the Reserved Red Rule is the system's central constraint.",
+      "Do use Stock Green (#14652a) for availability and for the inquiry-sent confirmation, so confirmation never reads as discount.",
+      "Do draw separation with a 1px hairline (#dde0e7) and a tonal step first; add shadow only for scroll, hover or a genuine overlay.",
+      "Do ship new status colours as a measured tinted-ground/same-hue-foreground pair at ≥6:1, and keep subtle ink no lighter than #666d7d.",
+      "Do size every gap on the 4px scale and every radius from 4/6/10/pill; no in-between values.",
+      "Do state responsive behaviour explicitly at 560 / 640 / 720 / 900 / 1100px, and offset sticky elements from --header-h, never from a literal pixel height.",
+      "Do keep the catalog at two columns on the narrowest phone and let auto-fill take over from a 210px (560px+) or 200px (900px+) floor.",
+      "Do scale text inside a CMS tile with container query units, because a tile's width is authored per-tile and unrelated to the viewport.",
+      "Do give numbers that share a column tabular figures, and set product and supplier codes in the mono stack.",
+      "Do end every product surface with the inquiry, and let it own the only primary button on the page."
+    ],
+    "donts": [
+      "Don't fill a surface, heading, divider or decorative panel with REED Red, and don't introduce a second accent hue beside it.",
+      "Don't design any cart, checkout, price-total, quantity-stepper or order-status affordance; inquiry is the business model, not a stopgap.",
+      "Don't imply social proof — no testimonial cards, client logo strips, case-study tiles, star ratings or counter statistics, and no placeholder shapes that read as any of those. None of that evidence exists.",
+      "Don't add a third type family, and don't fake weights: the Archivo variable axis and the mono stack are the whole system.",
+      "Don't write a kicker, eyebrow or decorative label line above a heading. The uppercase label role is for functional captions ('7 KOLORÓW') and status pills only.",
+      "Don't use hard offset shadows, glyph or emoji icons, or a system display face; icons are inline stroked SVG at 16–22px in currentColor.",
+      "Don't hardcode a colour, radius, duration or gap in a component when a token exists, and don't reach for the legacy --main / --white / --light aliases in new work — they exist only to keep old shared components alive.",
+      "Don't hardcode homepage composition: the CMS block system (title / tiles / category / whitespace) must keep working, and a tile's authored 4-column placement must survive untouched from 900px up.",
+      "Don't replace the REED logo, recolour it, or set it in type.",
+      "Don't let a hover transform ship without a prefers-reduced-motion cancellation."
+    ]
+  }
+}

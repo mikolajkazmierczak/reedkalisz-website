@@ -42,19 +42,11 @@ export const create = {
     hide: $?.hide ?? false,
     slug: $.slug, // required
   }),
-  whitespace: ($) => ({
-    _id: uid(),
-    type: 'whitespace',
-    hide: $?.hide ?? false,
-  }),
 };
 
+/** Adds ids and missing keys. Drops retired types (e.g. 'whitespace') so old layouts still load. */
 export function parseLayout(layout) {
-  // adds ids (to each element and tile) and keys for missing properties
-  return layout.map((element) => {
-    const { type } = element;
-    return create[type](element);
-  });
+  return layout.filter((element) => create[element.type]).map((element) => create[element.type](element));
 }
 
 export function parseBack(parsed) {

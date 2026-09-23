@@ -45,3 +45,9 @@ export const fields = [
   'gallery.enabled',
   'gallery.img',
 ];
+
+/** Distinct count: `filter_count` counts category junction rows, so multi-category products count twice. */
+export async function countProducts(api, filter) {
+  const { data } = await api.items('products').readByQuery({ filter, aggregate: { countDistinct: 'id' } });
+  return Number(data?.[0]?.countDistinct?.id ?? 0);
+}

@@ -1,6 +1,6 @@
 <script>
   import PricesTable from './PricesTable.svelte';
-  import Icon from '$c/Icon.svelte';
+  import IncludesLabeling from './IncludesLabeling.svelte';
 
   export let field;
   export let place;
@@ -8,43 +8,68 @@
   export let prices;
   export let pricesSale;
   export let pricesWithLabeling;
+  /** False when the caller already shows the note beside its own heading. */
+  export let showIncludes = true;
 </script>
 
-{#if field[0] && field[1]}
-  <small class="info field">
-    <Icon name="arrow_expand" height="1.25rem" style="position:relative;top:1px;" />Pole znakowania:
-    <b>{field[0]}x{field[1]} mm</b>
-  </small>
+{#if (pricesWithLabeling && showIncludes) || (field[0] && field[1]) || place}
+  <div class="meta">
+    {#if pricesWithLabeling && showIncludes}<IncludesLabeling />{/if}
+    {#if field[0] && field[1]}
+      <span class="meta__item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Pole znakowania: <b class="tnum">{field[0]}&times;{field[1]} mm</b>
+      </span>
+    {/if}
+    {#if place}
+      <span class="meta__item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke-linejoin="round" />
+          <circle cx="12" cy="10" r="2.4" />
+        </svg>
+        Miejsce znakowania: <b>{place}</b>
+      </span>
+    {/if}
+  </div>
 {/if}
-{#if place}
-  <small class="info place">
-    <Icon name="resize_small" height="1.25rem" style="position:relative;top:1px;" />Miejsce znakowania: <b>{place}</b>
-  </small>
-{/if}
+
 <div class="prices">
-  <PricesTable prices={prices.filter((p) => p.enabled)} pricesSale={pricesSale.filter((p) => p.enabled)} />
-  {#if pricesWithLabeling}
-    <div class="prices-with-labeling">Ceny ze znakowaniem</div>
-  {/if}
+  <PricesTable
+    prices={prices.filter((p) => p.enabled)}
+    pricesSale={pricesSale.filter((p) => p.enabled)}
+    withLabeling={!!pricesWithLabeling} />
 </div>
 
 <style>
-  .prices-with-labeling {
-    display: inline-block;
-    opacity: 0.6;
-    border-top: none;
-    padding: 0.25rem 0.5rem;
-    background-color: var(--grey);
-    font-size: small;
-    text-transform: uppercase;
-  }
-  .prices {
-    margin-top: 0.5rem;
-  }
-  .info {
+  .meta {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.2rem;
-    opacity: 0.6;
+    gap: var(--sp-2) var(--sp-5);
+    margin-bottom: var(--sp-3);
+  }
+  .meta__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+  }
+  .meta__item svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--text-subtle);
+  }
+  .meta__item b {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .prices {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
   }
 </style>

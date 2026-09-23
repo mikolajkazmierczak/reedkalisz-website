@@ -17,3 +17,11 @@ export function parseColor(multicolored, first, second) {
 
   return { label, bg, fg };
 }
+
+/** Polish plural: `plural(3, ['produkt', 'produkty', 'produktów'])` → 'produkty'. */
+export function plural(n, [one, few, many]) {
+  if (n === 1) return one;
+  const t = n % 10;
+  const h = n % 100;
+  return t >= 2 && t <= 4 && (h < 10 || h >= 20) ? few : many;
+}

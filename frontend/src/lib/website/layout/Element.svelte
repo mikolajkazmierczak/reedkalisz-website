@@ -31,19 +31,16 @@
 
 {#if $editing}
   <div class="wrapper" class:grey={greyscale}>
-    <div class="side left" class:greyscale>
+    <!-- Label and controls sit inside the frame: sections are full width, so outside would clip. -->
+    <div class="bar" class:greyscale>
       <ElementLabel {label} {icon} />
-    </div>
-    <div class="side right" class:greyscale>
-      <div>
-        <Button icon="delete" bold onclick={handleDelete} />
+      <div class="controls">
+        <Button icon="arrow_up" onclick={() => handleMove('up')} />
+        <Button icon="arrow_down" onclick={() => handleMove('down')} />
         <div class:greyscale={element.hide}>
           <Button icon={element.hide ? 'eye_off' : 'eye'} onclick={() => (element.hide = !element.hide)} />
         </div>
-      </div>
-      <div>
-        <Button icon="arrow_up" onclick={() => handleMove('up')} />
-        <Button icon="arrow_down" onclick={() => handleMove('down')} />
+        <Button icon="delete" bold onclick={handleDelete} />
       </div>
     </div>
     <div class="content">
@@ -51,10 +48,17 @@
     </div>
   </div>
 {:else if !element.hide}
-  <slot />
+  <div class="el" data-type={type}>
+    <slot />
+  </div>
 {/if}
 
 <style>
+  /* The type class lets the page set spacing between blocks. */
+  .el {
+    width: 100%;
+  }
+
   .wrapper {
     position: relative;
     border: 2px solid var(--main-2);
@@ -67,24 +71,17 @@
     filter: grayscale(1);
   }
 
-  .side {
-    z-index: 1;
-    position: absolute;
-    top: -2px;
-    display: flex;
-  }
-  .left {
-    left: -1rem;
-    transform: translate(-100%, 0);
-  }
-  .right {
-    right: -1rem;
-    gap: 0.25rem;
-    transform: translate(100%, 0);
-  }
-  .right > div {
+  .bar {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding-block: 0.5rem;
+  }
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   .content {

@@ -11,7 +11,7 @@
 {#if product}
   <div class="recommended">
     <h2>Podobne produkty</h2>
-    <CategorySlider limit={3} slug={categorySlug} filterIds={[product.id]} />
+    <CategorySlider slug={categorySlug} filterIds={[product.id]} />
   </div>
 {/if}
 
@@ -19,11 +19,11 @@
   .recommended {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--sp-4);
   }
   h2 {
-    margin-top: 3rem;
-    margin-bottom: 1rem;
-    font-weight: normal;
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--fs-h2);
   }
 </style>

@@ -1,36 +1,59 @@
 <script>
   import { page } from '$app/stores';
 
-  // TODO: refresh after auth
+  $: notFound = $page.error?.message === '404' || $page.status === 404;
 </script>
 
-<div class="wrapper">
-  {#if $page.error.message === '404'}
-    <h1><span>Ups!</span> Taka strona nie istnieje</h1>
-    <p>Prawdopodobnie została przeniesiona lub usunięta</p>
-    <a href="/">Zapraszamy do zapoznania się z ofertą!</a>
-  {/if}
+<svelte:head>
+  <title>{notFound ? 'Strona nie istnieje' : 'Wystąpił błąd'} | REED Kalisz</title>
+  <meta name="robots" content="noindex" />
+</svelte:head>
+
+<div class="wrap">
+  <div class="err">
+    <p class="err__status tnum">{$page.status}</p>
+    {#if notFound}
+      <h1>Taka strona nie istnieje</h1>
+      <p class="err__lead">Prawdopodobnie została przeniesiona albo usunięta.</p>
+    {:else}
+      <h1>Coś poszło nie tak</h1>
+      <p class="err__lead">
+        {$page.error?.message || 'Spróbuj odświeżyć stronę za chwilę.'}
+      </p>
+    {/if}
+
+    <div class="err__actions">
+      <a class="btn btn--ink" href="/">Strona główna</a>
+      <a class="btn btn--orange" href="/kontakt">Kontakt</a>
+    </div>
+  </div>
 </div>
 
 <style>
-  .wrapper {
+  .err {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    max-width: 48ch;
+    padding: var(--sp-20) 0 var(--sp-24);
   }
-  h1 {
-    margin-top: 1rem;
+  .err__status {
+    color: var(--red);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: 0.08em;
   }
-  h1 span {
-    color: var(--main);
+  .err h1 {
+    font-size: var(--fs-h1);
   }
-  a {
-    margin-top: 2rem;
-    font-size: 1.25rem;
+  .err__lead {
+    color: var(--ink-500);
   }
-  a:hover {
-    text-decoration: none;
+  .err__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
   }
 </style>

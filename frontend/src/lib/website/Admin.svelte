@@ -2,7 +2,7 @@
   import { slide } from 'svelte/transition';
   import { page } from '$app/stores';
   import { baseUrl } from '$/api';
-  import { me, logout } from '$/auth';
+  import { me } from '$/auth';
 
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
@@ -87,13 +87,6 @@
         <Icon name="slide_settings" width={iconSize} />
       </div>
     </a>
-    <button class="logout" on:click={logout}>
-      <HoverCircle color="var(--main-2)" />
-      <Tooltip>Wyloguj</Tooltip>
-      <div class="content">
-        <Icon name="logout" width={iconSize} />
-      </div>
-    </button>
     <div class="avatar">
       <Tooltip>{$me.first_name} {$me.last_name}</Tooltip>
       <img src="{baseUrl}/assets/{$me.avatar}" alt="avatar" />
@@ -118,7 +111,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--padding);
-    border-radius: 100px;
+    border-radius: var(--r-pill);
     padding: var(--padding);
     background-color: var(--main-1);
   }
@@ -130,7 +123,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 100px;
+    border-radius: var(--r-pill);
     border: none;
     padding: 0;
     width: 2.5rem;
@@ -150,7 +143,7 @@
 
   img {
     z-index: 1;
-    border-radius: 100px;
+    border-radius: var(--r-pill);
     width: 100%;
   }
 </style>

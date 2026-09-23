@@ -1,25 +1,26 @@
 import { error } from '@sveltejs/kit';
-import { writable, get } from 'svelte/store';
 
 import api from '$/api';
 import { parseSearchToParams } from '$/searchparams';
 import { treeGetAllChildrenIDs } from '%/utils';
-import { fields, enabledFilter } from '#/products/fields';
+import { fields, enabledFilter, countProducts } from '#/products/fields';
 
-const countStore = writable();
-const filterStore = writable();
+/** Only what Directus can sort on directly; nothing is sorted in the app. */
+const SORTS = {
+  price: ['price_min'],
+  'price-desc': ['-price_min'],
+  name: ['name'],
+  newest: ['-date_created'],
+};
 
-async function getFilter(query, category, categoriesTree) {
-  // by search query
+function getFilter(query, category, categoriesTree) {
   if (query) {
     return { ...enabledFilter, _or: [{ name: { _contains: query } }, { code: { _contains: query } }] };
   }
-  // by category
   if (category) {
-    const getIDs = (c) => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
-    return { ...enabledFilter, categories: { category: { _in: getIDs(category.id) } } };
+    const ids = [category.id, ...treeGetAllChildrenIDs(categoriesTree, category.id)];
+    return { ...enabledFilter, categories: { category: { _in: ids } } };
   }
-  // all products
   return { ...enabledFilter };
 }
 
@@ -27,29 +28,23 @@ export async function load({ url, parent, params }) {
   const { categoriesTree, categoriesItems, menus } = await parent();
 
   const { l, p, q } = parseSearchToParams(url.search);
+  const sortKey = SORTS[url.searchParams.get('s')] ? url.searchParams.get('s') : 'price';
 
   // `enabled` so it 404s for admins too
   const category = categoriesItems.find((c) => c.slug === params.slug && c.enabled);
   if (params.slug !== '_' && !category) throw error(404, '404');
 
-  const filter = await getFilter(q, category, categoriesTree);
-  const sort = ['price_min'];
+  const filter = getFilter(q, category, categoriesTree);
   const limit = l || 25;
   const page = p || 1;
 
-  let products = (await api.items('products').readByQuery({ filter, sort, fields, limit, page, meta: '*' })).data;
+  const [{ data }, count] = await Promise.all([
+    api.items('products').readByQuery({ filter, sort: SORTS[sortKey], fields, limit, page }),
+    countProducts(api, filter),
+  ]);
+  let products = data;
 
-  // a tragic way to count products without running too many requests
-  // to workaround meta.filter_count consistently returning the wrong values
-  let count = get(countStore);
-  const oldFilter = get(filterStore);
-  if (oldFilter !== JSON.stringify(filter)) {
-    count = (await api.items('products').readByQuery({ filter, fields: ['id'], limit: -1 })).data.length;
-    countStore.set(count);
-    filterStore.set(JSON.stringify(filter));
-  }
-
-  // add calendars from the fragment as tiles
+  // calendars arrive from a fragment as pseudo-tiles
   if (params.slug === 'kalendarze-Bf4TIYjf') {
     const calendars = (await api.items('fragments').readOne(11)).data;
     products = [
@@ -58,5 +53,5 @@ export async function load({ url, parent, params }) {
     ];
   }
 
-  return { category, menus, products, limit, page, count };
+  return { category, menus, products, limit, page, count, sort: sortKey };
 }

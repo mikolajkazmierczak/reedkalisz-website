@@ -1,57 +1,43 @@
 <script>
   import '$/styles/ui-website.css';
   import { onMount } from 'svelte';
+  import { page } from '$app/stores';
 
   import { me, readme } from '$/auth';
   import Admin from '#/Admin.svelte';
-  import Header from '#/header/Header.svelte';
+  import MobileBar from '#/shell/MobileBar.svelte';
   import Footer from '#/footer/Footer.svelte';
+  import { SITE } from '#/seo';
 
   export let data;
 
   onMount(readme);
+
+  // Canonical keeps only the page number; sort, size and search are views of the same list.
+  $: pageNo = Number($page.url.searchParams.get('p')) || 1;
+  $: canonical = SITE + $page.url.pathname + (pageNo > 1 ? `?p=${pageNo}` : '');
 </script>
+
+<svelte:head>
+  <link rel="canonical" href={canonical} />
+  <meta property="og:site_name" content="REED Kalisz" />
+  <meta property="og:locale" content="pl_PL" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonical} />
+</svelte:head>
 
 {#if $me}
   <Admin />
 {/if}
 
-<Header menu={data.menus.top} />
+<a class="skip-link" href="#main">Przejdź do treści</a>
 
-<div class="wrapper">
-  <div class="content">
+<div class="sheet">
+  <MobileBar sideMenu={data.menus.side} />
+
+  <main id="main">
     <slot />
-  </div>
-  <div class="bg" />
+  </main>
+
+  <Footer fragments={data.footerFragments} />
 </div>
-
-<Footer fragments={data.footerFragments} menu={data.menus.footer} />
-
-<style>
-  .wrapper {
-    position: relative;
-    display: grid;
-    padding-top: 5rem;
-    min-height: calc(100% - 16rem); /* footer height */
-  }
-
-  .content {
-    padding: 0 4rem;
-    width: 100%;
-  }
-
-  .bg {
-    z-index: -1;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    /* background-color: rgba(191, 4, 23, 0.02); */
-    /* background: linear-gradient(315deg, rgba(191, 4, 23, 0.2) 0%, #fff 100%); */
-    /* background: linear-gradient(340deg, rgba(0, 0, 0, 0.05) 0%, #fff 100%); */
-    background-color: rgba(191, 4, 23, 0.07);
-    -webkit-mask-image: url('/topography.svg');
-    mask-image: url('/topography.svg');
-  }
-</style>
