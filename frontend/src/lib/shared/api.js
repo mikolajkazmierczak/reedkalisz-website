@@ -3,6 +3,12 @@ import { Directus } from '@directus/sdk';
 
 export const baseUrl = PUBLIC_API_URL;
 
-export default new Directus(baseUrl);
+const api = new Directus(baseUrl);
 
-// TODO: add wrapper aroud the sdk that checks for 401 error and sets $auth=false
+// The SDK refreshes an expired session before every request and fails the request when that refresh fails
+// (a stale refresh cookie), so public pages 500 until a reload. The failed refresh has already cleared the
+// session, so carry on logged out: the request goes out without a token and readme() shows the login form.
+const refreshIfExpired = api.auth.refreshIfExpired.bind(api.auth);
+api.auth.refreshIfExpired = () => refreshIfExpired().catch(() => {});
+
+export default api;

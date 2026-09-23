@@ -46,8 +46,8 @@ beta.reed.kalisz.pl {
 	}
 
 	handle {
-		# basic auth guard
-		import /etc/caddy/beta-auth.conf
+		# basic auth guard, off for now
+		# import /etc/caddy/beta-auth.conf
 
 		# the "beta" branch (see deploy.sh)
 		reverse_proxy localhost:5001
