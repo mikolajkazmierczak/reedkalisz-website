@@ -64,14 +64,6 @@
     background-color: var(--navy);
     color: #fff;
   }
-  /* Beside the rail: as tall as its navy block, rule included (like the catalogue toolbar), and the title
-     standing on the logo's foot. */
-  @media (min-width: 61.25rem) {
-    .band {
-      min-height: var(--rail-head);
-      padding-top: var(--title-top);
-    }
-  }
   .band__title {
     font-size: var(--fs-h1);
   }
@@ -81,6 +73,18 @@
     color: #a9bcd6;
   }
 
+  /* Beside the rail: as tall as its navy block, rule included (like the catalogue toolbar), and the title
+     standing on the logo's foot. */
+  @media (min-width: 61.25rem) {
+    .band {
+      min-height: var(--rail-head);
+      padding-top: var(--title-top);
+      padding-bottom: var(--sp-5);
+    }
+    .band__lede {
+      max-width: none;
+    }
+  }
   .body {
     display: grid;
     grid-template-columns: minmax(0, 1fr);

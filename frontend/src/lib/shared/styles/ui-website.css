@@ -92,11 +92,11 @@
   --page: 97.5rem;
   --gutter: clamp(0.875rem, 0.4rem + 1.8vw, 2rem);
   --rail: 16.5rem;
-  /* the desktop rail's navy contact block; category toolbars line up with its foot */
-  --rail-head: 13.1875rem;
   /* page titles stand on the logo */
   --logo-h: 4.4375rem;
   --logo-foot: calc(var(--sp-5) + var(--logo-h));
+  /* the desktop rail's navy contact block (logo, contact line, Kontakt); category toolbars line up with its foot */
+  --rail-head: calc(var(--logo-foot) + var(--sp-4) + 1.45 * var(--fs-xs) + var(--sp-3) + 2.5rem + var(--sp-3));
   --baseline-shift: 0.33;
   --title-top: calc(var(--logo-foot) - (1.08 / 2 + var(--baseline-shift)) * var(--fs-h1));
   --topbar-h: 3.25rem;
@@ -347,6 +347,15 @@ textarea {
   color: #fff;
 }
 .btn--orange:hover {
+  background-color: var(--orange-bright);
+  color: var(--ink);
+}
+.btn--ghost-orange {
+  border-color: var(--orange-light);
+  color: var(--orange-light);
+}
+.btn--ghost-orange:hover {
+  border-color: var(--orange-bright);
   background-color: var(--orange-bright);
   color: var(--ink);
 }

@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import Menu from '#/menu/Menu.svelte';
+  import { growHead, dropIn } from './menuMotion';
 
   export let items;
   /** Phone menu: categories open in place instead of by navigating. */
@@ -17,13 +18,20 @@
 </script>
 
 <!-- Shared by the desktop rail and the phone menu (MenuOverlay lays it out differently). -->
-<div class="rail__contact">
+<div
+  class="rail__contact"
+  in:growHead|global={{ enabled: expandable }}
+  out:growHead|global={{ enabled: expandable, out: true }}>
   <div class="brand-row">
     <a class="brand" href="/" aria-label="REED Kalisz — strona główna">
       <img src="/logo.svg" alt="REED" width="200" height="69" />
     </a>
     <a
-      class="btn btn--orange kontakt"
+      in:dropIn|global={{ enabled: expandable, delay: 60 }}
+      out:dropIn|global={{ enabled: expandable, out: true }}
+      class="btn kontakt"
+      class:btn--orange={!expandable}
+      class:btn--ghost-orange={expandable}
       class:on={onContact}
       href="/kontakt"
       aria-current={onContact ? 'page' : undefined}>
@@ -38,21 +46,17 @@
   </div>
 
   <div class="reach">
-    <p class="reach__talk">
-      <a href="tel:+48627531590">62&nbsp;753&nbsp;15&nbsp;90</a><span class="sep" aria-hidden="true">/</span><a
-        href="mailto:info@reed.kalisz.pl">info@reed.kalisz.pl</a>
-    </p>
-    <p class="reach__visit">
-      <a
-        href="https://www.openstreetmap.org/?mlat=51.757428&amp;mlon=18.061910#map=17/51.757428/18.061910"
-        target="_blank"
-        rel="noreferrer">ul.&nbsp;Dobrzecka&nbsp;95<span class="visually-hidden"> (w nowej karcie)</span></a
-      ><span class="sep" aria-hidden="true">/</span><span>pn–pt&nbsp;10:00–14:00</span>
+    <p>
+      <a class="tel" href="tel:+48627531591">62&nbsp;753&nbsp;15&nbsp;91</a><span class="sep" aria-hidden="true">/</span
+      ><a href="mailto:info@reed.kalisz.pl">info@reed.kalisz.pl</a>
     </p>
   </div>
 </div>
 
-<div class="rail__search">
+<div
+  class="rail__search"
+  in:dropIn|global={{ enabled: expandable, delay: 60 }}
+  out:dropIn|global={{ enabled: expandable, out: true }}>
   <form class="search-field search" role="search" action="/kategorie/_" on:submit|preventDefault={search}>
     <input
       bind:value={q}
@@ -69,7 +73,10 @@
   </form>
 </div>
 
-<div class="rail__nav">
+<div
+  class="rail__nav"
+  in:dropIn|global={{ enabled: expandable, delay: 100 }}
+  out:dropIn|global={{ enabled: expandable, out: true }}>
   <Menu {items} {expandable} />
 </div>
 
@@ -136,24 +143,15 @@
     line-height: 1.45;
   }
   .reach a {
+    color: #fff;
     white-space: nowrap;
     transition: color var(--dur-fast) var(--ease);
   }
   .reach a:hover {
     color: var(--orange-bright);
   }
-  .reach__talk a {
-    color: #fff;
+  .reach .tel {
     font-weight: 700;
-  }
-  .reach__visit {
-    margin-top: 0.125rem;
-  }
-  .reach__visit a {
-    color: inherit;
-  }
-  .reach__visit span {
-    white-space: nowrap;
   }
   .sep {
     margin: 0 0.4em;
@@ -177,6 +175,7 @@
   }
   /* On /kontakt: white, the current page rather than an action. */
   .kontakt.on {
+    border-color: #fff;
     background-color: #fff;
     color: var(--navy);
   }

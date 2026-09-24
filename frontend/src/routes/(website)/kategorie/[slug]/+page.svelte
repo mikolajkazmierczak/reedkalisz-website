@@ -8,15 +8,17 @@
   import Pagination from '#c/Pagination.svelte';
   import SideRail from '#/shell/SideRail.svelte';
   import Products from '#/products/Products.svelte';
-  import { plural } from '#/utils';
+  import SectionIcon from '#c/SectionIcon.svelte';
+  import { plural, sectionKind } from '#/utils';
   import { describe, jsonLd, breadcrumbList } from '#/seo';
 
   export let data;
 
   $: query = $page.url.searchParams.get('q');
-  $: title = data.category?.name ?? (query ? `Wyniki: ${query}` : 'Cały katalog');
-
   $: breadcrumbs = getBreadcrumbs(data.category, $page.data.categoriesTree);
+
+  $: title = data.category?.name ?? (query ? `Wyniki: ${query}` : 'Cały katalog');
+  $: icon = breadcrumbs.length === 1 && sectionKind(data.category.name);
 
   function getBreadcrumbs(category, tree) {
     if (!category || !tree) return [];
@@ -96,7 +98,10 @@
         </div>
 
         <header class="head">
-          <h1 class="head__title">{title}</h1>
+          <div class="head__row">
+            {#if icon}<div class="head__icon"><SectionIcon name={data.category.name} /></div>{/if}
+            <h1 class="head__title">{title}</h1>
+          </div>
           {#if data.category?.description}
             <div class="desc">
               <div
@@ -209,8 +214,31 @@
     }
   }
 
-  .head__title {
+  .head__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.35em;
     font-size: var(--fs-h1);
+  }
+  .head__title {
+    min-width: 0;
+    font-size: var(--fs-h1);
+  }
+  /* The drawing's ground line (6/48 up) sits on the title's baseline (0.21em above the line's foot); it rises past
+     the line box, so the title doesn't move. */
+  .head__icon {
+    --w: 1.9em;
+    --drop: calc(0.21em - var(--w) * 0.125);
+    flex: none;
+    width: var(--w);
+    margin-top: calc(1.08em - var(--w) - var(--drop));
+    margin-bottom: var(--drop);
+    color: var(--ink);
+  }
+  @media (min-width: 61.25rem) {
+    .head__icon {
+      --w: 1.15em;
+    }
   }
   .desc {
     margin-top: var(--sp-4);

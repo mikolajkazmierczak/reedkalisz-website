@@ -111,11 +111,14 @@
     io.observe(askEl);
     return () => io.disconnect();
   });
-  function toAsk(e) {
+  // In-page links glide; focus follows without a second jump.
+  function glide(e) {
+    const target = document.querySelector(e.currentTarget.getAttribute('href'));
+    if (!target) return;
     e.preventDefault();
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    askEl.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-    askEl.querySelector('.buy__ask-title')?.focus({ preventScroll: true });
+    target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    target.querySelector('[tabindex="-1"]')?.focus({ preventScroll: true });
   }
 
   function getBreadcrumbs(categories) {
@@ -163,6 +166,9 @@
           <span aria-hidden="true">/</span>
           <span class="crumbs__here" aria-current="page">{code}</span>
         </nav>
+      {:else}
+        <!-- No category, no trail: its line stays, so the title sits where it does on every product. -->
+        <div class="crumbs label" aria-hidden="true">&nbsp;</div>
       {/if}
 
       <div class="product">
@@ -245,7 +251,7 @@
                     {#if priceFromWithLabeling}<span class="buy__with">ze znakowaniem</span>{/if}
                   </p>
                   {#if showCustomPrices || showLabelingsPrices}
-                    <a class="buy__tocennik" href="#cennik">Pełny cennik według nakładu ↓</a>
+                    <a class="buy__tocennik" href="#cennik" on:click={glide}>Pełny cennik według nakładu ↓</a>
                   {/if}
                 {/if}
 
@@ -309,7 +315,7 @@
       href="#zapytaj"
       tabindex={showFab ? 0 : -1}
       aria-hidden={!showFab}
-      on:click={toAsk}>
+      on:click={glide}>
       Zapytaj
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
         <path d="M12 5v14M6 13l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
@@ -434,14 +440,23 @@
     }
   }
   /* Framed like the rail's orange Kontakt button. */
+  /* A faint orange halftone, clear behind the title. */
   .buy__ask {
+    --ground: var(--surface);
+    --dot: color-mix(in srgb, var(--orange) 8%, transparent);
     width: 100%;
     margin-top: var(--sp-5);
     padding: var(--sp-5);
     border: 2px solid var(--orange);
     border-radius: var(--r-card);
     corner-shape: squircle;
-    background-color: var(--surface);
+    background-color: var(--ground);
+    background-image:
+      linear-gradient(160deg, var(--ground), transparent 65%),
+      radial-gradient(circle, var(--dot) 0.1rem, transparent 0.14rem);
+    background-size:
+      auto,
+      0.5rem 0.5rem;
   }
   .buy__ask-title {
     margin-bottom: var(--sp-4);
@@ -665,19 +680,20 @@
     .product__variants {
       order: 5;
     }
-    /* Single column: the enquiry is a plain titled section, no frame. */
+    /* Single column: a band across the screen. */
     .buy__ask {
       order: 6;
-      margin-top: 0;
-      padding: 0;
+      width: auto;
+      margin: 0 calc(var(--gutter) * -1);
+      padding: var(--sp-6) var(--gutter) var(--sp-8);
       border: none;
       border-radius: 0;
-      background: none;
+      --ground: var(--paper);
     }
     .buy__ask-title {
       margin-bottom: var(--sp-4);
       padding-bottom: var(--sp-2);
-      border-bottom: var(--rule);
+      border-bottom: 2px solid var(--orange);
     }
     .buy__ask-word {
       font-size: var(--fs-h2);

@@ -8,7 +8,7 @@
   export let categorySlug;
 </script>
 
-{#if product}
+{#if product && categorySlug}
   <div class="recommended">
     <h2>Podobne produkty</h2>
     <CategorySlider slug={categorySlug} filterIds={[product.id]} preloaded={similar} />

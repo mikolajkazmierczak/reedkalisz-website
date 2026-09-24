@@ -1,6 +1,9 @@
 <script>
   import { page } from '$app/stores';
-  import { addLinks } from '#/utils';
+  import { addLinks, sectionKind } from '#/utils';
+  import MenuIcon from './MenuIcon.svelte';
+
+  const MARKED = ['new', 'best', 'sale'];
 
   function deepFindItemByCategorySlug(items, slug) {
     if (!items) return;
@@ -27,10 +30,11 @@
     {@const exact = href === $page.url.pathname}
     {@const active = exact || childActive}
     {@const open = expandable ? (expanded[id] ?? !!active) : !!active}
+    {@const kind = lvl0 && MARKED.find((k) => k === sectionKind(name))}
     <li>
       <div class="row">
-        <a {href} class="item" class:active class:exact aria-current={exact ? 'page' : undefined}>
-          {name}
+        <a {href} class="item" class:active class:exact class:marked={kind} aria-current={exact ? 'page' : undefined}>
+          {#if kind}<MenuIcon {kind} />{/if}{name}
         </a>
         {#if expandable && children?.length}
           <button
@@ -73,6 +77,11 @@
   }
   .item:hover {
     color: var(--red);
+  }
+  .item.marked {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
   }
   .item.active {
     color: var(--ink);

@@ -1,6 +1,7 @@
 <script>
   import { tick } from 'svelte';
   import RailContent from './RailContent.svelte';
+  import { cover } from './menuMotion';
 
   export let open = false;
   export let sideMenu = [];
@@ -43,6 +44,7 @@
 <!-- The desktop rail, full screen; branches expand in place. -->
 {#if open}
   <div class="overlay rail-frame" role="dialog" aria-modal="true" aria-label="Menu" bind:this={overlay}>
+    <div class="cover" in:cover out:cover={{ out: true }} />
     <RailContent items={sideMenu} expandable>
       <!-- Same position and size as the bar's Menu button. -->
       <button
@@ -62,11 +64,18 @@
 {/if}
 
 <style>
+  /* The paper is its own layer, so it can fade in under the head without fading the head. */
   .overlay {
     position: fixed;
     inset: 0;
     z-index: 100;
+    isolation: isolate;
     height: 100dvh;
+  }
+  .cover {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background-color: var(--bg);
   }
 
@@ -105,27 +114,6 @@
     }
   }
 
-  .overlay :global(.rail__contact .reach) {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--sp-4);
-  }
-  .overlay :global(.rail__contact .reach p) {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-  }
-  .overlay :global(.rail__contact .reach__visit) {
-    align-items: flex-end;
-    text-align: right;
-  }
-  .overlay :global(.rail__contact .reach a),
-  .overlay :global(.rail__contact .reach__visit span) {
-    padding-block: 0.1875rem;
-  }
-  .overlay :global(.rail__contact .sep) {
-    display: none;
-  }
   .overlay :global(.rail__search),
   .overlay :global(.rail__nav) {
     padding-inline: var(--gutter);

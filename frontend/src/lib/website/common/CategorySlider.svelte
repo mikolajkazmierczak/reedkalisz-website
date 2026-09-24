@@ -27,11 +27,10 @@
   /** The page on show; until one is picked (and in SSR), the preloaded first page. */
   let current = null;
   $: shown = current ?? preloaded;
-  let box;
   let mounted = false;
 
-  // Pages by filter, size and number. The current one stays up until the next is in, and the page after is
-  // always fetched ahead (pictures too), so paging is instant.
+  // Pages by filter, size and number. The current one stays up until the next is in, and once the slider is
+  // within a screen of the viewport the page after is fetched ahead (pictures too), so paging is instant.
   const pages = new Map();
   /** Totals by filter: a count doesn't change from page to page, so it's asked for once. */
   const counts = new Map();
@@ -61,17 +60,20 @@
   $: if (key) show(pageSize, page);
 
   let requests = 0;
+  let ahead = null;
+  let near = false;
   async function show(size, page) {
     const request = ++requests;
     try {
       const result = await load(size, page);
       if (request !== requests) return;
       current = result;
-      if (page * size < result.count) load(size, page + 1).catch(() => {});
+      ahead = page * size < result.count ? [size, page + 1] : null;
     } catch {
       // keep what's showing; the next click retries
     }
   }
+  $: if (near && ahead) load(...ahead).catch(() => {});
 
   /* Mirrors the grid in Products.svelte — keep in sync, with the .first rules below. */
   function columnsFor(boxWidth, viewport) {
@@ -82,31 +84,38 @@
     return Math.max(1, Math.floor((boxWidth + gap) / (min + gap)));
   }
 
-  function measure() {
-    if (!box) return;
-    const w = box.getBoundingClientRect().width;
-    if (!w) return;
-    cols = columnsFor(w, window.innerWidth);
+  function measure(node) {
+    const w = node.getBoundingClientRect().width;
+    if (w) cols = columnsFor(w, window.innerWidth);
   }
 
-  onMount(() => {
-    measure();
-    mounted = true;
+  /* An action, not onMount: the box only exists while there's a category to show. */
+  function watch(node) {
+    measure(node);
     let t;
     const ro = new ResizeObserver(() => {
       clearTimeout(t);
-      t = setTimeout(measure, 150);
+      t = setTimeout(() => measure(node), 150);
     });
-    ro.observe(box);
-    return () => {
-      clearTimeout(t);
-      ro.disconnect();
+    ro.observe(node);
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && ((near = true), io.disconnect()), {
+      rootMargin: '100% 0px',
+    });
+    io.observe(node);
+    return {
+      destroy() {
+        clearTimeout(t);
+        ro.disconnect();
+        io.disconnect();
+      },
     };
-  });
+  }
+
+  onMount(() => (mounted = true));
 </script>
 
 {#if filter}
-  <div class="wrapper" class:first={page === 1} bind:this={box}>
+  <div class="wrapper" class:first={page === 1} use:watch>
     <!-- Nothing until there's a page: no empty state flashing. -->
     {#if shown}<Products products={shown.products} />{/if}
     <Pagination limit={pageSize} bind:page count={shown?.count ?? 0} limitLocked hideSingle noSearchParams />

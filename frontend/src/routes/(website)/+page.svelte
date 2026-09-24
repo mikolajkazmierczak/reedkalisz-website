@@ -48,7 +48,7 @@
     const promo = /promocje|bestseller|nowości/i;
     const ordered = [...sections.filter((s) => !promo.test(s.name)), ...sections.filter((s) => promo.test(s.name))];
     const add = (name, href) => {
-      const n = name.replace(/^[^\p{L}]+/u, '').trim();
+      const n = name.trim();
       if (!exact.has(n)) exact.set(n, href);
       if (!loose.has(n.toLowerCase())) loose.set(n.toLowerCase(), href);
     };
@@ -148,7 +148,7 @@
             <a class="btn btn--light" href="/kategorie/_">
               {catalogueCount ? `Katalog ${catalogueCount}+ produktów` : 'Przejdź do katalogu'}
             </a>
-            <a class="btn btn--ghost-light" href="/kontakt">Napisz do nas</a>
+            <a class="btn btn--ghost-orange" href="/kontakt">Napisz do nas</a>
           </div>
         </div>
         <div class="hero__plate" aria-hidden="true">

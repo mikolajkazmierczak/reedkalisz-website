@@ -186,15 +186,18 @@
     overflow: hidden;
   }
 
-  /* Tapping the label toggles the box; don't select its text. */
+  /* The whole row toggles the box; its text isn't selected on tap. */
   .qf__consent {
     -webkit-user-select: none;
     user-select: none;
     display: flex;
     align-items: flex-start;
-    gap: var(--sp-2);
+    gap: var(--sp-3);
+    margin: calc(var(--sp-2) * -1);
+    padding: var(--sp-2);
     color: var(--ink-500);
     font-size: var(--fs-sm);
+    line-height: 1.5;
     cursor: pointer;
   }
   .qf__consent a {
@@ -205,12 +208,46 @@
   .qf__consent a:hover {
     color: var(--orange);
   }
+  /* A squircle like the fields, centred on the first line of text. */
   .qf__consent input {
     flex: none;
-    width: 1.125rem;
-    height: 1.125rem;
-    margin: 0.15em 0 0;
+    appearance: none;
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    margin: calc((1.5em - 1.625rem) / 2) 0 0;
+    border: 1px solid var(--ink-300);
+    border-radius: 0.625rem;
+    corner-shape: squircle;
+    background-color: var(--surface);
     cursor: pointer;
+    transition:
+      background-color var(--dur-fast) var(--ease),
+      border-color var(--dur-fast) var(--ease);
+  }
+  .qf__consent input::after {
+    content: '';
+    width: 1.0625rem;
+    height: 1.0625rem;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5' fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    transform: scale(0.4);
+    opacity: 0;
+    transition:
+      transform var(--dur-fast) var(--ease),
+      opacity var(--dur-fast) var(--ease);
+  }
+  .qf__consent:hover input {
+    border-color: var(--orange);
+  }
+  .qf__consent input:checked {
+    border-color: var(--orange);
+    background-color: var(--orange);
+  }
+  .qf__consent input:checked::after {
+    transform: none;
+    opacity: 1;
   }
 
   .qf__error {

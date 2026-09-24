@@ -1,20 +1,10 @@
 <script>
+  import { sectionKind } from '#/utils';
+
   /** The catalogue section's name, as the CMS spells it. */
   export let name = '';
 
-  // Matched on a word of the name, so "NOWOŚCI 2027" or a new emoji keeps its drawing.
-  const kinds = [
-    ['new', /nowo[śs]ci/i],
-    ['best', /bestseller/i],
-    ['sale', /promocj/i],
-    ['gadgets', /gad[żz]et/i],
-    ['print', /drukarni/i],
-    ['calendar', /kalendar/i],
-    ['stamp', /piecz[ąa]t/i],
-    ['outdoor', /zewn[ęe]trzn/i],
-    ['plate', /tabliczk/i],
-  ];
-  $: kind = kinds.find(([, re]) => re.test(name))?.[0] ?? 'box';
+  $: kind = sectionKind(name) ?? 'box';
 </script>
 
 <!-- Shop-drawing line work, like the hero's: ink on a ground line, and one red part — the mark REED puts on it. -->

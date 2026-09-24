@@ -17,7 +17,7 @@ export const business = {
   url: SITE,
   logo: `${SITE}/logo.svg`,
   image: `${SITE}/imgs/machine-playful.webp`,
-  telephone: '+48 62 753 15 90',
+  telephone: '+48 62 753 15 91',
   email: 'info@reed.kalisz.pl',
   foundingDate: '2002',
   address: {
