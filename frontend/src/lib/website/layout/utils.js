@@ -42,11 +42,22 @@ export const create = {
     hide: $?.hide ?? false,
     slug: $.slug, // required
   }),
+  catalogue: () => ({ _id: uid(), type: 'catalogue' }),
+  headquarters: () => ({ _id: uid(), type: 'headquarters' }),
 };
 
-/** Adds ids and missing keys. Drops retired types (e.g. 'whitespace') so old layouts still load. */
+/** Built into the page: always there, once, and can't be hidden, edited or deleted; other blocks go around them. */
+export const FIXED = ['catalogue', 'headquarters'];
+
+/**
+ * Adds ids and missing keys. Drops retired types (e.g. 'whitespace') so old layouts still load. A missing fixed block
+ * goes first, where it sat before it joined the layout.
+ */
 export function parseLayout(layout) {
-  return layout.filter((element) => create[element.type]).map((element) => create[element.type](element));
+  const first = (e, i, all) => !FIXED.includes(e.type) || all.findIndex((x) => x.type === e.type) === i;
+  const known = layout.filter((e) => create[e.type]).filter(first);
+  const missing = FIXED.filter((type) => !known.some((e) => e.type === type)).map((type) => ({ type }));
+  return [...missing, ...known].map((element) => create[element.type](element));
 }
 
 export function parseBack(parsed) {

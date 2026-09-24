@@ -5,22 +5,25 @@
   import SideRail from '#/shell/SideRail.svelte';
 
   import { layout, modified } from '#/layout/store';
-  import { create, parseLayout, parseBack } from '#/layout/utils';
+  import { create, parseLayout, parseBack, FIXED } from '#/layout/utils';
   import ElementLabels from '#/layout/ElementLabels.svelte';
   import Element from '#/layout/Element.svelte';
   import Title from '#/layout/elements/Title.svelte';
   import Tiles from '#/layout/elements/tiles/Tiles.svelte';
   import Category from '#/layout/elements/Category.svelte';
-  import SectionIcon from '#c/SectionIcon.svelte';
-  import { plural } from '#/utils';
+  import Catalogue from '#/layout/elements/Catalogue.svelte';
+  import Headquarters from '#/layout/elements/Headquarters.svelte';
   import { SITE, jsonLd, business } from '#/seo';
-
-  const cities = ['Kalisz', 'Ostrów Wielkopolski', 'Pleszew', 'Jarocin', 'Turek', 'Krotoszyn', 'Konin', 'Sieradz'];
 
   const types = [
     { type: 'title', label: 'Tytuł', icon: 'text_t' },
     { type: 'tiles', label: 'Kafelki', icon: 'apps' },
     { type: 'category', label: 'Kategoria', icon: 'categories' },
+  ];
+  const labels = [
+    ...types,
+    { type: 'catalogue', label: 'Katalog', icon: 'grid' },
+    { type: 'headquarters', label: 'Siedziba', icon: 'location' },
   ];
 
   export let data;
@@ -162,52 +165,28 @@
       </div>
     </section>
 
-    {#if summary?.sections?.length}
-      <section class="sections">
-        <div class="sections__grid">
-          {#each summary.sections as s (s.id)}
-            <a class="sec" href={s.href}>
-              <div class="sec__icon"><SectionIcon name={s.name} /></div>
-              <div class="sec__text">
-                <!-- remove emojis since the drawings replace them -->
-                <h2 class="sec__name">{s.name.replace(/^[^\p{L}\p{N}]+/u, '')}</h2>
-                <span class="sec__count tnum">{s.count} {plural(s.count, ['pozycja', 'pozycje', 'pozycji'])}</span>
-              </div>
-            </a>
-          {/each}
-        </div>
-      </section>
-    {/if}
-
-    <section class="reach">
-      <div class="wrap reach__inner">
-        <h2 class="reach__title">Siedziba w Kaliszu, wysyłkowo cała Polska</h2>
-        <p class="reach__lede">
-          <span class="reach__s"
-            >Z Kalisza i okolic wpadnij do nas na Dobrzecką 95, od poniedziałku do piątku między 10:00 a&nbsp;14:00.</span>
-          <span class="reach__s">Paczki wysyłamy na terenie całej Polski — prosto pod Twój adres.</span>
-        </p>
-        <ul class="cities">
-          {#each cities as city}
-            <li class="city" class:city--home={city === 'Kalisz'}>{city}</li>
-          {/each}
-        </ul>
-
-        <a class="btn btn--orange" href="/kontakt">Umów się albo napisz</a>
-      </div>
-    </section>
-
     <div class="blocks">
       <ElementLabels {types} on:add={(e) => handleAdd(e)} />
       {#each parsedLayout as element}
         {@const { _id: id, type } = element}
-        <Element bind:element {types} {type} on:delete={() => handleDelete(id)} on:move={(e) => handleMove(e, id)}>
+        <Element
+          bind:element
+          types={labels}
+          {type}
+          fixed={FIXED.includes(type)}
+          bleed={type === 'tiles' || FIXED.includes(type)}
+          on:delete={() => handleDelete(id)}
+          on:move={(e) => handleMove(e, id)}>
           {#if type === 'title'}
             <Title bind:element />
           {:else if type === 'category'}
             <Category bind:element {categories} />
           {:else if type === 'tiles'}
             <Tiles bind:element />
+          {:else if type === 'catalogue'}
+            <Catalogue {summary} />
+          {:else if type === 'headquarters'}
+            <Headquarters />
           {/if}
         </Element>
         <ElementLabels {types} on:add={(e) => handleAdd(e, id)} />
@@ -379,6 +358,9 @@
     aspect-ratio: 3 / 2;
     object-fit: contain;
   }
+  .hero__title em {
+    color: var(--orange-light);
+  }
   .hero__title {
     font-size: var(--fs-hero);
     font-weight: 800;
@@ -398,130 +380,6 @@
     flex-wrap: wrap;
     gap: var(--sp-3);
     margin-top: var(--sp-7);
-  }
-
-  /* --- catalogue sections --- */
-
-  .sections {
-    border-bottom: var(--rule);
-    background-color: var(--surface);
-  }
-  /* Rules are the grid background showing through a 1px gap; the last cell spans a short row. */
-  .sections__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1px;
-    background-color: var(--border);
-  }
-  .sec {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-4);
-    -webkit-user-select: none;
-    user-select: none;
-    padding: var(--sp-4) var(--gutter);
-    background-color: var(--surface);
-    color: var(--ink);
-    transition:
-      background-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
-  }
-  .sec:hover {
-    background-color: var(--paper-2);
-    color: var(--red);
-  }
-  .sec__icon {
-    flex: none;
-    width: 3.25rem;
-    color: var(--ink);
-    transition: transform var(--dur) var(--ease);
-  }
-  .sec:hover .sec__icon {
-    transform: translateY(-0.1875rem);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .sec:hover .sec__icon {
-      transform: none;
-    }
-  }
-  .sec__text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-1);
-    min-width: 0;
-  }
-  .sec__name {
-    font-size: var(--fs-h3);
-    font-weight: 700;
-    line-height: 1.15;
-  }
-  .sec__count {
-    color: var(--ink-400);
-    font-size: var(--fs-xs);
-  }
-
-  /* --- reach band --- */
-
-  /* No top rule: the hero or the sections above already end in one. */
-  .reach {
-    border-bottom: var(--rule);
-    background-color: var(--navy);
-    color: #fff;
-  }
-  .reach__inner {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--sp-3);
-    padding: var(--sp-8) var(--gutter);
-  }
-  .reach__title {
-    max-width: 22ch;
-    font-size: var(--fs-h2);
-    color: #fff;
-  }
-  /* One paragraph on phones, a line per sentence from 56.25rem. */
-  .reach__lede {
-    max-width: 58ch;
-    color: #a9bcd6;
-    font-size: var(--fs-sm);
-    line-height: 1.6;
-  }
-  @media (min-width: 56.25rem) {
-    .reach__lede {
-      max-width: none;
-    }
-    .reach__s {
-      display: block;
-    }
-  }
-  /* A separator before each town, shifted and clipped so no line starts with one. */
-  .cities {
-    --sep: calc(1px + var(--sp-3));
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2) var(--sp-3);
-    margin: var(--sp-3) 0 var(--sp-1) calc(var(--sep) * -1);
-    padding: 0;
-    list-style: none;
-    clip-path: inset(0 0 0 var(--sep));
-  }
-  .city {
-    display: flex;
-    align-items: center;
-    color: #cfdcee;
-    font-size: var(--fs-sm);
-  }
-  .city::before {
-    content: '';
-    width: 1px;
-    height: 0.9em;
-    margin-right: var(--sp-3);
-    background-color: #3c567d;
-  }
-  .city--home {
-    color: #fff;
-    font-weight: 700;
   }
 
   /* --- SEO band --- */
@@ -679,9 +537,17 @@
     margin-inline: auto;
     padding-inline: var(--gutter);
   }
-  .blocks > :global([data-type='tiles']) {
+  .blocks > :global([data-bleed]) {
     max-width: none;
     padding-inline: 0;
+  }
+  /* The fixed bands are ruled top and bottom, but never twice where one follows the hero or another band. */
+  .blocks > :global([data-fixed]) {
+    border-block: var(--rule);
+  }
+  .blocks > :global([data-fixed]:first-child),
+  .blocks > :global([data-fixed] + [data-fixed]) {
+    border-top: 0;
   }
   .blocks > :global(* + *) {
     margin-top: var(--sp-10);
@@ -692,24 +558,20 @@
   .blocks > :global(* + [data-type='title']) {
     margin-top: var(--sp-16);
   }
-  /* Consecutive banners touch. */
-  .blocks > :global([data-type='tiles'] + [data-type='tiles']) {
+  .blocks > :global([data-fixed] + [data-type='title']) {
+    margin-top: var(--sp-10);
+  }
+  /* Banners and bands touch each other, and a leading one meets the hero directly. */
+  .blocks > :global([data-bleed] + [data-bleed]) {
     margin-top: 0;
   }
-  /* A leading banner meets the section above directly. */
-  .blocks > :global([data-type='tiles']:first-child) {
+  .blocks > :global([data-bleed]:first-child) {
     margin-top: calc(var(--sp-10) * -1);
   }
 
   @media (min-width: 38.75rem) {
     .map__cols {
       column-gap: var(--sp-8);
-    }
-    .sections__grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .sec:last-child:nth-child(2n + 1) {
-      grid-column: 1 / -1;
     }
   }
 
@@ -801,22 +663,6 @@
   @media (min-width: 68.75rem) {
     .map__cols {
       columns: 4;
-    }
-  }
-
-  /* Nine sections, three rows of three. */
-  @media (min-width: 64rem) {
-    .sections__grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .sec:last-child:nth-child(2n + 1) {
-      grid-column: auto;
-    }
-    .sec:last-child:nth-child(3n + 1) {
-      grid-column: 1 / -1;
-    }
-    .sec:last-child:nth-child(3n + 2) {
-      grid-column: span 2;
     }
   }
 </style>
