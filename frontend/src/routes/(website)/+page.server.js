@@ -2,6 +2,7 @@ import api from '$/api';
 import { makeTree } from '%/utils';
 import { enabledFilter, countProducts } from '#/products/fields';
 import { preloadSlider } from '#/products/slider';
+import { cached, SERVER_MAX_AGE } from '$lib/server/cache';
 
 /** Item counts per top-level section, in the rail's order: one distinct count each, cheap enough to run live. */
 async function catalogueSummary(tree) {
@@ -21,7 +22,11 @@ async function catalogueSummary(tree) {
 /** Each category block's first page, so the server render has its cards. */
 async function preloadSliders(layout, categoriesItems, categoriesTree) {
   const slugs = [...new Set(layout.filter((e) => e.type === 'category' && e.slug).map((e) => e.slug))];
-  const pages = await Promise.all(slugs.map((slug) => preloadSlider(api, slug, categoriesItems, categoriesTree)));
+  const pages = await Promise.all(
+    slugs.map((slug) =>
+      cached(`slider:${slug}`, SERVER_MAX_AGE, () => preloadSlider(api, slug, categoriesItems, categoriesTree)),
+    ),
+  );
   return Object.fromEntries(slugs.map((slug, i) => [slug, pages[i]]));
 }
 
@@ -32,7 +37,7 @@ export async function load({ depends, parent }) {
   const [{ categoriesItems }, { data: layout }] = await Promise.all([parent(), api.items('fragments').readOne(12)]);
   const categoriesTree = makeTree(categoriesItems.filter((c) => c.enabled));
   const [summary, sliders] = await Promise.all([
-    catalogueSummary(categoriesTree),
+    cached('summary', SERVER_MAX_AGE, () => catalogueSummary(categoriesTree)),
     preloadSliders(layout, categoriesItems, categoriesTree),
   ]);
   return { layout, summary, sliders };
