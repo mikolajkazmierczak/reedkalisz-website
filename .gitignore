@@ -14,3 +14,8 @@ uploads
 .vite
 build
 
+# impeccable
+**/.impeccable/config.local.json
+**/.impeccable/review
+**/.impeccable/live
+**/.impeccable/questions

@@ -51,10 +51,8 @@ export const create = {
 
 export function parseLayout(layout) {
   // adds ids (to each element and tile) and keys for missing properties
-  return layout.map((element) => {
-    const { type } = element;
-    return create[type](element);
-  });
+  // skips types this version doesn't know (e.g. blocks added by a newer site sharing the database)
+  return layout.filter((element) => create[element.type]).map((element) => create[element.type](element));
 }
 
 export function parseBack(parsed) {
