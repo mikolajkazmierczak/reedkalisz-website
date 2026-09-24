@@ -17,3 +17,29 @@ export function parseColor(multicolored, first, second) {
 
   return { label, bg, fg };
 }
+
+/** Polish plural: `plural(3, ['produkt', 'produkty', 'produktów'])` → 'produkty'. */
+export function plural(n, [one, few, many]) {
+  if (n === 1) return one;
+  const t = n % 10;
+  const h = n % 100;
+  return t >= 2 && t <= 4 && (h < 10 || h >= 20) ? few : many;
+}
+
+// Matched on a word of the CMS name, so "NOWOŚCI 2027" keeps its drawing.
+const sectionKinds = [
+  ['new', /nowo[śs]ci/i],
+  ['best', /bestseller/i],
+  ['sale', /promocj/i],
+  ['gadgets', /gad[żz]et/i],
+  ['print', /drukarni/i],
+  ['calendar', /kalendar/i],
+  ['stamp', /piecz[ąa]t/i],
+  ['outdoor', /zewn[ęe]trzn/i],
+  ['plate', /tabliczk/i],
+];
+
+/** Which drawing a catalogue section gets, or null for a name none matches. */
+export function sectionKind(name = '') {
+  return sectionKinds.find(([, re]) => re.test(name))?.[0] ?? null;
+}

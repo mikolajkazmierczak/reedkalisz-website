@@ -1,8 +1,9 @@
 <script>
-  import { slide, fly } from 'svelte/transition';
-
   import { page } from '$app/stores';
-  import { addLinks } from '#/utils';
+  import { addLinks, sectionKind } from '#/utils';
+  import MenuIcon from './MenuIcon.svelte';
+
+  const MARKED = ['new', 'best', 'sale'];
 
   function deepFindItemByCategorySlug(items, slug) {
     if (!items) return;
@@ -14,80 +15,144 @@
   }
 
   export let items;
+  /** Toggle branches open in place (phone menu) instead of navigating. */
+  export let expandable = false;
+  /** Open state per item id; unset follows the current page. */
+  export let expanded = {};
   addLinks(items);
 
-  const depth = items[0]._meta.depth;
-  const lvl0 = depth == 0;
-  const lvl1 = depth == 1;
+  const lvl0 = (items[0]?._meta.depth ?? 0) === 0;
 </script>
 
-<!-- out:slide={{ duration: 150, delay: 150 }} -->
-<!-- out:fly={{ y: -15, duration: 150 }} -->
-<div class="menu" class:lvl0 class:lvl1 in:slide={{ duration: 300 }}>
-  {#each items as { id, href, name }, i (id)}
-    {@const children = items.find((c) => c.id === id)?.children}
+<ul class="menu" class:lvl0 class:expandable>
+  {#each items as { id, href, name, children } (id)}
     {@const childActive = deepFindItemByCategorySlug(children, $page.params.slug)}
-    {@const active = href === $page.url.pathname || childActive}
-    <a {href} class="item" class:active in:fly={{ y: -15, duration: 300, delay: 50 * i }}>
-      {name}
-    </a>
-    {#if children?.length && active}
-      <svelte:self items={children} />
-    {/if}
+    {@const exact = href === $page.url.pathname}
+    {@const active = exact || childActive}
+    {@const open = expandable ? (expanded[id] ?? !!active) : !!active}
+    {@const kind = lvl0 && MARKED.find((k) => k === sectionKind(name))}
+    <li>
+      <div class="row">
+        <a {href} class="item" class:active class:exact class:marked={kind} aria-current={exact ? 'page' : undefined}>
+          {#if kind}<MenuIcon {kind} />{/if}{name}
+        </a>
+        {#if expandable && children?.length}
+          <button
+            class="toggle"
+            type="button"
+            aria-expanded={open}
+            aria-label="{open ? 'Zwiń' : 'Rozwiń'}: {name}"
+            on:click={() => (expanded[id] = !open)}>
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              {#if !open}<path d="M8 2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />{/if}
+            </svg>
+          </button>
+        {/if}
+      </div>
+      {#if children?.length && open}
+        <svelte:self items={children} {expandable} bind:expanded />
+      {/if}
+    </li>
   {/each}
-</div>
+</ul>
 
 <style>
-  :root {
-    --bg-hover: var(--main-1);
-    --bg-active: var(--main);
-  }
   .menu {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-    border-left: 2px solid var(--bg-active);
-    padding-left: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
-  .lvl0,
-  .lvl1 {
-    padding-left: 0;
-    border-left: none;
-  }
-  .lvl0 {
-    gap: 1.4rem;
-  }
-  .lvl1 {
-    margin-top: -0.75rem;
+  .menu:not(.lvl0) {
+    padding-left: var(--sp-3);
+    border-left: 1px solid var(--border);
   }
 
   .item {
-    cursor: pointer;
-    outline: none;
-    border: none;
-    background-color: rgba(0, 0, 0, 0);
-    font-size: 1.1rem;
-    color: var(--text);
-    text-align: left;
-    text-decoration: none;
-    white-space: nowrap;
-    transition:
-      padding 200ms,
-      background-color 100ms;
+    display: block;
+    padding: 0.3125rem 0;
+    color: var(--ink-600);
+    font-size: var(--fs-sm);
+    line-height: 1.35;
   }
   .item:hover {
-    background-color: var(--bg-hover);
-    padding: 0 0.5rem;
+    color: var(--red);
+  }
+  .item.marked {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
   }
   .item.active {
-    background-color: var(--bg-active);
-    padding: 0 0.5rem;
-    color: #fff;
-    transition: padding 200ms;
-  }
-  .lvl0 > .item {
-    font-size: 1.3rem;
+    color: var(--ink);
     font-weight: 600;
+  }
+  .item.exact {
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  /* Long-press opens the link menu, not a selection. */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .row > .item {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .lvl0 > li > .row {
+    border-bottom: 1px solid var(--border);
+  }
+  .lvl0 > li > .row > .item {
+    padding: var(--sp-2) 0;
+    font-size: var(--fs-body);
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .lvl0 > li > .row > .item:hover,
+  .lvl0 > li > .row > .item.exact {
+    color: var(--red);
+  }
+
+  /* Expandable (mobile): thumb-sized rows and a toggle on every branch */
+  .toggle {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: none;
+    border-radius: var(--r-pill);
+    background-color: rgba(17, 17, 16, 0.06);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+  .toggle:hover {
+    background-color: rgba(17, 17, 16, 0.12);
+  }
+  .toggle[aria-expanded='true'] {
+    background-color: var(--ink);
+    color: #fff;
+  }
+  .toggle svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  .expandable .item {
+    padding-block: 0.625rem;
+    font-size: var(--fs-body);
+  }
+  .expandable.lvl0 > li > .row > .item {
+    padding-block: var(--sp-3);
+    font-size: 1.125rem;
+  }
+  .expandable:not(.lvl0) {
+    margin-bottom: var(--sp-2);
   }
 </style>

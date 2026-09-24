@@ -4,67 +4,126 @@
   export let products;
 </script>
 
-<div class="tiles">
-  {#each products as product (product.id)}
-    {#if product.url}
-      <a href={product.url} class="href-tile" target="_blank" rel="noreferrer">
-        <div class="img-wrapper">
-          <img src={product.img} alt={product.alt} />
-        </div>
-        <div class="info">
-          <div class="title">{product.title}</div>
-          <div>{product.subtitle}</div>
-        </div>
-      </a>
-    {:else}
-      <ProductTile {product} />
-    {/if}
-  {/each}
-</div>
+{#if products.length}
+  <!-- Unkeyed: paging reuses the cards, so each one crossfades its picture instead of being rebuilt. -->
+  <div class="grid">
+    {#each products as product}
+      {#if product.url}
+        <a class="promo" href={product.url} target="_blank" rel="noreferrer">
+          <div class="promo__media">
+            <img src={product.img} alt={product.alt} loading="lazy" decoding="async" />
+          </div>
+          <div class="promo__body">
+            <h3 class="promo__title">{product.title}</h3>
+            <p class="promo__sub">{product.subtitle}</p>
+          </div>
+        </a>
+      {:else}
+        <ProductTile {product} />
+      {/if}
+    {/each}
+  </div>
+{:else}
+  <div class="empty">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m16.5 16.5 4 4" stroke-linecap="round" />
+    </svg>
+    <h2>Brak produktów</h2>
+    <p>
+      W tej kategorii nie ma jeszcze produktów. Sprawdź inną kategorię lub napisz do nas — wiele rzeczy sprowadzamy na
+      zamówienie.
+    </p>
+    <a class="btn btn--orange empty__cta" href="/kontakt">Napisz do nas</a>
+  </div>
+{/if}
 
 <style>
-  .tiles {
+  .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.75rem 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-3);
+  }
+  @media (min-width: 35rem) {
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.125rem), 1fr));
+      gap: var(--sp-4);
+    }
+  }
+  @media (min-width: 56.25rem) {
+    .grid {
+      /* 12.5rem floor: four columns beside the rail. */
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 12.5rem), 1fr));
+      gap: var(--sp-5);
+    }
   }
 
-  /* temporary custom tile */
-  .href-tile {
-    overflow: hidden;
-    position: relative;
+  /* === Promotional tile (externally linked) === */
+
+  .promo {
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
+    background-color: var(--paper-2);
+    color: inherit;
     text-decoration: none;
-    background-color: rgb(250, 250, 250);
+    overflow: hidden;
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
   }
-  .href-tile:hover {
-    background-color: var(--main-0);
+  .promo:hover {
+    border-color: var(--border-strong);
   }
-
-  .href-tile .img-wrapper {
-    width: 100%;
+  .promo__media {
     aspect-ratio: 1 / 1;
-    background-color: #fff;
+    padding: var(--sp-4);
   }
-  .href-tile .img-wrapper img {
-    object-fit: cover;
-    display: block;
+  .promo__media img {
     width: 100%;
     height: 100%;
-    aspect-ratio: 1 / 1;
+    object-fit: contain;
+  }
+  .promo__body {
+    padding: var(--sp-4);
+    border-top: 1px solid var(--border);
+  }
+  .promo__title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+  .promo__sub {
+    margin-top: var(--sp-1);
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
   }
 
-  .href-tile .info {
-    position: relative;
-    padding: 0.8rem;
-    padding-top: 1rem;
-    padding-bottom: 1.2rem;
-    font-size: 1.3rem;
+  /* === Empty state === */
+
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-16) var(--sp-4);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--r-sm);
+    text-align: center;
   }
-  .href-tile .info .title {
-    font-size: 1.5rem;
-    font-weight: bold;
+  .empty svg {
+    width: 2.125rem;
+    height: 2.125rem;
+    color: var(--ink-400);
+  }
+  .empty h2 {
+    font-size: var(--fs-h3);
+  }
+  .empty p {
+    max-width: 46ch;
+    color: var(--text-muted);
+    font-size: var(--fs-sm);
+  }
+  .empty__cta {
+    margin-top: var(--sp-2);
   }
 </style>

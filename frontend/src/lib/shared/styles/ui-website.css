@@ -1,29 +1,750 @@
-@import url('https://use.typekit.net/vfj0jgu.css');
-
 :root {
-  --white: #fff;
-  --black: #000;
+  --paper: #fdfdfc;
+  --paper-2: #f4f3f0;
+  --paper-3: #e9e7e2;
+  --paper-4: #d8d5cf;
 
-  --light: #f5f5f5;
-  --grey: rgb(235, 235, 235);
-  --grey-dark: rgb(200, 200, 200);
-  --border: 1px solid var(--main);
+  --ink: #111110;
+  --ink-700: #2e2d2b;
+  --ink-600: #47443f;
+  --ink-500: #55524d;
+  --ink-400: #78746d;
+  --ink-300: #a8a49c;
 
-  --sale: rgb(160, 226, 154);
-  --sale-dark: rgb(97, 177, 90);
-  --new: rgb(154, 191, 226);
-  --bestseller: rgb(255, 203, 34);
-  --coming-soon: rgb(225, 163, 255);
-  --out-of-stock: rgb(215, 215, 215);
+  --red: #bf0417;
+  --red-hover: #a20313;
+  --red-deep: #8c020f;
+  --red-ink: #2e0a0d;
+  --red-tint: #fbeff0;
 
-  --scroll-thumb: var(--main);
-  --scroll-track: var(--light);
+  --navy: #1b2f4e;
+  --navy-700: #142640;
+  --navy-tint: #eaf0f8;
+
+  --purple: #5b2a86;
+
+  --orange: #c2560b;
+  --orange-bright: #ff8a3d;
+  --orange-light: #ffa45e;
+  --orange-deep: #b04d0a;
+  --orange-tint: #fdf1e6;
+
+  --green: #166534;
+  --green-tint: #e7f3ea;
+  --amber: #8a5a00;
+  --amber-tint: #fdf3dd;
+
+  --bg: var(--paper);
+  --surface: #ffffff;
+  --surface-sunk: var(--paper-2);
+  --border: rgba(17, 17, 16, 0.14);
+  --border-strong: rgba(17, 17, 16, 0.26);
+  /* the system's separator; replaces every shadow */
+  --rule: 2px solid var(--ink);
+  --rule-hair: 1px solid var(--border);
+  --text: var(--ink);
+  --text-muted: var(--ink-500);
+  --text-subtle: var(--ink-400);
+  --accent: var(--red);
+  --accent-hover: var(--red-hover);
+  --accent-contrast: #ffffff;
+  --focus: var(--red);
+
+  --font: 'Bricolage Grotesque', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* font sizes */
+  --fs-hero: clamp(2.25rem, 1.2rem + 4.4vw, 4rem);
+  --fs-h1: clamp(1.875rem, 1.35rem + 2.2vw, 3rem);
+  --fs-h2: clamp(1.375rem, 1.15rem + 0.95vw, 2rem);
+  --fs-h3: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --fs-body: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.8125rem;
+  --fs-label: 0.6875rem;
+
+  /* spacing (4px) */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-7: 1.75rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
+  --sp-20: 5rem;
+  --sp-24: 6rem;
+
+  /* border-radiuses */
+  --r-sm: 0px;
+  --r-md: 0px;
+  --r-card: 1.125rem;
+  --r-field: 1.5rem;
+  --r-pill: 62.4375rem;
+
+  /* depth */
+  --shadow-overlay: 0 1.5rem 3.75rem rgba(17, 17, 16, 0.28);
+
+  /* layout */
+  --page: 97.5rem;
+  --gutter: clamp(0.875rem, 0.4rem + 1.8vw, 2rem);
+  --rail: 16.5rem;
+  /* page titles stand on the logo */
+  --logo-h: 4.4375rem;
+  --logo-foot: calc(var(--sp-5) + var(--logo-h));
+  /* the desktop rail's navy contact block (logo, contact line, Kontakt); category toolbars line up with its foot */
+  --rail-head: calc(var(--logo-foot) + var(--sp-4) + 1.45 * var(--fs-xs) + var(--sp-3) + 2.5rem + var(--sp-3));
+  --baseline-shift: 0.33;
+  --title-top: calc(var(--logo-foot) - (1.08 / 2 + var(--baseline-shift)) * var(--fs-h1));
+  --topbar-h: 3.25rem;
+  /* only visible on overscroll */
+  --surround: #fdfdfc;
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --dur-fast: 110ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+
+  /* legacy aliases referenced by shared components */
+  --white: #ffffff;
+  --light: var(--paper-2);
+  --grey: var(--paper-3);
+  --grey-dark: var(--ink-300);
+  --main: var(--red);
+
+  /* admin controls overlay */
+  --main-0: #fbeff0;
+  --main-1: #f3c9cd;
+  --main-2: #e59aa1;
+  --main-3: #d3616c;
+  --main-4: #c62b3b;
+  --main-light: var(--main-4);
+  --scroll-thumb: var(--ink-300);
+  --scroll-track: var(--paper-2);
 }
 
-* {
-  font-family: 'urw-din', sans-serif;
+/* === Base === */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  overflow-y: scroll;
+  margin: 0;
+  background-color: var(--surround);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-optical-sizing: auto;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--red);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--red-deep);
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background-color: var(--red);
+  color: #fff;
+}
+
+:root {
+  accent-color: var(--red);
+  caret-color: var(--red);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--paper-2);
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid var(--paper-2);
+    border-radius: var(--r-pill);
+    background-color: var(--ink-300);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ink-300);
+  }
+}
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: var(--ink-300) var(--paper-2);
+  }
+}
+
+/* === Primitives === */
+
+/* Tracked uppercase label in mono: codes, breadcrumbs, small group headings. */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--text-subtle);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.block {
+  border: var(--rule);
+  background-color: var(--surface);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--sp-2);
+  left: var(--sp-2);
+  z-index: 200;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-pill);
+  background-color: var(--red);
+  color: #fff;
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  color: #fff;
+}
+
+/* === Buttons === */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 2.75rem;
+  padding: 0 var(--sp-6);
+  border: 2px solid transparent;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+.btn--red {
+  background-color: var(--red);
+  color: #fff;
+}
+.btn--red:hover {
+  background-color: var(--red-hover);
+  color: #fff;
+}
+.btn--ink {
+  background-color: var(--ink);
+  color: #fff;
+}
+.btn--ink:hover {
+  background-color: var(--ink-700);
+  color: #fff;
+}
+.btn--light {
+  background-color: #fff;
+  color: var(--ink);
+}
+.btn--light:hover {
+  background-color: var(--paper-2);
+  color: var(--ink);
+}
+.btn--outline {
+  border-color: var(--border-strong);
+  background-color: transparent;
+  color: var(--ink);
+}
+.btn--outline:hover {
+  border-color: var(--ink);
+  background-color: var(--surface);
+  color: var(--ink);
+}
+.btn--orange {
+  background-color: var(--orange);
+  color: #fff;
+}
+.btn--orange:hover {
+  background-color: var(--orange-bright);
+  color: var(--ink);
+}
+.btn--ghost-orange {
+  border-color: var(--orange-light);
+  color: var(--orange-light);
+}
+.btn--ghost-orange:hover {
+  border-color: var(--orange-bright);
+  background-color: var(--orange-bright);
+  color: var(--ink);
+}
+.btn--ghost-light {
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #fff;
+}
+.btn--ghost-light:hover {
+  background-color: #fff;
+  color: var(--ink);
+}
+.btn:disabled {
+  background-color: var(--paper-4);
+  border-color: transparent;
+  color: var(--ink-400);
+  cursor: not-allowed;
+}
+
+/* Controls are squircles (fallback to rounded). */
+.btn,
+.chip,
+.go,
+.select,
+.select select,
+.search-field,
+.pg__btn,
+.skip-link,
+.field,
+.squircle {
+  corner-shape: squircle;
+}
+
+/* === Form controls === */
+
+/* Shared skin for selects and the search field; the native arrow is replaced by our chevron. */
+.select {
+  position: relative;
+  display: inline-flex;
+}
+.select select {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 2.5rem;
+  padding: 0 calc(var(--sp-3) + 1.125rem) 0 var(--sp-4);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--r-pill);
+  background-color: var(--surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23111110' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--sp-3) center;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.select select:hover {
+  border-color: var(--ink-600);
+}
+/* One offset focus ring, no red border inside it. */
+.select select:focus {
+  outline: none;
+}
+.select select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  padding-left: var(--sp-3);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--r-pill);
+  background-color: var(--surface);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.search-field:hover {
+  border-color: var(--ink-600);
+}
+/* The pill takes the focus ring, not the input inside it. */
+.search-field input:focus {
+  outline: none;
+}
+.search-field:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.field {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--ink-300);
+  border-radius: var(--r-pill);
+  background-color: var(--surface);
+  font-size: var(--fs-sm);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+textarea.field {
+  border-radius: var(--r-field);
+}
+.field::placeholder {
+  color: var(--text-subtle);
+}
+.field:hover {
+  border-color: var(--ink-600);
+}
+.field:focus {
+  outline: none;
+}
+.field:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* === Prose (CMS markdown) === */
+
+.prose {
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 68ch;
+}
+.prose > * + * {
+  margin-top: var(--sp-4);
+}
+.prose h2,
+.prose h3 {
+  margin-top: var(--sp-8);
+  color: var(--text);
+}
+.prose h2 {
+  font-size: var(--fs-h2);
+}
+.prose h3 {
+  font-size: var(--fs-h3);
+}
+.prose strong {
+  color: var(--text);
+  font-weight: 700;
+}
+.prose ul,
+.prose ol {
+  margin: 0;
+  padding-left: 1.15em;
+}
+.prose li + li {
+  margin-top: var(--sp-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* === The sheet === */
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--surround);
+}
+
+.island {
+  background-color: var(--bg);
+}
+
+@media (min-width: 47.5rem) {
+  :root {
+    --topbar-h: 3.75rem;
+  }
+}
+
+/* === Shell: persistent left column, content to its right === */
+
+.shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  flex: 1 1 auto;
+  align-items: start;
+}
+
+.shell__rail {
+  display: none;
+}
+
+.shell__main {
+  min-width: 0;
+  background-color: var(--bg);
+}
+
+@media (min-width: 61.25rem) {
+  .shell {
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+  }
+  .shell__rail {
+    display: block;
+    position: sticky;
+    top: 0;
+    background-color: var(--bg);
+    border-right: var(--rule);
+  }
+  .shell__rail-inner {
+    height: 100vh;
+  }
+}
+
+/* === Rail frame: shared by the desktop rail and the phone menu === */
+
+/* Fixed head (contact, search); only the catalogue scrolls. Height comes from the container. */
+.rail-frame {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.rail__contact {
+  flex: none;
+  padding: var(--sp-5) var(--sp-5) var(--sp-3);
+  background-color: var(--navy);
+}
+.shell__rail .rail__contact {
+  min-height: var(--rail-head);
+}
+.rail__search {
+  flex: none;
+  padding: 0.625rem var(--sp-5) 0;
+}
+.rail__nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sp-4) var(--sp-5) var(--sp-8);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-300) transparent;
+  /* Fade items out at the list edges. */
+  -webkit-mask-image: linear-gradient(transparent, #000 var(--sp-4), #000 calc(100% - var(--sp-6)), transparent);
+  mask-image: linear-gradient(transparent, #000 var(--sp-4), #000 calc(100% - var(--sp-6)), transparent);
+}
+.rail__nav::-webkit-scrollbar {
+  width: 0.5rem;
+}
+.rail__nav::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.rail__nav::-webkit-scrollbar-thumb {
+  border: 2px solid var(--bg);
+  border-radius: var(--r-pill);
+  background-color: var(--ink-300);
+}
+.rail__nav:hover::-webkit-scrollbar-thumb {
+  background-color: var(--ink-400);
+}
+
+/* === Poster primitives === */
+
+/* Page measure; colour fields bleed past it. */
+.wrap {
+  width: 100%;
+  max-width: var(--page);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* In the shell the measure is the content column. */
+.shell__main .wrap {
+  max-width: none;
+}
+
+.field-block {
+  padding: var(--sp-10) 0;
+  border-bottom: var(--rule);
+}
+.field-block--red {
+  background-color: var(--red);
+  color: #fff;
+}
+.field-block--navy {
+  background-color: var(--navy);
+  color: #fff;
+}
+.field-block--ink {
+  background-color: var(--ink);
+  color: #fff;
+}
+.field-block--paper {
+  background-color: var(--paper-2);
+}
+.field-block--red a,
+.field-block--navy a,
+.field-block--ink a {
+  color: #fff;
+}
+
+/* Muted text on dark fields: tinted, not grey. */
+.field-block--red .dim {
+  color: #f6cdd1;
+}
+.field-block--navy .dim {
+  color: #a9bcd6;
+}
+.field-block--ink .dim {
+  color: #a8a49c;
+}
+
+/* Two-tone display line: second clause in ink. */
+.two-tone em {
+  font-style: normal;
+  color: var(--ink);
+}
+.field-block--navy .two-tone em,
+.field-block--ink .two-tone em {
+  color: var(--red);
+}
+
+/* === Chips === */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0.3125rem 0.75rem;
+  border: 1px solid var(--ink);
+  border-radius: var(--r-pill);
+  background-color: transparent;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.chip:hover {
+  background-color: var(--ink);
+  color: #fff;
+}
+.chip--on {
+  background-color: var(--ink);
+  color: #fff;
+}
+.chip--red {
+  border-color: var(--red);
+  background-color: var(--red);
+  color: #fff;
+}
+.chip--navy {
+  border-color: var(--navy);
+  background-color: var(--navy);
+  color: #fff;
+}
+.chip--orange {
+  border-color: var(--orange);
+  background-color: var(--orange);
+  color: #fff;
+}
+.chip--static {
+  cursor: default;
+}
+.chip--static:hover {
+  background-color: transparent;
+  color: inherit;
+}
+.chip--red.chip--static:hover,
+.chip--navy.chip--static:hover,
+.chip--orange.chip--static:hover {
+  color: #fff;
+}
+.chip--red.chip--static:hover {
+  background-color: var(--red);
+}
+.chip--navy.chip--static:hover {
+  background-color: var(--navy);
+}
+.chip--orange.chip--static:hover {
+  background-color: var(--orange);
+}
+
+/* === Non-selectable controls === */
+/* Scoped to the public sheet. Never on an element containing a field: Safari can block the caret. */
+.sheet :is(button, .btn, .chip, .go, .label, .skip-link) {
+  -webkit-user-select: none;
+  user-select: none;
 }

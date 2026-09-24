@@ -2,26 +2,33 @@
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/stores';
   import { deep, treeFlatten } from '%/utils';
-  import Menu from '#/menu/Menu.svelte';
+  import SideRail from '#/shell/SideRail.svelte';
 
   import { layout, modified } from '#/layout/store';
-  import { create, parseLayout, parseBack } from '#/layout/utils';
+  import { create, parseLayout, parseBack, FIXED } from '#/layout/utils';
   import ElementLabels from '#/layout/ElementLabels.svelte';
   import Element from '#/layout/Element.svelte';
   import Title from '#/layout/elements/Title.svelte';
   import Tiles from '#/layout/elements/tiles/Tiles.svelte';
   import Category from '#/layout/elements/Category.svelte';
-  import Whitespace from '#/layout/elements/Whitespace.svelte';
+  import Catalogue from '#/layout/elements/Catalogue.svelte';
+  import Headquarters from '#/layout/elements/Headquarters.svelte';
+  import { SITE, jsonLd, business } from '#/seo';
 
   const types = [
     { type: 'title', label: 'Tytuł', icon: 'text_t' },
     { type: 'tiles', label: 'Kafelki', icon: 'apps' },
     { type: 'category', label: 'Kategoria', icon: 'categories' },
-    { type: 'whitespace', label: 'Przerwa', icon: 'arrow_maximize_vertical' },
+  ];
+  const labels = [
+    ...types,
+    { type: 'catalogue', label: 'Katalog', icon: 'grid' },
+    { type: 'headquarters', label: 'Siedziba', icon: 'location' },
   ];
 
   export let data;
 
+  let loadedLayout = null;
   let originalLayout = [];
   let parsedLayout = [];
 
@@ -30,17 +37,40 @@
   $: $modified = !deep.same(originalLayout, $layout);
 
   $: ({ categoriesTree } = $page.data);
+
+  $: ({ summary } = data);
+  $: catalogueCount = Math.floor((summary?.total ?? 0) / 100) * 100;
+
+  /* Resolves category names to links (missing ones become plain text). Promo sections are searched last; exact names beat case-insensitive. */
+  function categoryIndex(sections) {
+    const exact = new Map();
+    const loose = new Map();
+    const promo = /promocje|bestseller|nowości/i;
+    const ordered = [...sections.filter((s) => !promo.test(s.name)), ...sections.filter((s) => promo.test(s.name))];
+    const add = (name, href) => {
+      const n = name.trim();
+      if (!exact.has(n)) exact.set(n, href);
+      if (!loose.has(n.toLowerCase())) loose.set(n.toLowerCase(), href);
+    };
+    const walk = (node, href) => {
+      add(node.name, href);
+      for (const c of node.children ?? []) walk(c, `/kategorie/${c.slug}`);
+    };
+    for (const s of ordered) walk(s, s.href);
+    return (name) => exact.get(name) ?? loose.get(name.toLowerCase()) ?? null;
+  }
+  $: to = categoryIndex(summary?.sections ?? []);
   $: categories = treeFlatten(categoriesTree).map(({ slug, name, _meta }) => {
     const path = _meta.path.map((p) => p + 1).join('.');
     return { id: slug, text: `${path} ${name}` };
   });
 
   function refresh(data) {
-    const loadLayout = deep.copy(data.layout);
-    if (!deep.same(originalLayout, loadLayout)) {
-      originalLayout = loadLayout;
-      parsedLayout = parseLayout(deep.copy(loadLayout));
-    }
+    if (deep.same(loadedLayout, data.layout)) return;
+    loadedLayout = deep.copy(data.layout);
+    parsedLayout = parseLayout(deep.copy(loadedLayout));
+    // Compare against the layout as saved, so blocks parseLayout drops don't count as edits.
+    originalLayout = parseBack(deep.copy(parsedLayout));
   }
 
   function handleDelete(id) {
@@ -56,8 +86,6 @@
       } else if (type === 'category') {
         const slug = categories[0].id;
         return create.category({ slug });
-      } else if (type === 'whitespace') {
-        return create.whitespace();
       }
     };
 
@@ -93,50 +121,548 @@
 </script>
 
 <svelte:head>
-  <!-- TODO: those should be fragments (or a singleton? but probably a bad idea) -->
-  <title>REED Kalisz</title>
+  <title>REED Kalisz — gadżety reklamowe, druk, grawer laserowy</title>
   <meta
     name="description"
-    content="Firma Reed przedstawia gadżety dla firm, takie jak długopisy reklamowe, kalendarze czy kubki. Oferujemy również cyfrowy druk niskonakładowy i grawerowanie laserowe." />
+    content="Gadżety reklamowe z logo, druk cyfrowy, grawerowanie laserowe i pieczątki. Znakowanie robimy u siebie w Kaliszu od 2002 roku." />
+  <meta property="og:title" content="REED Kalisz — gadżety reklamowe, druk, grawer laserowy" />
+  <meta property="og:image" content="{SITE}/imgs/machine-playful.webp" />
+  {@html jsonLd(business)}
 </svelte:head>
 
-<div class="wrapper">
-  <Menu items={data.menus.side} />
+<div class="shell">
+  <SideRail items={data.menus.side} />
 
-  <main>
-    <ElementLabels {types} on:add={(e) => handleAdd(e)} />
-    {#each parsedLayout as element}
-      {@const { _id: id, type } = element}
-      <Element bind:element {types} {type} on:delete={() => handleDelete(id)} on:move={(e) => handleMove(e, id)}>
-        {#if type === 'title'}
-          <Title bind:element />
-        {:else if type === 'category'}
-          <Category bind:element {categories} />
-        {:else if type === 'whitespace'}
-          <Whitespace />
-        {:else if type === 'tiles'}
-          <Tiles bind:element />
-        {/if}
-      </Element>
-      <ElementLabels {types} on:add={(e) => handleAdd(e, id)} />
-    {/each}
-  </main>
+  <div class="shell__main">
+    <section class="hero">
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <h1 class="hero__title two-tone">
+            Na biurko, na&nbsp;ścianę,<br /> do&nbsp;kieszeni. <em>Porządnie,<br /> z&nbsp;Twoim logo.</em>
+          </h1>
+          <p class="hero__lede">
+            Doradzimy przy wyborze i oznakujemy — grawerem laserowym, tampodrukiem, drukiem cyfrowym. Na własnych
+            maszynach, w&nbsp;Kaliszu, od 2002 roku.
+          </p>
+          <div class="hero__acts">
+            <a class="btn btn--light" href="/kategorie/_">
+              {catalogueCount ? `Katalog ${catalogueCount}+ produktów` : 'Przejdź do katalogu'}
+            </a>
+            <a class="btn btn--ghost-orange" href="/kontakt">Napisz do nas</a>
+          </div>
+        </div>
+        <div class="hero__plate" aria-hidden="true">
+          <img
+            class="hero__machine"
+            src="/imgs/machine-playful.webp"
+            srcset="/imgs/machine-playful-768.webp 768w, /imgs/machine-playful-1024.webp 1024w, /imgs/machine-playful.webp 1536w"
+            sizes="30rem"
+            alt=""
+            width="1536"
+            height="1024"
+            fetchpriority="high" />
+        </div>
+      </div>
+    </section>
+
+    <div class="blocks">
+      <ElementLabels {types} on:add={(e) => handleAdd(e)} />
+      {#each parsedLayout as element}
+        {@const { _id: id, type } = element}
+        <Element
+          bind:element
+          types={labels}
+          {type}
+          fixed={FIXED.includes(type)}
+          bleed={type === 'tiles' || FIXED.includes(type)}
+          on:delete={() => handleDelete(id)}
+          on:move={(e) => handleMove(e, id)}>
+          {#if type === 'title'}
+            <Title bind:element />
+          {:else if type === 'category'}
+            <Category bind:element {categories} />
+          {:else if type === 'tiles'}
+            <Tiles bind:element />
+          {:else if type === 'catalogue'}
+            <Catalogue {summary} />
+          {:else if type === 'headquarters'}
+            <Headquarters />
+          {/if}
+        </Element>
+        <ElementLabels {types} on:add={(e) => handleAdd(e, id)} />
+      {/each}
+    </div>
+
+    <!-- SEO copy. Confirmed claims only: no turnaround, minimums or client names. -->
+    <section class="seo" aria-labelledby="seo-title">
+      <div class="wrap seo__inner">
+        <h2 class="seo__title" id="seo-title">Gadżety reklamowe z logo i drukarnia w&nbsp;Kaliszu</h2>
+        <p class="seo__lede">
+          REED to firma poligraficzno-reklamowa z Kalisza, działająca od 2002 roku. W jednym miejscu dobierzesz
+          <a href={to('GADŻETY REKLAMOWE')}>gadżety reklamowe</a> z nadrukiem, upominki firmowe i materiały drukowane —
+          i zlecisz ich znakowanie.
+          {#if catalogueCount}Katalog liczy ponad {catalogueCount} produktów, a znakujemy je{:else}Produkty z katalogu
+            znakujemy{/if} we własnej pracowni: grawerem laserowym, tampodrukiem i drukiem cyfrowym.
+        </p>
+
+        <div class="seo__cols">
+          <section class="seo__block">
+            <h3>Gadżety reklamowe z nadrukiem</h3>
+            <p>
+              W katalogu znajdziesz <a href={to('ARTYKUŁY PIŚMIENNICZE')}>długopisy z logo</a> —
+              <a href={to('Długopisy metalowe')}>metalowe</a>, <a href={to('Długopisy plastikowe')}>plastikowe</a>,
+              <a href={to('Długopisy ekologiczne')}>ekologiczne</a> i
+              <a href={to('Długopisy żelowe i półżelowe')}>żelowe</a> — a także
+              <a href={to('Kubki')}>kubki reklamowe</a>, <a href={to('Kubki izotermiczne')}>kubki termiczne</a>,
+              <a href={to('Bidony, butelki')}>bidony</a>, <a href={to('Torby na zakupy')}>torby na zakupy</a>,
+              <a href={to('Plecaki')}>plecaki</a>, <a href={to('Parasole')}>parasole</a> i
+              <a href={to('Smycze reklamowe')}>smycze reklamowe</a>. Na biurko: <a href={to('Notesy')}>notesy</a>,
+              <a href={to('Karteczki memo')}>karteczki memo</a>,
+              <a href={to('Podkładki pod mysz')}>podkładki pod mysz</a> i
+              <a href={to('Kalkulatory')}>kalkulatory</a>. Z elektroniki:
+              <a href={to('Powerbanki')}>powerbanki</a>, <a href={to('Pendrive')}>pendrive'y</a> i
+              <a href={to('Głośniki')}>głośniki</a>.
+            </p>
+          </section>
+
+          <section class="seo__block">
+            <h3>Upominki firmowe premium</h3>
+            <p>
+              Na prezenty dla klientów i pracowników: pióra i długopisy <a href={to('Parker')}>Parker</a> i
+              <a href={to('Waterman')}>Waterman</a>, scyzoryki <a href={to('Victorinox')}>Victorinox</a>, akcesoria
+              <a href={to('Pierre Cardin')}>Pierre Cardin</a> oraz <a href={to('Zestawy do wina')}>zestawy do wina</a> —
+              cała <a href={to('PREMIUM')}>kolekcja premium</a> z możliwością grawerowania logo lub dedykacji.
+            </p>
+          </section>
+
+          <section class="seo__block">
+            <h3>Znakowanie: grawer laserowy, tampodruk, druk cyfrowy</h3>
+            <p>
+              Logo nanosimy sami, na miejscu w Kaliszu. Grawer laserowy daje trwałe oznakowanie na metalu — długopisach,
+              kubkach termicznych, scyzorykach i tabliczkach. Tampodruk przenosi kolorowy nadruk na plastik i
+              powierzchnie zaokrąglone. Druk cyfrowy odwzorowuje pełnokolorowe grafiki. Przy produktach podajemy pole i
+              miejsce znakowania oraz cennik z nadrukiem, więc od razu widać, ile kosztuje gadżet z Twoim logo.
+            </p>
+          </section>
+
+          <section class="seo__block">
+            <h3>Drukarnia: wizytówki, ulotki, druki samokopiujące</h3>
+            <p>
+              Drukujemy <a href={to('WIZYTÓWKI')}>wizytówki</a>, <a href={to('ULOTKI')}>ulotki</a>,
+              <a href={to('TECZKI')}>teczki firmowe</a>, <a href={to('NOTESY KLEJONE')}>notesy klejone</a>,
+              <a href={to('KARTECZKI W PUDEŁKU')}>karteczki w pudełku</a>,
+              <a href={to('NAKLEJKI I ETYKIETY SAMOPRZYLEPNE')}>naklejki i etykiety samoprzylepne</a> oraz
+              <a href={to('TORBY PAPIEROWE')}>torby papierowe z nadrukiem</a>. Przygotowujemy
+              <a href={to('DRUKI SAMOKOPIUJĄCE')}>druki samokopiujące</a> —
+              <a href={to('Standardowe druki dla FIRM')}>standardowe druki dla firm</a>,
+              <a href={to('Druki dla firm TRANSPORTOWYCH')}>druki dla firm transportowych</a>,
+              <a href={to('Druki dla KOMINIARZY')}>druki dla kominiarzy</a> i
+              <a href={to('Druki samokopiujące na ZAMÓWIENIE')}>druki na zamówienie</a> według własnego wzoru — a także
+              <a href={to('KARTKI ŚWIĄTECZNE DLA FIRM')}>kartki świąteczne dla firm</a> i
+              <a href={to('DRUK INSTRUKCJI OBSŁUGI')}>druk instrukcji obsługi</a>.
+            </p>
+          </section>
+
+          <section class="seo__block">
+            <h3>Kalendarze firmowe z logo</h3>
+            <p>
+              <a href={to('KSIĄŻKOWE')}>Kalendarze książkowe</a> w formatach A4, A5, B5 i A6,
+              <a href={to('ŚCIENNE')}>kalendarze ścienne</a> jedno- i trójdzielne oraz
+              <a href={to('BIURKOWE')}>kalendarze biurkowe</a> — z logo i danymi firmy. Cały wybór w dziale
+              <a href={to('KALENDARZE')}>kalendarze reklamowe</a>.
+            </p>
+          </section>
+
+          <section class="seo__block">
+            <h3>Pieczątki, tabliczki i reklama zewnętrzna</h3>
+            <p>
+              Wykonujemy <a href={to('PIECZĄTKI')}>pieczątki</a> firmowe i imienne,
+              <a href={to('TABLICZKI GRAWEROWANE')}>tabliczki grawerowane</a> — m.in.
+              <a href={to('Tabliczki z laminatu')}>tabliczki z laminatu</a> na drzwi i urządzenia — oraz
+              <a href={to('REKLAMA ZEWNĘTRZNA')}>reklamę zewnętrzną</a> dla firm.
+            </p>
+          </section>
+
+          <section class="seo__block">
+            <h3>Kalisz i okolice, wysyłka w całej Polsce</h3>
+            <p>
+              Biuro mieści się w Kaliszu przy ul. Dobrzeckiej 95 (pn–pt 10:00–14:00). Najbliżej do nas mają klienci z
+              Kalisza, Ostrowa Wielkopolskiego, Pleszewa, Jarocina, Turku, Krotoszyna, Konina i Sieradza — a zamówienia
+              z każdego miejsca w Polsce wysyłamy pod wskazany adres. <a href="/kontakt">Napisz do nas lub zadzwoń</a> — pomożemy
+              dobrać produkt i sposób znakowania.
+            </p>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    {#if summary?.sections?.length}
+      <section class="map">
+        <div class="wrap">
+          <h2 class="map__title">Pełna mapa katalogu</h2>
+          <div class="map__cols">
+            {#each summary.sections as s (s.id)}
+              <div class="map__col">
+                <a class="map__head" href={s.href}>{s.name}</a>
+                {#if s.children.length}
+                  <ul class="map__list">
+                    {#each s.children as c (c.id)}
+                      <li class="map__group">
+                        <a class="map__sub" href={`/kategorie/${c.slug}`}>{c.name}</a>
+                        {#if c.children.length}
+                          <ul class="map__leaves">
+                            {#each c.children as g (g.id)}
+                              <li><a href={`/kategorie/${g.slug}`}>{g.name}</a></li>
+                            {/each}
+                          </ul>
+                        {/if}
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      </section>
+    {/if}
+  </div>
 </div>
 
 <style>
-  .wrapper {
-    display: grid;
-    grid-template-columns: 18rem 1fr 18rem;
-    column-gap: 3rem;
+  /* --- hero --- */
+
+  .hero {
+    border-bottom: var(--rule);
+    background-color: var(--red);
+    color: #fff;
   }
-  main {
+  .hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-8);
+    align-items: center;
+    padding: var(--sp-10) var(--gutter) var(--sp-8);
+  }
+  .hero__copy {
+    min-width: 0;
+  }
+  .hero__plate {
+    min-width: 0;
+  }
+  .hero__machine {
+    display: block;
+    width: 100%;
+    max-width: 30rem;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: contain;
+  }
+  .hero__title em {
+    color: var(--orange-light);
+  }
+  .hero__title {
+    font-size: var(--fs-hero);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 0.96;
+    max-width: 16ch;
+  }
+  .hero__lede {
+    margin-top: var(--sp-5);
+    max-width: 50ch;
+    color: #f6cdd1;
+    font-size: clamp(1rem, 0.95rem + 0.35vw, 1.125rem);
+    line-height: 1.45;
+  }
+  .hero__acts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-top: var(--sp-7);
+  }
+
+  /* --- SEO band --- */
+
+  .seo {
+    border-top: var(--rule);
+    background-color: var(--navy);
+    color: #cfdcee;
+  }
+  .seo__inner {
+    padding-block: var(--sp-12);
+  }
+  .seo__title {
+    max-width: 24ch;
+    color: #fff;
+    font-size: var(--fs-h2);
+    text-wrap: balance;
+  }
+  .seo__lede {
+    max-width: 62ch;
+    margin-top: var(--sp-4);
+    color: #e3ebf6;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+    line-height: 1.6;
+  }
+  /* Keep each block whole across columns. */
+  .seo__cols {
+    margin-top: var(--sp-8);
+    columns: 1;
+    column-gap: var(--sp-10);
+    column-rule: 1px solid #2d4468;
+  }
+  .seo__block {
+    break-inside: avoid;
+    margin-bottom: var(--sp-6);
+  }
+  .seo__block h3 {
+    margin-bottom: var(--sp-2);
+    color: #fff;
+    font-size: var(--fs-h3);
+    text-wrap: balance;
+  }
+  .seo__block p {
+    font-size: var(--fs-sm);
+    line-height: 1.65;
+  }
+  .seo a[href] {
+    color: #fff;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.35);
+    text-underline-offset: 0.2em;
+    transition:
+      color var(--dur-fast) var(--ease),
+      text-decoration-color var(--dur-fast) var(--ease);
+  }
+  .seo a[href]:hover {
+    color: var(--orange-bright);
+    text-decoration-color: currentColor;
+  }
+  @media (min-width: 47.5rem) {
+    .seo__cols {
+      columns: 2;
+    }
+  }
+  @media (min-width: 75rem) {
+    .seo__cols {
+      columns: 3;
+    }
+  }
+
+  /* --- catalogue map --- */
+
+  .map {
+    border-top: var(--rule);
+    background-color: var(--paper-2);
+    padding: var(--sp-10) 0 var(--sp-12);
+  }
+  .map__title {
+    margin-bottom: var(--sp-6);
+    font-size: var(--fs-h2);
+  }
+  /* Columns, not grid rows: sections have 0 to 9 children. */
+  /* Two columns even on a phone: long names hyphenate, the map is half as tall. */
+  .map__cols {
+    columns: 2;
+    column-gap: var(--sp-5);
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+  /* Sections may break across columns; subcategory groups don't. */
+  .map__col {
+    margin-bottom: var(--sp-6);
+  }
+  .map__group {
+    break-inside: avoid;
+    margin-bottom: var(--sp-3);
+  }
+  .map__head {
+    display: block;
+    break-after: avoid;
+    padding-bottom: var(--sp-2);
+    margin-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--border-strong);
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+  }
+  .map__head:hover {
+    color: var(--red);
+  }
+  .map__list,
+  .map__leaves {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .map__sub {
+    display: block;
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .map__sub:hover {
+    color: var(--red);
+  }
+  .map__leaves {
+    margin-top: 3px;
+    padding-left: var(--sp-3);
+    border-left: 1px solid var(--border);
+  }
+  .map__leaves a {
+    display: block;
+    padding: 1px 0;
+    color: var(--ink-500);
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+  }
+  .map__leaves a:hover {
+    color: var(--red);
+  }
+
+  /* Spacing between blocks (replaces the old PRZERWA element). */
+  .blocks {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    width: 100%;
+    align-items: stretch;
+    padding-top: var(--sp-10);
+    padding-bottom: var(--sp-12);
   }
-  main {
-    padding: 4.5rem 0;
+  /* Each block carries its own measure, so banners can go full-bleed. */
+  .blocks > :global(*) {
+    width: 100%;
+    max-width: var(--page);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .blocks > :global([data-bleed]) {
+    max-width: none;
+    padding-inline: 0;
+  }
+  /* The fixed bands are ruled top and bottom, but never twice where one follows the hero or another band. */
+  .blocks > :global([data-fixed]) {
+    border-block: var(--rule);
+  }
+  .blocks > :global([data-fixed]:first-child),
+  .blocks > :global([data-fixed] + [data-fixed]) {
+    border-top: 0;
+  }
+  .blocks > :global(* + *) {
+    margin-top: var(--sp-10);
+  }
+  .blocks > :global([data-type='title'] + *) {
+    margin-top: var(--sp-5);
+  }
+  .blocks > :global(* + [data-type='title']) {
+    margin-top: var(--sp-16);
+  }
+  .blocks > :global([data-fixed] + [data-type='title']) {
+    margin-top: var(--sp-10);
+  }
+  /* Banners and bands touch each other, and a leading one meets the hero directly. */
+  .blocks > :global([data-bleed] + [data-bleed]) {
+    margin-top: 0;
+  }
+  .blocks > :global([data-bleed]:first-child) {
+    margin-top: calc(var(--sp-10) * -1);
+  }
+
+  @media (min-width: 38.75rem) {
+    .map__cols {
+      column-gap: var(--sp-8);
+    }
+  }
+
+  @media (min-width: 56.25rem) {
+    .hero__inner {
+      padding: var(--sp-12) var(--gutter);
+    }
+  }
+
+  /* Phone: machine first, pulled up under the clear top bar (see MobileBar). */
+  @media (max-width: 47.4988rem) {
+    .hero {
+      --bar: calc(var(--topbar-h) + 2px);
+      margin-top: calc(var(--bar) * -1);
+      padding-top: var(--bar);
+      background-image: linear-gradient(
+        var(--paper) 0 var(--topbar-h),
+        var(--ink) var(--topbar-h) var(--bar),
+        var(--red) var(--bar)
+      );
+    }
+    .hero__inner {
+      gap: var(--sp-3);
+      padding-top: 0;
+    }
+    .hero__plate {
+      order: -1;
+      margin-top: -1.25rem;
+    }
+    .hero__machine {
+      margin-inline: auto;
+    }
+  }
+
+  /* Mid widths: full-width title, machine beside the lede and buttons. */
+  @media (min-width: 47.5rem) and (max-width: 82.4988rem) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: var(--sp-8);
+      row-gap: 0;
+    }
+    .hero__copy {
+      display: contents;
+    }
+    .hero__title {
+      grid-column: 1 / -1;
+    }
+    .hero__lede {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .hero__acts {
+      grid-column: 1;
+      grid-row: 3;
+      align-self: start;
+    }
+    .hero__plate {
+      grid-column: 2;
+      grid-row: 2 / span 2;
+      align-self: center;
+      margin-top: var(--sp-5);
+    }
+    .hero__machine {
+      max-width: none;
+    }
+  }
+
+  /* Wide: machine beside the whole title; copy column sized to the title. */
+  @media (min-width: 82.5rem) {
+    .hero__inner {
+      grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+      gap: var(--sp-8);
+    }
+    /* Out of flow, so the image never sets the row height. */
+    .hero__plate {
+      position: relative;
+      align-self: stretch;
+      margin-block: calc(var(--sp-6) * -1);
+    }
+    .hero__machine {
+      position: absolute;
+      inset: 0;
+      max-width: none;
+      height: 100%;
+      aspect-ratio: auto;
+    }
+  }
+
+  @media (min-width: 68.75rem) {
+    .map__cols {
+      columns: 4;
+    }
   }
 </style>

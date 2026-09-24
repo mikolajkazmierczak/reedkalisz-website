@@ -9,7 +9,7 @@
   export let amount = null;
   export let available = false;
 
-  export let size = '20px';
+  export let size = '1.25rem';
   export let notooltip = false;
 
   export let onhoverchange = () => {};
@@ -39,6 +39,8 @@
 
 <style>
   .wrapper {
+    -webkit-user-select: none;
+    user-select: none;
     cursor: help;
     overflow: hidden;
     position: relative;
@@ -55,8 +57,6 @@
   }
   .multi {
     transform: rotate(45deg);
-    /* background: rgb(180, 58, 58, 1); */
-    /* background: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); */
   }
   .multi img {
     width: 100%;

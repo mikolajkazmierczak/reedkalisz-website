@@ -1,3 +1,20 @@
+<script context="module">
+  import { browser } from '$app/environment';
+
+  // One listener for every tooltip: where the pointer is, for a tooltip that's about to show.
+  const pointer = { x: 0, y: 0 };
+  if (browser) {
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+      },
+      { passive: true },
+    );
+  }
+</script>
+
 <script>
   import { onMount } from 'svelte';
   import { spring } from 'svelte/motion';
@@ -14,8 +31,18 @@
 
   $: visible = show === null ? parentHover : show;
 
+  // Only a visible tooltip follows the pointer; it appears where the pointer is.
   function handlePointerMove(e) {
     mouse.set({ x: e.clientX + 25, y: e.clientY });
+  }
+  $: if (browser) follow(visible);
+  function follow(on) {
+    if (on) {
+      mouse.set({ x: pointer.x + 25, y: pointer.y }, { hard: true });
+      window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    } else {
+      window.removeEventListener('pointermove', handlePointerMove);
+    }
   }
 
   onMount(() => {
@@ -24,10 +51,9 @@
     const parent = tooltip.parentNode;
     parent.addEventListener('pointerenter', () => (parentHover = true));
     parent.addEventListener('pointerleave', () => (parentHover = false));
+    return () => window.removeEventListener('pointermove', handlePointerMove);
   });
 </script>
-
-<svelte:window on:pointermove={handlePointerMove} />
 
 <div
   bind:this={tooltip}

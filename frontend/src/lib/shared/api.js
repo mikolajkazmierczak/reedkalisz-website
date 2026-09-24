@@ -3,6 +3,10 @@ import { Directus } from '@directus/sdk';
 
 export const baseUrl = PUBLIC_API_URL;
 
-export default new Directus(baseUrl);
+const api = new Directus(baseUrl);
 
-// TODO: add wrapper aroud the sdk that checks for 401 error and sets $auth=false
+// SDK fails every request when refreshing a stale session fails, so public pages showed 500 until a reload.
+const refreshIfExpired = api.auth.refreshIfExpired.bind(api.auth);
+api.auth.refreshIfExpired = () => refreshIfExpired().catch(() => {});
+
+export default api;

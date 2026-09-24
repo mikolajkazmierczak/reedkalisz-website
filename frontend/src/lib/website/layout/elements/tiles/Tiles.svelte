@@ -54,10 +54,7 @@
   }
 </script>
 
-<div
-  class="tiles"
-  style:grid-template-rows="repeat({rowCount}, 1fr)"
-  style:aspect-ratio={`${columnCount} / ${rowCount}`}>
+<div class="tiles" class:editing={$editing} style:--tile-rows={rowCount} style:--tile-cols={columnCount}>
   {#each matrixTiles as tile}
     {@const { _id: id } = tile}
     <Tile {matrix} bind:element bind:tile on:delete={() => handleDelete(id)} on:add={() => handleAdd(id)} />
@@ -65,10 +62,50 @@
 </div>
 
 <style>
+  /* Below 56.25rem the tiles linearise; !important beats Tile's inline grid placement. */
+  /* Gap only in the editor, so resize handles stay grabbable. */
+  .tiles.editing {
+    gap: var(--sp-4);
+  }
+
   .tiles {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-gap: 1rem;
+    grid-template-columns: repeat(var(--tile-cols), 1fr);
+    grid-template-rows: repeat(var(--tile-rows), 1fr);
+    aspect-ratio: var(--tile-cols) / var(--tile-rows);
     width: 100%;
+  }
+
+  @media (max-width: 56.1875rem) {
+    .tiles:not(.editing) {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: none;
+      aspect-ratio: auto;
+    }
+    .tiles:not(.editing) > :global(*) {
+      grid-column: auto !important;
+      grid-row: auto !important;
+      aspect-ratio: 4 / 3;
+    }
+    /* Hide empty slots and hidden tiles so they don't leave holes. */
+    .tiles:not(.editing) > :global(.empty),
+    .tiles:not(.editing) > :global(.off) {
+      display: none;
+    }
+    /* Wide banners (3–4 columns) keep the full width. */
+    .tiles:not(.editing) > :global(.wide) {
+      grid-column: 1 / -1 !important;
+      aspect-ratio: 2 / 1;
+    }
+  }
+
+  @media (max-width: 34.9375rem) {
+    .tiles:not(.editing) {
+      grid-template-columns: 1fr;
+    }
+    .tiles:not(.editing) > :global(*),
+    .tiles:not(.editing) > :global(.wide) {
+      aspect-ratio: 16 / 10;
+    }
   }
 </style>

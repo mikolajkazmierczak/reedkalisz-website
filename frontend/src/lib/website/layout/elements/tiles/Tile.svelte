@@ -32,6 +32,13 @@
   let tileInputsOpen = false;
   let buttonInputsOpen = false;
 
+  // One element per <br>-separated line, so each gets its own blur.
+  const lines = (html) =>
+    html
+      .split(/<br\s*\/?>/i)
+      .map((line) => line.trim())
+      .filter((line) => line && line !== '&nbsp;');
+
   function toggleButtonInputs() {
     buttonInputsOpen = !buttonInputsOpen;
   }
@@ -148,6 +155,8 @@
 <div
   class="wrapper"
   class:empty={_empty}
+  class:off={tile.hide && !$editing}
+  class:wide={tile.width >= 3}
   class:editing={$editing}
   class:greyscale={tile.hide}
   style="grid-row: {tile.row} / span {tile.height}; grid-column: {tile.column} / span {tile.width};">
@@ -218,11 +227,13 @@
         href={$editing ? null : href}
         {target}
         class="tile"
+        class:locked={!$editing}
         class:red
         class:white={!red && !tile.img}
+        class:photo={!!tile.img}
         class:href={$editing ? false : tile.uri}>
         {#if tile.img}
-          <img src={parseImg(tile.img)} alt="" />
+          <img src={parseImg(tile.img)} alt="" draggable="false" />
         {/if}
         <div class="content" class:dark class:contrast>
           <div class="text">
@@ -235,10 +246,14 @@
               </p>
             {:else}
               {#if tile.title}
-                <h2 class="title" class:dark>{@html tile.title}</h2>
+                <h2 class="title" class:dark>
+                  {#each lines(tile.title) as line}<span class="line">{@html line}</span>{' '}{/each}
+                </h2>
               {/if}
               {#if tile.subtitle}
-                <p class="subtitle" class:dark>{@html tile.subtitle}</p>
+                <p class="subtitle" class:dark>
+                  {#each lines(tile.subtitle) as line}<span class="line">{@html line}</span>{' '}{/each}
+                </p>
               {/if}
             {/if}
           </div>
@@ -248,14 +263,15 @@
               <Button icon="edit" onclick={toggleButtonInputs} float="top left" />
               <a href={hide ? null : href} {target} class="button" class:dark class:hide>
                 {tile.button ?? ''}
-                <Icon name="arrow_right" color={tile.dark ? 'var(--text)' : 'var(--light)'} />
+                <Icon name="arrow_right" color="currentColor" />
               </a>
             </div>
           {:else if linked}
-            <a {href} {target} class="button" class:dark>
+            <!-- not a link: the tile already is one, and nested links break the server-rendered HTML -->
+            <span class="button" class:dark>
               {tile.button ?? ''}
-              <Icon name="arrow_right" color={tile.dark ? 'var(--text)' : 'var(--light)'} />
-            </a>
+              <Icon name="arrow_right" color="currentColor" />
+            </span>
           {/if}
         </div>
       </a>
@@ -320,20 +336,37 @@
   }
 
   .tile {
+    /* Text scales to the tile (1–4 columns), not the viewport. */
+    container-type: inline-size;
     overflow: hidden;
     z-index: 0;
     position: relative;
     display: block;
     width: 100%;
     height: 100%;
-    transition: transform 150ms;
+    border-radius: var(--r-sm);
     text-decoration: none;
+  }
+  /* Hover frame on its own layer: the tile's box-shadow painted under the image. */
+  .tile::after {
+    content: '';
+    z-index: 0;
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 0 var(--ink);
+    transition: box-shadow var(--dur) var(--ease);
+    pointer-events: none;
+  }
+  /* Not selectable outside the editor. */
+  .tile.locked {
+    -webkit-user-select: none;
+    user-select: none;
   }
   .tile.white {
     background-color: var(--white); /* needed because of ugly rendering while loading if it's set in .tile */
   }
-  .tile.href:hover {
-    transform: translateY(-0.5rem);
+  .tile.href:hover::after {
+    box-shadow: inset 0 0 0 2px var(--ink);
   }
 
   img {
@@ -347,19 +380,18 @@
     object-fit: cover;
   }
 
+  /* Content in flow, so the tile grows to fit instead of clipping the button. */
   .content {
     z-index: 1;
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 1rem;
+    gap: var(--sp-2);
+    padding: clamp(0.75rem, 4cqw, 1.75rem);
     width: 100%;
-    height: 100%;
-    /* text-decoration: none; */
+    min-height: 100%;
   }
 
   .title,
@@ -369,12 +401,39 @@
   }
 
   .title {
-    font-size: 2.5rem;
-    line-height: 1.1;
+    font-size: clamp(1.125rem, 8.5cqw, 2.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
   .subtitle {
-    font-size: 1.5rem;
-    line-height: 1.2;
+    margin-top: 0.35em;
+    max-width: 30ch;
+    font-size: clamp(0.8125rem, 4.4cqw, 1.5rem);
+    line-height: 1.25;
+    overflow-wrap: break-word;
+  }
+  .line {
+    display: block;
+  }
+  /* Over a photo each line sits on its own squircle of blur, touching the next (in the editor, the whole field). */
+  .photo .title,
+  .photo .subtitle {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  /* negative margin: the blur reaches past the text instead of indenting it */
+  .photo .line,
+  .photo .editing :global([contenteditable]) {
+    margin-inline: -0.625rem;
+    padding: 0.0625rem 0.625rem;
+    border-radius: var(--r-pill);
+    corner-shape: squircle;
+    -webkit-backdrop-filter: blur(0.75rem);
+    backdrop-filter: blur(0.75rem);
   }
   .button {
     cursor: pointer;
@@ -382,10 +441,27 @@
     align-items: center;
     gap: 0.5rem;
     border: 2px solid var(--light);
-    padding: 0.5rem 1rem;
+    border-radius: var(--r-pill);
+    corner-shape: squircle;
+    padding: 0.4em 0.9em;
     background-color: transparent;
-    font-size: 1rem;
+    -webkit-backdrop-filter: blur(0.5rem);
+    backdrop-filter: blur(0.5rem);
+    font-size: clamp(0.75rem, 3.2cqw, 1rem);
+    font-weight: 600;
+    white-space: nowrap;
     text-decoration: none;
+    transition:
+      background-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+  }
+  .tile:hover .button:not(.dark) {
+    background-color: var(--light);
+    color: var(--text);
+  }
+  .tile:hover .button.dark {
+    background-color: var(--text);
+    color: var(--light);
   }
   .button.dark {
     border-color: var(--text);

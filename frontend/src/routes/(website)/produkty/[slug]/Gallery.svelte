@@ -1,45 +1,71 @@
 <script>
   import { fly } from 'svelte/transition';
   import { baseUrl } from '$/api';
-  import AdminOnlyOverlay from '#c/AdminOnlyOverlay.svelte';
 
-  export let imgs;
-  $: index = imgs.length ? 0 : null;
-  $: main = imgs.length ? imgs[index] : null;
-  $: showPicker = imgs.length !== 1;
-
+  export let imgs = [];
+  /** Product name, for alt text. */
+  export let alt = '';
   export let small = false;
 
-  let lightbox = { open: false, img: null };
+  // A disabled image is disabled for everyone, admin included.
+  $: shown = imgs.filter((i) => i.enabled !== false);
+  $: index = shown.length ? 0 : null;
+  $: main = shown.length ? shown[index] : null;
 
-  const openLightbox = (i) => (lightbox = { open: true, img: imgs[i] });
-  const closeLightbox = () => (lightbox.open = false);
+  // Variant cards show thumbnails only; a single image needs no strip.
+  $: showMain = !small;
+  $: showPicker = small ? shown.length > 0 : shown.length !== 1;
+
+  const label = (i) => (shown.length > 1 ? `${alt} — zdjęcie ${i + 1} z ${shown.length}` : alt);
+
+  // The lightbox takes focus and returns it on close.
+  let zoomed = null;
+  let opener = null;
+  function openLightbox(i) {
+    opener = document.activeElement;
+    zoomed = { img: shown[i].img, alt: label(i) };
+  }
+  function closeLightbox() {
+    zoomed = null;
+    opener?.focus?.({ preventScroll: true });
+  }
+  const focus = (node) => node.focus();
 </script>
 
-{#if imgs.length}
-  {#if lightbox.img}
-    {@const { open, img } = lightbox}
-    <button class="lightbox" class:open on:click={closeLightbox}>
-      <img src="{baseUrl}/assets/{img.img}" alt={img.alt} />
+<svelte:window on:keydown={(e) => zoomed && e.key === 'Escape' && closeLightbox()} />
+
+{#if shown.length}
+  {#if zoomed}
+    <button class="lightbox" type="button" aria-label="Zamknij powiększenie" use:focus on:click={closeLightbox}>
+      <img src="{baseUrl}/assets/{zoomed.img}" alt={zoomed.alt} />
     </button>
   {/if}
 
   <div class="gallery">
-    <div class="main" class:only={!showPicker}>
-      <button class="main__button" on:click={() => openLightbox(index)}>
-        {#key main}
-          <img src="{baseUrl}/assets/{main.img}" alt={main.alt} in:fly={{ y: 20, duration: 200 }} />
-        {/key}
-        <AdminOnlyOverlay show={!main.enabled} />
-      </button>
-    </div>
+    {#if showMain}
+      <div class="main" class:only={!showPicker}>
+        <button class="main__button" type="button" on:click={() => openLightbox(index)}>
+          {#key main}
+            <img
+              src="{baseUrl}/assets/{main.img}"
+              alt={label(index)}
+              draggable="false"
+              in:fly={{ y: 20, duration: 200 }} />
+          {/key}
+        </button>
+      </div>
+    {/if}
 
     {#if showPicker}
       <div class="picker" class:small>
-        {#each imgs as { enabled, img, alt }, i}
-          <button class="picker__button" on:mouseenter={() => (index = i)} on:click={() => openLightbox(i)}>
-            <img src="{baseUrl}/assets/{img}" {alt} />
-            <AdminOnlyOverlay show={!enabled} padding="5%" />
+        {#each shown as { img }, i}
+          <button
+            class="picker__button"
+            type="button"
+            aria-label="Powiększ: {label(i)}"
+            on:mouseenter={() => (index = i)}
+            on:click={() => openLightbox(i)}>
+            <img src="{baseUrl}/assets/{img}" alt="" loading="lazy" decoding="async" draggable="false" />
           </button>
         {/each}
       </div>
@@ -48,75 +74,91 @@
 {/if}
 
 <style>
+  .gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
   button {
     position: relative;
-    cursor: zoom-in;
     margin: 0;
     padding: 0;
     border: none;
     background-color: transparent;
-  }
-  img {
-    display: block;
-    width: 100%;
-    object-fit: contain;
-    aspect-ratio: 1 / 1;
-  }
-
-  .lightbox {
-    cursor: zoom-out;
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: none;
-    place-items: center;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 100;
-  }
-  .lightbox.open {
-    display: grid;
-  }
-  .lightbox img {
-    max-width: 90vh;
-    max-height: 90vh;
-    object-fit: contain;
-  }
-
-  .gallery {
-    --border: 1px solid rgba(0, 0, 0, 0.1);
-    --radius: 0;
-    width: 100%;
-    background-color: #fff;
+    cursor: zoom-in;
   }
 
   .main {
-    overflow: hidden;
-    border-radius: var(--radius) var(--radius) 0 0;
-    border: var(--border);
-    padding: 5%;
-    width: 100%;
+    position: relative;
     aspect-ratio: 1 / 1;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    overflow: hidden;
   }
-  .main.only {
-    border-radius: var(--radius);
+  .main__button {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .main__button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
   }
 
   .picker {
-    overflow: hidden;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-    border-radius: 0 0 var(--radius) var(--radius);
-    border: var(--border);
-    border-top: none;
-    padding: 0 5%;
-  }
-  .picker.small {
-    grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
+    gap: var(--sp-2);
   }
   .picker__button {
-    padding: 5%;
+    aspect-ratio: 1 / 1;
+    padding: var(--sp-1);
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    cursor: zoom-in;
+  }
+  /* Instant 2× zoom on hover (a tween jitters); pointer devices only. */
+  @media (hover: hover) {
+    .picker__button:hover {
+      z-index: 2;
+      transform: scale(2);
+      border-color: var(--ink);
+      box-shadow: 0 0.25rem 1rem rgba(17, 17, 16, 0.18);
+    }
+  }
+  .picker__button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  /* --- lightbox --- */
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: var(--gutter);
+    background-color: color-mix(in srgb, var(--ink) 82%, transparent);
+    cursor: zoom-out;
+  }
+  .lightbox img {
+    max-width: min(100%, 68.75rem);
+    max-height: 88vh;
+    object-fit: contain;
+    border-radius: var(--r-md);
     background-color: #fff;
+  }
+
+  @media (min-width: 56.25rem) {
+    .picker {
+      grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
+    }
   }
 </style>
