@@ -604,9 +604,12 @@
     font-size: var(--fs-h2);
   }
   /* Columns, not grid rows: sections have 0 to 9 children. */
+  /* Two columns even on a phone: long names hyphenate, the map is half as tall. */
   .map__cols {
-    columns: 1;
-    column-gap: var(--sp-8);
+    columns: 2;
+    column-gap: var(--sp-5);
+    hyphens: auto;
+    overflow-wrap: break-word;
   }
   /* Sections may break across columns; subcategory groups don't. */
   .map__col {
@@ -700,7 +703,7 @@
 
   @media (min-width: 38.75rem) {
     .map__cols {
-      columns: 2;
+      column-gap: var(--sp-8);
     }
     .sections__grid {
       grid-template-columns: repeat(2, 1fr);
