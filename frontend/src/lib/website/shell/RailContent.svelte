@@ -95,9 +95,9 @@
     place-items: center;
     width: 1.75rem;
     height: 1.75rem;
-    margin-right: 3px;
+    margin-right: 0.25rem;
     border: none;
-    border-radius: 0.5rem;
+    border-radius: var(--r-pill);
     corner-shape: squircle;
     background-color: transparent;
     color: var(--ink-500);
@@ -111,8 +111,7 @@
     height: 0.9375rem;
   }
   .search button:hover {
-    background-color: var(--ink);
-    color: #fff;
+    color: var(--ink);
   }
 
   /* Rail: the brand row dissolves so the mark, contact lines and Kontakt stack. */
@@ -178,7 +177,7 @@
     background-color: #fff;
     color: var(--navy);
   }
-  /* 1rem avoids iOS zoom on focus; touch has no hover, so the button is solid. */
+  /* 1rem avoids iOS zoom on focus; touch has no hover, so the glyph is full ink. */
   @media (max-width: 61.1875rem) {
     .search input {
       height: 2.75rem;
@@ -187,9 +186,7 @@
     .search button {
       width: 2.25rem;
       height: 2.25rem;
-      margin-right: 0.25rem;
-      background-color: var(--ink);
-      color: #fff;
+      color: var(--ink);
     }
     .search button svg {
       width: 1rem;

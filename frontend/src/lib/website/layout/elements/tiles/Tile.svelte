@@ -32,7 +32,7 @@
   let tileInputsOpen = false;
   let buttonInputsOpen = false;
 
-  // Each <br>-separated line becomes its own element, so its blur fits it; blank lines are dropped.
+  // One element per <br>-separated line, so each gets its own blur.
   const lines = (html) =>
     html
       .split(/<br\s*\/?>/i)
@@ -267,10 +267,11 @@
               </a>
             </div>
           {:else if linked}
-            <a {href} {target} class="button" class:dark>
+            <!-- not a link: the tile already is one, and nested links break the server-rendered HTML -->
+            <span class="button" class:dark>
               {tile.button ?? ''}
               <Icon name="arrow_right" color="currentColor" />
-            </a>
+            </span>
           {/if}
         </div>
       </a>
@@ -365,7 +366,7 @@
     background-color: var(--white); /* needed because of ugly rendering while loading if it's set in .tile */
   }
   .tile.href:hover::after {
-    box-shadow: inset 0 0 0 0.3125rem var(--ink);
+    box-shadow: inset 0 0 0 2px var(--ink);
   }
 
   img {
@@ -417,8 +418,7 @@
   .line {
     display: block;
   }
-  /* Over a photo every line sits on its own blur, fitted to it: legible on a busy picture, invisible on a calm
-     one. In the editor the whole field gets it (contenteditable must stay a single block). */
+  /* Over a photo each line sits on its own blur (in the editor, the whole field). */
   .photo .title,
   .photo .subtitle {
     display: flex;
@@ -426,7 +426,7 @@
     align-items: flex-start;
     gap: 0.125rem;
   }
-  /* The blur reaches past the text rather than pushing it in: title, subtitle and button share one left edge. */
+  /* negative margin: the blur reaches past the text instead of indenting it */
   .photo .line,
   .photo .editing :global([contenteditable]) {
     margin-inline: -0.375rem;
@@ -444,7 +444,6 @@
     border-radius: var(--r-pill);
     corner-shape: squircle;
     padding: 0.4em 0.9em;
-    /* Blur without a fill, so the outline and label hold up over busy photos. */
     background-color: transparent;
     -webkit-backdrop-filter: blur(0.5rem);
     backdrop-filter: blur(0.5rem);

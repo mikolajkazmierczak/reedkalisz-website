@@ -13,6 +13,9 @@
   $: colorName = multicolored
     ? 'wielokolorowy'
     : [color_first?.name, color_second?.name].filter(Boolean).join('\u00a0/\u00a0');
+  // Two colours always take two lines: "Pomarańczowy" / "/ Biały".
+  $: firstLine = multicolored ? 'WIELOKOLOROWY' : (color_first ?? color_second)?.name;
+  $: secondLine = !multicolored && color_first && color_second ? `/\u00a0${color_second.name}` : null;
 
   function getCodeSeparator(company) {
     switch (company?.name) {
@@ -33,7 +36,8 @@
     </div>
     <h3>
       <small class="code">{code}{api_color_code ? codeSeparator : ''}{api_color_code}</small>
-      <span class="color">{multicolored ? 'WIELOKOLOROWY' : colorName}</span>
+      <span class="color">{firstLine ?? ''}</span>
+      {#if secondLine}<span class="color">{' '}{secondLine}</span>{/if}
     </h3>
   </div>
 
@@ -58,30 +62,32 @@
     background-color: var(--surface);
   }
 
+  /* Code and two colour lines on every card, so "Dostępność" lines up; the swatch centres on the first two. */
   .badge {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-    min-width: 0;
+    --line: calc(var(--fs-xs) * 1.25);
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    grid-template-rows: auto minmax(var(--line), auto) minmax(var(--line), auto);
+    column-gap: var(--sp-2);
     padding: var(--sp-2) var(--sp-3);
   }
   .swatch {
-    flex: none;
-    width: 1.5rem;
+    grid-row: 1 / span 2;
+    align-self: center;
   }
   h3 {
+    display: grid;
+    grid-row: 1 / span 3;
+    grid-template-rows: subgrid;
     min-width: 0;
     font-size: var(--fs-xs);
   }
   .code {
-    display: block;
     font-size: 0.6875rem;
   }
   .color {
-    display: block;
     font-weight: 700;
     line-height: 1.25;
-    overflow-wrap: anywhere;
   }
 
   .amount {

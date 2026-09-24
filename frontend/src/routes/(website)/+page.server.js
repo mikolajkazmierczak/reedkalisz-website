@@ -3,10 +3,7 @@ import api from '$/api';
 import { makeTree } from '%/utils';
 import { enabledFilter } from '#/products/fields';
 
-/**
- * Item counts per top-level section. Reads the whole catalogue (~1 s), so it runs on the server only,
- * cached and refreshed in the background: the browser gets the result, never the sweep.
- */
+/** Item counts per top-level section. Reads the whole catalogue (~1 s): server only, cached, refreshed behind. */
 const SUMMARY_TTL = 10 * 60 * 1000;
 let summaryCache = null;
 

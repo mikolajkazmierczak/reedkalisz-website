@@ -12,9 +12,12 @@
   export let showIncludes = true;
 </script>
 
-{#if (pricesWithLabeling && showIncludes) || (field[0] && field[1]) || place}
+{#if pricesWithLabeling && showIncludes}
+  <div class="includes"><IncludesLabeling /></div>
+{/if}
+
+{#if (field[0] && field[1]) || place}
   <div class="meta">
-    {#if pricesWithLabeling && showIncludes}<IncludesLabeling />{/if}
     {#if field[0] && field[1]}
       <span class="meta__item">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -43,6 +46,9 @@
 </div>
 
 <style>
+  .includes {
+    margin-bottom: var(--sp-3);
+  }
   .meta {
     display: flex;
     flex-wrap: wrap;
@@ -54,6 +60,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
+    white-space: nowrap;
     color: var(--text-muted);
     font-size: var(--fs-sm);
   }

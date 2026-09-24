@@ -65,14 +65,15 @@
     amount,
     available,
   }));
+  // Each price with whether it includes marking: labeling prices always do, custom ones when flagged.
   $: allPrices = [
-    ...(custom_prices ?? []),
-    ...(custom_prices_sale ?? []),
-    ...(labelings ?? []).flatMap((l) => [...l.prices, ...l.prices_sale]),
+    ...[...(custom_prices ?? []), ...(custom_prices_sale ?? [])].map((p) => [p, !!custom_prices_with_labeling]),
+    ...(labelings ?? []).flatMap((l) => [...l.prices, ...l.prices_sale].map((p) => [p, true])),
   ]
-    .filter((p) => p.enabled && p.price)
-    .map((p) => p.price);
-  $: priceFrom = allPrices.length ? Math.min(...allPrices) : null;
+    .filter(([p]) => p.enabled && p.price)
+    .sort(([a], [b]) => a.price - b.price);
+  $: priceFrom = allPrices[0]?.[0].price ?? null;
+  $: priceFromWithLabeling = allPrices[0]?.[1] ?? false;
   $: inStock = enabledStorage.some((s) => parseAmount({ available: s.available, amount: s.amount }).state !== NONE);
 
   $: metaTitle = `${seo_title || name} — ${code}`;
@@ -241,7 +242,8 @@
                   <p class="buy__price">
                     <span class="buy__from">od</span>
                     <strong class="tnum">{priceFrom.toFixed(2)} zł</strong>
-                    <span class="buy__unit">netto / szt</span>
+                    <span class="buy__unit">/ szt</span>
+                    {#if priceFromWithLabeling}<span class="buy__with">ze znakowaniem</span>{/if}
                   </p>
                   {#if showCustomPrices || showLabelingsPrices}
                     <a class="buy__tocennik" href="#cennik">Pełny cennik według nakładu ↓</a>
@@ -279,8 +281,11 @@
               </div>
 
               <div class="buy__ask" id="zapytaj" bind:this={askEl}>
-                <h2 class="buy__ask-title" tabindex="-1">Zapytanie</h2>
-                <QuestionForm source="product" product={{ code, name, slug }} />
+                <h2 class="buy__ask-title" tabindex="-1">
+                  <span class="buy__ask-word">Zapytanie</span> o <strong>{name}</strong>
+                  <span class="code">{code}</span>
+                </h2>
+                <QuestionForm {code} />
               </div>
             </div>
           </div>
@@ -418,7 +423,18 @@
   }
   .buy__ask-title {
     margin-bottom: var(--sp-4);
+    color: var(--ink-500);
+    font-size: var(--fs-sm);
+    font-weight: 400;
+  }
+  .buy__ask-word {
+    margin-right: 0.25rem;
+    color: var(--orange);
     font-size: var(--fs-h3);
+    font-weight: 700;
+  }
+  .buy__ask-title strong {
+    color: var(--ink);
   }
   .buy__title {
     font-size: var(--fs-h1);
@@ -459,6 +475,11 @@
   .buy__unit {
     color: var(--ink-400);
     font-size: var(--fs-sm);
+  }
+  .buy__with {
+    color: var(--red);
+    font-size: var(--fs-sm);
+    font-weight: 700;
   }
 
   .buy__colors {
@@ -640,6 +661,8 @@
       margin-bottom: var(--sp-4);
       padding-bottom: var(--sp-2);
       border-bottom: var(--rule);
+    }
+    .buy__ask-word {
       font-size: var(--fs-h2);
     }
   }

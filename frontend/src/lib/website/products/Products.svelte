@@ -5,8 +5,9 @@
 </script>
 
 {#if products.length}
+  <!-- Unkeyed: paging reuses the cards, so each one crossfades its picture instead of being rebuilt. -->
   <div class="grid">
-    {#each products as product (product.id)}
+    {#each products as product}
       {#if product.url}
         <a class="promo" href={product.url} target="_blank" rel="noreferrer">
           <div class="promo__media">

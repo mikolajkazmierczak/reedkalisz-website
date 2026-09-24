@@ -66,7 +66,7 @@
     if (deep.same(loadedLayout, data.layout)) return;
     loadedLayout = deep.copy(data.layout);
     parsedLayout = parseLayout(deep.copy(loadedLayout));
-    // Compare edits against the layout as it would be saved, so blocks parseLayout drops don't count as changes.
+    // Compare against the layout as saved, so blocks parseLayout drops don't count as edits.
     originalLayout = parseBack(deep.copy(parsedLayout));
   }
 
@@ -167,7 +167,7 @@
             <a class="sec" href={s.href}>
               <div class="sec__icon"><SectionIcon name={s.name} /></div>
               <div class="sec__text">
-                <!-- the drawing replaces the CMS emoji -->
+                <!-- remove emojis since the drawings replace them -->
                 <h2 class="sec__name">{s.name.replace(/^[^\p{L}\p{N}]+/u, '')}</h2>
                 <span class="sec__count tnum">{s.count} {plural(s.count, ['pozycja', 'pozycje', 'pozycji'])}</span>
               </div>

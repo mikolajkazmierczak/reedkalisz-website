@@ -9,6 +9,8 @@
 
   export let noSearchParams = false;
   export let limitLocked = false;
+  /** Render nothing when everything fits on one page (the homepage sliders). */
+  export let hideSingle = false;
   /** Two pagers on one page need two names for screen readers. */
   export let label = 'Paginacja';
 
@@ -49,7 +51,7 @@
   }
 </script>
 
-{#if pagesCount > 1 || !limitLocked}
+{#if pagesCount > 1 || !hideSingle}
   <nav class="pg" aria-label={label}>
     <div class="pg__nav">
       <button class="pg__btn" type="button" disabled={page <= 1} on:click={prev} aria-label="Poprzednia strona">
@@ -109,27 +111,31 @@
     gap: var(--sp-2);
   }
 
-  /* Arrows only, named by aria-label. */
+  /* Shaped and edged like the sort select; hover thickens like a product card. */
   .pg__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.25rem;
+    min-height: 2.5rem;
     padding: 0 var(--sp-5);
-    border: none;
+    border: 1px solid var(--ink-300);
     border-radius: var(--r-pill);
-    background-color: rgba(17, 17, 16, 0.06);
+    background-color: var(--surface);
     color: var(--ink);
     cursor: pointer;
     transition:
-      background-color var(--dur-fast) var(--ease),
+      border-color var(--dur-fast) var(--ease),
+      box-shadow var(--dur-fast) var(--ease),
       color var(--dur-fast) var(--ease);
   }
   .pg__btn:hover:not(:disabled) {
-    background-color: rgba(17, 17, 16, 0.12);
+    border-color: var(--ink);
+    box-shadow: 0 0 0 1px var(--ink);
   }
+  /* Off: no outline, just a sunken fill. The border stays transparent so the size holds. */
   .pg__btn:disabled {
-    background-color: rgba(17, 17, 16, 0.03);
+    border-color: transparent;
+    background-color: var(--paper-2);
     color: var(--ink-300);
     cursor: not-allowed;
   }

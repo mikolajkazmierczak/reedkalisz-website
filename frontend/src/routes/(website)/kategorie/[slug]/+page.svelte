@@ -62,7 +62,7 @@
 
   $: metaDescription =
     describe(data.category?.description) ||
-    `${title} — ${countLabel} w katalogu REED Kalisz. Ceny netto ze znakowaniem, wycena na zapytanie.`;
+    `${title} — ${countLabel} w katalogu REED Kalisz. Ceny ze znakowaniem, wycena na zapytanie.`;
 </script>
 
 <svelte:head>

@@ -25,6 +25,7 @@
 
   --orange: #c2560b;
   --orange-bright: #ff8a3d;
+  --orange-deep: #b04d0a;
   --orange-tint: #fdf1e6;
 
   --green: #166534;
@@ -80,6 +81,7 @@
   --r-sm: 0px;
   --r-md: 0px;
   --r-card: 1.125rem;
+  --r-field: 1.5rem;
   --r-pill: 62.4375rem;
 
   /* depth */
@@ -366,6 +368,7 @@ textarea {
 .search-field,
 .pg__btn,
 .skip-link,
+.field,
 .squircle {
   corner-shape: squircle;
 }
@@ -434,13 +437,13 @@ textarea {
   min-height: 2.75rem;
   padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--ink-300);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
   background-color: var(--surface);
   font-size: var(--fs-sm);
-  outline: none;
-  transition:
-    border-color var(--dur) var(--ease),
-    box-shadow var(--dur) var(--ease);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+textarea.field {
+  border-radius: var(--r-field);
 }
 .field::placeholder {
   color: var(--text-subtle);
@@ -449,8 +452,11 @@ textarea {
   border-color: var(--ink-600);
 }
 .field:focus {
-  border-color: var(--red);
-  box-shadow: inset 0 0 0 1px var(--red);
+  outline: none;
+}
+.field:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 /* === Prose (CMS markdown) === */

@@ -33,8 +33,11 @@
 
       <div class="ask" id="zapytanie">
         <h2 class="ask__title">Czego potrzeba?</h2>
-        <p class="ask__lede">Nakład, termin i budżet wystarczą, żebyśmy odpisali z konkretną wyceną.</p>
-        <QuestionForm source="contact" />
+        <p class="ask__lede">
+          Nakład, termin i budżet wystarczą, żebyśmy odpisali z konkretną wyceną.<br />
+          Pisz śmiało także jeśli masz mniej konkretne pytanie, postaramy się pomóc :)
+        </p>
+        <QuestionForm />
       </div>
 
       <div class="map">

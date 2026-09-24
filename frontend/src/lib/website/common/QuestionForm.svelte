@@ -2,10 +2,8 @@
   import { tick } from 'svelte';
   import api from '$/api';
 
-  /** 'product' or 'contact' — sets the flag the admin filters inquiries by. */
-  export let source = 'contact';
-  /** Present on a product page; its code is prefixed onto the message. */
-  export let product = null;
+  /** The product asked about, prefixed onto the message; without one it is a contact-page inquiry. */
+  export let code = null;
 
   let email = '';
   let phone = '';
@@ -20,7 +18,7 @@
 
   /** Last sent payload; resending unchanged content is blocked. */
   let sentSignature = null;
-  $: signature = JSON.stringify({ email, phone, name, content: content.trim(), code: product?.code ?? null });
+  $: signature = JSON.stringify({ email, phone, name, content: content.trim(), code });
   $: alreadySent = sentSignature !== null && sentSignature === signature;
   $: blocked = !consent || sending || alreadySent;
 
@@ -41,14 +39,14 @@
     const payload = signature;
     try {
       sending = true;
-      const prefix = product ? `# Kod: ${product.code}\n\n` : '';
+      const prefix = code ? `# Kod: ${code}\n\n` : '';
       await api.items('questions').createOne({
         email,
         phone,
         name,
         content: prefix + content.trim(),
-        from_product: source === 'product',
-        from_contact: source === 'contact',
+        from_product: !!code,
+        from_contact: !code,
       });
       sentSignature = payload;
     } catch (e) {
@@ -60,12 +58,6 @@
 </script>
 
 <form class="qf" bind:this={form} on:submit|preventDefault={handleSend} novalidate>
-  {#if product}
-    <p class="qf__about">
-      Pytasz o <strong>{product.name}</strong> <span class="code">{product.code}</span>.
-    </p>
-  {/if}
-
   <div class="qf__grid">
     <label class="f">
       <span class="f__label">E-mail <span class="req" aria-hidden="true">*</span></span>
@@ -144,18 +136,14 @@
 </form>
 
 <style>
+  /* the orange contact flow; errors stay red */
   .qf {
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
-  }
-
-  .qf__about {
-    color: var(--ink-500);
-    font-size: var(--fs-sm);
-  }
-  .qf__about strong {
-    color: var(--ink);
+    --focus: var(--orange);
+    accent-color: var(--orange);
+    caret-color: var(--orange);
   }
 
   .qf__grid {
@@ -175,7 +163,7 @@
     font-weight: 700;
   }
   .req {
-    color: var(--red);
+    color: var(--orange-deep);
   }
   textarea.field {
     resize: vertical;
@@ -208,6 +196,14 @@
     color: var(--ink-500);
     font-size: var(--fs-sm);
     cursor: pointer;
+  }
+  .qf__consent a {
+    color: var(--orange-deep);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+  .qf__consent a:hover {
+    color: var(--orange);
   }
   .qf__consent input {
     flex: none;

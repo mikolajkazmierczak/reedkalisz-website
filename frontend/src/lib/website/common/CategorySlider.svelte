@@ -1,45 +1,68 @@
 <script>
-  import { onMount, tick } from 'svelte';
-  import { browser } from '$app/environment';
+  import { onMount } from 'svelte';
   import { page as pageStore } from '$app/stores';
 
   import api from '$/api';
-  import { treeGetAllChildrenIDs } from '%/utils';
-  import { fields, enabledFilter, countProducts } from '#/products/fields';
+  import { sliderFilter, fetchSlider } from '#/products/slider';
+  import { preloadImages } from '#/products/images';
 
   import Pagination from '#c/Pagination.svelte';
   import Products from '#/products/Products.svelte';
 
-  $: ({ categoriesTree, categoriesItems } = $pageStore.data);
-
   export let slug;
-  /** Fallback page size until the grid is measured. */
+  /** Page size until the grid is measured. */
   export let limit = 4;
   export let filterIds = [];
 
-  let page = 1;
-  let count = 0;
+  $: ({ categoriesTree, categoriesItems, sliders } = $pageStore.data);
+  $: filter = slug ? sliderFilter(slug, categoriesItems, categoriesTree, filterIds) : null;
+  $: preloaded = sliders?.[slug] ?? null;
 
+  let page = 1;
   /** Measured grid columns, so each page is exactly one row. */
   let cols = null;
   $: pageSize = cols ?? limit;
 
-  let products = [];
-  let loading = false;
+  /** The page on show; until one is picked (and in SSR), the preloaded first page. */
+  let current = null;
+  $: shown = current ?? preloaded;
   let box;
-  let minHeight = 0;
+  let mounted = false;
 
-  $: filter = slug && getFilter(slug, filterIds);
-
-  // Measuring can set the same `cols` again; don't refetch then.
-  let lastKey = null;
-  $: key = filter ? JSON.stringify([filter, pageSize, page]) : null;
-  $: if (key && key !== lastKey) {
-    lastKey = key;
-    fetchRecommended(pageSize, page);
+  // Pages by filter, size and number. The current one stays up until the next is in, and the page after is
+  // always fetched ahead (pictures too), so paging is instant.
+  const pages = new Map();
+  function load(size, page) {
+    const key = JSON.stringify([filter, size, page]);
+    if (!pages.has(key)) {
+      const covers = preloaded && (preloaded.products.length >= size || preloaded.products.length >= preloaded.count);
+      const request =
+        page === 1 && covers
+          ? Promise.resolve(preloaded)
+          : fetchSlider(api, filter, size, page).then((result) => (preloadImages(result.products), result));
+      pages.set(key, request.catch((err) => (pages.delete(key), Promise.reject(err))));
+    }
+    return pages.get(key);
   }
 
-  /* Mirrors the grid in Products.svelte — keep in sync. It can't be measured: there is no grid before the first fetch. */
+  // A string, so an equal recompute (same `cols` measured again, fresh page data) doesn't reload.
+  $: key = filter && mounted ? JSON.stringify([filter, pageSize, page]) : null;
+  $: if (key) show(pageSize, page);
+
+  let requests = 0;
+  async function show(size, page) {
+    const request = ++requests;
+    try {
+      const result = await load(size, page);
+      if (request !== requests) return;
+      current = result;
+      if (page * size < result.count) load(size, page + 1).catch(() => {});
+    } catch {
+      // keep what's showing; the next click retries
+    }
+  }
+
+  /* Mirrors the grid in Products.svelte — keep in sync, with the .first rules below. */
   function columnsFor(boxWidth, viewport) {
     // Same rem breakpoints, converted at the reader's font size.
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
@@ -52,12 +75,12 @@
     if (!box) return;
     const w = box.getBoundingClientRect().width;
     if (!w) return;
-    const n = columnsFor(w, window.innerWidth);
-    if (n !== cols) cols = n;
+    cols = columnsFor(w, window.innerWidth);
   }
 
   onMount(() => {
     measure();
+    mounted = true;
     let t;
     const ro = new ResizeObserver(() => {
       clearTimeout(t);
@@ -69,74 +92,89 @@
       ro.disconnect();
     };
   });
-
-  function getFilter(slug, filterIds) {
-    const category = categoriesItems.find((c) => c.slug === slug && c.enabled)?.id;
-    if (!category) throw Error('Category not found');
-    const getIds = (c) => [c, ...treeGetAllChildrenIDs(categoriesTree, c)];
-    let filter = { ...enabledFilter, categories: { category: { _in: getIds(category) } } };
-    if (filterIds.length) {
-      filter = { ...filter, id: { _nin: filterIds } }; // exclude some products
-    }
-    return filter;
-  }
-
-  async function fetchRecommended(limit, page) {
-    // Pin the height so swapping rows doesn't make the page jump.
-    if (browser && box) minHeight = box.offsetHeight;
-    loading = true;
-    try {
-      const sort = ['price_min'];
-      const [{ data }, total] = await Promise.all([
-        api.items('products').readByQuery({ filter, sort, fields, limit, page }),
-        countProducts(api, filter),
-      ]);
-      count = total;
-      products = data;
-    } finally {
-      loading = false;
-      // Release only once the new rows are in the DOM.
-      if (browser) {
-        await tick();
-        requestAnimationFrame(() => (minHeight = 0));
-      }
-    }
-  }
 </script>
 
-{#if products}
-  <div
-    class="wrapper"
-    class:is-loading={loading}
-    bind:this={box}
-    style:min-height={minHeight ? `${minHeight}px` : null}>
-    <Products {products} />
-    <Pagination limit={pageSize} bind:page {count} limitLocked noSearchParams />
+{#if filter}
+  <div class="wrapper" class:first={page === 1} bind:this={box}>
+    <!-- Nothing until there's a page: no empty state flashing. -->
+    {#if shown}<Products products={shown.products} />{/if}
+    <Pagination limit={pageSize} bind:page count={shown?.count ?? 0} limitLocked hideSingle noSearchParams />
   </div>
 {/if}
 
 <style>
   .wrapper {
+    container: slider / inline-size;
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
     width: 100%;
   }
-  .is-loading :global(.tile) {
-    animation: tile-glow 900ms var(--ease) infinite alternate;
-  }
-  @keyframes tile-glow {
-    from {
-      box-shadow: 0 0 0 0 rgba(191, 4, 23, 0);
-    }
-    to {
-      box-shadow: 0 0 16px 0 rgba(191, 4, 23, 0.3);
+
+  /* The preloaded first page renders before it can be measured: show one row by the grid's track maths.
+     Counted "of" cards, since each card's colour tooltips are grid children too. */
+  @media (max-width: 34.9375rem) {
+    .first :global(.grid > :nth-child(n + 3 of .tile)) {
+      display: none;
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .is-loading :global(.tile) {
-      animation: none;
-      box-shadow: 0 0 14px 0 rgba(191, 4, 23, 0.25);
+  @media (min-width: 35rem) and (max-width: 56.1875rem) {
+    @container slider (width < 27.25rem) {
+      .first :global(.grid > :nth-child(n + 2 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 41.375rem) {
+      .first :global(.grid > :nth-child(n + 3 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 55.5rem) {
+      .first :global(.grid > :nth-child(n + 4 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 69.625rem) {
+      .first :global(.grid > :nth-child(n + 5 of .tile)) {
+        display: none;
+      }
+    }
+  }
+  @media (min-width: 56.25rem) {
+    @container slider (width < 26.25rem) {
+      .first :global(.grid > :nth-child(n + 2 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 40rem) {
+      .first :global(.grid > :nth-child(n + 3 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 53.75rem) {
+      .first :global(.grid > :nth-child(n + 4 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 67.5rem) {
+      .first :global(.grid > :nth-child(n + 5 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 81.25rem) {
+      .first :global(.grid > :nth-child(n + 6 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 95rem) {
+      .first :global(.grid > :nth-child(n + 7 of .tile)) {
+        display: none;
+      }
+    }
+    @container slider (width < 108.75rem) {
+      .first :global(.grid > :nth-child(n + 8 of .tile)) {
+        display: none;
+      }
     }
   }
 </style>

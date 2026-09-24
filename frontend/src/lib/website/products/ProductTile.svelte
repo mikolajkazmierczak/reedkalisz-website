@@ -1,9 +1,9 @@
 <script>
-  import { baseUrl } from '$/api';
   import { parseColor } from '#/utils';
   import Color from '#c/Color.svelte';
   import Badges from '#c/badges/Badges.svelte';
   import ProductColorTooltip from '#/products/ProductColorTooltip.svelte';
+  import { productImages } from '#/products/images';
 
   export let product;
   $: ({
@@ -17,41 +17,50 @@
     out_of_stock,
     price_min,
     price_min_sale,
-    custom_prices_with_labeling,
-    custom_prices,
-    custom_prices_sale,
-    labelings,
     storage,
-    gallery,
   } = product);
 
-  function getPriceType(price, custom_prices, custom_prices_sale, labelings) {
-    for (const p of custom_prices.concat(custom_prices_sale)) {
-      if (p.enabled && p.price === price) return 'custom';
-    }
-    for (const l of labelings) {
-      for (const p of l.prices.concat(l.prices_sale)) {
-        if (p.enabled && p.price === price) return 'labeling';
-      }
-    }
-    return 'none';
+  /** Whether the lowest price includes marking: labeling prices always do, custom ones when flagged. */
+  function includesMarking({ price_min, custom_prices, custom_prices_sale, custom_prices_with_labeling, labelings }) {
+    const has = (prices) => prices.some((p) => p.enabled && p.price === price_min);
+    if (has([...custom_prices, ...custom_prices_sale])) return !!custom_prices_with_labeling;
+    return labelings.some((l) => has([...l.prices, ...l.prices_sale]));
+  }
+  $: withMarking = !!price_min && includesMarking(product);
+
+  $: [src, hoverSrc] = productImages(product);
+
+  // Images stack; a new one fades in over the old once it has loaded, then the old is dropped.
+  let layers = [];
+  let layerId = 0;
+  $: stack(src);
+  function stack(src) {
+    if (!src) layers = [];
+    else if (layers.at(-1)?.src !== src) layers = [...layers.slice(-2), { src, id: ++layerId, ready: !layers.length }];
+  }
+  function reveal(layer, node) {
+    if (layer.ready) return;
+    // Commit its zero opacity first, so even a cached picture fades in.
+    getComputedStyle(node).opacity;
+    layer.ready = true;
+    layers = layers;
+  }
+  function settle() {
+    const top = layers.at(-1);
+    if (top?.ready && layers.length > 1) layers = [top];
+  }
+  /** Settled (loaded or failed), even when it came from the cache before the listener was attached. */
+  function onLoad(node, done) {
+    const settled = () => done(node);
+    if (node.complete) return settled();
+    node.addEventListener('load', settled, { once: true });
+    node.addEventListener('error', settled, { once: true });
   }
 
-  function getImgs(gallery, storage) {
-    const imgs = [];
-    for (const { enabled, img } of gallery) {
-      if (enabled && img) imgs.push({ src: `${baseUrl}/assets/${img}?key=medium` });
-    }
-    for (const s of storage.filter((s) => s.enabled)) {
-      for (const { enabled, img } of s.img) {
-        if (enabled && img) imgs.push({ src: `${baseUrl}/assets/${img}?key=medium` });
-      }
-    }
-    return imgs;
-  }
-
-  $: imgs = getImgs(gallery, storage);
-  $: img = imgs[0];
+  // The second picture only loads on the first hover.
+  let hovered = false;
+  let hoverReady = false;
+  $: hoverSrc, (hoverReady = false);
 
   // Disabled variants are hidden even from admins.
   $: colors = storage
@@ -67,8 +76,11 @@
   $: extraColors = colors.length - shownColors.length;
   $: colorsHovers = colors.map(() => false);
 
-  $: priceType = getPriceType(price_min, custom_prices, custom_prices_sale, labelings);
-  $: pricesWithLabeling = priceType !== 'none' && (priceType === 'labeling' || custom_prices_with_labeling);
+  // The whole card is the link: a click on a swatch (which keeps the pointer for its tooltip) goes to it too.
+  let link;
+  function forwardToLink(e) {
+    if (!link.contains(e.target)) link.dispatchEvent(new MouseEvent('click', e));
+  }
 
   function handleHoverChange(hover, i) {
     colorsHovers[i] = hover;
@@ -76,24 +88,34 @@
 </script>
 
 <!-- Tooltips live outside the card: its transform breaks their positioning. -->
-{#if shownColors.length}
-  {#each shownColors as { multicolored, first, second, amount, available }, i}
-    {@const { label } = parseColor(multicolored, first, second)}
-    <ProductColorTooltip {label} {amount} {available} show={colorsHovers[i]} />
-  {/each}
-{/if}
+{#each shownColors as { multicolored, first, second, amount, available }, i}
+  {@const { label } = parseColor(multicolored, first, second)}
+  <ProductColorTooltip {label} {amount} {available} show={colorsHovers[i]} />
+{/each}
 
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <article
+  on:click={forwardToLink}
+  on:pointerenter={(e) => e.pointerType === 'mouse' && (hovered = true)}
   class="tile"
   class:is-out={out_of_stock}
   class:t-sale={sale}
   class:t-new={isNew}
   class:t-best={bestseller}
   class:t-soon={coming_soon}>
-  <a class="tile__link" href="/produkty/{slug}">
+  <a class="tile__link" href="/produkty/{slug}" bind:this={link}>
     <div class="tile__media">
-      {#if img}
-        <img src={img.src} alt={name} loading="lazy" decoding="async" />
+      {#each layers as layer (layer.id)}
+        {@const last = layer === layers.at(-1)}
+        <img
+          class="tile__img"
+          class:shown={layer.ready && (last || !layers.at(-1).ready)}
+          src={layer.src}
+          alt={last ? name : ''}
+          loading="lazy"
+          decoding="async"
+          use:onLoad={(node) => reveal(layer, node)}
+          on:transitionend={settle} />
       {:else}
         <div class="tile__none" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -101,6 +123,17 @@
             <path d="m3 16 5-5 4 4 3-3 6 6" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </div>
+      {/each}
+      {#if hoverSrc && hovered}
+        {#key hoverSrc}
+          <img
+            class="tile__img tile__img--hover"
+            class:ready={hoverReady}
+            src={hoverSrc}
+            alt=""
+            decoding="async"
+            use:onLoad={() => (hoverReady = true)} />
+        {/key}
       {/if}
 
       <Badges {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} />
@@ -131,18 +164,22 @@
     </div>
 
     <div class="tile__price">
-      {#if price_min}
-        <span class="from">od</span>
-        {#if price_min_sale}
-          <s class="was tnum">{price_min.toFixed(2)}</s>
-          <strong class="now now--sale tnum">{price_min_sale.toFixed(2)} zł</strong>
+      <p class="tile__amount">
+        {#if price_min}
+          <span class="from">od</span>
+          {#if price_min_sale}
+            <s class="was tnum">{price_min.toFixed(2)}</s>
+            <strong class="now now--sale tnum">{price_min_sale.toFixed(2)} zł</strong>
+          {:else}
+            <strong class="now tnum" class:now--long={price_min >= 100}>{price_min.toFixed(2)} zł</strong>
+          {/if}
+          <span class="per">/szt</span>
         {:else}
-          <strong class="now tnum">{price_min.toFixed(2)} zł</strong>
+          <span class="ask">Zapytaj o cenę</span>
         {/if}
-        <span class="unit">{pricesWithLabeling ? 'netto/szt ze znakowaniem' : 'netto/szt'}</span>
-      {:else}
-        <span class="ask">Zapytaj o cenę</span>
-      {/if}
+      </p>
+      <!-- Always rendered, so prices line up whether or not it's said. -->
+      <p class="tile__with">{#if withMarking}ze znakowaniem{/if}</p>
     </div>
   </div>
 </article>
@@ -209,15 +246,40 @@
     border-bottom: 1px solid var(--border);
     background-color: #fff;
     overflow: hidden;
+    /* Every picture shares one cell, so a new one fades in over the old without moving anything. */
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   }
-  .tile__media img {
+  .tile__img,
+  .tile__none {
+    grid-area: 1 / 1;
+  }
+  .tile__img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    opacity: 0;
+    transition: opacity calc(var(--dur) * 1.5) var(--ease);
   }
-  .is-out .tile__media img {
-    opacity: 0.5;
+  .tile__img.shown {
+    opacity: 1;
+  }
+  .tile__img--hover {
+    background-color: #fff;
+  }
+  .tile:hover .tile__img--hover.ready {
+    opacity: 1;
+  }
+  .is-out .tile__img {
     filter: grayscale(1);
+  }
+  .is-out .tile__img.shown {
+    opacity: 0.5;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile__img {
+      transition: none;
+    }
   }
   .tile__none {
     display: grid;
@@ -257,9 +319,11 @@
     padding: 0 var(--sp-3) var(--sp-3);
   }
 
+  /* Above the link's overlay for the swatch tooltips, but only the swatches take the pointer. */
   .tile__colors {
     position: relative;
     z-index: 1;
+    pointer-events: none;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
@@ -270,6 +334,7 @@
   /* One swatch tall and no wrap: overflow is cut by "+N". */
   .tile__colors > :global(*) {
     flex: none;
+    pointer-events: auto;
   }
   .tile__more {
     color: var(--ink-400);
@@ -277,34 +342,55 @@
   }
 
   .tile__price {
+    container-type: inline-size;
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--paper-3);
+  }
+  /* One height at every price size, set on the bottom, so the rows line up. */
+  .tile__amount {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.35em;
-    padding-top: var(--sp-2);
-    border-top: 1px solid var(--paper-3);
+    align-content: flex-end;
+    min-height: 2.25rem;
+    gap: 0.3em;
+  }
+  .tile__with {
+    min-height: 1lh;
+    color: var(--ink-500);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1.3;
   }
   .from {
     color: var(--ink-400);
     font-size: var(--fs-xs);
   }
   .now {
-    font-size: 1.0625rem;
+    font-size: 1.4375rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
   .now--sale {
     color: var(--red);
   }
+  /* On narrow cards the longer lines step down to stay on one line: three-digit prices, and sales with two. */
+  @container (width < 10rem) {
+    .now--long {
+      font-size: 1.3125rem;
+    }
+    .now--sale {
+      font-size: 1.0625rem;
+    }
+  }
   .was {
     color: var(--ink-400);
     font-size: var(--fs-sm);
   }
-  .unit {
-    flex: 1 1 100%;
-    color: var(--ink-400);
-    font-size: var(--fs-xs);
-    line-height: 1.3;
+  .per {
+    margin-left: -0.2em;
+    color: var(--ink-500);
+    font-size: var(--fs-sm);
   }
   .ask {
     color: var(--ink-600);

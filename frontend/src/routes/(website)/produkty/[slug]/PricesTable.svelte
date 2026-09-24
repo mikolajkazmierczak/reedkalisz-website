@@ -32,7 +32,7 @@
           <th scope="col">Ilość</th>
           <th scope="col">
             PLN / szt.
-            <small class:with={withLabeling}>{withLabeling ? 'ze znakowaniem' : 'netto'}</small>
+            {#if withLabeling}<small class="with">ze znakowaniem</small>{/if}
           </th>
         </tr>
       </thead>
@@ -68,7 +68,7 @@
           <tr>
             <th scope="row">
               PLN / szt.
-              <small class:with={withLabeling}>{withLabeling ? 'ze znakowaniem' : 'netto'}</small>
+              {#if withLabeling}<small class="with">ze znakowaniem</small>{/if}
             </th>
             {#each prices as { price }, i}
               {@const sale = !!pricesSale[i]?.price}
