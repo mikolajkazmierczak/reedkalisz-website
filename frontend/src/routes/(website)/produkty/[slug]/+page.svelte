@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { marked } from 'marked';
 
-  import { treeGetItem, treeGetItemsFromPath } from '%/utils';
+  import { treeGetItemsFromPath } from '%/utils';
   import { me } from '$/auth';
   import { baseUrl } from '$/api';
   import { parseAmount, NONE } from '$/storage';
@@ -14,7 +14,9 @@
   import Prices from './Prices.svelte';
   import IncludesLabeling from './IncludesLabeling.svelte';
   import QuestionForm from '#c/QuestionForm.svelte';
+  import Icon from '$c/Icon.svelte';
   import Recommended from './Recommended.svelte';
+  import { deepestCategory } from './product';
   import { plural } from '#/utils';
   import { describe, jsonLd, breadcrumbList } from '#/seo';
 
@@ -26,7 +28,6 @@
     slug,
     code,
     company,
-    enabled,
     new: isNew,
     bestseller,
     coming_soon,
@@ -91,7 +92,7 @@
       if (img?.img) imgs.push(img);
     }
     for (const s of storage) {
-      // Admins also get disabled variants; keep their photos out.
+      // disabled variants' photos stay out
       if (!s.enabled) continue;
       for (const img of s.img) {
         if (img.show_in_gallery && img.img) imgs.push(img);
@@ -117,18 +118,8 @@
     askEl.querySelector('.buy__ask-title')?.focus({ preventScroll: true });
   }
 
-  // Only enabled categories are in the tree.
-  function findDeepestCategory(categories) {
-    let deepest = null;
-    for (const c of categories) {
-      const category = treeGetItem(categoriesTree, c.category);
-      if (category && (!deepest || category._meta.depth > deepest._meta.depth)) deepest = category;
-    }
-    return deepest;
-  }
-
   function getBreadcrumbs(categories) {
-    const category = categories && findDeepestCategory(categories);
+    const category = deepestCategory(categories, categoriesTree);
     if (!category) return [];
     const pathCategories = treeGetItemsFromPath(categoriesTree, category._meta.path);
     return pathCategories.map(({ name, slug }) => ({ name, slug }));
@@ -137,6 +128,7 @@
 
 <svelte:head>
   <title>{metaTitle} | REED Kalisz</title>
+  {#if data.hidden}<meta name="robots" content="noindex" />{/if}
   {#if metaDescription}<meta name="description" content={metaDescription} />{/if}
   <meta property="og:title" content={metaTitle} />
   {#if ogImage}<meta property="og:image" content={ogImage} />{/if}
@@ -149,6 +141,13 @@
     )}
   {/if}
 </svelte:head>
+
+{#if data.hidden}
+  <p class="hidden-pill" role="status">
+    <Icon name="eye_off" light width="1.125rem" height="1.125rem" />
+    Ukryty produkt
+  </p>
+{/if}
 
 <div class="shell">
   <SideRail items={data.menus.side} />
@@ -207,7 +206,7 @@
                             <span class="pricing__meta">
                               {#if code}<span class="code">{code}</span>{/if}
                               {#if type}<span class="pricing__type">{type}</span>{/if}
-                              {#if $me && company?.name}<span class="pricing__company">({company.name})</span>{/if}
+                              {#if $me && company?.name}<span class="company">({company.name})</span>{/if}
                             </span>
                           </h3>
                           <IncludesLabeling />
@@ -231,12 +230,12 @@
             <div class="buy">
               <div class="buy__summary">
                 <Badges inline {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} />
-                {#if !enabled}
-                  <p class="admin-note">Produkt ukryty — widoczny tylko dla zalogowanych.</p>
-                {/if}
 
                 <h1 class="buy__title">{name}</h1>
-                <p class="code buy__code">{code}</p>
+                <p class="code buy__code">
+                  {code}
+                  {#if $me && company?.name}<span class="company">({company.name})</span>{/if}
+                </p>
 
                 {#if priceFrom}
                   <p class="buy__price">
@@ -324,6 +323,29 @@
 </div>
 
 <style>
+  /* Only an admin reaches a hidden product (to check it before publishing): say so, over everything. */
+  .hidden-pill {
+    position: fixed;
+    z-index: 100;
+    top: var(--sp-3);
+    left: 50%;
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    width: max-content;
+    max-width: calc(100% - 2rem);
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--r-pill);
+    corner-shape: squircle;
+    background-color: var(--red);
+    color: #fff;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    box-shadow: 0 0.25rem 1rem rgba(17, 17, 16, 0.25);
+    pointer-events: none;
+  }
+
   /* Reserved so the title doesn't shift. */
   .crumbs {
     display: flex;
@@ -522,14 +544,6 @@
     font-weight: 600;
   }
 
-  .admin-note {
-    padding: var(--sp-2) var(--sp-3);
-    background-color: var(--red-tint);
-    color: var(--red-deep);
-    font-size: var(--fs-xs);
-    font-weight: 700;
-  }
-
   /* --- detail ------------------------------------------------------------- */
 
   .detail {
@@ -589,9 +603,12 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
-  .pricing__company {
+  /* The supplier, for admins only; the same beside the pricing and the product code. */
+  .company {
     color: var(--red);
+    font-family: var(--font);
     font-weight: 700;
+    letter-spacing: 0;
   }
 
   @media (min-width: 56.25rem) {

@@ -152,6 +152,8 @@
           <img
             class="hero__machine"
             src="/imgs/machine-playful.webp"
+            srcset="/imgs/machine-playful-768.webp 768w, /imgs/machine-playful-1024.webp 1024w, /imgs/machine-playful.webp 1536w"
+            sizes="30rem"
             alt=""
             width="1536"
             height="1024"
@@ -460,8 +462,8 @@
 
   /* --- reach band --- */
 
+  /* No top rule: the hero or the sections above already end in one. */
   .reach {
-    border-top: var(--rule);
     border-bottom: var(--rule);
     background-color: var(--navy);
     color: #fff;

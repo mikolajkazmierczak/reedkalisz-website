@@ -1,7 +1,20 @@
+<script context="module">
+  const retried = new Set();
+</script>
+
 <script>
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
+  import { me } from '$/auth';
 
   $: notFound = $page.error?.message === '404' || $page.status === 404;
+
+  // A hidden product 404s on the server; for an admin, retry in the browser, with their token (produkty/[slug]).
+  $: path = $page.url.pathname;
+  $: if (notFound && $me && path.startsWith('/produkty/') && !retried.has(path)) {
+    retried.add(path);
+    goto($page.url.href, { replaceState: true, invalidateAll: true });
+  }
 </script>
 
 <svelte:head>

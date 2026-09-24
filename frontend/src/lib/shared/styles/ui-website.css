@@ -93,6 +93,11 @@
   --rail: 16.5rem;
   /* the desktop rail's navy contact block; category toolbars line up with its foot */
   --rail-head: 13.1875rem;
+  /* page titles stand on the logo */
+  --logo-h: 4.4375rem;
+  --logo-foot: calc(var(--sp-5) + var(--logo-h));
+  --baseline-shift: 0.33;
+  --title-top: calc(var(--logo-foot) - (1.08 / 2 + var(--baseline-shift)) * var(--fs-h1));
   --topbar-h: 3.25rem;
   /* only visible on overscroll */
   --surround: #fdfdfc;

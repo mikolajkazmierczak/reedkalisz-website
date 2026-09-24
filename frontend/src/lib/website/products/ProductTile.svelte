@@ -57,10 +57,11 @@
     node.addEventListener('error', settled, { once: true });
   }
 
-  // The second picture only loads on the first hover.
+  // Made on the card's first hover: the second picture, and the swatches' tooltips (a page holds hundreds).
+  let touched = false;
   let hovered = false;
   let hoverReady = false;
-  $: hoverSrc, (hoverReady = false);
+  $: (hoverSrc, (hoverReady = false));
 
   // Disabled variants are hidden even from admins.
   $: colors = storage
@@ -88,15 +89,20 @@
 </script>
 
 <!-- Tooltips live outside the card: its transform breaks their positioning. -->
-{#each shownColors as { multicolored, first, second, amount, available }, i}
-  {@const { label } = parseColor(multicolored, first, second)}
-  <ProductColorTooltip {label} {amount} {available} show={colorsHovers[i]} />
-{/each}
+{#if touched}
+  {#each shownColors as { multicolored, first, second, amount, available }, i}
+    {@const { label } = parseColor(multicolored, first, second)}
+    <ProductColorTooltip {label} {amount} {available} show={colorsHovers[i]} />
+  {/each}
+{/if}
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <article
   on:click={forwardToLink}
-  on:pointerenter={(e) => e.pointerType === 'mouse' && (hovered = true)}
+  on:pointerenter={(e) => {
+    touched = true;
+    if (e.pointerType === 'mouse') hovered = true;
+  }}
   class="tile"
   class:is-out={out_of_stock}
   class:t-sale={sale}
@@ -169,9 +175,13 @@
           <span class="from">od</span>
           {#if price_min_sale}
             <s class="was tnum">{price_min.toFixed(2)}</s>
-            <strong class="now now--sale tnum">{price_min_sale.toFixed(2)} zł</strong>
+            <strong
+              class="now now--sale tnum"
+              class:now--10={price_min_sale >= 10}
+              class:now--100={price_min_sale >= 100}>{price_min_sale.toFixed(2)} zł</strong>
           {:else}
-            <strong class="now tnum" class:now--long={price_min >= 100}>{price_min.toFixed(2)} zł</strong>
+            <strong class="now tnum" class:now--10={price_min >= 10} class:now--100={price_min >= 100}
+              >{price_min.toFixed(2)} zł</strong>
           {/if}
           <span class="per">/szt</span>
         {:else}
@@ -179,7 +189,9 @@
         {/if}
       </p>
       <!-- Always rendered, so prices line up whether or not it's said. -->
-      <p class="tile__with">{#if withMarking}ze znakowaniem{/if}</p>
+      <p class="tile__with">
+        {#if withMarking}ze znakowaniem{/if}
+      </p>
     </div>
   </div>
 </article>
@@ -362,9 +374,13 @@
     font-weight: 700;
     line-height: 1.3;
   }
-  .from {
+  .from,
+  .per {
     color: var(--ink-400);
     font-size: var(--fs-xs);
+  }
+  .per {
+    margin-left: -0.2em;
   }
   .now {
     font-size: 1.4375rem;
@@ -374,24 +390,35 @@
   .now--sale {
     color: var(--red);
   }
-  /* On narrow cards the longer lines step down to stay on one line: three-digit prices, and sales with two. */
+  /* Narrow cards step the longer prices down, so the line never wraps: three-digit ones, and sales with two. */
   @container (width < 10rem) {
-    .now--long {
+    .now--100 {
       font-size: 1.3125rem;
     }
     .now--sale {
       font-size: 1.0625rem;
     }
   }
+  /* Smallest phones drop the old price. */
+  @container (width < 8rem) {
+    .now {
+      font-size: 1.25rem;
+    }
+    .now--10 {
+      font-size: 1.125rem;
+    }
+    .now--100 {
+      font-size: 1rem;
+    }
+    .was {
+      display: none;
+    }
+  }
   .was {
     color: var(--ink-400);
     font-size: var(--fs-sm);
   }
-  .per {
-    margin-left: -0.2em;
-    color: var(--ink-500);
-    font-size: var(--fs-sm);
-  }
+
   .ask {
     color: var(--ink-600);
     font-size: var(--fs-sm);

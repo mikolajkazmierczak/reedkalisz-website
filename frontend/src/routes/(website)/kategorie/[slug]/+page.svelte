@@ -163,21 +163,15 @@
     flex-direction: column;
     margin-bottom: var(--sp-8);
   }
-  @media (min-width: 61.25rem) {
-    .intro {
-      min-height: calc(var(--rail-head) - var(--sp-5));
-    }
+  .content {
+    padding-top: var(--sp-5);
+    padding-bottom: var(--sp-16);
   }
 
   /* The trail's space is kept on every category, so the title never moves. */
   .crumbs-slot {
     min-height: 1.75rem;
     margin-bottom: var(--sp-3);
-  }
-
-  .content {
-    padding-top: var(--sp-5);
-    padding-bottom: var(--sp-16);
   }
 
   .crumbs {
@@ -195,6 +189,24 @@
   }
   .crumbs a.last {
     color: var(--ink);
+  }
+  /* Beside the rail: the trail's capitals start level with the logo's top, the title stands on its foot. */
+  @media (min-width: 61.25rem) {
+    .intro {
+      min-height: calc(var(--rail-head) - var(--sp-5));
+    }
+    .crumbs-slot {
+      min-height: calc(var(--title-top) - var(--sp-5));
+      margin-bottom: 0;
+    }
+    .crumbs {
+      align-items: flex-start;
+      min-height: 0;
+    }
+    /* trimmed to the capitals, whatever monospace the system has */
+    .crumbs > * {
+      text-box: trim-both cap alphabetic;
+    }
   }
 
   .head__title {

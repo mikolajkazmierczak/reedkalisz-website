@@ -28,9 +28,11 @@
       href="/kontakt"
       aria-current={onContact ? 'page' : undefined}>
       Kontakt
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-        <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
+      {#if !onContact}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      {/if}
     </a>
     <slot name="aside" />
   </div>
@@ -74,7 +76,7 @@
 <style>
   .brand img {
     width: auto;
-    height: 4.4375rem;
+    height: var(--logo-h);
   }
 
   .search input {
@@ -173,6 +175,7 @@
   .kontakt:hover svg {
     transform: translateX(3px);
   }
+  /* On /kontakt: white, the current page rather than an action. */
   .kontakt.on {
     background-color: #fff;
     color: var(--navy);

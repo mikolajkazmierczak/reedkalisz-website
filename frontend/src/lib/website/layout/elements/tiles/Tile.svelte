@@ -418,20 +418,20 @@
   .line {
     display: block;
   }
-  /* Over a photo each line sits on its own blur (in the editor, the whole field). */
+  /* Over a photo each line sits on its own squircle of blur, touching the next (in the editor, the whole field). */
   .photo .title,
   .photo .subtitle {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.125rem;
   }
   /* negative margin: the blur reaches past the text instead of indenting it */
   .photo .line,
   .photo .editing :global([contenteditable]) {
-    margin-inline: -0.375rem;
-    padding: 0.0625rem 0.375rem;
-    border-radius: 0.25rem;
+    margin-inline: -0.625rem;
+    padding: 0.0625rem 0.625rem;
+    border-radius: var(--r-pill);
+    corner-shape: squircle;
     -webkit-backdrop-filter: blur(0.75rem);
     backdrop-filter: blur(0.75rem);
   }

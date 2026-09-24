@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/stores';
   import CategorySlider from '#c/CategorySlider.svelte';
 
   import { editing } from '#/layout/store';
@@ -23,10 +24,10 @@
 {#if $editing}
   <div class="editing">
     <Button icon="edit" onclick={toggleInputsOpen} float="top left" />
-    <CategorySlider limit={4} slug={element.slug} />
+    <CategorySlider limit={4} slug={element.slug} preloaded={$page.data.sliders?.[element.slug]} />
   </div>
 {:else}
-  <CategorySlider limit={4} slug={element.slug} />
+  <CategorySlider limit={4} slug={element.slug} preloaded={$page.data.sliders?.[element.slug]} />
 {/if}
 
 <style>

@@ -3,7 +3,7 @@
 
   import CategorySlider from '#c/CategorySlider.svelte';
 
-  $: ({ product } = $pageStore.data);
+  $: ({ product, similar } = $pageStore.data);
 
   export let categorySlug;
 </script>
@@ -11,7 +11,7 @@
 {#if product}
   <div class="recommended">
     <h2>Podobne produkty</h2>
-    <CategorySlider slug={categorySlug} filterIds={[product.id]} />
+    <CategorySlider slug={categorySlug} filterIds={[product.id]} preloaded={similar} />
   </div>
 {/if}
 
@@ -21,9 +21,10 @@
     flex-direction: column;
     gap: var(--sp-4);
   }
+  /* Same head as the page's other sections. */
   h2 {
-    padding-bottom: var(--sp-3);
-    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--sp-2);
+    border-bottom: var(--rule);
     font-size: var(--fs-h2);
   }
 </style>

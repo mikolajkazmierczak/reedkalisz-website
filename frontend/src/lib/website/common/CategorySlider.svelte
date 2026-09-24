@@ -13,10 +13,11 @@
   /** Page size until the grid is measured. */
   export let limit = 4;
   export let filterIds = [];
+  /** The first page, loaded on the server (see preloadSlider), so it's in the server render. */
+  export let preloaded = null;
 
-  $: ({ categoriesTree, categoriesItems, sliders } = $pageStore.data);
+  $: ({ categoriesTree, categoriesItems } = $pageStore.data);
   $: filter = slug ? sliderFilter(slug, categoriesItems, categoriesTree, filterIds) : null;
-  $: preloaded = sliders?.[slug] ?? null;
 
   let page = 1;
   /** Measured grid columns, so each page is exactly one row. */
@@ -32,15 +33,25 @@
   // Pages by filter, size and number. The current one stays up until the next is in, and the page after is
   // always fetched ahead (pictures too), so paging is instant.
   const pages = new Map();
+  /** Totals by filter: a count doesn't change from page to page, so it's asked for once. */
+  const counts = new Map();
   function load(size, page) {
     const key = JSON.stringify([filter, size, page]);
     if (!pages.has(key)) {
+      const filterKey = JSON.stringify(filter);
       const covers = preloaded && (preloaded.products.length >= size || preloaded.products.length >= preloaded.count);
       const request =
         page === 1 && covers
           ? Promise.resolve(preloaded)
-          : fetchSlider(api, filter, size, page).then((result) => (preloadImages(result.products), result));
-      pages.set(key, request.catch((err) => (pages.delete(key), Promise.reject(err))));
+          : fetchSlider(api, filter, size, page, counts.get(filterKey) ?? preloaded?.count).then((result) => {
+              counts.set(filterKey, result.count);
+              preloadImages(result.products);
+              return result;
+            });
+      pages.set(
+        key,
+        request.catch((err) => (pages.delete(key), Promise.reject(err))),
+      );
     }
     return pages.get(key);
   }

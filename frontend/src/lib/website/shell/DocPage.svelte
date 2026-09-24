@@ -31,6 +31,11 @@
     max-width: 72ch;
     padding: var(--sp-10) 0 var(--sp-16);
   }
+  @media (min-width: 61.25rem) {
+    .doc {
+      padding-top: var(--title-top);
+    }
+  }
   .doc :global(h1) {
     margin-bottom: var(--sp-6);
     color: var(--text);
