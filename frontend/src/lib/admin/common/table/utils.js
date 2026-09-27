@@ -2,20 +2,42 @@ import api from '$/api';
 import heimdall from '$/heimdall';
 import { treeGetItem } from '%/utils';
 
-export const smallestCellWidth = 2.25;
+const smallestCellWidth = 2.25;
 export const hierarchyCellWidth = smallestCellWidth * 0.8;
+const checkboxCellWidth = 1.4; // the flag columns: narrow, there are many of them
+// the "add a subcategory" column: its grey cell, over the row's padding and the gap after it (see TableRow), is a
+// little wider than the row is tall (a small button, 1.5rem, and the row's padding above and below), the button in
+// its middle
+export const addCellWidth = 'calc(1.5rem + 2 * var(--row-pad) + 0.6rem - var(--cell-pad) - var(--col-gap))';
+
+// a row of the table is being dragged (it carries its path, see TableRow), not a file or a text from elsewhere: only
+// the row's dragend closes a drop zone, nothing would close one opened for those
+export const draggingRow = (e) => e.dataTransfer?.types.includes('path');
+
+// a whole list (a global's, not searched) sorted here by Table's `sort`: as text, numbers as numbers; `value` reads a
+// field that isn't the item's own (a producer's name)
+export function sorted(list, sort, value = (item, field) => item[field]) {
+  if (!sort) return list;
+  const field = sort.replace(/^-/, '');
+  const way = sort.startsWith('-') ? -1 : 1;
+  const text = (item) => String(value(item, field) ?? '');
+  return [...list].sort((a, b) => way * text(a).localeCompare(text(b), 'pl', { numeric: true }));
+}
 
 export function getColumnWidths(head, tree, order, maxDepth) {
+  // the columns in the order of TableRow: "add a subcategory" (a tree), the hierarchy (a tree or an order), the head's
   let widths = [];
-  if (order) widths.push(smallestCellWidth + 'rem');
-  if (tree) widths.push(hierarchyCellWidth * (maxDepth + 1) + 'rem');
+  if (tree) widths.push(addCellWidth);
+  if (tree || order) widths.push(hierarchyCellWidth * (maxDepth + 1) + 'rem');
   widths.push(
     ...head.map((h) => {
-      if (h.width) widths.push(h.width);
-      if (h.checkbox) return smallestCellWidth + 'rem';
-      if (h.id || h.thin) return '4rem';
-      if (h.blame) return 'minmax(20ch, 1fr)';
-      return 'minmax(15ch, 1fr)';
+      if (h.width) return h.width;
+      if (h.checkbox) return checkboxCellWidth + 'rem';
+      // a Blame pill (an avatar, a name, a date), cut when short: it gives way to the text (a name, a title), both
+      // when the table is narrow (a smaller minimum) and wide (half the share). Shares, not a cap like 16.5rem: a
+      // column with a set maximum grows to it before the shares get anything
+      if (h.blame) return 'minmax(7rem, 1fr)';
+      return 'minmax(10rem, 2fr)';
     }),
   );
   return widths.join(' ');

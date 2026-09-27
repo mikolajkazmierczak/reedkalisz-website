@@ -46,12 +46,12 @@ function sortByAmount(prices) {
   prices.sort((a, b) => a.amount - b.amount);
 }
 function reusePrices(prices, reusablePrices) {
-  // Reuse prices from `reusablePrices` array.
+  // Reuse prices from `reusablePrices` array, only where there's none (a price typed in the editor stays).
   // Uses THE FIRST ENCOUNTERED PRICE in `reusablePrices` for each amount.
   for (let price of prices) {
     const amount = price.amount;
     const reusablePrice = reusablePrices.find((p) => p.amount == amount);
-    if (reusablePrice) price.price = reusablePrice.price;
+    if (reusablePrice && price.price == null) price.price = reusablePrice.price;
   }
 }
 function reuse(prices, reusable) {
@@ -94,7 +94,6 @@ export function cleanupPrices(amounts, prices1, prices2, pricesReusable = null) 
 }
 
 export function getMinMaxPrices(product) {
-  // returns { min: number/null, max: number/null, min_sale: number/null, max_sale: number/null }
   const prices = {
     min: null,
     max: null,
@@ -113,17 +112,15 @@ export function getMinMaxPrices(product) {
     }
   };
 
-  const pricePerAmounts = [product.custom_prices, ...product.labelings.map(({ prices }) => prices)].flat();
-  // console.log('pricePerAmounts', pricePerAmounts);
-  setMinMax(pricePerAmounts);
+  const labelings = product.labelings.filter((l) => l.enabled); // a disabled one's prices aren't shown anywhere
+  setMinMax([product.custom_prices, ...labelings.map(({ prices }) => prices)].flat());
 
   if (product.sale) {
-    const salePricePerAmounts = [
-      product.custom_prices_sale,
-      ...product.labelings.map(({ prices_sale }) => prices_sale),
-    ].flat();
-    // console.log('salePricePerAmounts', salePricePerAmounts);
-    setMinMax(salePricePerAmounts, 'minSale', 'maxSale');
+    setMinMax(
+      [product.custom_prices_sale, ...labelings.map(({ prices_sale }) => prices_sale)].flat(),
+      'minSale',
+      'maxSale',
+    );
   }
 
   return prices;

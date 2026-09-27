@@ -5,6 +5,7 @@ import { get } from 'svelte/store';
 import api from '$/api';
 import heimdall from '$/heimdall';
 import { unsaved } from '@/stores';
+import { ask } from '@/dialog';
 import { deep, deleteFields } from '%/utils';
 import fields from '%/fields';
 
@@ -17,7 +18,8 @@ function getNewPathname(root, oldKey, newKey) {
   // newPathname: root/newKey/...
   checkRoot(root);
   const pathname = get(page).url.pathname;
-  return pathname.replace(new RegExp(`^${root}/${oldKey}`), `${root}/${newKey}`);
+  const prefix = `${root}/${oldKey}`; // (not a RegExp: a new item's key is '+')
+  return pathname.startsWith(prefix) ? `${root}/${newKey}${pathname.slice(prefix.length)}` : pathname;
 }
 
 function gotoRoot(root) {
@@ -25,17 +27,15 @@ function gotoRoot(root) {
   goto(root, { replaceState: true, noScroll: true });
 }
 
-async function save(collection, item, itemOriginal, { root, fieldsToIgnore = [] } = {}) {
+async function save(collection, item, itemOriginal, { root } = {}) {
   const isNew = item.id == '+';
-  const oldKey = itemOriginal?.slug ?? itemOriginal.id;
-  const newKey = item?.slug ?? item.id;
+  const oldKey = isNew ? '+' : (itemOriginal.slug ?? itemOriginal.id); // (the url of a new item has '+')
 
   // clone data
   const itemData = deep.copy(item);
 
   // cleanup
-  fieldsToIgnore.push(...['user_created', 'date_created', 'user_updated', 'date_updated']);
-  await deleteFields(itemData, fieldsToIgnore);
+  await deleteFields(itemData, ['user_created', 'date_created', 'user_updated', 'date_updated']);
 
   // save
   if (isNew) {
@@ -48,6 +48,7 @@ async function save(collection, item, itemOriginal, { root, fieldsToIgnore = [] 
   // read item again beacuse nested fields may have been added (with their ids)
   if (!fields[collection].edit) throw new Error(`No fields matching the provided collection "${collection}"`);
   item = await api.items(collection).readOne(item.id, { fields: fields[collection].edit });
+  const newKey = item.slug ?? item.id; // (a new item's id is known only now)
 
   // replace original
   itemOriginal = deep.copy(item);
@@ -63,8 +64,8 @@ async function save(collection, item, itemOriginal, { root, fieldsToIgnore = [] 
   return [item, itemOriginal];
 }
 
-async function cancel(item, itemOriginal, { root, prompt = null } = {}) {
-  if (confirm(prompt ?? 'Na pewno chcesz cofnąć zmiany?')) {
+async function cancel(item, itemOriginal, { root } = {}) {
+  if (await ask('Cofnąć wszystkie niezapisane zmiany?', { ok: 'Cofnij zmiany', danger: true })) {
     if (item.id == '+') {
       unsaved.set(false);
       gotoRoot(root);
@@ -75,8 +76,12 @@ async function cancel(item, itemOriginal, { root, prompt = null } = {}) {
   return [item, itemOriginal];
 }
 
-async function remove(collection, id, { root, prompt = null, parent = null, index = null, menu = null } = {}) {
-  if (confirm(prompt ?? 'Na pewno chcesz usunąć ten element?')) {
+// `prompt: false`: the caller has already asked
+async function remove(collection, id, { root, prompt = null, parent = null, index = null } = {}) {
+  if (
+    prompt === false ||
+    (await ask(prompt ?? 'Usunąć ten element? Tego nie można cofnąć.', { ok: 'Usuń', danger: true }))
+  ) {
     if (id != '+') {
       const ids = [id];
       await api.items(collection).deleteOne(id);
@@ -86,7 +91,7 @@ async function remove(collection, id, { root, prompt = null, parent = null, inde
         const filters = [{ parent: parent ? { _eq: parent } : { _null: true } }];
         const options = {
           fields: ['id', 'index'],
-          filter: { _and: menu ? [...filters, { menu: { _eq: menu } }] : filters },
+          filter: { _and: filters },
         };
         const itemsToUpdate = (await api.items(collection).readByQuery(options)).data;
         for (const { id, index: i } of itemsToUpdate) {

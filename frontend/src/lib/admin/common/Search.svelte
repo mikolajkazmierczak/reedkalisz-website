@@ -19,45 +19,46 @@
   $: if (!value && query) set(null);
 
   const clear = () => (value = null);
-  const search = () => !!value && set(value.trim());
+  const search = () => !!value && set(String(value).trim()); // a number when it comes from ?q=123
 </script>
 
 <svelte:window
   on:keydown={(e) => {
-    // check if ctrl+f is pressed
+    // Enter in the field searches
+    if (e.key === 'Enter' && e.target === input) search();
+    // Ctrl+Q: into the field, its text selected
     if (e.ctrlKey && e.key == 'q') {
       e.preventDefault();
       e.stopPropagation();
-      // focus on input
       input.focus();
-      // select all text
       input.select();
     }
   }} />
 
+<!-- the field and its button one piece, as round as the buttons -->
 <div class="wrapper">
   {#if !!query}
-    <button class="clear" on:click={clear} transition:fly={{ x: 25, duration: 200 }}>
-      <div class="icon"><Icon fill name="arrow_clockwise" color="var(--primary)" /></div>
+    <button class="clear" aria-label="Wyczyść" on:click={clear} transition:fly={{ x: 25, duration: 200 }}>
+      <div class="icon"><Icon fill name="arrow_clockwise" color="var(--navy-700)" /></div>
     </button>
   {/if}
 
-  <div
-    class="search"
-    on:keypress={(e) => {
-      if (e.key === 'Enter') search();
-    }}>
+  <div class="search" role="search">
     <div class="input-wrapper">
       <Input
         bind:value
         bind:input
         placeholder="Szukaj..."
-        borderRadius="var(--border-radius) 0 0 var(--border-radius)" />
+        borderRadius="var(--button-radius) 0 0 var(--button-radius)" />
       {#if !value}
         <div class="shortcut-info" in:fly={{ x: 50, duration: 500 }}>Ctrl+Q</div>
       {/if}
     </div>
-    <Button icon="search" on:click={search} borderRadius="0 var(--border-radius) var(--border-radius) 0" />
+    <Button
+      icon="search"
+      title="Szukaj"
+      on:click={search}
+      borderRadius="0 var(--button-radius) var(--button-radius) 0" />
   </div>
 </div>
 
@@ -70,16 +71,17 @@
   }
   .clear {
     cursor: pointer;
-    height: 25px;
-    width: 25px;
+    height: 1.5625rem;
+    width: 1.5625rem;
     padding: 0.25rem;
     border-radius: var(--border-radius);
-    border: solid 1px var(--accent);
+    corner-shape: squircle;
+    border: solid 1px var(--edge);
     background-color: transparent;
     transition: background-color 0.1s ease;
   }
   .clear:hover {
-    background-color: var(--accent-light);
+    background-color: var(--blue-100);
   }
 
   .search {
@@ -90,16 +92,21 @@
   .input-wrapper {
     position: relative;
   }
+  /* it runs into its button: no edge between them */
+  .input-wrapper :global(input) {
+    border-right: none;
+  }
   .shortcut-info {
     position: absolute;
     top: 50%;
     right: 0.4rem;
     transform: translateY(-50%);
     border-radius: var(--border-radius);
+    corner-shape: squircle;
     padding: 0.2rem 0.4rem;
     font-size: 0.75rem;
-    color: #000;
+    color: var(--text);
     opacity: 0.5;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--black-10);
   }
 </style>

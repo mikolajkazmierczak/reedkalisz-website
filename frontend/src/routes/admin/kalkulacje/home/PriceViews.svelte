@@ -25,9 +25,11 @@
 </div>
 
 <style>
+  /* as many columns as fit, none narrower than a name and a few amounts */
   .items {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    align-items: start;
     gap: 0.5rem;
   }
   .add {

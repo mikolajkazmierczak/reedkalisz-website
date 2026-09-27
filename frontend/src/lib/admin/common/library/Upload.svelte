@@ -1,97 +1,43 @@
 <script>
-  import heimdall from '$/heimdall';
   import { createEventDispatcher } from 'svelte';
   import api from '$/api';
-  import Icon from '$c/Icon.svelte';
+  import heimdall from '$/heimdall';
+  import Button from '@c/Button.svelte';
 
+  // Adds files (or replaces the `update` one): picked with the button, dropped on it, or given to `upload(files)`.
   const dispatch = createEventDispatcher();
 
-  export let update = null; // id of file to update
-
-  let uploading = true;
-  let highlighted = false;
+  export let update = null; // id of the file to replace
+  export let company = null; // the added files' company: the list's Producent, or they wouldn't show up in it
 
   let input;
+  let uploading = false;
 
-  async function handleInput() {
-    uploading = false;
-    const files = input.files;
-    if (files.length) {
+  export async function upload(files) {
+    if (!files?.length || uploading) return;
+    uploading = true;
+    try {
       const form = new FormData();
-      for (const file of files) {
+      for (const file of update ? [files[0]] : files) {
+        // before each file: Directus forgets the fields after every one
+        if (company && !update) form.append('company', company);
         form.append('file', file);
       }
-      if (update) {
-        const fileData = await api.files.updateOne(update, form);
-        heimdall.emit('directus_files', fileData.id);
-      } else {
-        const filesData = (await api.files.createMany(form)).data;
-        const filesArray = Array.isArray(filesData) ? filesData : [filesData];
-        const filesIds = filesArray.map((f) => f.id);
-        heimdall.emit('directus_files', filesIds);
-      }
+      let ids = update;
+      if (update) await api.files.updateOne(update, form);
+      else ids = [(await api.files.createMany(form)).data].flat().map((f) => f.id); // one file comes back alone
+      heimdall.emit('directus_files', ids);
       dispatch('upload');
+    } finally {
+      uploading = false;
+      if (input) input.value = ''; // the same file can be picked again (unless it's gone, closed mid-upload)
     }
-    uploading = true;
-    highlighted = false;
   }
 </script>
 
-<div class="wrapper" class:highlighted>
-  <div class="text">
-    {#if uploading}
-      <Icon height="3rem" name="upload" dark />
-      <span>Przeciągnij<br />lub <span style:text-decoration="underline">Wybierz</span></span>
-    {:else}
-      <span>Przetwarzanie...</span>
-    {/if}
-  </div>
-
-  <input
-    disabled={!uploading}
-    multiple={!update}
-    type="file"
-    on:input={handleInput}
-    on:dragenter={() => (highlighted = true)}
-    on:dragleave={() => (highlighted = false)}
-    bind:this={input} />
+<div role="presentation" on:dragover|preventDefault on:drop|preventDefault={(e) => upload(e.dataTransfer.files)}>
+  <Button dashed icon={update ? 'upload' : 'add'} disabled={uploading} on:click={() => input.click()}>
+    {#if uploading}Przesyłanie...{:else if update}Przeciągnij lub podmień{:else}Przeciągnij lub dodaj{/if}
+  </Button>
+  <input type="file" hidden multiple={!update} bind:this={input} on:change={() => upload(input.files)} />
 </div>
-
-<style>
-  .wrapper {
-    position: relative;
-    border-radius: 0.5rem;
-    border: dashed 2px var(--primary-dark);
-    width: 100%;
-    height: 125px;
-  }
-  .wrapper.highlighted {
-    background-color: var(--accent-light);
-  }
-
-  .text {
-    pointer-events: none;
-
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-
-    padding: 0.5rem;
-    width: 100%;
-    height: 100%;
-
-    font-size: 1.5rem;
-  }
-
-  input {
-    cursor: pointer;
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-  }
-</style>

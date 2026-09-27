@@ -7,10 +7,10 @@ export function round(num) {
   return Math.round((num + Number.EPSILON) * 100) / 100;
 }
 
-function findColor(color) {
+export function findColor(color) {
   return typeof color == 'string'
-    ? get(colors).find((c) => slugify(c.name) == slugify(color))
-    : get(colors).find((c) => c.id == color);
+    ? get(colors)?.find((c) => slugify(c.name) == slugify(color))
+    : get(colors)?.find((c) => c.id == color);
 }
 export function findColorId(str) {
   if (!str) return null;

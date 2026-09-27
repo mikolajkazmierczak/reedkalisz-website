@@ -1,17 +1,17 @@
 import api from '$/api';
 import { makeTree } from '%/utils';
 import { enabledFilter, countProducts } from '#/products/fields';
+import { categoryFilter } from '#/sections';
 import { preloadSlider } from '#/products/slider';
 import { cached, SERVER_MAX_AGE } from '$lib/server/cache';
 
 /** Item counts per top-level section, in the rail's order: one distinct count each, cheap enough to run live. */
 async function catalogueSummary(tree) {
-  const ids = (node) => [node.id, ...node.children.flatMap(ids)];
   // Three levels: section, subcategories, leaves.
   const branch = ({ id, name, slug, children }) => ({ id, name, slug, children: children.map(branch) });
   const [total, ...counts] = await Promise.all([
     countProducts(api, enabledFilter),
-    ...tree.map((node) => countProducts(api, { ...enabledFilter, categories: { category: { _in: ids(node) } } })),
+    ...tree.map((node) => countProducts(api, categoryFilter(node, tree))),
   ]);
   const sections = tree
     .map((node, i) => ({ ...branch(node), href: `/kategorie/${node.slug}`, count: counts[i] }))

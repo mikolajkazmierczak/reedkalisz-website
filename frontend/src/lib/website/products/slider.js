@@ -1,15 +1,14 @@
-import { treeGetAllChildrenIDs } from '%/utils';
-import { fields, enabledFilter, countProducts } from './fields';
+import { fields, countProducts } from './fields';
+import { categoryFilter } from '#/sections';
 
 /** Cards fetched for a slider's first page ahead of time: enough for one row at the widest layout. */
 export const SLIDER_PRELOAD = 8;
 
-/** Enabled products in a category and everything under it; null when the category is gone or disabled. */
+/** Enabled products in a category (or a section) and everything under it; null when it's gone or disabled. */
 export function sliderFilter(slug, categoriesItems, categoriesTree, filterIds = []) {
-  const category = categoriesItems?.find((c) => c.slug === slug && c.enabled)?.id;
+  const category = categoriesItems?.find((c) => c.slug === slug && c.enabled);
   if (!category) return null;
-  const ids = [category, ...treeGetAllChildrenIDs(categoriesTree, category)];
-  const filter = { ...enabledFilter, categories: { category: { _in: ids } } };
+  const filter = categoryFilter(category, categoriesTree);
   return filterIds.length ? { ...filter, id: { _nin: filterIds } } : filter;
 }
 

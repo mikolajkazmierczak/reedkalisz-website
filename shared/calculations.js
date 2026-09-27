@@ -214,11 +214,11 @@ export function recalculateLabelings(amounts, global, labelings, companies, prod
 async function recalculateProduct(api, amounts, global, labelings, companies, product, { swapLabelings = null } = {}) {
   if (swapLabelings) {
     for (const [oldID, newID] of swapLabelings) {
-      const i = product.labelings.findIndex((l) => l.labeling === oldID);
+      // all of them: a product can have the same labeling more than once (in other places)
       if (newID === null) {
-        product.labelings.splice(i, 1);
+        product.labelings = product.labelings.filter((l) => l.labeling !== oldID);
       } else {
-        product.labelings[i].labeling = newID;
+        for (const l of product.labelings) if (l.labeling === oldID) l.labeling = newID;
       }
     }
   }

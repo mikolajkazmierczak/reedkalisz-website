@@ -44,7 +44,7 @@
 </script>
 
 <div class="c-target" class:missing title={missing ? 'Wybierz istniejące znakowanie' : null}>
-  <Input type="select" bind:value={selected} {options} />
+  <Input size="small" type="select" label="Znakowanie u nas" bind:value={selected} {options} />
 </div>
 
 <style>
@@ -52,6 +52,6 @@
     grid-column: 7;
   }
   .missing :global(select) {
-    outline: solid 2px var(--main);
+    outline: solid 2px var(--red-500);
   }
 </style>

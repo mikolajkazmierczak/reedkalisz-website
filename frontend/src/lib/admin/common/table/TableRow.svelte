@@ -1,26 +1,31 @@
 <script>
+  import { swatch, colorMissing } from '$/colors';
   import { goto } from '$app/navigation';
 
   import Icon from '$c/Icon.svelte';
-  import Tooltip from '$c/Tooltip.svelte';
   import Blame from '@c/Blame.svelte';
+  import Button from '@c/Button.svelte';
+  import CategoryCode from '@c/CategoryCode.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
   import Dropzone from './Dropzone.svelte';
+  import { draggingRow, hierarchyCellWidth } from './utils';
+  import Float from './Float.svelte';
 
+  // A row of Table (a `.row` of the Grid), then the drop zone under it, then its children when it's open.
   export let collection = null;
-  export let headRow = false;
   export let head;
 
   export let items = null;
   export let item = null;
   export let mapper = null;
-  $: row = item ? mapper(item) : null; // href, values
-  $: meta = item?._meta; // depth, index, path, isFirst, isLast
-  $: children = item?.children;
+  $: row = mapper(item); // href, values, warn (something to look at: an unread question, a colour without its value),
+  // and in a tree: hrefNew, codeNew (a new subcategory's link and number, for the add button)
+  $: meta = item._meta; // depth, index, path, isFirst, isLast
+  $: children = item.children;
 
   export let order = false;
   export let tree = false;
   export let maxDepth;
-  export let widths;
 
   export let expandedItems = null;
   $: expandable = children?.length;
@@ -40,155 +45,146 @@
   }
 
   export let dropzone = null;
+  export let dragged = null; // see Table
   let dragging = false;
 
   function dragstart(e) {
-    // dragging started
     dragging = true;
+    dragged = String(meta.path);
     e.dataTransfer.setData('path', meta.path);
     tryCollapse(item);
   }
   function dragend(e) {
-    // dragging stopped
     e.preventDefault();
     dragging = false;
     dropzone = null;
+    dragged = null;
+  }
+  function dragenter(e) {
+    // the dragged row is over this one: its drop zone opens
+    if (draggingRow(e)) dropzone = item.id;
   }
 
-  function dragenter() {
-    // dragged element entered a row
-    dropzone = item.id;
+  // a click anywhere but the tree's buttons opens the item, so does Enter on the row itself
+  function open(e) {
+    if (row.href && !e.target.closest('button, .hierarchy')) goto(row.href, { noScroll: true });
+  }
+  function openByKey(e) {
+    if (e.key === 'Enter' && e.target === e.currentTarget) open(e);
+  }
+  // the tree's arrow from the keyboard
+  function toggleByKey(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    toggle(item);
   }
 </script>
 
-{#if headRow}
-  <div class="row row--head" style:grid-template-columns={widths}>
-    {#if tree}
-      <div class="value value--head value--center">
-        <div>
-          <Tooltip>Dodawanie podkategorii</Tooltip>
-          <div class="icon"><div><Icon fill name="text_bullet_list_add" dark /></div></div>
-        </div>
-      </div>
-    {/if}
-    {#if tree || order}
-      <div class="value value--head value--center">
-        <div>
-          <Tooltip>Hierarchia</Tooltip>
-          <div class="icon"><div><Icon fill name="hierarchy" dark /></div></div>
-        </div>
-      </div>
-    {/if}
-    {#each head as { checkbox, label, icon }}
-      <div class="value value--head" class:center={checkbox}>
-        <div>
-          {#if icon}
-            {#if label}
-              <Tooltip>{label}</Tooltip>
-            {/if}
-            <div class="icon"><div><Icon fill name={icon} dark /></div></div>
-          {:else if label}
-            {label}
-          {/if}
-        </div>
-      </div>
-    {/each}
-  </div>
-{/if}
-
-{#if item}
-  <div class="row row--item" class:dragging style:grid-template-columns={widths} on:dragenter={dragenter}>
-    {#if tree}
-      <div
-        class="value value--item value--center"
-        on:click={() => {
-          goto(row.hrefNew);
-          expand(item);
-        }}>
-        <div><div class="icon"><div><Icon fill name="add" dark /></div></div></div>
-      </div>
-    {/if}
-    {#if tree || order}
-      {@const width = ((maxDepth - (meta.depth ?? 0) + 1) / (maxDepth + 1)) * 100}
-      <div class="value value--item value--hierarchy" class:expandable>
-        <div
-          on:click={() => toggle(item)}
-          style:margin-left={100 - width + '%'}
-          style:width={width + '%'}
-          class:border-left={meta.depth != 0}
-          draggable={order}
-          on:dragstart={dragstart}
-          on:dragend={dragend}>
+<div
+  class="row"
+  class:clickable={row.href}
+  class:warn={row.warn}
+  class:dragging
+  role="link"
+  tabindex="0"
+  on:dragenter={dragenter}
+  on:click={open}
+  on:keydown={openByKey}>
+  {#if tree}
+    <span class="center tree-cell add">
+      <span class="add__button">
+        <Button
+          small
+          dashed
+          icon="add"
+          label="Dodaj podkategorię {row.codeNew ?? ''}"
+          on:click={() => {
+            goto(row.hrefNew);
+            expand(item);
+          }} />
+        <Tooltip
+          >Dodaj podkategorię {#if row.codeNew}<CategoryCode code={row.codeNew} />{/if}</Tooltip>
+      </span>
+    </span>
+  {/if}
+  {#if tree || order}
+    <!-- the deeper, the further right it starts; the arrow opens it, the dots drag it -->
+    {@const width = ((maxDepth - (meta.depth ?? 0) + 1) / (maxDepth + 1)) * 100}
+    <span class="hierarchy tree-cell" class:expandable>
+      <span
+        class="hierarchy__bar"
+        class:nested={meta.depth != 0}
+        style:margin-left={100 - width + '%'}
+        style:width={width + '%'}
+        style:--level={hierarchyCellWidth + 'rem'}
+        draggable={order}
+        role="button"
+        tabindex="0"
+        aria-label={expandable ? (expanded ? 'Zwiń' : 'Rozwiń') : 'Przeciągnij'}
+        aria-expanded={expandable ? expanded : undefined}
+        on:click={() => toggle(item)}
+        on:keydown={toggleByKey}
+        on:dragstart={dragstart}
+        on:dragend={dragend}>
+        <span class="arrow">
           {#if expandable}
-            <div class="icon"><div><Icon fill name={expanded ? 'chevron_down' : 'chevron_right'} dark /></div></div>
+            <span class="icon"><Icon fill name={expanded ? 'chevron_down' : 'chevron_right'} dark /></span>
+          {/if}
+        </span>
+        {#if order}
+          <span class="icon drag"><Icon fill name="drag" dark /></span>
+        {/if}
+      </span>
+    </span>
+  {/if}
+  {#each row.values as value, i}
+    {@const { checkbox, blame, color, category, float: floating } = head[i]}
+    {#if checkbox}
+      <span class="center">
+        <span class="check">
+          {#if value}
+            <Icon fill name="ok" color={'var(--navy-700)'} strokeWidth="1" />
           {:else}
-            <div />
+            <Icon fill name="close" color={'var(--grey-300)'} />
           {/if}
-          {#if order}
-            <div class="icon drag"><div><Icon fill name="drag" dark /></div></div>
-          {/if}
-        </div>
-      </div>
+        </span>
+      </span>
+    {:else}
+      <!-- `float` in the column's head: its text, when cut, shows whole on hover -->
+      <Float enabled={!!floating} fade={!!blame}>
+        {#if blame}
+          <Blame {...value} />
+        {:else if category}
+          <!-- { code, name } -->
+          <CategoryCode code={value.code} />
+          {value.name}
+        {:else if color}
+          <!-- the whole colour: { color, multicolor, transparent } -->
+          <span class="color" class:missing={colorMissing(value)} style:background={swatch(value, null)} />
+          {#if value?.color}<span>{value.color}</span>{/if}{#if value?.multicolor}<span class="pill">wielokolorowy</span
+            >{/if}{#if value?.transparent}<span class="pill">przezroczysty</span>{/if}
+        {:else}
+          {value}
+        {/if}
+      </Float>
     {/if}
-    {#each row.values as value, i}
-      {@const { checkbox, blame, color } = head[i]}
-      <div
-        class="value value--item"
-        class:center={checkbox}
-        class:blame
-        on:click={() => {
-          if (row.href) goto(row.href, { noScroll: true });
-        }}
-        on:mouseenter={(e) => {
-          const table = e.target.parentNode.parentNode;
-          const tableRect = table.getBoundingClientRect();
-          const content = e.target.children[0];
-          const contentRect = content.getBoundingClientRect();
-          const isOut = contentRect.right > tableRect.right;
-          if (isOut) {
-            content.style.left = 'auto';
-            content.style.right = '0';
-          }
-        }}
-        on:mouseleave={(e) => {
-          const content = e.target.children[0];
-          content.style.left = '0';
-          content.style.right = 'auto';
-        }}>
-        <div>
-          {#if checkbox}
-            {#if value}
-              <Icon fill name="ok" color={'var(--primary)'} strokeWidth="1" />
-            {:else}
-              <Icon fill name="close" color={'var(--accent)'} />
-            {/if}
-          {:else if blame}
-            <Blame {...value} />
-          {:else}
-            {#if color}<div class="color" style:background-color={value} />{/if}
-            {value}
-          {/if}
-        </div>
-      </div>
-    {/each}
-  </div>
-{/if}
+  {/each}
+</div>
 
-{#if headRow || item}
-  <Dropzone
-    {collection}
-    bind:items
-    {meta}
-    {maxDepth}
-    {expanded}
-    {tryCollapse}
-    bind:dropzone
-    bind:dragging
-    id={headRow ? -1 : item.id} />
-{/if}
+<Dropzone
+  {collection}
+  bind:items
+  {meta}
+  {maxDepth}
+  {expanded}
+  {tryCollapse}
+  bind:dropzone
+  bind:dragging
+  {dragged}
+  id={item.id} />
 
-{#if !headRow && tree && expanded}
-  {#each children as child (child)}
+{#if tree && expanded}
+  {#each children as child (child.id)}
     <svelte:self
       {collection}
       {head}
@@ -198,100 +194,118 @@
       {order}
       {tree}
       {maxDepth}
-      {widths}
       bind:expandedItems
-      bind:dropzone />
+      bind:dropzone
+      bind:dragged />
   {/each}
 {/if}
 
 <style>
   .row {
-    cursor: pointer;
-    display: grid;
-    border-bottom: var(--border-light);
-    height: 2rem;
+    font-size: 0.95rem;
   }
-  .row--head {
-    height: 2.5rem;
-  }
-
-  .value {
-    z-index: 0;
-    overflow: hidden;
-    position: relative;
-    border-right: var(--border-light);
-    min-width: 100%;
-    height: 100%;
-    background-color: var(--accent-white);
-  }
-  .value:last-child {
-    border-right: none;
-  }
-
-  .value > div {
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
+  .center {
     display: flex;
-    align-items: center;
-    padding: 0 0.4rem;
-    min-width: 100%;
-    height: 100%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    background-color: var(--light);
-  }
-  .value--head > div {
-    background-color: var(--accent-white);
-  }
-  .row--item:hover > .value > div {
-    background-color: var(--accent-light);
-  }
-  .value:hover {
-    z-index: 1;
-    overflow: visible;
-  }
-  .value:hover > div {
-    outline: var(--border-light);
-    outline-width: 2px;
-  }
-
-  .value > div .icon {
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
-  .value > div .icon > div {
-    height: 55%;
-  }
-  .value--center > div {
     justify-content: center;
   }
-
-  .value--hierarchy:not(.expandable) > div {
-    background-color: var(--accent-light);
-  }
-  .value--hierarchy > div {
-    justify-content: space-between;
-    min-width: auto;
-  }
-  .value--hierarchy > div.border-left {
-    border-left: var(--border-light);
-  }
-
-  .color {
-    margin-right: 0.4rem;
-    border-radius: 0.2rem;
-    border: var(--border-light);
-    height: 60%;
+  .check {
+    display: flex;
+    height: 1rem;
     aspect-ratio: 1 / 1;
   }
 
+  /* the tree's columns are grey like the head, the whole height of the row; the bar starts further right the deeper
+     the item is, so its level shows as grey to its left */
+  .tree-cell {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    margin: calc(-1 * var(--row-pad)) 0;
+    background-color: var(--grey-100);
+  }
+  /* from the row's edge up to the tree column, over the padding and the gap, the button in its middle (see
+     addCellWidth) */
+  .tree-cell.add {
+    margin-left: calc(-1 * var(--cell-pad));
+    margin-right: calc(-1 * var(--col-gap));
+    padding: 0 var(--row-pad);
+  }
+  .add__button {
+    display: flex;
+  }
+  .hierarchy {
+    align-items: stretch;
+  }
+  .hierarchy__bar {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 0.2rem;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    corner-shape: squircle;
+    background-color: var(--light);
+  }
+  /* the arrow in the middle of its level's part of the column */
+  /* (it gives way at the deepest level: the bar is a level wide there, and has no arrow) */
+  .arrow {
+    display: flex;
+    justify-content: center;
+    width: var(--level);
+  }
+  .hierarchy:not(.expandable) .hierarchy__bar {
+    background-color: var(--blue-100); /* solid: it lies on the grey column */
+  }
+  /* it's a button (it opens the item's children, it drags it): it lights up under the pointer, in the colour of the
+     slots it's dropped into (see Dropzone) */
+  .hierarchy .hierarchy__bar:hover {
+    background-color: var(--navy-100);
+  }
+  .hierarchy__bar:focus-visible {
+    outline: solid 2px var(--navy-700);
+    outline-offset: -2px;
+  }
+  .hierarchy__bar.nested {
+    border-left: solid 1px var(--black-10);
+  }
+  .icon {
+    display: flex;
+    height: 1rem;
+    aspect-ratio: 1 / 1;
+  }
   .drag {
     cursor: grab;
   }
   .dragging {
     opacity: 0.5;
+  }
+
+  /* what else a colour is, as a pill (like a Blame's) */
+  .pill {
+    display: inline-block;
+    border-radius: 100rem;
+    padding: 0.15em 0.5em;
+    font-size: 0.8em;
+    background-color: var(--black-10);
+  }
+  /* apart from the hex or another pill before it (right after the swatch, it's the swatch's gap) */
+  :not(.color) + .pill {
+    margin-left: 0.3rem;
+  }
+  /* round like the website's; its edge is a ring drawn over the colour, not a border: under a border the colour (the
+     multicolour's quarters) starts inside it and repeats underneath, so it wouldn't reach the edge */
+  .color {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--black-20);
+    height: 1.25rem; /* the website's (its Color) */
+    aspect-ratio: 1 / 1;
+  }
+  /* no colour yet: an empty dashed circle (the menu asks for it too) */
+  .color.missing {
+    box-shadow: none;
+    border: dashed 1px var(--orange-500);
   }
 </style>

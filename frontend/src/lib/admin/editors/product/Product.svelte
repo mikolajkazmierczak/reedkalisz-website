@@ -5,20 +5,38 @@
   import heimdall from '$/heimdall';
   import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '%/fields/products';
-  import { deep, slugify, diff, makeTree, treeFlatten, moveItem } from '%/utils';
+  import { deep, slugify, diff } from '%/utils';
   import { getMinMaxPrices } from '%/calculationsPrices';
 
-  import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { globals, users, companies, categories, commercialDetails } from '@/globals';
+  import { tell } from '@/dialog';
+  import { globals, companies, categories, commercialDetails } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
+  import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import Blame from '@c/Blame.svelte';
   import ProductPricing from './ProductPricing.svelte';
   import ProductStorage from './ProductStorage.svelte';
   import ProductGallery from './ProductGallery.svelte';
-  // import ProductRecommendations from './ProductRecommendations.svelte';
+  import ApiBadge from '@c/ApiBadge.svelte';
+  import {
+    ancestorIds,
+    categoryIndex,
+    categoryLabels,
+    categoryOptions as catOptions,
+    mostSpecific,
+    sortCategoryRows,
+  } from '@/categories';
+  import { removeUnusedFiles, usedFiles } from '@/files';
+  import { syncsCategories, isManagedCategory, mappedCategories } from '@/sync';
+  import { scannedProduct, scannerFields } from '@/snapshot';
+  import BarButton, { barIconStroke } from '@c/BarButton.svelte';
+  import CategoryCode from '@c/CategoryCode.svelte';
+  import Select from '@c/Select.svelte';
+  import { goto } from '$app/navigation';
+  import { duplicateProduct } from './duplicate.js';
+  import Loader from '$c/Loader.svelte';
+  import Icon from '$c/Icon.svelte';
 
   const searchParams = SearchParams.read();
 
@@ -26,14 +44,22 @@
 
   let item;
   let itemOriginal;
-  let itemDiff;
 
   let errors = { code: null, materials: null };
   $: commercialDetailsOptions =
     $commercialDetails &&
-    [{ id: null, text: '---' }].concat($commercialDetails.map(({ id, name }) => ({ id, text: name })));
+    [{ id: null, text: 'Brak', special: true }].concat($commercialDetails.map(({ id, name }) => ({ id, text: name })));
+
+  let saleTooHigh = false; // (see ProductPricing)
 
   async function save(action) {
+    if (saleTooHigh) {
+      await tell('Cena w promocji nie może być wyższa od zwykłej. Popraw ją, żeby zapisać produkt.', {
+        title: 'Nie zapisano',
+        danger: true,
+      });
+      return;
+    }
     try {
       // set min and max prices
       const minMaxPrices = getMinMaxPrices(item); // takes care of nullifying for privacy
@@ -41,6 +67,10 @@
       item.price_max = minMaxPrices.max;
       item.price_min_sale = minMaxPrices.minSale;
       item.price_max_sale = minMaxPrices.maxSale;
+      // only the most specific categories, in the order of the tree
+      item.categories = keepSpecific(item.categories);
+      // remember every file the product ever used (the library shows where a file was used)
+      item.images_history = [...new Set([...(item.images_history ?? []), ...usedFiles(item)])];
       // save
       await action();
       errors = { code: null, materials: null };
@@ -51,10 +81,6 @@
     }
   }
 
-  function remove() {
-    editing.remove('products', item.id, { root: '/admin/produkty' });
-  }
-
   async function read() {
     await globals.update(companies);
     await globals.update(commercialDetails);
@@ -62,6 +88,9 @@
 
     if (slug == '+') {
       item = defaults();
+      // every product has a company: the one the list was narrowed to, or REED
+      const picked = $companies.find((c) => c.id == searchParams.producent);
+      item.company = (picked ?? $companies.find((c) => c.name === 'REED'))?.id ?? null;
       // add category from search params
       if (searchParams.c != null) item.categories = [...item.categories, { category: searchParams.c }];
     } else {
@@ -71,17 +100,100 @@
     itemOriginal = item ? deep.copy(item) : null;
   }
 
-  function pushCategory() {
-    item.categories.push({ category: $categories[0].id, index: item.categories.length });
-    item = item;
+  // a deleted product takes its images along, unless something else uses them
+  async function remove(action) {
+    const files = [...usedFiles(itemOriginal)];
+    if (!(await action())) return;
+    const deleted = await removeUnusedFiles(files);
+    if (deleted.length) heimdall.emit('directus_files', deleted);
   }
+
+  // a copy of what is saved (see duplicate.js), then the copy in this editor
+  let duplicating = false;
+  async function duplicate() {
+    duplicating = true;
+    try {
+      slug = await duplicateProduct(itemOriginal.id);
+      await read();
+      // in place of the original's entry: going back would show the copy under the original's url
+      goto(`/admin/produkty/${slug}`, { noScroll: true, replaceState: true });
+    } finally {
+      duplicating = false;
+    }
+  }
+
+  // the saved product as a PDF (see report.js: loaded on the first click, pdfmake is big)
+  let reporting = false;
+  async function report() {
+    if (reporting) return;
+    reporting = true;
+    try {
+      const { downloadAdminReport } = await import('./report.js');
+      await downloadAdminReport(itemOriginal);
+    } finally {
+      reporting = false;
+    }
+  }
+
+  $: company = $companies?.find((c) => c.id === item?.company);
+  // what the API scanner overwrites (the product as saved, found in the company's last scan): locked, with a pill
+  let scanned; // undefined while it loads
+  $: loadScanned(itemOriginal, company);
+  async function loadScanned(product, company) {
+    scanned = undefined;
+    const found = await scannedProduct(product, company);
+    if (product === itemOriginal) scanned = found; // (not one saved or opened since)
+  }
+  $: scanner = scannerFields(item, company, scanned);
+  $: categoriesSynced = scanner.categories && syncsCategories(company);
+  $: categoryTargets = mappedCategories(company);
+  // a product has only the most specific categories: picking a subcategory drops the one above it,
+  // and what's above a picked one can't be picked
+  $: catIndex = categoryIndex($categories);
+  $: catLabels = categoryLabels($categories);
+  $: takenCategories = new Set(
+    (item?.categories ?? []).flatMap((c) => [c.category, ...ancestorIds(c.category, catIndex.parents)]),
+  );
+  // the product's own ones picked again are taken away; the ones above them can't be added (they'd be dropped)
+  $: categoryOptions = catOptions(catLabels).map((o) => {
+    const chosen = !!item?.categories.some((c) => c.category === o.id);
+    const managed = chosen && isManaged({ category: o.id });
+    return { ...o, chosen, disabled: (takenCategories.has(o.id) && !chosen) || managed };
+  });
+  // one the category mappings lead to: the scanner's, not to be taken away here
+  $: isManaged = (productCategory) => categoriesSynced && isManagedCategory(productCategory, company, categoryTargets);
+  let categoryToAdd = null;
+  $: if (categoryToAdd != null) addCategory(categoryToAdd);
+
+  function keepSpecific(rows) {
+    const ids = mostSpecific(
+      rows.map((r) => r.category),
+      catIndex.parents,
+    );
+    return sortCategoryRows(
+      rows.filter((r) => ids.includes(r.category)),
+      catIndex.order,
+    );
+  }
+  function addCategory(id) {
+    categoryToAdd = null;
+    if (!item.categories.some((c) => c.category === id)) {
+      item.categories = keepSpecific([...item.categories, { category: id }]);
+    }
+  }
+
+  // for the image picker: the product's files now, and before
+  $: fileContext = item && {
+    used: [...usedFiles(item)],
+    history: (item.images_history ?? []).filter((id) => !usedFiles(item).has(id)),
+  };
+
+  const removeCategoryId = (id) => removeCategory(item.categories.findIndex((c) => c.category === id));
   function removeCategory(i) {
+    if (i < 0) return;
     item.categories.splice(i, 1);
     item.categories = item.categories.map((c, i) => ({ ...c, index: i })); // update indexes
     item = item;
-  }
-  function moveCategory(i, d) {
-    item.categories = moveItem(item.categories, i, d);
   }
 
   read();
@@ -94,15 +206,8 @@
     });
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
-  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed, html }) => {
-    itemDiff = html;
-    $unsaved = !errors.materials && correctSlug && changed;
-  });
-
-  heimdall.listen(({ match, me }) => {
-    if (match('products', item.id) && !me) {
-      alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
-    }
+  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
+    $unsaved = !errors.materials && correctSlug && item.company != null && changed;
   });
 </script>
 
@@ -113,12 +218,64 @@
   collection="products"
   bind:item
   bind:itemOriginal
+  removable={!!itemOriginal?.date_created}
+  {remove}
   {save}>
+  <svelte:fragment slot="bar">
+    {#if itemOriginal?.date_created}
+      <BarButton
+        disabled={reporting}
+        title="Pobierz raport PDF: karta produktu w zapisanej wersji, tak jak na stronie"
+        on:click={report}>
+        <span slot="icon" class="icon">
+          {#if reporting}<Loader dark />{:else}
+            <Icon fill name="arrow_download" color="var(--text)" strokeWidth={barIconStroke} />
+          {/if}
+        </span>
+        PDF
+      </BarButton>
+      <BarButton
+        icon="copy"
+        disabled={$unsaved || duplicating}
+        title={$unsaved
+          ? 'Najpierw zapisz albo cofnij zmiany'
+          : 'Ukryta kopia jako produkt REED, z kolejnym numerem w kodzie i nazwie'}
+        on:click={duplicate}>
+        {duplicating ? 'Duplikuję...' : 'Duplikuj'}
+      </BarButton>
+    {/if}
+  </svelte:fragment>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">
+            <div class="heading">
+              <h3 class="ui-h3">Nazwa</h3>
+              {#if scanner.name}
+                <ApiBadge
+                  edited={scanner.nameEdited}
+                  text={scanner.nameEdited
+                    ? 'Nazwa różni się od tej w API, więc skaner jej nie zmieni.'
+                    : 'Skaner API ustawia nazwę, dopóki nie zostanie zmieniona tutaj.'} />
+              {/if}
+            </div>
+            <Input bind:value={item.name} />
+          </div>
+          <div class="ui-box">
+            <div class="ui-pair">
+              <Input bind:value={item.code} error={errors.code}>
+                Kod{#if scanner.price}<small>API</small>{/if}
+              </Input>
+              <Input
+                type="select"
+                bind:value={item.company}
+                options={$companies.map(({ id, name }) => ({ id, text: name }))}
+                placeholder="Wybierz producenta"
+                error={item.company == null ? 'Wybierz producenta' : null}>
+                Producent
+              </Input>
+            </div>
             <div class="toggles">
               <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
               <Input type="checkbox" bind:value={item.new}>Nowość</Input>
@@ -127,56 +284,41 @@
             <div class="toggles">
               <Input type="checkbox" bind:value={item.coming_soon}>Już wkrótce</Input>
               <Input type="checkbox" bind:value={item.out_of_stock}>Koniec nakładu</Input>
-              <!-- <Input type="checkbox" bind:value={item.api_enabled}>API</Input> -->
             </div>
-            <Input bind:value={item.name}>Nazwa</Input>
-            <div class="ui-pair">
-              <Input bind:value={item.code} error={errors.code}>
-                Kod{#if item.api_enabled}&nbsp;<small style="opacity:0.65">API</small>{/if}
-              </Input>
-              <!-- {#if item.api_enabled} -->
-              <Input
-                type="select"
-                bind:value={item.company}
-                options={[{ id: null, text: '---' }].concat($companies.map(({ id, name }) => ({ id, text: name })))}>
-                Producent&nbsp;<small style="opacity:0.65">API</small>
-              </Input>
-              <!-- {/if} -->
-            </div>
-          </div>
-          <div class="ui-box">
-            <h3 class="ui-h3">Kategorie</h3>
-            {#each item.categories as { category }, i}
-              <div class="ui-list">
-                {#await makeTree($categories) then tree}
-                  <div class="category" class:main={i == 0}>
-                    <Input
-                      type="select"
-                      bind:value={category}
-                      options={treeFlatten(tree).map(({ id, name, _meta }) => {
-                        const path = _meta.path.map((p) => p + 1).join('.');
-                        return { id, text: `${path} ${name}` };
-                      })} />
-                  </div>
-                {/await}
-                <Button icon="arrow_up" on:click={() => moveCategory(i, -1)} square disabled={i == 0} />
-                <Button
-                  icon="arrow_down"
-                  on:click={() => moveCategory(i, 1)}
-                  square
-                  disabled={i == item.categories.length - 1} />
-                <Button icon="delete" on:click={() => removeCategory(i)} dangerous square />
-              </div>
-            {/each}
-            <Button icon="add" on:click={pushCategory}>Dodaj</Button>
           </div>
         </div>
 
         <div class="ui-section__col">
           <div class="ui-box">
-            <h3 class="ui-h3">SEO</h3>
-            <Input bind:value={item.seo_title}>Tytuł</Input>
-            <Input type="textarea" bind:value={item.seo_description}>Opis</Input>
+            <h3 class="ui-h3">Kategorie</h3>
+            <div class="categories">
+              {#each item.categories as productCategory, i (productCategory.category)}
+                {@const label = catLabels.get(productCategory.category)}
+                <div class="ui-list category">
+                  <span class="category__name" title={label?.path}>
+                    {#if label}<CategoryCode code={label.number} />{/if}
+                    {label?.name ?? `usunięta kategoria #${productCategory.category}`}
+                  </span>
+                  {#if isManaged(productCategory)}
+                    <ApiBadge text="Prowadzi do niej mapowanie kategorii. Skaner API ją dodaje i usuwa." />
+                  {/if}
+                  <Button
+                    small
+                    icon="delete"
+                    on:click={() => removeCategory(i)}
+                    disabled={isManaged(productCategory)}
+                    dangerous
+                    square />
+                </div>
+              {/each}
+            </div>
+            <Select
+              label="Dodaj kategorię"
+              bind:value={categoryToAdd}
+              options={categoryOptions}
+              placeholder="Dodaj kategorię…"
+              keepOpen
+              on:unchoose={(e) => removeCategoryId(e.detail.value)} />
           </div>
 
           <div class="ui-box" class:admin-notes-filled={!!item.admin_notes}>
@@ -186,10 +328,6 @@
         </div>
 
         <div class="ui-section__col">
-          <div class="ui-box">
-            <Button icon="delete" on:click={remove} dangerous>Usuń</Button>
-          </div>
-
           <div class="ui-box ui-box--uneditable">
             <h3 class="ui-h3">Link do strony</h3>
             {#if item.date_created}
@@ -197,45 +335,25 @@
             {:else}
               /produkty/{item.slug || '...'}
             {/if}
-            <h3 class="ui-h3">Utworzenie</h3>
-            <p>
-              {#if $users && item.date_created}
-                <Blame user={item.user_created} datetime={item.date_created} />
-              {:else}
-                Tu będziesz ty
-              {/if}
-            </p>
-            <h3 class="ui-h3">Aktualizacja</h3>
-            <p>
-              {#if $users && item.date_updated}
-                <Blame user={item.user_updated} datetime={item.date_updated} />
-              {:else}
-                Nie aktualizowano
-              {/if}
-            </p>
+            <Blames {item} />
           </div>
         </div>
-
-        <!-- <div class="ui-section__col">
-          <div class="diff">
-            UNSAVED: {$unsaved}
-            <h3 class="ui-h3">PRODUCT</h3>
-            <pre>{@html itemDiff}</pre>
-          </div>
-        </div> -->
       </div>
     </section>
 
     <section class="ui-section">
       <h2 class="ui-h2">Opis</h2>
       <div class="ui-section__row">
-        <div class="ui-section__col ui-box" style:grid-column={'1 / span 2'}>
+        <!-- as tall as the column on the right (at least a few lines): the text and its preview fill it -->
+        <div class="ui-section__col ui-box description" style:grid-column={'1 / span 2'}>
           <div class="ui-pair ui-texteditor">
             <div class="ui-texteditor__draft">
               <Input
                 type="textarea"
                 bind:value={item.description}
-                rows={15}
+                api={scanner.description}
+                disabled={scanner.description}
+                rows={4}
                 placeholder="Przed Tobą stoi puste płótno, zapełnij je czymś niezwykłym..." />
             </div>
             <div class="ui-texteditor__render">
@@ -243,29 +361,49 @@
                 {@const post =
                   item.commercial_details !== null &&
                   $commercialDetails.find((c) => c.id === item.commercial_details).content}
-                {@html marked.parse(item.description + (post ? '\n' + post : ''))}
+                {@html marked.parse(item.description + (post ? '\n\n---\n\n' + post : ''))}
               {/if}
             </div>
           </div>
         </div>
         <div class="ui-section__col">
           <div class="ui-box">
-            <Input type="select" bind:value={item.commercial_details} options={commercialDetailsOptions}>
-              Informacje handlowe
-            </Input>
+            <h3 class="ui-h3">Paragraf</h3>
+            <Input
+              type="select"
+              label="Paragraf"
+              bind:value={item.commercial_details}
+              options={commercialDetailsOptions} />
           </div>
           <div class="ui-box">
             <h3 class="ui-h3">Detale</h3>
             <div class="sizes">
-              <Input type="number" min="0" step="0.01" bind:value={item.size_x}>Rozmiar <small>mm</small></Input>
-              <Input type="number" min="0" step="0.01" bind:value={item.size_y} />
-              <Input type="number" min="0" step="0.01" bind:value={item.size_z} />
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                bind:value={item.size_x}
+                api={scanner.size_x}
+                disabled={scanner.size_x}>
+                Rozmiar <small>mm</small>
+              </Input>
+              {#each ['size_y', 'size_z'] as size}
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  bind:value={item[size]}
+                  api={scanner[size]}
+                  disabled={scanner[size]} />
+              {/each}
             </div>
             <Input
               type="list"
               placeholder="np. stal;plastik"
               bind:value={item.materials}
               bind:error={errors.materials}
+              api={scanner.materials}
+              disabled={scanner.materials}
               listDisallowNumbers>
               Materiały
             </Input>
@@ -274,28 +412,42 @@
       </div>
     </section>
 
-    <ProductPricing bind:product={item} productOriginal={itemOriginal} />
-    <ProductGallery bind:gallery={item.gallery} />
-    <ProductStorage bind:product={item} />
-    <!-- <ProductRecommendations bind:product={item} /> -->
+    <ProductPricing bind:product={item} productOriginal={itemOriginal} {scanner} bind:saleTooHigh />
+    <ProductGallery bind:gallery={item.gallery} {fileContext} />
+    <ProductStorage bind:product={item} {fileContext} {scanner} />
   {/if}
 </Editor>
 
 <style>
-  /* .diff {
-    overflow-y: scroll;
-    border: var(--border);
-    padding: 1rem;
-    max-height: 500px;
-    overflow-wrap: break-word;
-  } */
-
+  /* a box's heading with what goes with it at its right end */
+  .heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
   .toggles {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
   }
-  .category.main {
-    outline: var(--outline-dashed);
+  /* the category rows sit close, a thin line between them */
+  .categories {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: -0.5rem; /* the picker right under the list, not a box's gap away */
+  }
+  .category {
+    align-items: center;
+    padding: 0.175rem 0;
+  }
+  .category + .category {
+    border-top: var(--border-light);
+  }
+  .category__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .sizes {
     display: flex;
@@ -303,7 +455,32 @@
     gap: 1rem;
   }
 
+  .description .ui-texteditor {
+    flex: 1;
+    min-height: 16rem;
+  }
+  /* the preview doesn't make the row taller (it scrolls): the row is as tall as the column on the right */
+  .description .ui-texteditor__render {
+    contain: size;
+    height: auto;
+  }
+
+  /* a phone: the preview under the text, as tall as it was */
+  @media (max-width: 50rem) {
+    .description .ui-texteditor__draft {
+      height: 12rem;
+    }
+    .description .ui-texteditor__render {
+      contain: none;
+      height: 16rem;
+    }
+  }
+
   .admin-notes-filled {
-    background-color: #ffdf83;
+    background-color: var(--orange-100);
+  }
+  /* the spinner as big as the icon it stands in for */
+  .icon :global(svg) {
+    width: 100%;
   }
 </style>

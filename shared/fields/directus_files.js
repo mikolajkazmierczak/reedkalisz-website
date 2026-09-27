@@ -1,4 +1,4 @@
-export const search = ['id', 'title', 'type', 'filesize', 'filename_download', 'width', 'height'];
+export const search = ['id', 'title', 'type', 'filesize', 'filename_download', 'width', 'height', 'company'];
 export const show = [...search];
 
 export const read = [...show, 'uploaded_on', 'modified_on', 'uploaded_by', 'modified_by'];

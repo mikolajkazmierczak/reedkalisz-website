@@ -13,7 +13,7 @@ export const search = [
   'bestseller',
   'coming_soon',
   'out_of_stock',
-  'api_enabled',
+  'show_price',
   'categories',
 ];
 export const show = [];
@@ -29,7 +29,6 @@ export const edit = [
   'code',
   'slug',
   'company',
-  'api_enabled',
   'enabled',
   'new',
   'bestseller',
@@ -38,8 +37,7 @@ export const edit = [
   'categories.id',
   'categories.index',
   'categories.category',
-  'seo_title',
-  'seo_description',
+  'images_history',
   'admin_notes',
   'description',
   'commercial_details',
@@ -101,7 +99,6 @@ export const edit = [
   'storage.available',
   'storage.color_first',
   'storage.color_second',
-  'storage.multicolored',
   'storage.api_color_code',
   'storage.api_color_id',
   'storage.img.id',
@@ -114,9 +111,6 @@ export const edit = [
   'gallery.enabled',
   'gallery.main',
   'gallery.img',
-  'recommendations.id',
-  'recommendations.index',
-  'recommendations.recommendation',
 ];
 
 export const calculate = [
@@ -174,10 +168,7 @@ export const defaults = () => ({
   bestseller: false,
   coming_soon: false,
   out_of_stock: false,
-  api_enabled: false,
   categories: [],
-  seo_title: '',
-  seo_description: '',
   description: '',
   commercial_details: null,
   size_x: null,
@@ -207,7 +198,6 @@ export const defaults = () => ({
   product_minimum: 0,
   storage: [],
   gallery: [],
-  recommendations: [],
 });
 
 export default { search, show, read, edit, defaults };

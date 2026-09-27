@@ -14,12 +14,9 @@
   --red: #bf0417;
   --red-hover: #a20313;
   --red-deep: #8c020f;
-  --red-ink: #2e0a0d;
   --red-tint: #fbeff0;
 
   --navy: #1b2f4e;
-  --navy-700: #142640;
-  --navy-tint: #eaf0f8;
 
   --purple: #5b2a86;
 
@@ -27,21 +24,17 @@
   --orange-bright: #ff8a3d;
   --orange-light: #ffa45e;
   --orange-deep: #b04d0a;
-  --orange-tint: #fdf1e6;
 
   --green: #166534;
-  --green-tint: #e7f3ea;
-  --amber: #8a5a00;
-  --amber-tint: #fdf3dd;
+
+  --blue: #4f86d9; /* the photo picked in the lightbox */
 
   --bg: var(--paper);
   --surface: #ffffff;
-  --surface-sunk: var(--paper-2);
   --border: rgba(17, 17, 16, 0.14);
   --border-strong: rgba(17, 17, 16, 0.26);
   /* the system's separator; replaces every shadow */
   --rule: 2px solid var(--ink);
-  --rule-hair: 1px solid var(--border);
   --text: var(--ink);
   --text-muted: var(--ink-500);
   --text-subtle: var(--ink-400);
@@ -63,7 +56,7 @@
   --fs-xs: 0.8125rem;
   --fs-label: 0.6875rem;
 
-  /* spacing (4px) */
+  /* spacing (0.25rem) */
   --sp-1: 0.25rem;
   --sp-2: 0.5rem;
   --sp-3: 0.75rem;
@@ -79,14 +72,10 @@
   --sp-24: 6rem;
 
   /* border-radiuses */
-  --r-sm: 0px;
-  --r-md: 0px;
+  --r-sm: 0;
   --r-card: 1.125rem;
   --r-field: 1.5rem;
   --r-pill: 62.4375rem;
-
-  /* depth */
-  --shadow-overlay: 0 1.5rem 3.75rem rgba(17, 17, 16, 0.28);
 
   /* layout */
   --page: 97.5rem;
@@ -107,13 +96,10 @@
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
   --dur-fast: 110ms;
   --dur: 200ms;
-  --dur-slow: 320ms;
 
-  /* legacy aliases referenced by shared components */
+  /* older names, still read by the website's components and shared ones */
   --white: #ffffff;
   --light: var(--paper-2);
-  --grey: var(--paper-3);
-  --grey-dark: var(--ink-300);
   --main: var(--red);
 
   /* admin controls overlay */
@@ -122,9 +108,8 @@
   --main-2: #e59aa1;
   --main-3: #d3616c;
   --main-4: #c62b3b;
-  --main-light: var(--main-4);
-  --scroll-thumb: var(--ink-300);
-  --scroll-track: var(--paper-2);
+  --scroll-thumb: var(--ink-300); /* see global.css */
+  --scroll-track: transparent;
 }
 
 /* === Base === */
@@ -207,29 +192,6 @@ textarea {
   border-radius: var(--r-sm);
 }
 
-@supports selector(::-webkit-scrollbar) {
-  ::-webkit-scrollbar {
-    width: 0.75rem;
-    height: 0.75rem;
-  }
-  ::-webkit-scrollbar-track {
-    background-color: var(--paper-2);
-  }
-  ::-webkit-scrollbar-thumb {
-    border: 3px solid var(--paper-2);
-    border-radius: var(--r-pill);
-    background-color: var(--ink-300);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--ink-300);
-  }
-}
-@supports not selector(::-webkit-scrollbar) {
-  html {
-    scrollbar-color: var(--ink-300) var(--paper-2);
-  }
-}
-
 /* === Primitives === */
 
 /* Tracked uppercase label in mono: codes, breadcrumbs, small group headings. */
@@ -251,11 +213,6 @@ textarea {
 
 .tnum {
   font-variant-numeric: tabular-nums;
-}
-
-.block {
-  border: var(--rule);
-  background-color: var(--surface);
 }
 
 .visually-hidden {
@@ -308,14 +265,6 @@ textarea {
     color var(--dur) var(--ease),
     border-color var(--dur) var(--ease);
 }
-.btn--red {
-  background-color: var(--red);
-  color: #fff;
-}
-.btn--red:hover {
-  background-color: var(--red-hover);
-  color: #fff;
-}
 .btn--ink {
   background-color: var(--ink);
   color: #fff;
@@ -330,16 +279,6 @@ textarea {
 }
 .btn--light:hover {
   background-color: var(--paper-2);
-  color: var(--ink);
-}
-.btn--outline {
-  border-color: var(--border-strong);
-  background-color: transparent;
-  color: var(--ink);
-}
-.btn--outline:hover {
-  border-color: var(--ink);
-  background-color: var(--surface);
   color: var(--ink);
 }
 .btn--orange {
@@ -376,15 +315,13 @@ textarea {
 
 /* Controls are squircles (fallback to rounded). */
 .btn,
-.chip,
 .go,
 .select,
 .select select,
 .search-field,
 .pg__btn,
 .skip-link,
-.field,
-.squircle {
+.field {
   corner-shape: squircle;
 }
 
@@ -403,9 +340,10 @@ textarea {
   border: 1px solid var(--ink-300);
   border-radius: var(--r-pill);
   background-color: var(--surface);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23111110' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23111110' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--sp-3) center;
+  background-size: 0.75rem 0.5rem;
   color: var(--ink);
   font-family: inherit;
   font-size: var(--fs-sm);
@@ -596,25 +534,12 @@ textarea.field {
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--sp-4) var(--sp-5) var(--sp-8);
-  scrollbar-width: thin;
-  scrollbar-color: var(--ink-300) transparent;
   /* Fade items out at the list edges. */
   -webkit-mask-image: linear-gradient(transparent, #000 var(--sp-4), #000 calc(100% - var(--sp-6)), transparent);
   mask-image: linear-gradient(transparent, #000 var(--sp-4), #000 calc(100% - var(--sp-6)), transparent);
 }
-.rail__nav::-webkit-scrollbar {
-  width: 0.5rem;
-}
-.rail__nav::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-.rail__nav::-webkit-scrollbar-thumb {
-  border: 2px solid var(--bg);
-  border-radius: var(--r-pill);
-  background-color: var(--ink-300);
-}
-.rail__nav:hover::-webkit-scrollbar-thumb {
-  background-color: var(--ink-400);
+.rail__nav:hover {
+  scrollbar-color: var(--ink-400) transparent;
 }
 
 /* === Poster primitives === */
@@ -632,119 +557,15 @@ textarea.field {
   max-width: none;
 }
 
-.field-block {
-  padding: var(--sp-10) 0;
-  border-bottom: var(--rule);
-}
-.field-block--red {
-  background-color: var(--red);
-  color: #fff;
-}
-.field-block--navy {
-  background-color: var(--navy);
-  color: #fff;
-}
-.field-block--ink {
-  background-color: var(--ink);
-  color: #fff;
-}
-.field-block--paper {
-  background-color: var(--paper-2);
-}
-.field-block--red a,
-.field-block--navy a,
-.field-block--ink a {
-  color: #fff;
-}
-
-/* Muted text on dark fields: tinted, not grey. */
-.field-block--red .dim {
-  color: #f6cdd1;
-}
-.field-block--navy .dim {
-  color: #a9bcd6;
-}
-.field-block--ink .dim {
-  color: #a8a49c;
-}
-
 /* Two-tone display line: second clause in ink. */
 .two-tone em {
   font-style: normal;
   color: var(--ink);
 }
-.field-block--navy .two-tone em,
-.field-block--ink .two-tone em {
-  color: var(--red);
-}
-
-/* === Chips === */
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: 0.3125rem 0.75rem;
-  border: 1px solid var(--ink);
-  border-radius: var(--r-pill);
-  background-color: transparent;
-  font-size: var(--fs-xs);
-  font-weight: 600;
-  line-height: 1.3;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color var(--dur-fast) var(--ease),
-    color var(--dur-fast) var(--ease);
-}
-.chip:hover {
-  background-color: var(--ink);
-  color: #fff;
-}
-.chip--on {
-  background-color: var(--ink);
-  color: #fff;
-}
-.chip--red {
-  border-color: var(--red);
-  background-color: var(--red);
-  color: #fff;
-}
-.chip--navy {
-  border-color: var(--navy);
-  background-color: var(--navy);
-  color: #fff;
-}
-.chip--orange {
-  border-color: var(--orange);
-  background-color: var(--orange);
-  color: #fff;
-}
-.chip--static {
-  cursor: default;
-}
-.chip--static:hover {
-  background-color: transparent;
-  color: inherit;
-}
-.chip--red.chip--static:hover,
-.chip--navy.chip--static:hover,
-.chip--orange.chip--static:hover {
-  color: #fff;
-}
-.chip--red.chip--static:hover {
-  background-color: var(--red);
-}
-.chip--navy.chip--static:hover {
-  background-color: var(--navy);
-}
-.chip--orange.chip--static:hover {
-  background-color: var(--orange);
-}
 
 /* === Non-selectable controls === */
 /* Scoped to the public sheet. Never on an element containing a field: Safari can block the caret. */
-.sheet :is(button, .btn, .chip, .go, .label, .skip-link) {
+.sheet :is(button, .btn, .go, .label, .skip-link) {
   -webkit-user-select: none;
   user-select: none;
 }

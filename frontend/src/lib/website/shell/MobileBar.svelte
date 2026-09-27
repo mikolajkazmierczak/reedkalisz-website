@@ -40,16 +40,16 @@
     z-index: 60;
     border-bottom: var(--rule);
     background-color: rgba(253, 253, 252, 0.65);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(0.75rem);
+    backdrop-filter: blur(0.75rem);
   }
   /* Phone homepage only, where the hero rises into the bar. */
   @media (max-width: 47.4988rem) {
     .mbar.home {
       border-bottom-color: rgba(17, 17, 16, var(--solid));
       background-color: rgba(253, 253, 252, calc(0.65 * var(--solid)));
-      -webkit-backdrop-filter: blur(calc(12px * var(--solid)));
-      backdrop-filter: blur(calc(12px * var(--solid)));
+      -webkit-backdrop-filter: blur(calc(0.75rem * var(--solid)));
+      backdrop-filter: blur(calc(0.75rem * var(--solid)));
     }
     .mbar.home .menu-btn {
       background-color: var(--paper);

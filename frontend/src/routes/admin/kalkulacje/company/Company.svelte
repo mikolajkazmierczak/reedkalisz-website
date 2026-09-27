@@ -64,7 +64,7 @@
     margin-bottom: 0.5rem;
   }
   .title small {
-    margin-bottom: 5px;
+    margin-bottom: 0.3125rem;
     margin-left: 1rem;
   }
 </style>

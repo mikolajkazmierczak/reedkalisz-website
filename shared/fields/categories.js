@@ -9,8 +9,6 @@ export const search = [
   'enabled',
   'name',
   'slug',
-  'seo_title',
-  'seo_description',
   'description',
   'img',
 ];
@@ -30,8 +28,6 @@ export const defaults = () => ({
   index: null,
   name: '',
   slug: '',
-  seo_title: '',
-  seo_description: '',
   description: '',
   img: null,
 });

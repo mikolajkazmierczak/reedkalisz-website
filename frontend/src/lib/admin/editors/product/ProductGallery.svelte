@@ -5,6 +5,7 @@
   import Picker from '@c/library/Picker.svelte';
 
   export let gallery;
+  export let fileContext = null; // { used, history } file ids, for the picker
 
   function pushImg() {
     gallery.push({
@@ -40,15 +41,15 @@
         <div class="actions">
           <div>
             {#if !i == 0}
-              <Button icon="arrow_left" on:click={() => moveImg(i, -1)} square />
+              <Button small icon="arrow_left" on:click={() => moveImg(i, -1)} square />
             {/if}
             {#if i < gallery.length - 1}
-              <Button icon="arrow_right" on:click={() => moveImg(i, 1)} square />
+              <Button small icon="arrow_right" on:click={() => moveImg(i, 1)} square />
             {/if}
           </div>
-          <Button icon="delete" on:click={() => removeImg(i)} dangerous />
+          <Button small icon="delete" on:click={() => removeImg(i)} dangerous />
         </div>
-        <Picker bind:selected={img.img} />
+        <Picker bind:selected={img.img} {fileContext} />
         {#if !img.main}
           <Input type="checkbox" bind:value={img.enabled}>Włączone</Input>
         {/if}
@@ -61,7 +62,7 @@
 <style>
   .imgs {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(10.9375rem, 1fr));
     gap: 1rem;
   }
 

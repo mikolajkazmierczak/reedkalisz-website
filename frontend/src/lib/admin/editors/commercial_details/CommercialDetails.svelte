@@ -2,26 +2,18 @@
   import { marked } from 'marked';
 
   import api from '$/api';
-  import heimdall from '$/heimdall';
   import { edit as fields, defaults } from '%/fields/commercial_details';
   import { deep, diff } from '%/utils';
 
-  import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { users } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
+  import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
-  import Button from '@c/Button.svelte';
-  import Blame from '@c/Blame.svelte';
 
   export let id;
 
   let item;
   let itemOriginal;
-
-  function remove() {
-    editing.remove('commercial_details', id, { root: '/admin/informacje-handlowe' });
-  }
 
   async function read() {
     if (id == '+') {
@@ -37,19 +29,14 @@
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
     $unsaved = changed;
   });
-
-  heimdall.listen(({ match, me }) => {
-    if (match('commercial_details', id) && !me) {
-      alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
-    }
-  });
 </script>
 
 <Editor
-  root="/admin/informacje-handlowe"
+  root="/admin/paragrafy"
   icon="commercial_details"
   title={item?.name}
   collection="commercial_details"
+  removable={!!itemOriginal?.date_created}
   bind:item
   bind:itemOriginal>
   {#if item}
@@ -57,32 +44,14 @@
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">
-            <Input bind:value={item.name}>Nazwa</Input>
+            <h3 class="ui-h3">Nazwa</h3>
+            <Input bind:value={item.name} />
           </div>
         </div>
 
         <div class="ui-section__col">
-          <div class="ui-box">
-            <Button icon="delete" on:click={remove} dangerous>Usuń</Button>
-          </div>
-
           <div class="ui-box ui-box--uneditable">
-            <h3 class="ui-h3">Utworzenie</h3>
-            <p>
-              {#if $users && item.date_created}
-                <Blame user={item.user_created} datetime={item.date_created} />
-              {:else}
-                Tu będziesz ty
-              {/if}
-            </p>
-            <h3 class="ui-h3">Aktualizacja</h3>
-            <p>
-              {#if $users && item.date_updated}
-                <Blame user={item.user_updated} datetime={item.date_updated} />
-              {:else}
-                Nie aktualizowano
-              {/if}
-            </p>
+            <Blames {item} />
           </div>
         </div>
       </div>

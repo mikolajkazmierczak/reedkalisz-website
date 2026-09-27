@@ -6,6 +6,7 @@ export const search = [
   'date_updated',
   'from_contact',
   'from_product',
+  'read',
   'spam_chance',
   'name',
   'phone',
@@ -24,7 +25,9 @@ export const defaults = () => ({
   date_created: null,
   user_updated: null,
   date_updated: null,
-  from_website: false,
+  from_contact: false,
+  from_product: false,
+  read: true, // written in the panel: nothing new to read
   spam_chance: 0,
   name: '',
   phone: '',

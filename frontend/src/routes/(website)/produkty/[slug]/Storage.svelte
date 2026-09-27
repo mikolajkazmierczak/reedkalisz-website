@@ -3,39 +3,23 @@
   import Gallery from './Gallery.svelte';
   import { parseAmount, AMOUNT, NONE } from '$/storage';
 
-  export let company;
-  $: codeSeparator = getCodeSeparator(company);
-
   export let code;
   export let storage;
-  $: ({ amount, available, multicolored, api_color_code, color_first, color_second, img } = storage);
+  $: ({ amount, available, api_color_code, color_first, color_second, img } = storage);
   $: state = parseAmount({ available, amount });
-  $: colorName = multicolored
-    ? 'wielokolorowy'
-    : [color_first?.name, color_second?.name].filter(Boolean).join('\u00a0/\u00a0');
+  $: colorName = [color_first?.name, color_second?.name].filter(Boolean).join('\u00a0/\u00a0');
   // Two colours always take two lines: "Pomarańczowy" / "/ Biały".
-  $: firstLine = multicolored ? 'WIELOKOLOROWY' : (color_first ?? color_second)?.name;
-  $: secondLine = !multicolored && color_first && color_second ? `/\u00a0${color_second.name}` : null;
-
-  function getCodeSeparator(company) {
-    switch (company?.name) {
-      case 'PAR':
-        return '.';
-      case 'MidOcean':
-        return '-';
-      default:
-        return '';
-    }
-  }
+  $: firstLine = (color_first ?? color_second)?.name;
+  $: secondLine = color_first && color_second ? `/\u00a0${color_second.name}` : null;
 </script>
 
 <div class="storage">
   <div class="badge">
     <div class="swatch">
-      <Color {multicolored} first={color_first} second={color_second} {amount} {available} size="1.5rem" />
+      <Color first={color_first} second={color_second} {amount} {available} size="1.5rem" />
     </div>
     <h3>
-      <small class="code">{code}{api_color_code ? codeSeparator : ''}{api_color_code}</small>
+      <small class="code">{api_color_code || code}</small>
       <span class="color">{firstLine ?? ''}</span>
       {#if secondLine}<span class="color">{' '}{secondLine}</span>{/if}
     </h3>
@@ -50,7 +34,11 @@
     {/if}
   </div>
 
-  <Gallery small imgs={img} alt="{code} {colorName}" />
+  <Gallery
+    small
+    imgs={img}
+    alt="{code} {colorName}"
+    variant={{ code: api_color_code || code, first: color_first, second: color_second }} />
 </div>
 
 <style>

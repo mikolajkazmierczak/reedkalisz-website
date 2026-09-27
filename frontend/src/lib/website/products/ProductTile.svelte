@@ -1,8 +1,6 @@
 <script>
-  import { parseColor } from '#/utils';
   import Color from '#c/Color.svelte';
   import Badges from '#c/badges/Badges.svelte';
-  import ProductColorTooltip from '#/products/ProductColorTooltip.svelte';
   import { productImages } from '#/products/images';
 
   export let product;
@@ -66,8 +64,7 @@
   // Disabled variants are hidden even from admins.
   $: colors = storage
     .filter((s) => s.enabled)
-    .map(({ multicolored, color_first, color_second, amount, available }) => ({
-      multicolored,
+    .map(({ color_first, color_second, amount, available }) => ({
       first: color_first,
       second: color_second,
       amount,
@@ -75,26 +72,13 @@
     }));
   $: shownColors = colors.slice(0, 6);
   $: extraColors = colors.length - shownColors.length;
-  $: colorsHovers = colors.map(() => false);
 
   // The whole card is the link: a click on a swatch (which keeps the pointer for its tooltip) goes to it too.
   let link;
   function forwardToLink(e) {
     if (!link.contains(e.target)) link.dispatchEvent(new MouseEvent('click', e));
   }
-
-  function handleHoverChange(hover, i) {
-    colorsHovers[i] = hover;
-  }
 </script>
-
-<!-- Tooltips live outside the card: its transform breaks their positioning. -->
-{#if touched}
-  {#each shownColors as { multicolored, first, second, amount, available }, i}
-    {@const { label } = parseColor(multicolored, first, second)}
-    <ProductColorTooltip {label} {amount} {available} show={colorsHovers[i]} />
-  {/each}
-{/if}
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <article
@@ -154,15 +138,8 @@
   <div class="tile__foot">
     <!-- Always rendered, so rows without colours keep the same height. -->
     <div class="tile__colors">
-      {#each shownColors as { multicolored, first, second, amount, available }, i}
-        <Color
-          {multicolored}
-          {first}
-          {second}
-          {amount}
-          {available}
-          notooltip
-          onhoverchange={(hover) => handleHoverChange(hover, i)} />
+      {#each shownColors as { first, second, amount, available }}
+        <Color {first} {second} {amount} {available} notooltip={!touched} />
       {/each}
       {#if extraColors > 0}
         <span class="tile__more tnum">+{extraColors}</span>
@@ -246,8 +223,8 @@
     outline: none;
   }
   .tile__link:focus-visible::after {
-    outline: 3px solid var(--red);
-    outline-offset: -3px;
+    outline: 0.1875rem solid var(--red);
+    outline-offset: -0.1875rem;
   }
 
   .tile__media {

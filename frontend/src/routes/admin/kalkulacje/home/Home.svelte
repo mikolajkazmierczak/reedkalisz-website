@@ -11,7 +11,8 @@
   <div class="wrapper">
     <div class="ui-box margins">
       <h3 class="ui-h3 title">Odgórne marże</h3>
-      <GlobalMargins data={$globalMargins} />
+      <!-- a copy: the fields edit it in place, and margins typed but not saved mustn't reach the store -->
+      <GlobalMargins data={{ ...$globalMargins }} />
     </div>
     <div class="ui-box">
       <h3 class="ui-h3 title">Widoki</h3>
@@ -29,5 +30,11 @@
 
   .margins {
     align-self: start;
+  }
+  /* a phone: the views under the margins */
+  @media (max-width: 50rem) {
+    .wrapper {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 </style>

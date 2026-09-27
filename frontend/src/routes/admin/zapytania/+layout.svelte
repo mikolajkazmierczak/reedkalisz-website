@@ -14,25 +14,31 @@
   $header = { title: 'Zapytania', icon: 'questions' };
 
   const searchParams = new SearchParams('/admin/zapytania');
-  $: [limit, page, query] = $searchparams.get(searchParams.pathname).values();
+  $: [limit, page, query, sort] = $searchparams.get(searchParams.pathname).values();
 
   let items;
+  let lastRead = 0; // several reads can be in flight (every change of the url starts one): only the newest counts
 
-  async function read(limit, page, query) {
-    const options = { fields, sort: ['-date_created'], limit, page, search: query, meta: '*' };
-    items = await api.items('questions').readByQuery(options);
+  // the order when none is picked (see Table's `sort`)
+  const defaultSort = '-date_created';
+
+  async function read(limit, page, query, sort) {
+    const readId = ++lastRead;
+    const options = { fields, sort: [sort ?? defaultSort], limit, page, search: query, meta: '*' };
+    const res = await api.items('questions').readByQuery(options);
+    if (readId === lastRead) items = res;
   }
 
-  $: read(limit, page, query);
+  $: read(limit, page, query, sort);
 
   heimdall.listen(({ match }) => {
-    if (match('questions')) read(limit, page, query);
+    if (match('questions')) read(limit, page, query, sort);
   });
 </script>
 
 {#if items}
   <div class="wrapper">
-    <div class="actions">
+    <div class="actions ui-bar">
       <Button on:click={() => goto(`/admin/zapytania/+`)} icon="add">Dodaj</Button>
       <Search {searchParams} {query} />
     </div>
@@ -44,23 +50,18 @@
       head={[
         { checkbox: true, icon: 'alert_urgent', label: 'Źródło: Kontakt' },
         { checkbox: true, icon: 'products', label: 'Źródło: Produkt' },
-        { checkbox: true, icon: 'attach', label: 'Zawiera załącznik' },
-        { thin: true, label: 'Spam' },
-        { id: true, label: 'ID' },
-        { label: 'Imię i nazwisko' },
-        { label: 'Email' },
-        { label: 'Telefon' },
-        { blame: true, label: 'Utworzenie' },
-        { blame: true, label: 'Aktualizacja' },
+        { label: 'Imię i nazwisko', sort: 'name', float: true },
+        { label: 'Email', sort: 'email', float: true },
+        { label: 'Telefon', sort: 'phone', float: true },
+        { blame: true, label: 'Utworzenie', sort: 'date_created', float: true },
+        { blame: true, label: 'Aktualizacja', sort: 'date_updated', float: true },
       ]}
       mapper={($) => ({
         href: `/admin/zapytania/${$.id}`,
+        warn: !$.read, // unread: an orange row
         values: [
           $.from_contact,
           $.from_product,
-          !!$.file,
-          $.spam_chance + '%',
-          $.id,
           $.name ?? '',
           $.email,
           $.phone ?? '',
@@ -69,6 +70,8 @@
         ],
       })}
       {searchParams}
+      {sort}
+      {defaultSort}
       {limit}
       {page} />
   </div>
@@ -78,16 +81,5 @@
 <style>
   .wrapper {
     overflow-x: auto;
-  }
-  .actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border-radius: var(--border-radius);
-    border: var(--border-light);
-    background-color: var(--light);
   }
 </style>

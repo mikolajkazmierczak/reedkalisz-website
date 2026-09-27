@@ -6,7 +6,8 @@ export const search = [
   'date_updated',
   'name',
   'color',
-  'enabled',
+  'multicolor',
+  'transparent',
   'company',
 ];
 export const show = [...search];
@@ -21,8 +22,9 @@ export const defaults = () => ({
   user_updated: null,
   date_updated: null,
   name: '',
-  color: '',
-  enabled: true,
+  color: null, // none yet: the menu asks for one (unless it's multicolour or see-through)
+  multicolor: false,
+  transparent: false,
 });
 
 export default { search, show, read, edit, defaults };

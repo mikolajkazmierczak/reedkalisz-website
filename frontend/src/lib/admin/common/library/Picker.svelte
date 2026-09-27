@@ -4,16 +4,18 @@
   import api from '$/api';
   import { read as fields } from '%/fields/directus_files';
 
-  import HoverCircle from '$c/HoverCircle.svelte';
-  import Icon from '$c/Icon.svelte';
-  import File from '@c/library/File.svelte';
+  import Button from '@c/Button.svelte';
+  import File, { fileProps } from '@c/library/File.svelte';
   import Library from '@c/library/Library.svelte';
+  import { portal } from '@/portal';
 
   let opened;
 
   export let selected;
+  export let fileContext = null; // in a product: { used, history } file ids, shown first
+  export let backing = null; // on the dots (a page's): its tile's text on their grey (see File)
   let file;
-  let fileData;
+  let fileData; // just what File shows
 
   function close() {
     opened = false;
@@ -21,44 +23,34 @@
 
   function handleSelect(e) {
     file = e.detail;
+    fileData = fileProps(file);
     selected = file.id;
     close();
   }
 
   async function read(id) {
-    const getData = ({ id, title, type, filesize, uploaded_on, modified_on }) => {
-      return { id, title, type, filesize, uploaded_on, modified_on };
-    };
-
+    if (id && file?.id === id) return; // just picked in the library, read there already
     if (id) file = await api.files.readOne(id, { fields });
     else file = null;
-    fileData = file ? getData(file) : null;
+    fileData = file ? fileProps(file) : null;
   }
 
   $: read(selected);
 </script>
 
-<File {...file} marked={false} on:click={() => (opened = true)} />
+<File {...fileData} marked={false} {backing} on:click={() => (opened = true)} />
 
 {#if opened}
-  <div class="bg" transition:fade={{ duration: 200 }} />
-  <div class="wrapper" on:click|self={close}>
+  <div class="bg" use:portal transition:fade={{ duration: 200 }} />
+  <div class="wrapper" role="presentation" use:portal on:click|self={close}>
     <div class="library" transition:fly={{ y: -50, duration: 200 }}>
-      <Library picker bind:selected on:select={handleSelect}>
-        <div slot="picker" class="buttons">
-          <button on:click={close}>
-            <HoverCircle />
-            <div class="icon"><Icon fill name="arrow_left" light /></div>
-            <span>Powrót</span>
-          </button>
+      <Library picker {fileContext} bind:selected on:select={handleSelect}>
+        <svelte:fragment slot="actions">
+          <Button icon="close" on:click={close}>Anuluj</Button>
           {#if selected}
-            <button class="deselect" on:click={() => (selected = null)}>
-              <HoverCircle />
-              <div class="icon"><Icon fill name="close" light /></div>
-              <span>Wyczyść</span>
-            </button>
+            <Button icon="delete" dangerous on:click={() => (selected = null)}>Wyczyść</Button>
           {/if}
-        </div>
+        </svelte:fragment>
       </Library>
     </div>
   </div>
@@ -76,7 +68,7 @@
     height: 100%;
   }
   .bg {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--black-50);
   }
   .wrapper {
     overflow-y: auto;
@@ -84,49 +76,11 @@
   }
   .library {
     border-radius: 1rem;
+    corner-shape: squircle;
     padding: 1rem;
     width: 100%;
-    background-color: var(--accent-white);
+    background-color: var(--grey-100);
     background-image: url('/imgs/dot_grid.png');
-    background-size: 160px;
-  }
-
-  .buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1px 0;
-  }
-  button {
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--border-radius);
-    border: none;
-    height: 100%;
-    font-size: 1rem;
-    background-color: var(--primary);
-  }
-  button.deselect {
-    background-color: var(--primary-dark);
-  }
-  button:disabled {
-    cursor: not-allowed;
-    background-color: var(--accent-white);
-    border: var(--border-light);
-  }
-  button .icon {
-    position: relative;
-    top: 0.1rem;
-    width: 1.5rem;
-    margin-right: 0.5rem;
-  }
-  button span {
-    position: relative;
-    z-index: 1;
-    color: var(--light);
+    background-size: 10rem;
   }
 </style>

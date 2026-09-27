@@ -23,7 +23,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
           <path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
-        Pole znakowania: <b class="tnum">{field[0]}&times;{field[1]} mm</b>
+        <span>Pole znakowania: <b class="tnum">{field[0]}&times;{field[1]} mm</b></span>
       </span>
     {/if}
     {#if place}
@@ -32,7 +32,7 @@
           <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke-linejoin="round" />
           <circle cx="12" cy="10" r="2.4" />
         </svg>
-        Miejsce znakowania: <b>{place}</b>
+        <span>Miejsce znakowania: <b>{place}</b></span>
       </span>
     {/if}
   </div>
@@ -56,17 +56,20 @@
     gap: var(--sp-2) var(--sp-5);
     margin-bottom: var(--sp-3);
   }
+  /* the icon, then the text: a long place (supplier's "RIGHT HANDED / LEFT HANDED / …") wraps beside it */
   .meta__item {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--sp-2);
-    white-space: nowrap;
+    min-width: 0;
     color: var(--text-muted);
     font-size: var(--fs-sm);
   }
   .meta__item svg {
+    flex: none;
     width: 1rem;
     height: 1rem;
+    margin-top: 0.15rem; /* level with the first line */
     color: var(--text-subtle);
   }
   .meta__item b {

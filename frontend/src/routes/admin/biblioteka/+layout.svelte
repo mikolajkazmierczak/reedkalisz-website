@@ -1,4 +1,5 @@
 <script>
+  import { page as route } from '$app/stores';
   import { header } from '@/stores';
   import { searchparams, SearchParams } from '$/searchparams';
   import Library from '@c/library/Library.svelte';
@@ -9,6 +10,7 @@
   $: [limit, page, query] = $searchparams.get(searchParams.pathname).values();
 </script>
 
-<Library {searchParams} {limit} {page} {query} />
+<!-- an open file's editor has its own upload (a replacement) -->
+<Library {searchParams} {limit} {page} {query} dropping={!$route.params.id} />
 
 <slot />

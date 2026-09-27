@@ -3,8 +3,9 @@
   import { nanoid } from 'nanoid';
   import { deep } from '%/utils';
   import Icon from '$c/Icon.svelte';
+  import Select from '@c/Select.svelte';
+  import ApiBadge from '@c/ApiBadge.svelte';
   import Tooltip from '$c/Tooltip.svelte';
-  import Button from '@c/Button.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -17,25 +18,27 @@
   export let placeholder = null;
   export let disabled = false;
   export let error = null;
+  export let invalid = false; // outlined as `error` is, what's wrong said elsewhere (a number field only)
   export let borderless = false;
-  export let borderRadius = '0';
-  export let api = false; // whether the value will be updated via api
+  export let borderRadius = null; // a field's own (e.g. joined to a button, see Search); else a squircle by its size
+  export let size = 'normal'; // normal (2rem), small (1.5rem, like the small Button), compact (1.2rem, a value in a bar)
+  export let color = null; // a select's background, e.g. for a status
+  export let api = false; // the API scanner sets it: locked, "API" in the field, why when hovered
+  export let apiText = 'Tę wartość ustawia skaner API.';
+  export let label = null; // a field labelled by something outside it: its name for screen readers
 
   // number
   export let min = -Infinity;
   export let max = Infinity;
   export let step = 1;
-  export let buttons = false;
-  const minus = () => (min && value - 1 < min ? () => {} : value--);
-  const plus = () => (max && value + 1 > max ? () => {} : value++);
 
   // textarea
-  export let resize = false;
   export let rows = 3;
   export let format = 'html'; // text, html, markdown, json
 
-  // select
+  // select (see Select)
   export let options = [];
+  export let clearTo = undefined;
 
   // list
   function parseList(string) {
@@ -79,19 +82,20 @@
     }
   }
 
-  // token (for explicit labelling)
-  const id = `input-${nanoid(6)}`;
+  // token (for explicit labelling; given, for a label of its own outside it: <label for={id}>)
+  export let id = `input-${nanoid(6)}`;
 </script>
 
-<div class="wrapper">
+<div class="wrapper {size}" class:locked={api}>
   {#if $$slots.default && type != 'checkbox'}
-    <label for={id}><slot /></label>
+    <label class="ui-label" for={id}><slot /></label>
   {/if}
 
   {#if type == 'text'}
     <input
       {id}
       type="text"
+      aria-label={label}
       bind:value
       bind:this={input}
       {placeholder}
@@ -100,7 +104,8 @@
       class:borderless
       style:border-radius={borderRadius}
       on:click={(e) => dispatch('click', { e })}
-      on:input={(e) => dispatch('input', { e })} />
+      on:input={(e) => dispatch('input', { e })}
+      on:blur />
   {:else if type == 'textarea'}
     <textarea
       {id}
@@ -110,23 +115,10 @@
       class:error
       class:borderless
       {rows}
-      class:resize
       class:json={format === 'json'}
       on:click={(e) => dispatch('click', { e })}
-      on:input={(e) => dispatch('input', { e })} />
-  {:else if type == 'email'}
-    <input
-      {id}
-      type="email"
-      bind:value
-      bind:this={input}
-      {placeholder}
-      {disabled}
-      class:error
-      class:borderless
-      style:border-radius={borderRadius}
-      on:click={(e) => dispatch('click', { e })}
-      on:input={(e) => dispatch('input', { e })} />
+      on:input={(e) => dispatch('input', { e })}
+      on:blur />
   {:else if type == 'password'}
     <input
       {id}
@@ -139,34 +131,8 @@
       class:borderless
       style:border-radius={borderRadius}
       on:click={(e) => dispatch('click', { e })}
-      on:input={(e) => dispatch('input', { e })} />
-  {:else if type == 'date'}
-    <input
-      {id}
-      type="date"
-      bind:value
-      bind:this={input}
-      {placeholder}
-      {disabled}
-      class:error
-      class:borderless
-      style:border-radius={borderRadius}
-      on:click={(e) => dispatch('click', { e })}
-      on:input={(e) => dispatch('input', { e })} />
-  {:else if type == 'time'}
-    <input
-      {id}
-      type="time"
-      bind:value
-      bind:this={input}
-      {placeholder}
-      {disabled}
-      class:error
-      class:borderless
-      style:border-radius={borderRadius}
-      on:click={(e) => dispatch('click', { e })}
       on:input={(e) => dispatch('input', { e })}
-      {step} />
+      on:blur />
   {:else if type == 'color'}
     <input
       {id}
@@ -178,26 +144,29 @@
       class:borderless
       style:border-radius={borderRadius}
       on:click={(e) => dispatch('click', { e })}
-      on:input={(e) => dispatch('input', { e })} />
+      on:input={(e) => dispatch('input', { e })}
+      on:blur />
   {:else if type == 'checkbox'}
-    <div class="checkbox" class:error on:click={() => (value = !value)} on:keydown={() => {}}>
-      <input {id} type="checkbox" bind:checked={value} bind:this={input} {disabled} />
-      {#if $$slots.default}<label for={id} on:click|preventDefault on:keydown={() => {}}><slot /></label>{/if}
-    </div>
+    <label class="checkbox" class:error class:disabled>
+      <input {id} type="checkbox" aria-label={label} bind:checked={value} bind:this={input} {disabled} />
+      {#if $$slots.default}<span class="checkbox__label"><slot /></span>{/if}
+    </label>
   {:else if type == 'select'}
-    <select
+    <Select
       {id}
+      {label}
       bind:value
-      bind:this={input}
+      bind:button={input}
+      {options}
       {placeholder}
+      {clearTo}
       {disabled}
-      class:error
-      class:borderless
-      style:border-radius={borderRadius}>
-      {#each options as option}
-        <option value={option.id}>{option.text}</option>
-      {/each}
-    </select>
+      {size}
+      {color}
+      {error}
+      {borderless}
+      {borderRadius}
+      on:change />
   {:else if type == 'list'}
     <div class="list-wrapper">
       <div class="list">
@@ -211,50 +180,51 @@
           class:error
           class:borderless
           style:border-radius={borderRadius} />
-        <!-- <button class="list__tidy" on:click={() => (list = value.join(';'))} title="Uporządkuj">
-          <Icon fill name="broom" />
-        </button> -->
+        <!-- over the field, not the items below it -->
+        {#if api}
+          <span class="api"><ApiBadge /><Tooltip><small>{apiText}</small></Tooltip></span>
+        {/if}
       </div>
       <div class="list-items">
         {#if Array.isArray(value)}
           {#each value as v, i}
             <button
               class="list-items__item"
+              {disabled}
               on:click={() => {
                 value.splice(i, 1);
                 list = value.join(';');
                 value = value;
               }}>
               {v}
-              <div class="icon"><Icon fill name="close" /></div>
+              {#if !disabled}<div class="icon"><Icon fill name="close" /></div>{/if}
             </button>
           {/each}
         {/if}
       </div>
     </div>
   {:else if type == 'number'}
-    <div class="number-wrapper" class:buttons>
-      {#if buttons}<Button onclick={minus} disabled={value <= min}>&nbsp;-&nbsp;</Button>{/if}
+    <div class="number-wrapper">
       <div class="number">
         <input
           {id}
           type="number"
+          aria-label={label}
           bind:value
           bind:this={input}
           {placeholder}
           {disabled}
-          class:error
+          class:error={error || invalid}
           class:borderless
           style:border-radius={borderRadius}
-          class:center={buttons}
           {min}
           {max}
           {step}
           on:click={(e) => dispatch('click', { e })}
-          on:input={(e) => dispatch('input', { e })} />
+          on:input={(e) => dispatch('input', { e })}
+          on:blur />
         {#if error}<span class="error-info">{error}</span>{/if}
       </div>
-      {#if buttons}<Button onclick={plus} disabled={value >= max}>&nbsp;+&nbsp;</Button>{/if}
     </div>
   {/if}
 
@@ -262,28 +232,26 @@
     <span class="error-info">{@html error}</span>
   {/if}
 
-  {#if api}
-    <div class="api-icon">
-      <Tooltip>Ta wartość będzie aktualizowana przez API</Tooltip>
-      <Icon fill name="api" light />
-    </div>
+  <!-- over the whole field (a disabled one gets no pointer), the badge at its right end -->
+  {#if api && type != 'list'}
+    <span class="api" class:select={type == 'select'} class:textarea={type == 'textarea'}>
+      <ApiBadge /><Tooltip><small>{apiText}</small></Tooltip>
+    </span>
   {/if}
 </div>
 
 <style>
   .wrapper {
     position: relative;
+    min-width: 0; /* in a grid's column (ui-pair) as narrow as the column: a long value is cut, not widening it */
   }
-  label {
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-
+  /* the fields are squircles (rounded, where corner-shape isn't known), smaller ones less rounded */
   input,
   textarea,
-  select,
   .checkbox {
-    border: solid 1px var(--accent);
+    border: solid 1px var(--edge);
+    border-radius: var(--field-radius);
+    corner-shape: squircle;
     padding: 0.25rem 0.5rem;
     width: 100%;
     height: 2rem;
@@ -293,31 +261,40 @@
   [disabled] {
     cursor: not-allowed;
   }
+  /* faded, as a disabled select */
+  input:not([type='checkbox'])[disabled],
+  textarea[disabled] {
+    opacity: 0.6;
+  }
+  /* a hint, not a value: faint (navy seen through, on any box) */
+  input::placeholder,
+  textarea::placeholder {
+    color: rgb(27 47 78 / 0.4);
+  }
 
+  /* under the pointer the border darkens, as a checkbox's; in focus darker still */
+  input:not([type='checkbox']),
+  textarea {
+    transition: border-color 100ms;
+  }
+  input:not([type='checkbox'], [disabled]):hover,
+  textarea:not([disabled]):hover {
+    border-color: var(--navy-500);
+  }
   input:focus,
   textarea:focus,
-  select:focus {
+  input:focus:hover,
+  textarea:focus:hover {
     outline: none;
-    border-bottom: solid 1px var(--primary);
+    border-color: var(--navy-700);
   }
-  input.center {
-    text-align: center;
-  }
-
   textarea {
     resize: none;
     height: auto;
   }
-  textarea.resize {
-    resize: both;
-  }
   textarea.json {
     font-family: monospace;
     font-size: 0.9rem;
-  }
-
-  select {
-    cursor: pointer;
   }
 
   .checkbox {
@@ -326,58 +303,84 @@
     align-items: center;
     outline: none;
     border: none;
+    margin: 0;
     padding: 0;
     height: auto;
     background-color: unset;
   }
+  .checkbox.disabled {
+    cursor: not-allowed;
+  }
+  /* a squircle as the website's (its consent box): navy with a white tick when ticked */
   input[type='checkbox'] {
+    flex: none;
     cursor: pointer;
+    appearance: none;
+    display: grid;
+    place-items: center;
     margin: 0;
+    padding: 0;
     width: 1.25rem;
     height: 1.25rem;
-    accent-color: var(--primary);
+    border: solid 1px var(--edge);
+    border-radius: var(--field-radius-small);
+    background-color: var(--light);
+    transition:
+      background-color 100ms,
+      border-color 100ms;
+  }
+  input[type='checkbox']::after {
+    content: '';
+    width: 75%;
+    height: 75%;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5' fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    transform: scale(0.4);
+    opacity: 0;
+    transition:
+      transform 100ms,
+      opacity 100ms;
   }
   .checkbox:hover input[type='checkbox'] {
-    accent-color: var(--primary-light);
+    border-color: var(--navy-500);
   }
-  .checkbox label {
-    cursor: pointer;
+  input[type='checkbox']:checked {
+    border-color: var(--navy-700);
+    background-color: var(--navy-700);
+  }
+  .checkbox:hover input[type='checkbox']:checked {
+    border-color: var(--navy-500);
+    background-color: var(--navy-500);
+  }
+  input[type='checkbox']:checked::after {
+    transform: none;
+    opacity: 1;
+  }
+  input[type='checkbox']:focus-visible {
+    outline: solid 2px var(--navy-500);
+    outline-offset: 1px;
+  }
+  input[type='checkbox'][disabled] {
+    cursor: not-allowed;
+    border-color: var(--edge);
+    background-color: var(--grey-100);
+  }
+  input[type='checkbox'][disabled]:checked::after {
+    filter: invert(0.5);
+  }
+  .checkbox__label {
     user-select: none;
-    margin: 0;
     margin-left: 0.75rem;
   }
 
   .list {
     position: relative;
   }
-  /* .list__tidy {
-    cursor: pointer;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    aspect-ratio: 1 / 1;
-    border-radius: var(--border-radius);
-    border: none;
-    padding: 0.2rem;
-    height: calc(100% - 10px);
-    font-size: 0.75rem;
-    color: #000;
-    opacity: 0.75;
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-  .list__tidy:hover {
-    background-color: var(--accent-light);
-  } */
+  /* the tags under the field: a little space above and below, lined up with its edges */
   .list-items {
     display: flex;
     flex-wrap: wrap;
-    position: relative;
-    left: 1px;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
     padding-top: 0.25rem;
-    padding-left: 0.25rem;
-    width: calc(100% - 2px);
-    background-color: rgba(255, 255, 255, 0.5);
   }
   .list-items__item {
     cursor: pointer;
@@ -389,15 +392,20 @@
     padding: 0.25rem 0.5rem;
     padding-right: 0.25rem;
     border-radius: var(--border-radius);
+    corner-shape: squircle;
     border: none;
     height: 1.25rem;
     font-size: 0.75rem;
-    color: #000;
+    color: var(--text);
     opacity: 0.8;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--black-10);
   }
-  .list-items__item:hover {
-    background-color: rgba(0, 0, 0, 0.2);
+  .list-items__item:hover:not(:disabled) {
+    background-color: var(--black-20);
+  }
+  .list-items__item:disabled {
+    cursor: default;
+    padding-right: 0.5rem; /* no cross */
   }
   .list-items__item .icon {
     display: inline-block;
@@ -409,34 +417,76 @@
     grid-template-columns: auto;
     column-gap: 0.5rem;
   }
-  .number-wrapper.buttons {
-    grid-template-columns: auto 1fr auto;
-  }
 
   .error {
-    outline: solid 2px var(--main);
+    outline: solid 2px var(--red-500);
   }
   .error-info {
     display: inline-block; /* allows to put an optional <br> after the input to minimize content shift */
     margin-top: 0.25rem;
     margin-left: 0.75rem;
-    color: var(--main);
+    color: var(--red-500);
   }
 
-  .borderless {
+  .small input:not([type='checkbox']) {
+    padding: 0 0.35rem;
+    height: 1.5rem;
+    border-radius: var(--field-radius-small);
+    font-size: 0.85rem;
+  }
+  .small input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    border-radius: var(--field-radius-compact);
+  }
+  .small .checkbox__label {
+    margin-left: 0.4rem;
+    font-size: var(--label-size, 0.85rem); /* a surrounding bar can set its own */
+  }
+  .compact input:not([type='checkbox']) {
+    padding: 0 0.3rem;
+    height: 1.2rem;
+    border-radius: var(--field-radius-compact);
+    font-size: 0.85rem;
+  }
+
+  /* in a table's cell (the calculations): square, the cell draws the lines - whatever its size */
+  .wrapper input.borderless,
+  .wrapper textarea.borderless {
     border: none;
+    border-radius: 0;
   }
 
-  .api-icon {
+  /* the field's last line (a label may be above it), the badge at its right end, before a select's arrow */
+  .api {
+    --field: 2rem;
+    z-index: 1;
     cursor: help;
     position: absolute;
-    bottom: calc(-1.25rem / 2);
-    left: calc(-1.25rem / 2);
-    /* transform: translate(-50%, 50%); cannot be used, Tooltip would be shifted */
-    width: 1.25rem;
-    height: 1.25rem;
-    padding: 0.1rem;
-    background-color: var(--accent-dark);
-    border-radius: 50%;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-right: 0.3rem;
+  }
+  .small .api {
+    --field: 1.5rem;
+  }
+  .compact .api {
+    --field: 1.2rem;
+  }
+  .api > :global(.api-badge) {
+    margin-bottom: calc((var(--field) - 1.4rem) / 2);
+    box-shadow: none; /* the field is its frame */
+  }
+  .locked input:not([type='checkbox']),
+  .locked textarea {
+    padding-right: 2.25rem; /* the value clear of the badge */
+  }
+  .api.select {
+    padding-right: 1.8rem;
+  }
+  .api.textarea > :global(.api-badge) {
+    margin-bottom: 0.3rem;
   }
 </style>

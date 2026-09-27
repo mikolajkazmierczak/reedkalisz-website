@@ -1,7 +1,7 @@
 import api from '$/api';
 import heimdall from '$/heimdall';
 import { collectRecalculated, recalculateProductsGenerator as recalculate } from '%/calculations';
-import { companies, globalMargins, labelings, priceViews } from '@/globals';
+import { companies, globalMargins, globals, labelings, priceViews } from '@/globals';
 import { get } from 'svelte/store';
 
 /** Uses `recalculateProducts()` from shared folder to update all products that match the filter. */
@@ -9,6 +9,8 @@ export async function* recalculateProductsGenerator(
   filter,
   { newPriceView = null, swapLabelings = null, emit = true } = {},
 ) {
+  // every price needs all four, whichever page asks (a Kalkulacje tab reads only its own)
+  await Promise.all([globalMargins, priceViews, labelings, companies].map((store) => globals.update(store)));
   const stores = {
     globalMargins: get(globalMargins),
     priceViews: get(priceViews),

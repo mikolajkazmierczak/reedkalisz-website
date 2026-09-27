@@ -66,11 +66,6 @@ export async function walkObject(object, filters, func, _regex = null, _path = '
   return;
 }
 
-export async function getFields(object, filters) {
-  const fields = [];
-  await walkObject(object, filters, (obj, key, val) => fields.push(val));
-  return fields;
-}
 export async function deleteFields(object, filters) {
   // WARNING: inplace!
   await walkObject(object, filters, (obj, key) => {
@@ -154,24 +149,17 @@ export function reuseIDs(items, reusableIDs = []) {
 
 export function makeTree(items, _parent = null, _depth = 0, _path = []) {
   // Convert a flat array of items into a tree structure and add metadata (_meta property).
-  const tree = [];
-  for (const item of items) {
-    if (item.parent == _parent) {
-      const path = [..._path, item.index];
-      tree.push({
-        ...item,
-        _meta: { depth: _depth, path, isFirst: false, isLast: false },
-        children: makeTree(items, item.id, _depth + 1, path),
-      });
-    }
-  }
-  // sort children by their indexes
-  tree.sort((a, b) => a.index - b.index);
-  if (tree.length > 0) {
-    tree[0]._meta.isFirst = true;
-    tree[tree.length - 1]._meta.isLast = true;
-  }
-  return tree;
+  // The path is made of positions among the siblings (sorted by `index`), not the `index` values themselves:
+  // those can have gaps (a deleted category), and the path is how an item is found in the tree again.
+  const level = items.filter((item) => item.parent == _parent).sort((a, b) => a.index - b.index);
+  return level.map((item, position) => {
+    const path = [..._path, position];
+    return {
+      ...item,
+      _meta: { depth: _depth, path, isFirst: position === 0, isLast: position === level.length - 1 },
+      children: makeTree(items, item.id, _depth + 1, path),
+    };
+  });
 }
 
 export function treeFlatten(tree) {
@@ -217,21 +205,6 @@ export function treeGetItem(tree, id) {
     }
   }
 }
-export function treeRemoveItem(tree, id) {
-  // Remove item in a tree with a given id and return it.
-  for (let i = 0; i < tree.length; i++) {
-    const item = tree[i];
-    if (item.id == id) {
-      tree.splice(i, 1);
-      return item;
-    }
-    if (item.children.length) {
-      const found = treeRemoveItem(item.children, id);
-      if (found) return found;
-    }
-  }
-}
-
 export function treeMarkToRemove(tree, id) {
   // Mark item in a tree with a given id to be removed.
   for (const item of tree) {
@@ -259,14 +232,15 @@ export function treeRemoveMarked(tree) {
 }
 
 export function treeGetItemAtPath(tree, path) {
-  // Find item using it's path.
+  // Find item using it's path: positions among the siblings, like makeTree's (not `index` values - the website's tree
+  // has only the enabled categories, so its positions and the saved indexes differ).
   if (path.length === 0) return tree;
-  if (path.length === 1) return tree.find((item) => item.index == path[0]);
-  return treeGetItemAtPath(tree.find((item) => item.index == path[0]).children, path.slice(1));
+  if (path.length === 1) return tree[path[0]];
+  return treeGetItemAtPath(tree[path[0]].children, path.slice(1));
 }
 export function treePushItemAtPath(tree, path, item) {
-  // Insert item at path.
-  const parent = tree.find((item) => item.index == path[0]);
+  // Insert item at path (positions, see treeGetItemAtPath).
+  const parent = tree[path[0]];
   if (path.length === 1) {
     tree.splice(path[0], 0, item); // if path[0] is bigger then the array, it will still be added at the end
   } else treePushItemAtPath(parent.children, path.slice(1), item);
@@ -285,16 +259,6 @@ export function treeMoveItemToPath(tree, oldPath, newPath) {
   treeRefreshMetaAndParent(tree);
   const newItemData = getData(newItem);
   return { oldItemData, newItemData };
-}
-
-export function treeGetItemIDsFromPath(tree, path) {
-  // Find ids of all items in a path.
-  const ids = [];
-  for (let i = 0; i < path.length; i++) {
-    const item = treeGetItemAtPath(tree, path.slice(0, i + 1));
-    ids.push(item.id);
-  }
-  return ids;
 }
 
 export function treeGetItemsFromPath(tree, path) {

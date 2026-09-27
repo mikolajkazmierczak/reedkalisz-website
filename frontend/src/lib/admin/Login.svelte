@@ -54,7 +54,7 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: var(--black-50);
   }
 
   .login {
@@ -63,7 +63,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border-radius: var(--border-radius);
+    border-radius: var(--box-radius);
+    corner-shape: squircle;
     padding: 1rem 2rem;
     width: 30ch;
     border: var(--border);
@@ -81,16 +82,14 @@
     box-shadow: var(--shadow);
     border: var(--border);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 3.125rem;
+    height: 3.125rem;
     background-color: var(--light);
   }
 
   form {
     display: grid;
     row-gap: 0.5rem;
-    /* flex-flow: column; */
-    /* justify-content: center; */
   }
   h1 {
     margin-top: 1rem;

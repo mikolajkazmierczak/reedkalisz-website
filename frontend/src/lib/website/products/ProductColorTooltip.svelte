@@ -6,12 +6,10 @@
   export let amount;
   export let available = false;
 
-  export let show = null;
-
   $: state = parseAmount({ available, amount });
 </script>
 
-<Tooltip backgroundColor="var(--light)" border="1px solid rgba(0,0,0,0.5)" {show}>
+<Tooltip backgroundColor="var(--light)" border="1px solid rgba(0,0,0,0.5)">
   <b>{label}</b><br />
   Dostępność:
   {#if state.state === AMOUNT}

@@ -2,13 +2,12 @@ import fetch from 'node-fetch';
 import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
+import { addCategories } from '../common.js';
 
 function parseCode(code) {
   // formats: 'XXXXXX', 'XXXXXX-XX', 'XXXXXX-XX-XX', ...?
   const [productCode, ...tail] = code.split('-'); // code: 'XXXXXX-XX'
-  // TODO: for now colorCode includes the code for textile size (e.g. 'WH-XL' for white color, XL size)
-  const colorCode = tail ? tail.join('-') : null; // colorCode: '', 'XX', 'XX-XX'
-  return { productCode, colorCode, hasLongTail: tail.length > 1 };
+  return { productCode, hasLongTail: tail.length > 1 };
 }
 
 function parseSize(size, unit) {
@@ -48,7 +47,9 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
       const a = pos.max_print_size_height;
       const b = pos.max_print_size_width;
       const areaType = pos.print_position_type;
-      const area = areaType === 'Rectangle' ? a * b : areaType === 'Ellipse' ? Math.PI * a * b : null;
+      // the sizes are the whole width and height, an ellipse's half-axes are half of them;
+      // a polygon counts as its bounding box
+      const area = areaType === 'Ellipse' ? Math.round((Math.PI * a * b) / 4) : a * b;
       return {
         techniques: pos.printing_techniques.map((t) => t.id),
         label: pos.position_id,
@@ -70,15 +71,21 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
   }));
   handlingCosts.sort((a, b) => a.price - b.price); // sort by price, ascending
 
+  // looked up once per product / variant: a find per lookup blocks the socket server for seconds
+  const priceByProduct = new Map(); // the first variant's price
+  for (const p of pricelist) {
+    const code = parseCode(p.sku).productCode; // TODO: are prices same for all variants (probably not for textiles)
+    if (!priceByProduct.has(code)) priceByProduct.set(code, p.price);
+  }
+  const stockBySku = new Map(stock.map((s) => [s.sku, s.amount]));
+  const printByCode = new Map(printdata.map((p) => [p.productCode, p]));
+
   const items = products.map(($) => {
     const { productCode } = parseCode($.master_code);
 
-    const price =
-      pricelist.find((p) => {
-        return parseCode(p.sku).productCode === productCode; // TODO: are prices same for all variants (probably not for textiles)
-      })?.price || null;
+    const price = priceByProduct.get(productCode) || null;
 
-    const handlingCostCode = printdata.find((p) => p.productCode === productCode)?.manipulation || null;
+    const handlingCostCode = printByCode.get(productCode)?.manipulation || null;
     const handling_cost = handlingCosts.find((h) => h.code === handlingCostCode)?.price || null;
 
     const description = $?.commercial_description || $?.long_description || $?.short_description || null;
@@ -86,7 +93,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
     const data = {
       // only define fields that are both:
       // - different from defaults
-      // - pertain to the MidOcean api (e.g. enabled, api_enabled will be defined later)
+      // - pertain to the MidOcean api (e.g. enabled will be defined later)
       name: $.product_name ?? '',
       code: productCode,
       slug: slugify([productCode, $.product_name], { key: true }),
@@ -101,25 +108,28 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
       handling_cost,
       gallery: [], // TODO: $.digital_assets.filter(a => a.type === 'image').map(a => a.url)
       storage: $.variants.map((v) => {
-        const { colorCode, hasLongTail } = parseCode(v.sku);
-        const vStock = stock.find((s) => s.sku === v.sku);
+        const { hasLongTail } = parseCode(v.sku);
         const vImages = v?.digital_assets ?? [];
         const vColor = parseColorDescription(v.color_description);
         const data = {
           img: vImages.filter((a) => a.type === 'image').map((a) => a.url),
-          amount: vStock ? vStock.amount : null,
-          api_color_code: colorCode,
+          amount: stockBySku.get(v.sku) ?? null,
+          api_color_code: v.sku, // the variant's whole code
           api_color_id: v.variant_id,
           multicolored: false,
           color_first: vColor[0],
           color_second: vColor[1],
         };
-        // console.log(data);
 
         if (hasLongTail) data._incompatible = true;
         return data;
       }),
-      _labelings: printdata.find((p) => p.productCode === productCode)?.positions || [],
+      _labelings: printByCode.get(productCode)?.positions || [],
+      // categories are set per variant
+      _categories: addCategories(
+        [],
+        $.variants.map((v) => [v.category_level1, v.category_level2, v.category_level3]),
+      ),
     };
     if (data.storage.every((s) => s?._incompatible)) data._incompatible = true;
     return data;

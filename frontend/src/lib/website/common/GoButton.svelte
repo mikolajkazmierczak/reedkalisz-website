@@ -81,9 +81,9 @@
     transition: transform var(--dur) var(--ease);
   }
   .go:not(.reverse):hover .go__icon {
-    transform: translateX(3px);
+    transform: translateX(0.1875rem);
   }
   .go.reverse:hover .go__icon {
-    transform: translateX(-3px);
+    transform: translateX(-0.1875rem);
   }
 </style>

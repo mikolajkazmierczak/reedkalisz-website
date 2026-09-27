@@ -1,13 +1,14 @@
 <script>
-  import { fade, fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
   import Button from '@c/Button.svelte';
+  import Modal from '@c/Modal.svelte';
 
+  // A titled Modal with a close button (a click beside it closes it too)
   const dispatch = createEventDispatcher();
 
   export let title;
   export let opened;
-  export let maxWidth = '500px';
+  export let maxWidth = '32rem';
 
   function close() {
     opened = false;
@@ -16,38 +17,18 @@
 </script>
 
 {#if opened}
-  <div class="wrapper" transition:fade={{ duration: 200 }} on:click|self={close}>
-    <div class="content" transition:fly={{ duration: 300 }} style:max-width={maxWidth}>
-      <div class="close">
-        <Button icon="close" on:click={close} square />
-      </div>
-      <h3>{title}</h3>
-      <slot />
+  <Modal {maxWidth} on:close={close}>
+    <div class="close">
+      <Button icon="close" title="Zamknij" on:click={close} square />
     </div>
-  </div>
+    <h3>{title}</h3>
+    <slot />
+  </Modal>
 {/if}
 
 <style>
-  .wrapper {
-    position: fixed;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: grid;
-    place-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    border: var(--border);
-    background-color: var(--light);
+  h3 {
+    margin: 0;
   }
   .close {
     position: absolute;

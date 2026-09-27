@@ -1,7 +1,6 @@
 <script>
   import '$/styles/ui-admin.css';
 
-  import { beforeNavigate } from '$app/navigation';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
@@ -10,27 +9,28 @@
 
   import globals from '@/globals';
   import { errors, unsaved } from '@/stores';
+  import { guardLeaving } from '@/dialog';
 
+  import Dialog from '@/Dialog.svelte';
   import Error from '@/Error.svelte';
   import Login from '@/Login.svelte';
   import Nav from '@/nav/Nav.svelte';
   import Header from '@/Header.svelte';
   import Loader from '$c/Loader.svelte';
 
-  beforeNavigate((navigation) => {
-    if ($unsaved) {
-      if (confirm('Zmiany nie zostały zapisane. Czy na pewno chcesz opuścić stronę?')) {
-        $unsaved = false;
-      } else navigation.cancel();
-    }
-  });
+  // an editor with unsaved changes
+  guardLeaving(() => $unsaved, { discard: () => ($unsaved = false) });
 
   let ready = false;
   onMount(async () => {
     await readme();
     ready = true;
     // catch all errors
-    window.addEventListener('error', (e) => ($errors = [...$errors, e?.reason?.message]));
+    window.addEventListener('error', (e) => {
+      // the browser's harmless note that a ResizeObserver had more to report in one frame
+      if (e.message?.startsWith('ResizeObserver loop')) return;
+      $errors = [...$errors, e.error?.message ?? e.message];
+    });
     window.addEventListener('unhandledrejection', (e) => ($errors = [...$errors, e?.reason?.message]));
   });
 
@@ -48,14 +48,15 @@
   <meta name="robots" content="noindex" />
   <style>
     body {
-      background-color: var(--accent-white);
+      background-color: var(--grey-100);
       background-image: url('/imgs/dot_grid.png');
-      background-size: 160px;
+      background-size: 10rem;
     }
   </style>
 </svelte:head>
 
 <Error />
+<Dialog />
 
 {#if ready}
   <Login />
@@ -85,6 +86,14 @@
   }
 
   .content {
-    padding: 1.5rem 1.5rem 1.5rem 5.5rem;
+    /* the header is fixed above it (4rem); under it, a gap like between the boxes (the menu's first button starts
+       there too, see Nav) */
+    padding: calc(var(--header-height) + 1rem) 1.5rem 1.5rem calc(var(--nav-width) + 1.5rem);
+  }
+  /* a phone: no menu beside it (it's over the page when opened, see Nav), room under it for the menu's button */
+  @media (max-width: 50rem) {
+    .content {
+      padding: calc(var(--header-height) + 0.75rem) 0.75rem 5rem;
+    }
   }
 </style>

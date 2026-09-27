@@ -1,6 +1,6 @@
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
-import { parseItems } from '../common.js';
+import { mergePositions, parseItems, printPosition } from '../common.js';
 import { fetchSimpleApi } from '../utils.js';
 
 function parseMaterials(materials) {
@@ -58,37 +58,51 @@ export function parseSize(size) {
 export function parseCode(short, full) {
   const isUnset = (code) => typeof code !== 'string' || code === '';
   if (isUnset(short) && isUnset(full)) {
-    return { productCode: null, colorCode: null };
+    return { productCode: null };
   }
   // if either code is unset while the other is set, or both are set and match, then each color is a separate product
   if (isUnset(short) && !isUnset(full)) {
-    return { productCode: full, colorCode: null };
+    return { productCode: full };
   } else if (!isUnset(short) && isUnset(full)) {
-    return { productCode: short, colorCode: null };
+    return { productCode: short };
   } else if (short === full) {
-    return { productCode: short, colorCode: null };
+    return { productCode: short };
   }
   const commonLength = Math.min(short.length, full.length);
   const productCode = short.slice(0, commonLength + 1);
-  const colorCode = full.slice(commonLength);
-  return { productCode, colorCode };
+  return { productCode };
 }
 
-// TODO: are prices same for all variants (pendrives? textiles?)
-export const getPrice = (prices, codeFull, key = 'code_full') => prices.find((p) => p?.[key] === codeFull);
-export const getStock = (stocks, codeFull, key = 'code_full') => stocks.find((s) => s?.[key] === codeFull);
+function parseCategories(categories) {
+  // categories: [{ name, subcategory: { name } }, ...] - one entry per subcategory
+  // -> [['name', 'subcategory name'], ...]
+  return (categories ?? []).flatMap((c) => {
+    const subs = [c?.subcategory].flat().filter(Boolean);
+    return subs.length ? subs.map((s) => [c?.name, s?.name]) : [[c?.name]];
+  });
+}
 
-function parse(company, offer, prices, stocks) {
-  prices = prices.products;
+function parseMarkings(entry) {
+  // products-markings: { places: [{ name: 'Przód', marking_code: 'T1', marking_size: '10 x 5 cm' }, ...] }
+  return mergePositions((entry?.places ?? []).map((p) => printPosition([p.marking_code], p.name, p.marking_size)));
+}
+
+// rows of the prices / stocks / markings files by the variant's full code
+export const byCode = (rows, key = 'code_full') => new Map((rows ?? []).map((row) => [row?.[key], row]));
+
+function parse(company, offer, prices, stocks, markings) {
+  const pricesByCode = byCode(prices.products);
+  const stocksByCode = byCode(stocks);
+  const markingsByCode = new Map((markings ?? []).map((m) => [m?.baseinfo?.code_full, m]));
 
   return parseItems(
     offer.map(($) => {
-      const { productCode, colorCode } = parseCode($?.baseinfo?.code_short, $?.baseinfo?.code_full);
+      const { productCode } = parseCode($?.baseinfo?.code_short, $?.baseinfo?.code_full);
       const name = $?.baseinfo?.name || '';
       const description = $?.baseinfo?.intro || '';
       const size = parseSize($?.attributes?.size);
-      const price = getPrice(prices, $?.baseinfo?.code_full);
-      const stock = getStock(stocks, $?.baseinfo?.code_full);
+      const price = pricesByCode.get($?.baseinfo?.code_full);
+      const stock = stocksByCode.get($?.baseinfo?.code_full);
 
       return {
         name,
@@ -102,10 +116,12 @@ function parse(company, offer, prices, stocks) {
         size_z: size.z,
         materials: parseMaterials($?.materials),
         price: parsePrice(company, price?.price, !price?.no_discount && !price?.additional_offer),
+        _categories: parseCategories($?.categories),
+        _labelings: markings ? parseMarkings(markingsByCode.get($?.baseinfo?.code_full)) : undefined,
         _storage: {
           img: parseImages($?.images),
           amount: parseStock(stock),
-          api_color_code: colorCode,
+          api_color_code: $?.baseinfo?.code_full || productCode, // the variant's whole code
           api_color_id: $?.baseinfo?.id,
           color_first: $?.color?.name || null, // str
           _color_first_hex: $?.color?.hex ? `#${$?.color?.hex}` : null,
@@ -119,6 +135,7 @@ export const fetchApi = async (company, hostname) =>
   fetchSimpleApi({
     company,
     routes: ['offer', 'prices', 'stocks'],
+    optional: ['products-markings'],
     url: (route) => `https://${hostname}/data/webapi2/pl/json/${route}.json`,
     parse,
   });

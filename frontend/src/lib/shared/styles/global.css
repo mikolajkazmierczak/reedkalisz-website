@@ -1,24 +1,20 @@
 :root {
-  --main-0: #fbf2f3;
-  --main-1: #efc2c7;
-  --main-2: #e3939b;
-  --main-3: #d7636f;
-  --main-4: #cb3343;
-  --main-5: #bf0417;
-  --main-6: #980312;
-  --main-7: #72020d;
-  --main-8: #4c0109;
-  --main-9: #260004;
-  --main-light: var(--main-4);
-  --main: var(--main-5);
-  --main-dark: var(--main-7);
-
   --text: #0d1821;
   --light: #ffffff;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Scrollbars: the system's own, thin and in the page's colours (--scroll-thumb, --scroll-track). Only the standard
+   properties: a Mac keeps its native scrollbars that show up while scrolling, Windows draws thin ones in these
+   colours. (::-webkit-scrollbar would force the old always-there bars on a Mac, in Safari too.) */
+:root {
+  scrollbar-color: var(--scroll-thumb, rgba(0, 0, 0, 0.3)) var(--scroll-track, transparent);
+}
+* {
+  scrollbar-width: thin;
 }
 
 html,

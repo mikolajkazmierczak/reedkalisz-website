@@ -1,25 +1,31 @@
 <script>
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { readUid } from '%/uid';
+  import { ask } from '@/dialog';
+  import { removeUnusedFiles, usedFiles } from '@/files';
   import { colors } from '@/globals';
   import { selected, toggleItemSelected, toggleStorageSelected } from './selected.js';
   import { getFlag, parseColors } from './utils.js';
 
   import Icon from '$c/Icon.svelte';
-  import Tooltip from '$c/Tooltip.svelte';
+  import Button from '@c/Button.svelte';
+  import Input from '@c/Input.svelte';
+  import Float from '@c/table/Float.svelte';
+  import HeadIcon from '@c/table/HeadIcon.svelte';
+  import Grid from '@c/table/Grid.svelte';
 
   export let items;
   export let company;
+  export let total = items.length; // of the whole list, so the number column fits its longest number
 
   let expanded = new Set();
   $: flags = (() => {
-    const { rejected, cut, check, todo, edit, inprogress, done } = company.api_flags;
+    const { rejected, cut, check, todo, edit, inprogress, done } = company.api_flags ?? {}; // (none yet: a new company)
     return {
-      _default: { text: '' },
+      _default: { text: 'Brak statusu' },
+      check: { text: '🔍 Hmm', items: check || [] },
       rejected: { text: '❌ Odrzucony', items: rejected || [] },
       cut: { text: '♻️ Ma zamiennik', items: cut || [] },
-      check: { text: '🔍 Hmm', items: check || [] },
       todo: { text: '💼 Do dodania', items: todo || [] },
       edit: { text: '✏️ Do edycji', items: edit || [] },
       inprogress: { text: '🔧 W budowie', items: inprogress || [] },
@@ -27,12 +33,24 @@
     };
   })();
 
-  async function handleStatusChange(e, item) {
-    // get previous flag
+  // the status select, coloured by the status; none is a button over the list (see Select), and an empty select
+  $: flagOptions = Object.entries(flags).map(([id, { text }]) =>
+    id === '_default' ? { id, text, special: true } : { id, text, color: flagColors[id] },
+  );
+  const flagColors = {
+    _default: 'var(--light)',
+    rejected: 'var(--red-100)',
+    cut: 'var(--red-50)', // paler than rejected: it's been dealt with
+    check: 'var(--purple-100)',
+    todo: 'var(--orange-100)',
+    edit: 'var(--yellow-100)',
+    inprogress: 'var(--blue-100)',
+    done: 'var(--green-100)',
+  };
+
+  async function handleStatusChange(newFlag, item) {
     const flag = getFlag(flags, item._uid);
-    // get selected flag
-    const options = Array.from(e.target.children);
-    const newFlag = options.find((o) => o.selected).value;
+    if (newFlag === flag) return void (flags = flags); // e.g. "Brak statusu" on one without any: its select back to empty
     // move uid to the selected flag
     if (flag != '_default') flags[flag].items = flags[flag].items.filter((uid) => uid != item._uid); // remove from previous flag
     if (newFlag != '_default') flags[newFlag].items.push(item._uid); // add to new flag
@@ -52,40 +70,48 @@
     expanded = expanded;
   }
 
+  // a deleted product or variant takes its images along, unless something else uses them
+  async function removeFiles(files) {
+    const deleted = await removeUnusedFiles(files);
+    if (deleted.length) heimdall.emit('directus_files', deleted);
+  }
+
+  const openProduct = (item) => window.open(`/admin/produkty/${item.slug}`, '_blank', 'noreferrer');
+  // the supplier's search, also for what the api no longer has (their "not found" confirms it's gone)
+  const openApi = (code, name) => window.open(getApiUrl(code, name), '_blank', 'noreferrer');
+
+  async function toggleVisible(item) {
+    item.enabled = !item.enabled;
+    items = items;
+    await api.items('products').updateOne(item.id, { enabled: item.enabled });
+    heimdall.emit('products', item.id);
+  }
+  async function toggleStorageVisible(item, storage) {
+    storage.enabled = !storage.enabled;
+    items = items;
+    await api.items('products_storage').updateOne(storage.id, { enabled: storage.enabled });
+    heimdall.emit('products', item.id);
+  }
+
   async function removeItem(item) {
-    if (confirm(`OPERACJA NIEODWRACALNA!\nUsunąć produkt ${item._uid}?`)) {
+    if (await ask(`Usunąć produkt ${item.code} ${item.name}? Tego nie można cofnąć.`, { ok: 'Usuń', danger: true })) {
+      const files = [...usedFiles(item)];
       await api.items('products').deleteOne(item.id);
       heimdall.emit('products', item.id);
+      await removeFiles(files);
     }
   }
   async function removeStorage(item, storage) {
-    if (confirm(`OPERACJA NIEODWRACALNA!\nUsunąć kolor ${storage._uid}?`)) {
+    if (
+      await ask(`Usunąć wariant ${storage.api_color_code ?? ''}? Tego nie można cofnąć.`, { ok: 'Usuń', danger: true })
+    ) {
       await api.items('products').updateOne(item.id, {
         // filter out 1) the storage being deleted 2) all storages not in db
         // and reindex the storages
         storage: item.storage.filter((s) => s.id && s.id != storage.id).map((s, i) => ({ ...s, index: i })),
       });
       heimdall.emit('products', item.id);
-    }
-  }
-
-  function getCompanySpecificCode(uid) {
-    const { productCode, colorCode } = readUid(uid);
-    switch (company.name) {
-      case 'PAR':
-        return `${productCode}${colorCode ? `.${colorCode}` : ''}`;
-      case 'MidOcean':
-      case 'BlueCollection':
-        return `${productCode}${colorCode ? `-${colorCode}` : ''}`;
-      case 'EasyGifts':
-      case 'Macma':
-      case 'Promotionway':
-      case 'AXPOL':
-        return `${productCode}${colorCode ? colorCode : ''}`;
-      case 'USBSystem':
-        return productCode;
-      default:
-        throw new Error('Company code not supported');
+      await removeFiles((storage.img ?? []).map((i) => i.img));
     }
   }
 
@@ -94,16 +120,14 @@
     return input.replace(/\s*\d+(?:\.\d+)?\s*[GT]B(?:\s*\/\s*\d+(?:\.\d+)?\s*[GT]B)*\s*$/i, '').trim();
   }
 
-  function getApiUrl(uid, name) {
-    const code = getCompanySpecificCode(uid);
+  function getApiUrl(code, name) {
     switch (company.name) {
       case 'PAR':
         return `https://www.par.com.pl/products?search=${code}`;
       case 'MidOcean':
         return `https://www.midocean.com/INTERSHOP/web/WFS/midocean-PL-Site/pl_PL/-/PLN/ViewParametricSearchBySearchIndex-Browse?SearchTerm=${code}`;
       case 'BlueCollection':
-        const productCode = code.split('-')[0];
-        return `https://bluecollection.gifts/pl/${productCode}.html`;
+        return `https://bluecollection.gifts/pl/${code.split('-')[0]}.html`;
       case 'EasyGifts':
         return `https://www.easygifts.com.pl/search.php?dosearch=1&query=${code}`;
       case 'Macma':
@@ -112,6 +136,9 @@
         return `https://promotionway.pl/search.php?query=${code}`;
       case 'AXPOL':
         return `https://axpol.com.pl/pl/search/?search=product&string=${code}`;
+      case 'HappyBrands':
+        // by name: a variant's code may have its product's in front ('605RM/605R01W'), which their search doesn't know
+        return `https://happybrands.promo/searchProduct?name=${encodeURIComponent(name)}&category=0&color=&amount=`;
       case 'USBSystem':
         const productName = stripUsbSizes(name).replace(' ', '+');
         return `https://usbsystem.pl/?s=${productName}&post_type=product`;
@@ -121,326 +148,205 @@
   }
 </script>
 
-<div class="scroll">
-  <table>
-    {#each items as item}
-      {@const getDbUrl = (slug) => `/admin/produkty/${slug}`}
-      {@const itemNotAllInApi = item.storage.some((s) => !s._api)}
-      {@const itemNotInApi = item.storage.every((s) => !s._api) || !item._api}
-      {@const itemSelected = $selected.has(item._uid)}
-      {@const itemExpanded = expanded.has(item._uid)}
-      {@const itemCompatible = !item?._incompatible}
-      {@const flag = flags && getFlag(flags, item._uid)}
-      {@const code = getCompanySpecificCode(item._uid)}
-      <tr class:selected={itemSelected}>
-        <td class="flag">
-          {#if flags}
-            <select class={flag} on:change={(e) => handleStatusChange(e, item)}>
-              {#each Object.entries(flags) as [key, { text }]}
-                <option value={key} selected={flag == key}>{text}</option>
-              {/each}
-            </select>
-          {/if}
-        </td>
-        <td class="mono index">
-          <b>{item._index + 1}</b>
-        </td>
-        <td class="mono expand">
-          {#if item.storage.length}
-            <button on:click={() => toggleExpanded(item._uid)}>
-              {itemExpanded ? '-' : `+${item.storage.length}`}
-            </button>
-          {/if}
-        </td>
-        <td class="code">
-          <div class="codeContent" title={code}>{code}</div>
-        </td>
-        <td class="mono selection">
-          {#if itemCompatible && !item.storage.every((s) => s._db)}
-            {@const all = item.storage.every((s) => $selected.has(s._uid))}
-            {@const some = item.storage.some((s) => $selected.has(s._uid))}
-            <button on:click={() => toggleItemSelected(item)}>{all ? '-' : some ? '/' : '+'}</button>
-          {/if}
-        </td>
-        <td class="name">
-          {item.name}
-          {#if item._db && !item.enabled}
-            <div class="icon">
-              <Icon height="15px" name="eye_off" />
-              <Tooltip><small>Ukryty</small></Tooltip>
-            </div>
-          {/if}
-        </td>
-        <td class="remove">
-          {#if item._db}
-            <button class="remove" on:click={() => removeItem(item)}>
-              <Icon height="16px" name="delete" color="var(--main)" />
-            </button>
-          {/if}
-        </td>
-        <td class="tags db">
-          {#if item._db}
-            <a class="tag in-db" href={getDbUrl(item.slug)} target="_blank" rel="noreferrer">
-              <Icon height="15px" name="products" />Zaimportowany
-            </a>
-          {/if}
-        </td>
-        <td class="tags api">
-          {#if itemNotInApi}
-            <div class="tag not-in-api"><Icon height="18px" name="cloud_off" />Wycofany</div>
-          {:else if itemNotAllInApi}
-            <a class="tag not-all-in-api" href={getApiUrl(item._uid, item.name)} target="_blank" rel="noreferrer">
-              <Icon height="18px" name="cloud" />Wycofane kolory
-            </a>
-          {:else}
-            <a class="tag in-api" href={getApiUrl(item._uid, item.name)} target="_blank" rel="noreferrer">
-              <Icon height="18px" name="cloud" />Dostępny
-            </a>
-          {/if}
-          {#if !itemCompatible}
-            <div class="tag not-in-api"><Icon height="18px" name="cloud_dismiss" />Niekompatybilny</div>
-          {/if}
-        </td>
-      </tr>
+<!-- the number column fits 5 digits, more if a supplier ever has that many products (rem, not ch: the head's text is
+     smaller than the rows', ch would make the columns differ) -->
+<Grid
+  columns="1.5rem 8.5rem {Math.max(5, String(total).length) *
+    0.5}rem 1.5rem 2.75rem 1.5rem 1.5rem 7rem minmax(18rem, 1fr)">
+  <svelte:fragment slot="head">
+    <HeadIcon icon="delete" label="Usuwanie" />
+    <span>Status</span>
+    <span class="index head-index"><HeadIcon icon="number_symbol" label="Numer na liście" /></span>
+    <HeadIcon icon="cloud" label="Dostępność u producenta (otwiera jego wyszukiwarkę)" />
+    <HeadIcon icon="hierarchy" label="Kolory" />
+    <HeadIcon icon="add" label="Dodawanie / zaimportowany produkt" />
+    <HeadIcon icon="eye" label="Widoczność" />
+    <span>Kod</span>
+    <span>Nazwa</span>
+  </svelte:fragment>
 
-      {#if $colors && itemExpanded}
-        {#each item.storage as storage}
-          {@const storageSelected = $selected.has(storage._uid)}
-          {@const storageCompatible = !storage?._incompatible}
-          {@const storageCode = getCompanySpecificCode(storage._uid)}
-          <tr class:selected={storageSelected}>
-            <td class="flag" />
-            <td class="index">
-              <span style:opacity={0.65}>{storage._index + 1}</span>
-            </td>
-            <td class="expand" />
-            <td class="code">
-              <div class="codeContent" title={storageCode}>{storageCode}</div>
-            </td>
-            <td class="selection">
-              {#if storageCompatible && !storage._db}
-                <button on:click={() => toggleStorageSelected(item, storage)}>
-                  {storageSelected ? '-' : '+'}
-                </button>
-              {/if}
-            </td>
-            <td class="name">
+  {#each items as item}
+    {@const itemNotAllInApi = item.storage.some((s) => !s._api)}
+    {@const itemNotInApi = item.storage.every((s) => !s._api) || !item._api}
+    {@const itemSelected = $selected.has(item._uid)}
+    {@const itemExpanded = expanded.has(item._uid)}
+    {@const itemCompatible = !item?._incompatible}
+    {@const flag = flags && getFlag(flags, item._uid)}
+    <div class="row" class:selected={itemSelected}>
+      <span>
+        {#if item._db}
+          <Button small dangerous icon="delete" title="Usuń produkt" on:click={() => removeItem(item)} />
+        {/if}
+      </span>
+      <span>
+        {#if flags}
+          <Input
+            size="small"
+            type="select"
+            label="Status"
+            value={flag === '_default' ? null : flag}
+            options={flagOptions}
+            clearTo="_default"
+            color={flagColors[flag]}
+            on:change={(e) => handleStatusChange(e.detail.value, item)} />
+        {/if}
+      </span>
+      <span class="index">{item._index + 1}</span>
+      <Button
+        small
+        icon={itemNotInApi ? 'cloud_off' : 'cloud'}
+        tone={itemNotInApi ? 'danger' : itemNotAllInApi ? 'warning' : 'success'}
+        title={itemNotInApi ? 'Wycofany' : itemNotAllInApi ? 'Wycofane kolory' : 'Dostępny'}
+        on:click={() => openApi(item.code, item.name)} />
+      <span class="expand">
+        {#if item.storage.length}
+          <Button small dashed width="100%" on:click={() => toggleExpanded(item._uid)}>
+            {itemExpanded ? '−' : `+${item.storage.length}`}
+          </Button>
+        {/if}
+      </span>
+      <span>
+        {#if item._db}
+          <Button
+            small
+            tone="info"
+            icon="cube"
+            title="Otwórz zaimportowany produkt"
+            on:click={() => openProduct(item)} />
+        {:else if itemCompatible}
+          {@const all = item.storage.every((s) => $selected.has(s._uid))}
+          {@const some = item.storage.some((s) => $selected.has(s._uid))}
+          <Button
+            small
+            dashed={!some}
+            icon={all ? 'checkmark' : some ? 'subtract' : 'add'}
+            title="Zaznacz do dodania"
+            on:click={() => toggleItemSelected(item)} />
+        {/if}
+      </span>
+      <span>
+        {#if item._db}
+          <Button
+            small
+            tone={item.enabled ? 'info' : null}
+            ghost={!item.enabled}
+            icon={item.enabled ? 'eye' : 'eye_off'}
+            title={item.enabled ? 'Widoczny, kliknij by ukryć' : 'Ukryty, kliknij by pokazać'}
+            on:click={() => toggleVisible(item)} />
+        {/if}
+      </span>
+      <span class="code"><Float title={item.code}>{item.code}</Float></span>
+      <span class="name" class:hidden={item._db && !item.enabled}>
+        <Float>
+          {item.name}
+          {#if !itemCompatible}
+            <span class="tag"><Icon height="1rem" name="cloud_dismiss" />Niekompatybilny</span>
+          {/if}
+        </Float>
+      </span>
+    </div>
+
+    {#if $colors && itemExpanded}
+      {#each item.storage as storage}
+        {@const storageSelected = $selected.has(storage._uid)}
+        {@const storageCompatible = !storage?._incompatible}
+        <div class="row variant" class:selected={storageSelected}>
+          <span>
+            {#if storage._db}
+              <Button small dangerous icon="delete" title="Usuń kolor" on:click={() => removeStorage(item, storage)} />
+            {/if}
+          </span>
+          <span />
+          <span class="index">{storage._index + 1}</span>
+          <Button
+            small
+            icon={storage._api ? 'cloud' : 'cloud_off'}
+            tone={storage._api ? 'success' : 'danger'}
+            title={storage._api ? 'Dostępny' : 'Wycofany'}
+            on:click={() => openApi(storage.api_color_code ?? item.code, item.name)} />
+          <span />
+          <span>
+            {#if storage._db}
+              <Button
+                small
+                tone="info"
+                icon="cube"
+                title="Otwórz zaimportowany produkt"
+                on:click={() => openProduct(item)} />
+            {:else if storageCompatible}
+              <Button
+                small
+                dashed={!storageSelected}
+                icon={storageSelected ? 'checkmark' : 'add'}
+                title="Zaznacz do dodania"
+                on:click={() => toggleStorageSelected(item, storage)} />
+            {/if}
+          </span>
+          <span>
+            {#if storage._db}
+              <Button
+                small
+                tone={storage.enabled ? 'info' : null}
+                ghost={!storage.enabled}
+                icon={storage.enabled ? 'eye' : 'eye_off'}
+                title={storage.enabled ? 'Widoczny, kliknij by ukryć' : 'Ukryty, kliknij by pokazać'}
+                on:click={() => toggleStorageVisible(item, storage)} />
+            {/if}
+          </span>
+          <span class="code"><Float title={storage.api_color_code}>{storage.api_color_code}</Float></span>
+          <span class="name" class:hidden={storage._db && !storage.enabled}>
+            <Float>
               {$colors && parseColors(storage.color_first, storage.color_second)}
-              {#if storage._db && !storage.enabled}
-                <div class="icon">
-                  <Icon height="15px" name="eye_off" />
-                  <Tooltip><small>Ukryty</small></Tooltip>
-                </div>
-              {/if}
-            </td>
-            <td class="remove">
-              {#if storage._db}
-                <button class="remove" on:click={() => removeStorage(item, storage)}>
-                  <Icon height="16px" name="delete" color="var(--main)" />
-                </button>
-              {/if}
-            </td>
-            <td class="tags db">
-              {#if storage._db}
-                <a class="tag in-db" href={getDbUrl(item.slug)} target="_blank" rel="noreferrer">
-                  <Icon height="15px" name="products" />Zaimportowany
-                </a>
-              {/if}
-            </td>
-            <td class="tags api">
-              {#if storage._api}
-                <a class="tag in-api" href={getApiUrl(storage._uid, item.name)} target="_blank" rel="noreferrer">
-                  <Icon height="18px" name="cloud" />Dostępny
-                </a>
-              {:else}
-                <div class="tag not-in-api"><Icon height="18px" name="cloud_off" />Wycofany</div>
-              {/if}
               {#if !storageCompatible}
-                <div class="tag not-in-api"><Icon height="18px" name="cloud_dismiss" />Niekompatybilny</div>
+                <span class="tag"><Icon height="1rem" name="cloud_dismiss" />Niekompatybilny</span>
               {/if}
-            </td>
-          </tr>
-        {/each}
-      {/if}
-    {/each}
-  </table>
-</div>
+            </Float>
+          </span>
+        </div>
+      {/each}
+    {/if}
+  {/each}
+</Grid>
 
 <style>
-  :root {
-    --row-height: 26px;
-    --blue: var(--accent-light);
-    --blue-dark: #cee1e9;
-    --green: #ddffdd;
-    --green-dark: #c9e7c9;
-    --yellow: #ffe9c2;
-    --yellow-dark: #f0d9ba;
-    --orange: #ffddc2;
-    --red: var(--main-1);
-    --purple: #e9d8ff;
-    --purple-dark: #d1b1ff;
-  }
-  * {
+  span {
     font-size: 0.9rem;
   }
-  .mono,
-  .mono * {
+  .index {
+    text-align: right;
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--grey-500);
+  }
+  .head-index {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .variant .index {
+    opacity: 0.65;
+  }
+  /* the Float inside cuts and floats the text */
+  .code,
+  .name {
+    min-width: 0;
+  }
+  .code {
     font-family: monospace;
   }
-
-  a:hover {
-    text-decoration: none;
+  .variant .name {
+    padding-left: 1rem;
   }
-  /* input[type='checkbox'] {
-    cursor: pointer;
-    width: calc(var(--row-height) - 11px);
-    height: calc(var(--row-height) - 11px);
-  } */
-  button {
-    cursor: pointer;
-    margin: 0;
-    padding: 0;
-    height: calc(var(--row-height) - 2px);
-    width: 100%;
-  }
-  button.remove {
-    height: calc(var(--row-height) - 6px);
-    color: var(--main);
-    font-weight: bold;
-  }
-
-  .scroll {
-    overflow-x: auto;
-  }
-  table {
-    border-collapse: collapse;
-    width: max-content;
-    min-width: 100%;
-  }
-  tr {
-    /* keeps inline-flex cells on the same line */
-    white-space: nowrap;
-    border: var(--border-light);
-    background-color: var(--light);
-  }
-  tr:hover {
-    background-color: var(--accent-light);
-  }
-  tr.selected {
-    background-color: var(--primary-white);
-  }
-  tr.selected:hover {
-    /* gradient of hover and selected */
-    background: linear-gradient(90deg, var(--primary-white), var(--accent-light));
-  }
-
-  td {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    margin: 0;
-    padding: 0 0.25rem;
-    height: var(--row-height);
-    white-space: nowrap;
-  }
-  td.flag {
-    display: table-cell;
-  }
-  td.index {
-    justify-content: flex-end;
-    width: 2.5rem;
-  }
-  td.expand {
-    width: 3rem;
-  }
-  td.code {
-    width: 6rem;
-  }
-  td.code .codeContent {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 6rem;
-  }
-  td.selection {
-    width: 2rem;
-  }
-  td.name {
-    display: table-cell;
-    min-width: 60ch;
-  }
-  td.remove {
-    width: 2rem;
-  }
-
-  td.tags.db {
-    width: 8rem;
-  }
-  td.tags.api {
-    margin-right: 0.25rem;
+  .name.hidden {
+    color: var(--grey-500);
   }
   .tag {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    border-radius: var(--border-radius);
-    border: var(--border);
     padding: 0 0.25rem;
-    height: calc(var(--row-height) - 4px);
-    width: 100%;
-    white-space: nowrap;
+    border-radius: var(--border-radius);
+    corner-shape: squircle;
     font-size: 0.8rem;
-    text-decoration: none;
-  }
-  .in-db {
-    background-color: var(--blue);
-  }
-  .in-db:hover {
-    background-color: var(--blue-dark);
-  }
-  .in-api {
-    background-color: var(--green);
-  }
-  .in-api:hover {
-    background-color: var(--green-dark);
-  }
-  .not-all-in-api {
-    background-color: var(--yellow);
-  }
-  .not-all-in-api:hover {
-    background-color: var(--yellow-dark);
-  }
-  .not-in-api {
-    cursor: not-allowed;
-    background-color: var(--red);
-  }
-
-  .icon {
-    display: inline-flex;
-    align-items: center;
-  }
-  select._default {
-    background-color: var(--white);
-  }
-  select.rejected {
-    background-color: var(--red);
-  }
-  select.cut {
-    background-color: var(--red);
-  }
-  select.check {
-    background-color: var(--purple);
-  }
-  select.todo {
-    background-color: var(--yellow);
-  }
-  select.edit {
-    background-color: var(--orange);
-  }
-  select.inprogress {
-    background-color: var(--blue);
-  }
-  select.done {
-    background-color: var(--green);
+    background-color: var(--red-100);
   }
 </style>

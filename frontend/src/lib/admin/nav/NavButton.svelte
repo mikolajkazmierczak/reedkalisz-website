@@ -1,52 +1,53 @@
 <script>
   import Icon from '$c/Icon.svelte';
-  import HoverCircle from '$c/HoverCircle.svelte';
-  import Tooltip from '$c/Tooltip.svelte';
 
+  // A button of the menu: an icon and its label; `tick` for the page you're on, `warn` when there's something to look
+  // at there (an orange outline; the slot can hold a Tooltip saying what).
   export let tick = false;
-  export let round = false;
-
+  export let warn = false;
   export let label = null;
   export let icon = null;
 </script>
 
-<button class="button" class:round on:click>
-  <HoverCircle color={'var(--primary-dark)'} show={tick} />
-  <div class="content">
-    {#if label}
-      <Tooltip>{label}</Tooltip>
-    {/if}
-    {#if icon}
-      <Icon fill name={icon} light />
-    {/if}
-    <slot />
-  </div>
+<button class="button" class:tick class:warn on:click>
+  {#if icon}<span class="icon"><Icon fill name={icon} light /></span>{/if}
+  <slot />
+  {#if label}<span class="label">{label}</span>{/if}
 </button>
 
 <style>
   .button {
     cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    justify-self: center;
-    outline: none;
-    border: none;
-    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0 var(--nav-button-pad, 0.7rem);
     width: 100%;
-    aspect-ratio: 1 / 1;
+    height: 2.4rem;
+    border: none;
+    border-radius: var(--button-radius); /* as the rest of the buttons */
+    corner-shape: squircle;
     background-color: transparent;
   }
-  .button.round {
-    border-radius: 50%;
+  /* the page you're on, and where the pointer is: just a darker background, no animation */
+  .button:hover,
+  .button.tick {
+    background-color: var(--navy-900);
   }
-
-  .content {
-    z-index: 1;
-    position: relative;
-    display: grid;
-    place-items: center;
-    padding: 0.3rem;
-    width: 100%;
-    height: 100%;
+  .warn {
+    box-shadow: inset 0 0 0 1px var(--orange-500);
+  }
+  .icon {
+    display: flex;
+    flex: none;
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+  .label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.95rem;
+    color: var(--light);
   }
 </style>

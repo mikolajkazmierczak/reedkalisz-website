@@ -2,31 +2,40 @@
   import { deep, uid, diffSync, deleteFields } from '%/utils';
   import api from '$/api';
   import heimdall from '$/heimdall';
-  import { labelings } from '@/globals';
-  import { findLabeling } from '@/labelings';
+  import { companies, labelings } from '@/globals';
+  import { tell } from '@/dialog';
+  import { labelingText } from '@/labelings';
+  import { mappedLabelings } from '@/sync';
+  import { lostCodes, uselessRules } from '../status.js';
   import { newTarget } from './utils';
-  import Icon from '$c/Icon.svelte';
   import Button from '@c/Button.svelte';
+  import HeadIcon from '@c/table/HeadIcon.svelte';
+  import Panel from '../mappings/Panel.svelte';
+  import Grid from '@c/table/Grid.svelte';
   import Mapping from './Mapping.svelte';
 
   export let apiCompany;
-  export let supported = false; // whether the api of this company provides labelings
   export let apiCodes = []; // labeling codes found in the api snapshot
 
-  let mappingsOriginal = null;
-  let mappings = null;
+  let mappingsOriginal = [];
+  let mappings = [];
 
-  $: apiCompany && updateMappings();
-  $: unsaved = diffSync(mappings || [], mappingsOriginal || []).changed;
+  // once per company: a store update (even the echo of a save) mustn't wipe the edits (a new scan remounts this)
+  let loadedId;
+  $: if (apiCompany.id !== loadedId) {
+    loadedId = apiCompany.id;
+    setMappings(apiCompany.api_labelings_mappings ?? []);
+  }
+  $: unsaved = diffSync(mappings, mappingsOriginal).changed;
 
-  $: codes = (mappings ?? []).map((m) => m.code).filter(Boolean);
+  $: codes = mappings.map((m) => m.code).filter(Boolean);
   // all the codes the api uses - a code without a rule is still imported if we have a labeling
   // of that company with the very same code, otherwise it is lost
-  $: apiCodeStates = apiCodes.map((code) => {
-    const mapped = codes.includes(code);
-    return { code, mapped, lost: !mapped && !findLabeling($labelings, apiCompany.id, code) };
-  });
-  $: someLost = apiCodeStates.some((c) => c.lost);
+  $: lost = new Set(lostCodes(apiCodes, mappings, $labelings, apiCompany.id));
+  $: apiCodeStates = apiCodes.map((code) => ({ code, mapped: codes.includes(code), lost: lost.has(code) }));
+  $: someLost = lost.size > 0;
+  $: mappedCount = apiCodeStates.filter((s) => s.mapped).length;
+  $: useless = new Set(uselessRules(mappings, apiCodes, $labelings, apiCompany.id));
   $: duplicated = [...new Set(codes.filter((code, i) => codes.indexOf(code) !== i))];
   // every rule is its own grid, so the code column can't be `auto` - it is sized from the longest code
   $: codeWidth = `calc(${Math.max(3, ...codes.map((c) => c.length))}ch + 1.25rem)`;
@@ -64,20 +73,27 @@
     mappings = deep.copy(decorated);
   }
 
-  function updateMappings() {
-    if (!supported) {
-      mappingsOriginal = mappings = null;
-      return;
-    }
-    setMappings(apiCompany.api_labelings_mappings ?? []);
-  }
-
   async function save() {
     const data = prune(sort(deep.copy(mappings)));
     await deleteFields(data, ['_uid']);
     await api.items('companies').updateOne(apiCompany.id, { api_labelings_mappings: data });
     heimdall.emit('companies', apiCompany.id);
+    // the scanner only removes labelings the rules (or the codes without one) lead to: one no longer led to stays on
+    // the products
+    const led = (list) => mappedLabelings({ ...apiCompany, api_labelings_mappings: list }, apiCodes);
+    const before = led(mappingsOriginal);
+    const after = led(data);
+    const key = (l) => `${l.company}|${l.code}`;
+    const dropped = ($labelings ?? []).filter((l) => before.has(key(l)) && !after.has(key(l)));
     setMappings(data); // pruned rules disappear without waiting for the update
+    if (dropped.length) {
+      const name = (l) => labelingText(l, $companies?.find((c) => c.id === l.company)?.name);
+      tell(
+        `Żadna reguła nie prowadzi już do: ${dropped.map(name).join(', ')}. Produkty tego producenta, które je mają, ` +
+          'zachowają je - skaner ich nie usunie. Trzeba to zrobić ręcznie.',
+        { title: 'Uwaga' },
+      );
+    }
   }
 
   function cancel() {
@@ -97,125 +113,70 @@
   }
 </script>
 
-<div class="wrapper ui-box" class:shrink={!mappings} style:--code-w={codeWidth}>
-  <h3>Reguły importowania znakowań</h3>
-
-  {#if mappings}
+<Panel title="Mapowanie znakowań" {unsaved} on:save={save} on:cancel={cancel}>
+  <svelte:fragment slot="summary">
     {#if apiCodeStates.length}
+      <small>Zmapowano <b>{mappedCount}</b> / {apiCodeStates.length}</small>
+      <small class="muted">Znakowania, które nie występują w regułach, nie są usuwane przez skaner.</small>
+    {/if}
+  </svelte:fragment>
+  <!-- the hints as one block, the codes under their label (the box spaces its parts wider) -->
+  <div class="legend">
+    <small class="muted"> Miejsca są łączone (np. przód / tył) dla powtórzonych znakowań z tym samym polem. </small>
+    {#if apiCodeStates.length}
+      <!-- the codes' colours, each on a small copy of such a code -->
       <small>
-        <b>Kody znakowań w API.</b>
-        <span class="hint-info">Kliknij, by dodać regułę.</span>
+        <span class="key key--grey">Wyszarzone</span> mają regułę.
+        <span class="key">Niebieskie</span> są automatycznie przypisywane według kodu.
       </small>
-      <div class="hint">
-        {#each apiCodeStates as { code, mapped, lost }}
-          <span class:lost>
-            <Button small disabled={mapped} on:click={() => add(code)}>{code}</Button>
-          </span>
-        {/each}
-      </div>
       {#if someLost}
-        <small class="hint-info">
-          Wyszarzone kody mają już regułę. Pozostałe znakowania zaimportują się według kodu.<br />
-          Kody w <span class="lost-text">czerwonej ramce</span> nie mają reguły, ani znakowania o tym kodzie. Przy imporcie
-          zostaną utracone.
+        <small>
+          <span class="key key--red">Czerwone</span> nie mają ani reguły, ani odpowiadającego znakowania u nas.
         </small>
       {/if}
     {/if}
-    {#if duplicated.length}
-      <small class="error">
-        Powtórzone kody u producenta: {duplicated.join(', ')}. Użyta zostanie pierwsza reguła.
-      </small>
-    {/if}
+  </div>
+  {#if apiCodeStates.length}
+    <div class="codes">
+      <small><b>Znakowania</b> · <span class="muted">Kliknij, by dodać regułę</span></small>
+      <div class="chips">
+        {#each apiCodeStates as { code, mapped, lost }}
+          <Button small disabled={mapped} tone={lost ? 'danger' : null} on:click={() => add(code)}>{code}</Button>
+        {/each}
+      </div>
+    </div>
+  {/if}
+  {#if duplicated.length}
+    <small class="error">
+      Powtórzone kody u producenta: {duplicated.join(', ')}. Użyta zostanie pierwsza reguła.
+    </small>
+  {/if}
 
-    <div class="table">
-      <div class="head">
-        <span class="c-remove"><Icon height="14px" name="delete" /></span>
+  <svelte:fragment slot="after">
+    <Grid
+      columns="1.5rem {codeWidth} 10rem 4.5rem 6rem 1.5rem minmax(12rem, 1fr) 1.5rem"
+      empty={mappings.length
+        ? null
+        : apiCodeStates.length
+          ? 'Brak reguł. Kliknij kod powyżej, aby dodać pierwszą.'
+          : 'Zeskanuj API, aby zobaczyć kody znakowań, dla których można dodać reguły.'}>
+      <svelte:fragment slot="head">
+        <span class="c-remove"><HeadIcon icon="delete" label="Usuwanie" /></span>
         <span class="c-code">Kod</span>
         <span class="c-type">Typ</span>
         <span class="c-condition">Warunek</span>
         <span class="c-target">Znakowanie u nas</span>
-      </div>
-
+      </svelte:fragment>
       {#each mappings as mapping (mapping._uid)}
-        <Mapping {apiCompany} {apiCodes} bind:mappings bind:mapping />
-      {:else}
-        <p class="empty">
-          {#if !apiCodeStates.length}
-            Zeskanuj API, aby zobaczyć kody znakowań, dla których można dodać reguły.
-          {:else}
-            Brak reguł. Kliknij kod powyżej, aby dodać pierwszą.
-          {/if}
-        </p>
+        <Mapping {apiCompany} {apiCodes} useless={useless.has(mapping)} bind:mappings bind:mapping />
       {/each}
-    </div>
-
-    {#if unsaved}
-      <div class="ui-pair actions">
-        <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
-        <Button icon="ok" on:click={save}>Zapisz</Button>
-      </div>
-    {/if}
-  {:else}
-    <p>Nie zaimplementowano dla API tego producenta lub jego struktura nie zawiera znakowań.</p>
-  {/if}
-</div>
+    </Grid>
+  </svelte:fragment>
+</Panel>
 
 <style>
-  .wrapper {
-    /* shared grid of all the rows (header, mappings, thresholds) */
-    --gap: 0.5rem;
-    --columns: 1.5rem var(--code-w) 12rem 4.5rem 6.5rem 1.5rem minmax(18rem, 1fr) 1.5rem;
-    margin-top: 2rem;
-    margin-bottom: 4rem;
-  }
-  .wrapper.shrink {
-    display: inline-flex;
-  }
-
-  h3 {
-    margin: 0;
-  }
-  .actions {
-    /* `align-self` (not `justify-self`) - the panel is a column flex, so this is the cross axis */
-    align-self: flex-start;
-    min-width: 22rem;
-  }
-
-  .hint {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.25rem;
-  }
-  .lost :global(button) {
-    outline: solid 2px var(--main);
-    outline-offset: 1px;
-  }
-  .lost-text {
-    color: var(--main);
-  }
-  .hint-info {
-    color: var(--accent-dark);
-  }
-  .error {
-    color: var(--main);
-  }
-
-  .table {
-    overflow-x: auto;
-  }
-  .head {
-    display: grid;
-    grid-template-columns: var(--columns);
-    column-gap: var(--gap);
-    padding-bottom: 0.25rem;
-    border-bottom: var(--border-light);
-    font-size: 0.85rem;
-    color: var(--accent-dark);
-  }
   .c-remove {
     grid-column: 1;
-    place-self: center;
   }
   .c-code {
     grid-column: 2;
@@ -229,9 +190,5 @@
   }
   .c-target {
     grid-column: 7;
-  }
-  .empty {
-    margin: 0.75rem 0 0;
-    color: var(--accent-dark);
   }
 </style>

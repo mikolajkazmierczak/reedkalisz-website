@@ -5,18 +5,14 @@ import { default as collectionsFields } from '%/fields';
 // Global arrays of items from their respective collections:
 // - global because they are needed on many pages in the app, so redownlading them every time is pointless
 // - first loaded on load of one the pages that need them, then updated when Heimdall detects an update
-// - pages that need a certain store are listed in comments below
-// TODO: update the lists below
-export const users = writable(null); // virtually everywhere
-export const companies = writable(null); // /produkty/:slug, /kalkulacje
-export const labelings = writable(null); // /produkty/:slug, /kalkulacje
-export const priceViews = writable(null); // /produkty/:slug, /kalkulacje
-export const globalMargins = writable(null); // /produkty/:slug, /kalkulacje
-export const commercialDetails = writable(null); // /produkty/:slug
-export const categories = writable(null); // /produkty, /produkty/:slug
-export const colors = writable(null); // /produkty/:slug
-export const menus = writable(null);
-export const menuItems = writable(null);
+export const users = writable(null);
+export const companies = writable(null);
+export const labelings = writable(null);
+export const priceViews = writable(null);
+export const globalMargins = writable(null);
+export const commercialDetails = writable(null);
+export const categories = writable(null);
+export const colors = writable(null);
 
 const collections = [
   { collection: 'directus_users', store: users },
@@ -27,13 +23,16 @@ const collections = [
   { collection: 'commercial_details', store: commercialDetails },
   { collection: 'categories', store: categories },
   { collection: 'colors', store: colors },
-  { collection: 'menus', store: menus },
-  { collection: 'menu_items', store: menuItems },
 ];
 
+// works for numbers and strings (users have uuids)
+const by = (key) => (a, b) => (a[key] > b[key]) - (a[key] < b[key]);
+
 async function updateItemsWithIDs(store, collection, ids, sortingKey, fields) {
-  // only update specified ids
-  const updated = (await api.items(collection).readMany(ids, { fields })).data;
+  // only update specified ids (as a CSV: Directus reads a url list of more than 20 items as an object, which matches
+  // nothing, and every id counted as deleted)
+  const filter = { id: { _in: ids.join(',') } };
+  const updated = (await api.items(collection).readByQuery({ fields, filter, limit: -1 })).data;
   const deletedIDs = ids.filter((id) => !updated.find((item) => item.id == id));
   store.update((items) => {
     let needsSorting = false;
@@ -52,22 +51,37 @@ async function updateItemsWithIDs(store, collection, ids, sortingKey, fields) {
     items = items.filter((i) => !deletedIDs.includes(i.id));
     if (items.length != itemsLength) needsSorting = true;
     // sort by the given key
-    if (needsSorting) items.sort((a, b) => a[sortingKey] - b[sortingKey]);
+    if (needsSorting) items.sort(by(sortingKey));
     return items;
   });
 }
 
-async function updateAllItems(store, collection, fields) {
-  // update all items
+async function updateAllItems(store, collection, fields, sortingKey) {
+  // update all items, always in the same order (Directus doesn't promise one without `sort`)
   const items = (await api.items(collection).readByQuery({ fields, limit: -1 })).data;
-  store.set(items);
+  store.set(items.sort(by(sortingKey)));
 }
+
+async function read(store, ids, sortingKey) {
+  const { collection, singleton } = collections.find((c) => c.store === store);
+
+  if (singleton) {
+    // update singleton
+    store.set(await api.singleton(collection).read());
+  } else {
+    const fields = collectionsFields[collection].read;
+    if (ids) {
+      await updateItemsWithIDs(store, collection, ids, sortingKey, fields);
+    } else await updateAllItems(store, collection, fields, sortingKey);
+  }
+}
+
+// first reads still running, by store: a layout and a component in it asking at once share one
+const pending = new Map();
 
 class Globals {
   constructor() {
     this.collections = collections.map((c) => c.collection);
-    this.stores = collections.map((c) => c.store);
-    // this.queue = []; // TODO: queue of the updates requested, to avoid unnecessary multiple updates
   }
 
   update = async (global, { ids = null, refresh = false, sortingKey = 'id' } = {}) => {
@@ -82,21 +96,16 @@ class Globals {
     const isPopulated = get(store) != null;
     const shouldRead = !isPopulated && !ids && !refresh; // not populated AND neither ids nor refresh given
     const shouldUpdate = isPopulated && (ids || refresh); // populated AND either ids or refresh given
-    // console.log('$globals update:', global, { ids, refresh, sortingKey }, shouldRead, shouldUpdate);
     if (!(shouldRead || shouldUpdate)) return;
 
-    const { collection, singleton } = collections.find((c) => c.store === store);
-
-    // console.log('$globals read:', collection, singleton);
-    if (singleton) {
-      // update singleton
-      store.set(await api.singleton(collection).read());
-    } else {
-      const fields = collectionsFields[collection].read;
-      if (ids) {
-        await updateItemsWithIDs(store, collection, ids, sortingKey, fields);
-      } else await updateAllItems(store, collection, fields);
+    if (shouldRead) {
+      if (!pending.has(store)) {
+        const reading = read(store, null, sortingKey).finally(() => pending.delete(store));
+        pending.set(store, reading);
+      }
+      return pending.get(store);
     }
+    await read(store, ids, sortingKey);
   };
 }
 

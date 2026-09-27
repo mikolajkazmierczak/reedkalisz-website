@@ -7,8 +7,6 @@ export const search = [
   'enabled',
   'name',
   'slug',
-  'seo_title',
-  'seo_description',
   'content',
 ];
 export const show = [...search];
@@ -25,8 +23,6 @@ export const defaults = () => ({
   enabled: true,
   name: '',
   slug: '',
-  seo_title: '',
-  seo_description: '',
   content: '',
 });
 

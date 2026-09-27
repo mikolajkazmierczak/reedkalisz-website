@@ -2,9 +2,9 @@
   import { uid } from '%/utils';
   import { labelings } from '@/globals';
   import { newTarget } from './utils';
-  import Icon from '$c/Icon.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
+  import Arrow from '../mappings/Arrow.svelte';
   import Target from './Target.svelte';
 
   // the matching threshold with the highest bound wins, so the order doesn't matter
@@ -30,18 +30,18 @@
 </script>
 
 {#each thresholds as t (t._uid)}
-  <div class="c-type"><Input type="select" bind:value={t.type} options={types} /></div>
+  <div class="c-type"><Input size="small" type="select" label="Typ" bind:value={t.type} options={types} /></div>
   <div class="c-value">
-    <Input type="number" min={0} step={0.01} bind:value={t.threshold} />
+    <Input size="small" type="number" min={0} step={0.01} bind:value={t.threshold} />
     {#if unit}<small>{unit}</small>{/if}
   </div>
-  <div class="c-arrow"><Icon name="arrow_import" /></div>
+  <div class="c-arrow"><Arrow /></div>
   <Target {apiCompany} bind:company={t.company} bind:code={t.code} />
   <div class="c-remove"><Button small dangerous square icon="delete" on:click={() => remove(t._uid)} /></div>
 {/each}
 
 <div class="c-add">
-  <Button small icon="add" on:click={add}>Próg</Button>
+  <Button small dashed icon="add" on:click={add}>Próg</Button>
 </div>
 
 <style>
@@ -55,7 +55,7 @@
     gap: 0.25rem;
   }
   .c-value small {
-    color: var(--accent-dark);
+    color: var(--grey-500);
   }
   .c-arrow {
     grid-column: 6;

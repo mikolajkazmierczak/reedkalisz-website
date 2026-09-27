@@ -8,8 +8,6 @@ import commercial_details from './commercial_details';
 import categories from './categories';
 import colors from './colors';
 import pages from './pages';
-import menus from './menus';
-import menu_items from './menu_items';
 import fragments from './fragments';
 import questions from './questions';
 
@@ -24,8 +22,6 @@ export default {
   categories,
   colors,
   pages,
-  menus,
-  menu_items,
   fragments,
   questions,
 };

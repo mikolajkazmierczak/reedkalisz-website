@@ -99,7 +99,7 @@
     });
     ro.observe(node);
     const io = new IntersectionObserver(([e]) => e.isIntersecting && ((near = true), io.disconnect()), {
-      rootMargin: '100% 0px',
+      rootMargin: '100% 0%',
     });
     io.observe(node);
     return {

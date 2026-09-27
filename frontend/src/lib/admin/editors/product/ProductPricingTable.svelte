@@ -9,7 +9,7 @@
 </script>
 
 {#if prices.length == pricesSale.length}
-  <table class="ui-table ui-table--dark">
+  <table class="ui-table ui-table--dark" class:manual={!fixed} class:calculated={fixed}>
     <tr>
       <th>Ilość</th>
       <th>Cena</th>
@@ -45,7 +45,21 @@
 {/if}
 
 <style>
-  .sale {
-    background-color: var(--accent-light);
+  /* typed by hand: half into the box's padding, as ui-box--optional (a labeling's calculated ones stay in line) */
+  .manual {
+    margin-inline: -0.5rem;
+    width: calc(100% + 1rem);
+  }
+  .manual:first-child {
+    margin-top: -0.5rem;
+  }
+  /* calculated: nothing to type, but not greyed out either - white, as the fields of the table typed by hand */
+  .calculated .fixed {
+    background-color: var(--light);
+  }
+  /* the sale's: as the box of the sale's price (ui-box--optional) */
+  .sale,
+  .calculated .fixed.sale {
+    background-color: var(--blue-100);
   }
 </style>

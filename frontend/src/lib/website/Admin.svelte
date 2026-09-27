@@ -15,6 +15,13 @@
 
   $: pathname = $page.url.pathname;
 
+  // a section (NOWOŚCI...) isn't in Directus: its copies edit the real category, its root has nothing to edit
+  $: category = $page.data.category;
+  $: categorySlug = category?.section
+    ? category.category != null && $page.data.categoriesItems.find((c) => c.id === category.category)?.slug
+    : category?.slug;
+  $: categoryUrl = categorySlug ? '/admin/kategorie/' + categorySlug : null;
+
   // more specific pathnames go first (since '/produkty' also matches '/')
   $: edits = [
     {
@@ -27,7 +34,7 @@
       pathname: '/kategorie',
       label: 'Edytuj kategorię',
       icon: 'categories',
-      url: '/admin/kategorie/' + pathname.split('/')[2],
+      url: categoryUrl,
     },
     {
       pathname: '/',
@@ -50,7 +57,14 @@
   async function handleToggle() {
     $editing = !$editing;
     if ($modified && edit?.save) {
-      await edit.save($data);
+      try {
+        await edit.save($data);
+      } catch (e) {
+        // back to editing, with the changes: the website has no error panel, a silent failure looked saved
+        $editing = true;
+        alert(`Nie udało się zapisać układu. Spróbuj ponownie.\n${e.message}`);
+        return;
+      }
       $modified = false;
     }
     edit = edit;
@@ -58,7 +72,7 @@
 </script>
 
 <div class="admin">
-  {#if edit}
+  {#if edit?.url || $editing !== undefined}
     <div class="strip" transition:slide={{ duration: 200 }}>
       {#if edit?.url}
         <a href={edit.url} rel="noreferrer" target="_blank">

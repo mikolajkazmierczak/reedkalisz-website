@@ -1,8 +1,5 @@
 <script>
   import { tick } from 'svelte';
-  import Icon from '$c/Icon.svelte';
-  import Tooltip from '$c/Tooltip.svelte';
-  import HoverCircle from '$c/HoverCircle.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Popup from '@c/Popup.svelte';
@@ -15,22 +12,13 @@
   let removing = false;
   let swapID = null;
 
-  $: removingIDs = items.filter((item) => item._remove).map((item) => item.id);
-
-  $: swappable = items.filter(({ id }) => !removingIDs.includes(id));
+  // saved ones that stay: not this one, not new ones (no id yet), not ones going too
   $: swapOptions = [
-    { id: null, text: 'Bez zamiennika' },
-    ...swappable.map(({ id, name, code, type }) => ({ id, text: code || name || type || '???' })),
+    { id: null, text: 'Bez zamiennika', special: true },
+    ...items
+      .filter((l) => l.id != null && l.id !== item.id && !l._remove)
+      .map(({ id, name, code, type }) => ({ id, text: code || name || type || '???' })),
   ];
-
-  function setDefault(i) {
-    const old = items.find((old) => old.default);
-    if (old) old.default = false;
-    if (items.length > 0) {
-      items[i].default = true;
-    }
-    items = items;
-  }
 
   function handleIndexClick(e) {
     e.detail.e.target.select();
@@ -58,15 +46,18 @@
   }
 
   function remove() {
-    item._remove = true;
-    item._swap = swapID;
-    reindex(items);
-    setDefault(0); // set new default if possible
+    if (item._new) {
+      items = reindex(items.filter((i) => i._uid !== item._uid)); // not saved yet: nothing to delete, it just goes
+    } else {
+      item._remove = true;
+      item._swap = swapID;
+      items = reindex(items); // the first one left becomes the default (see Labelings)
+    }
     removing = false;
   }
 </script>
 
-<Popup title="Zaznaczyć do usunięcia?" maxWidth={'300px'} bind:opened={removing} on:close={removeCancel}>
+<Popup title="Zaznaczyć do usunięcia?" maxWidth={'18.75rem'} bind:opened={removing} on:close={removeCancel}>
   <small>
     Przy zapisywaniu znakowanie zostanie usunięte w produktach, które z niego korzystają. Możesz też wybrać zamiennik.
   </small>
@@ -80,7 +71,10 @@
 </Popup>
 
 <tr class:remove={item._remove}>
-  <th class="input type col-sticky col-index">
+  <td class="col-sticky col-remove">
+    <span class="cell-button"><Button small dangerous icon="delete" title="Usuń" on:click={tryRemove} /></span>
+  </td>
+  <td class="input type col-sticky col-index heavy-border">
     <Input
       type="number"
       borderless
@@ -89,24 +83,6 @@
       value={item.index}
       on:click={handleIndexClick}
       on:input={handleIndexInput} />
-  </th>
-
-  <td class="input action default" class:default={item.default}>
-    {#if !item.default}
-      <button on:click={() => setDefault(index)}>
-        <HoverCircle color={'var(--accent-light)'} />
-        <div class="icon"><Icon fill name="star" /></div>
-      </button>
-    {:else}
-      <Tooltip>Domyślne</Tooltip>
-      <div class="dummy" />
-    {/if}
-  </td>
-  <td class="input action down heavy-border">
-    <button on:click={tryRemove}>
-      <HoverCircle color={'var(--main-3)'} />
-      <div class="icon"><Icon fill name="delete" /></div>
-    </button>
   </td>
 
   <td class="input type">
@@ -140,6 +116,9 @@
       <Input type="number" borderless min={0} step={0.01} bind:value={p.price} />
     </td>
   {/each}
+  <!-- under the head's "add an amount": the column goes all the way down -->
+  <td class="add-amount" />
+  <td class="filler" />
 </tr>
 
 <style>
@@ -149,37 +128,17 @@
 
   .col-sticky {
     position: sticky;
-    /* left: 4rem; */
     left: 0;
     z-index: 1;
   }
+  .col-index {
+    left: 2.25rem;
+  }
   .col-code {
-    /* left: calc(4rem + 60px); */
-    left: 60px;
+    left: 6rem;
   }
-
-  .action button {
-    overflow: hidden;
-    position: relative;
-    top: 2px;
-    cursor: pointer;
-    padding: 0 0.4rem;
-    width: 100%;
-    height: 100%;
-    border: none;
-    background-color: var(--light);
-  }
-  .default {
-    border-left: var(--outline-dashed);
-  }
-  .dummy {
-    width: 100%;
-    height: 100%;
-    background-color: var(--light);
-  }
-
-  .icon {
-    position: relative;
-    height: 100%;
+  .cell-button {
+    display: flex;
+    justify-content: center;
   }
 </style>

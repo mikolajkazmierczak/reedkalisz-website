@@ -2,13 +2,14 @@ import fetch from 'node-fetch';
 import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
+import { addCategories, mergePositions, printPosition } from '../common.js';
 
-function parseStorage(item, colorCode) {
+function parseStorage(item) {
   const { imgs, amount, id, colors } = item;
   return {
     img: imgs,
     amount,
-    api_color_code: colorCode,
+    api_color_code: item.code, // the variant's whole code
     api_color_id: id,
     multicolored: false,
     color_first: colors[0] ?? null, // str
@@ -16,14 +17,14 @@ function parseStorage(item, colorCode) {
   };
 }
 
-function parseMain(item, code, colorCode) {
+function parseMain(item, code) {
   const name = item.name.split(',')[0].trim();
   const sizes = item.size.split('x').map(Number);
   const { desc, materials, price } = item;
   return {
     // only define fields that are both:
     // - different from defaults
-    // - pertain to the PAR api (e.g. enabled, api_enabled will be defined later)
+    // - pertain to the PAR api (e.g. enabled will be defined later)
     name,
     code,
     slug: slugify([code, name], { key: true }),
@@ -35,24 +36,51 @@ function parseMain(item, code, colorCode) {
     size_z: sizes.length > 2 ? sizes[2] : null,
     materials,
     price,
-    storage: [parseStorage(item, colorCode)], // first color varitant
+    storage: [parseStorage(item)], // first color variant
     gallery: [],
+    _categories: addCategories([], item.categories),
+    _labelings: item.labelings,
   };
 }
 
-function parseCode(code) {
-  // formats: 'XXXXXX', 'XXXXXX.XX', 'XXXXXX.XX.XX', ...?
-  const [productCode, ...tail] = code.split('.');
-  // TODO: for now colorCode includes the code for quality (e.g. '00.QII' for transparent color, second hand quality)
-  const colorCode = tail.join('.'); // colorCode: '', 'XX', 'XX.XX'
-  return { productCode, colorCode };
+function parseDecorations(decorations) {
+  // techniki_zdobienia: [{ technic_category: 'L2', miejsce_zdobienia: 'na przodzie', maksymalny_rozmiar_logo: '50x30',
+  // wymiary_zdobienia: '75x100' }] - sizes in mm, the logo's is what can be printed; 'XXX' is a place left unnamed
+  return mergePositions(
+    (decorations ?? []).map((d) =>
+      printPosition(
+        [d.technic_category],
+        d.miejsce_zdobienia === 'XXX' ? '' : d.miejsce_zdobienia,
+        d.maksymalny_rozmiar_logo || d.wymiary_zdobienia,
+      ),
+    ),
+  );
 }
 
-function parse(products, stocks) {
+function parseCode(code) {
+  // 'R12345', 'R12345.02', 'R12345.00.QII' -> 'R12345': the product is what's before the first dot (after it, the
+  // colour and sometimes the quality)
+  return { productCode: code.split('.')[0] };
+}
+
+function parseCategoryTree(categories) {
+  // { categories: [{ category: { id, name, nodes: [{ id, name, nodes }] } }] } -> Map(id -> ['root', ..., 'name'])
+  const paths = new Map();
+  const walk = (node, path) => {
+    const here = [...path, node.name];
+    paths.set(String(node.id), here);
+    for (const child of node.nodes ?? []) walk(child, here);
+  };
+  for (const { category } of categories?.categories ?? []) walk(category, []);
+  return paths;
+}
+
+function parse(products, stocks, categories) {
+  const categoryPaths = parseCategoryTree(categories);
   products = products.products.map((item) => item.product);
-  stocks = stocks.products.map((item) => item.product);
+  const stocksById = new Map(stocks.products.map(({ product }) => [String(product.id), product]));
   const items = products.map(($) => {
-    const s = stocks.find((s) => s.id == $.id);
+    const s = stocksById.get(String($.id));
     return {
       id: Number($.id),
       code: $.kod,
@@ -61,7 +89,11 @@ function parse(products, stocks) {
       size: $.wymiary,
       materials: [$.material_wykonania, $.material_dodatkowy].filter(Boolean),
       colors: [$.kolor_podstawowy, $.kolor_dodatkowy].filter(Boolean),
+      // tag-like categories (e.g. "Gadżety do 20 zł") are not in the tree, they stay flat
+      // (without the tree none are given: flat subcategory names would match no mapping and drop the mapped ones)
+      categories: categoryPaths.size ? ($.kategorie ?? []).map((k) => categoryPaths.get(String(k.id)) ?? [k.name]) : [],
       imgs: $.zdjecia.map((item) => `https://www.par.com.pl${item.zdjecie}`),
+      labelings: parseDecorations($.techniki_zdobienia),
       amount: s ? Number(s.stan_magazynowy) : null,
       price: s ? Number(s.cena_po_rabacie) : null,
     };
@@ -69,13 +101,15 @@ function parse(products, stocks) {
 
   const parsed = [];
   for (let item of items) {
-    const { productCode, colorCode } = parseCode(item.code);
+    const { productCode } = parseCode(item.code);
     // first create main item (and first storage item), then add storage items
     const i = parsed.findIndex((item) => item.code == productCode);
-    if (i === -1) parsed.push(parseMain(item, productCode, colorCode));
+    if (i === -1) parsed.push(parseMain(item, productCode));
     else {
       if (parsed[i].price < item.price) parsed[i].price = item.price; // replace with highest price
-      parsed[i].storage.push(parseStorage(item, colorCode));
+      parsed[i].storage.push(parseStorage(item));
+      addCategories(parsed[i]._categories, item.categories);
+      if (!parsed[i]._labelings.length) parsed[i]._labelings = item.labelings; // from the first variant that has any
     }
   }
   return parsed;
@@ -85,14 +119,16 @@ export class PAR extends Api {
   fetch = async ({ env: { username, password } }) => {
     const auth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
     const options = { headers: { Authorization: auth } };
-    const [resProducts, resStocks] = await Promise.all([
+    const [resProducts, resStocks, resCategories] = await Promise.all([
       fetch('https://www.par.com.pl/api/products.json', options),
       fetch('https://www.par.com.pl/api/stocks.json', options),
+      fetch('https://www.par.com.pl/api/categories.json', options),
     ]);
     const products = await resProducts.json();
     const stocks = await resStocks.json();
+    const categories = resCategories.ok ? await resCategories.json() : null; // without it the categories are skipped
 
-    const items = parse(products, stocks);
+    const items = parse(products, stocks, categories);
     return { items, lastScan: getISODate() };
   };
 }

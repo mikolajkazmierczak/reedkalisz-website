@@ -1,9 +1,9 @@
 <script>
   import ProductColorTooltip from '#/products/ProductColorTooltip.svelte';
   import { parseColor } from '#/utils';
+  import { swatch } from '$/colors';
 
-  export let multicolored = false;
-  export let first = null; // { name, color, enabled }
+  export let first = null; // { name, color, multicolor, transparent }
   export let second = null;
 
   export let amount = null;
@@ -12,26 +12,21 @@
   export let size = '1.25rem';
   export let notooltip = false;
 
-  export let onhoverchange = () => {};
-  function handleHoverChange(e) {
-    onhoverchange(e.type === 'pointerenter'); // otherwise must be 'pointerleave'
-  }
-
-  $: ({ label, bg, fg } = parseColor(multicolored, first, second));
+  $: ({ label, bg, fg, multicolor } = parseColor(first, second));
 </script>
 
-<div class="wrapper" style:height={size} on:pointerenter={handleHoverChange} on:pointerleave={handleHoverChange}>
+<div class="wrapper" style:height={size}>
   {#if !notooltip}
     <ProductColorTooltip {label} {amount} {available} />
   {/if}
 
-  {#if multicolored}
+  {#if multicolor}
     <div class="color multi">
       <img src="/multicolor.svg" alt="" />
     </div>
   {:else if bg || fg}
-    {#if bg}<div class="color bg" style:background-color={bg.color} />{/if}
-    {#if fg}<div class="color fg" style:background-color={fg.color} />{/if}
+    {#if bg}<div class="color bg" style:background={swatch(bg)} />{/if}
+    {#if fg}<div class="color fg" style:background={swatch(fg)} />{/if}
   {:else}
     <div class="color none">?</div>
   {/if}
@@ -45,8 +40,17 @@
     overflow: hidden;
     position: relative;
     border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.2);
     aspect-ratio: 1 / 1;
+  }
+  /* its edge is a ring over the colour, not a border around it: a darker shade of the colour itself (as in the admin),
+     over both halves of a two-colour one and the multicolour's quarters */
+  .wrapper::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
   }
 
   .color {

@@ -2,11 +2,9 @@ import fetch from 'node-fetch';
 import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
-import { parseItems } from '../common.js';
+import { mergePositions, parseItems, printPosition } from '../common.js';
 import { parseFormData, parseSearchParams } from '../utils.js';
 import { parsePrice, parseSize } from './EasyGifts.js';
-
-import { apiAgent } from 'reedkalisz-shared/ca/AXPOL.js';
 
 function parseColor(color) {
   // 'color1' -> { first: 'color1', second: null }
@@ -67,15 +65,21 @@ export function parseCode(code) {
   return { productCode: c, colorCode: '' };
 }
 
-function parse(company, products) {
+function parsePrinting(row) {
+  // Print: [{ Position: 'przód - po lewej stronie', Size: '100x80' (mm), Technique: ['TF1', 'DTF1'] }]
+  return mergePositions((row?.Print ?? []).map((p) => printPosition([p.Technique].flat(), p.Position, p.Size)));
+}
+
+function parse(company, products, printing = null) {
   const handlingCosts = company?.api_handling_costs ?? [];
+  const printingByCode = new Map((printing ?? []).map((row) => [row.CodeERP, row]));
 
   return parseItems(
     products
       // leftover header row and codeless banner rows
       .filter(($) => $.CodeERP && $.CodeERP !== 'symbol')
       .map(($) => {
-        const { productCode, colorCode } = parseCode($.CodeERP);
+        const { productCode } = parseCode($.CodeERP);
         const name = $.TitlePL || '';
         const description = $.DescriptionPL || '';
         const size = parseSize($.Dimensions);
@@ -95,10 +99,12 @@ function parse(company, products) {
           materials: $.MaterialPL?.split(',').map((m) => m.trim()),
           price,
           handling_cost: handlingCosts.find((h) => h.code === $.HandlingCost)?.price || null,
+          _categories: [[$.MainCategoryPL, $.SubCategoryPL]],
+          _labelings: printing ? parsePrinting(printingByCode.get($.CodeERP)) : undefined,
           _storage: {
             img: $.Foto,
             amount,
-            api_color_code: colorCode,
+            api_color_code: $.CodeERP.trim(), // the whole code (the part after the product's is the colour)
             api_color_id: $.productId,
             color_first: colors.first, // str
             color_second: colors.second, // str
@@ -123,7 +129,6 @@ async function fetchApi(method, { jwt = null, searchparams = null, formdata = nu
   };
   if (jwt) options.headers.Authorization = `Bearer ${jwt}`;
   if (formdata) options.body = parseFormData(formdata);
-  if (apiAgent) options.agent = apiAgent; // use the custom https agent with the intermediate certificate
 
   const res = await fetch(`https://axpol.com/api/b2b-api/${params}`, options);
   return await res.json();
@@ -146,7 +151,31 @@ const endpoints = {
     const params = { 'params[date]': date, 'params[limit]': limit, 'params[offset]': offset };
     return await fetchApi('GET', { jwt, searchparams: { method: 'Product.List', key, uid, ...params } });
   },
+  printingCount: async (key, uid, jwt, date) => {
+    // returns { succes: 0/1, data: { count: '123' } }
+    const params = { 'params[date]': date };
+    return await fetchApi('GET', { jwt, searchparams: { method: 'Printing.Count', key, uid, ...params } });
+  },
+  printingList: async (key, uid, jwt, date, limit, offset) => {
+    // returns { success: 0/1, data: { 'id1': { productId, CodeERP, Print: [...] }, ... } }
+    const params = { 'params[date]': date, 'params[limit]': limit, 'params[offset]': offset };
+    return await fetchApi('GET', { jwt, searchparams: { method: 'Printing.List', key, uid, ...params } });
+  },
 };
+
+// every row of a paged list, 1000 at a time
+// a page that doesn't come fails the list: a lost page of print data would read as products without labelings
+async function fetchAllRows(count, list) {
+  const limit = 1000;
+  const rows = [];
+  for (let offset = 0; offset < count; offset += limit) {
+    console.log(`   - fetching: ${offset}-${offset + limit}/${count}`);
+    const page = await list(limit, offset);
+    if (!page?.data) throw new Error(`page ${offset} not fetched`);
+    rows.push(...Object.values(page.data));
+  }
+  return rows;
+}
 
 export class AXPOL extends Api {
   fetch = async ({ company, env: { username, password, key } }) => {
@@ -159,16 +188,22 @@ export class AXPOL extends Api {
     const { count } = (await endpoints.productCount(key, uid, jwt, date)).data;
     console.log(`   - count: ${count}`);
 
-    // Get the products, in chunks of 1000.
-    const limit = 1000;
-    const products = [];
-    for (let offset = 0; offset < count; offset += limit) {
-      console.log(`   - fetching: ${offset}-${offset + limit}/${count}`);
-      const chunk = (await endpoints.productList(key, uid, jwt, date, limit, offset)).data;
-      products.push(...Object.values(chunk));
+    const products = await fetchAllRows(count, (limit, offset) =>
+      endpoints.productList(key, uid, jwt, date, limit, offset),
+    );
+
+    // print data is not essential: without it the products just have no labelings
+    let printing = null;
+    try {
+      const printCount = Number((await endpoints.printingCount(key, uid, jwt, date)).data.count);
+      printing = await fetchAllRows(printCount, (limit, offset) =>
+        endpoints.printingList(key, uid, jwt, date, limit, offset),
+      );
+    } catch (e) {
+      console.log(`   - printing not fetched: ${e}`);
     }
 
-    const items = parse(company, products);
+    const items = parse(company, products, printing);
     return { items, lastScan: getISODate() };
   };
 }

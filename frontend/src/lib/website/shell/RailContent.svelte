@@ -171,7 +171,7 @@
     transition: transform var(--dur) var(--ease);
   }
   .kontakt:hover svg {
-    transform: translateX(3px);
+    transform: translateX(0.1875rem);
   }
   /* On /kontakt: white, the current page rather than an action. */
   .kontakt.on {

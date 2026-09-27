@@ -11,6 +11,7 @@
   import SectionIcon from '#c/SectionIcon.svelte';
   import { plural, sectionKind } from '#/utils';
   import { describe, jsonLd, breadcrumbList } from '#/seo';
+  import { SECTIONS } from '#/sections';
 
   export let data;
 
@@ -18,6 +19,9 @@
   $: breadcrumbs = getBreadcrumbs(data.category, $page.data.categoriesTree);
 
   $: title = data.category?.name ?? (query ? `Wyniki: ${query}` : 'Cały katalog');
+  // a section's copy of a category ("PROMOCJE / Długopisy") isn't the category itself
+  $: section = data.category?.category != null && SECTIONS.find((s) => s.id === data.category.section);
+  $: documentTitle = section ? `${title} — ${section.name}` : title;
   $: icon = breadcrumbs.length === 1 && sectionKind(data.category.name);
 
   function getBreadcrumbs(category, tree) {
@@ -68,7 +72,7 @@
 </script>
 
 <svelte:head>
-  <title>{title}{data.page > 1 ? ` — strona ${data.page}` : ''} | REED Kalisz</title>
+  <title>{documentTitle}{data.page > 1 ? ` — strona ${data.page}` : ''} | REED Kalisz</title>
   <meta name="description" content={metaDescription} />
   <!-- Don't index search results. -->
   {#if query}<meta name="robots" content="noindex, follow" />{/if}

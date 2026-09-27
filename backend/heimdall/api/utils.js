@@ -10,19 +10,6 @@ function camelCase(str) {
     .replace(/([A-Z]+)/g, (match, p1, offset) => (offset === 0 ? match.toLowerCase() : match));
 }
 
-export function arraysToJson(arrays) {
-  // Transform a json file that is arrays of arrays where the first row is the header (like a csv), into a json object.
-  // All keys are transformed to camelCase.
-  const header = arrays[0];
-  const data = arrays.slice(1);
-  return data.map((row) =>
-    header.reduce((acc, key, i) => {
-      acc[camelCase(key)] = row[i];
-      return acc;
-    }, {}),
-  );
-}
-
 function replaceTextKeyObjects(obj) {
   // Recursively find all objects with "_text" key and replace them with the value of that key.
   // Other keys of the node with "_text" key will be discarded.
@@ -87,12 +74,23 @@ export function parseFormData(data) {
   return formData;
 }
 
-export async function fetchSimpleApi({ company, routes, url, parse }) {
-  const responses = await Promise.all(routes.map((route) => fetch(url(route))));
-
+export async function fetchSimpleApi({ company, routes, optional = [], url, parse }) {
+  // `optional` routes are not essential (e.g. print data): one that fails reaches `parse` as null
   const isXml = url('test').includes('xml'); // a bit crude, but does the job
-  const data = await Promise.all(responses.map((res) => (isXml ? res.text() : res.json())));
+  const read = (res) => (isXml ? res.text() : res.json());
+  const data = await Promise.all(routes.map(async (route) => read(await fetch(url(route)))));
+  const extra = await Promise.all(
+    optional.map(async (route) => {
+      try {
+        const res = await fetch(url(route));
+        return res.ok ? await read(res) : null;
+      } catch (e) {
+        console.log(`   - ${route} not fetched: ${e}`);
+        return null;
+      }
+    }),
+  );
 
-  const items = parse(company, ...data);
+  const items = parse(company, ...data, ...extra);
   return { items, lastScan: getISODate() };
 }

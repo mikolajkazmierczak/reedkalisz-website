@@ -2,7 +2,7 @@
   import { slide } from 'svelte/transition';
 
   import { treeGetItemAtPath, treeMoveItemToPath } from '%/utils';
-  import { smallestCellWidth, hierarchyCellWidth, saveAfterMove } from './utils';
+  import { addCellWidth, hierarchyCellWidth, saveAfterMove } from './utils';
 
   import Icon from '$c/Icon.svelte';
 
@@ -15,16 +15,36 @@
 
   export let dropzone;
   export let dragging;
-  export let id; // id of the item that is being dragged: -1 for headRow or item id for other rows
+  export let dragged = null; // the path of the row being dragged (see Table)
+  // the row this zone is under (-1: the head); it opens while a dragged row is over that row (dropzone === id)
+  export let id;
 
   $: show = dropzone === id;
   let hoverParent = false;
   let hoverSibling = false;
   let hoverChild = false;
 
-  $: parent = meta?.depth != 0 && meta?.isLast;
-  $: sibling = !dragging && !expanded;
-  $: child = !dragging;
+  // the head's drop zone (id -1) takes a row to the very first place, that's all it does
+  $: head = id === -1;
+
+  // where a slot puts the row: P(arent) - after this row's parent, S(ibling) - after this row (or first, the head's),
+  // C(hild) - this row's first child
+  function target(type) {
+    if (type === 'P') {
+      const path = meta.path.slice(0, -1);
+      path[path.length - 1]++;
+      return path;
+    }
+    if (type === 'S' && head) return [0];
+    if (type === 'S') return [...meta.path.slice(0, -1), meta.path[meta.path.length - 1] + 1];
+    if (type === 'C') return [...meta.path, 0];
+  }
+  // no slot that'd leave the dragged row where it is (worked out only for an open zone: the rows of a flat table have
+  // no path)
+  const moves = (type, dragged) => String(target(type)) !== dragged;
+  $: parent = show && !head && meta.depth != 0 && meta.isLast && moves('P', dragged);
+  $: sibling = show && (head || (!dragging && !expanded)) && moves('S', dragged);
+  $: child = show && !head && !dragging && moves('C', dragged);
 
   function dragover(e, type) {
     // dragged element entered a slot
@@ -52,19 +72,7 @@
     const parent = treeGetItemAtPath(items, oldPath.slice(0, -1));
     if (!Array.isArray(parent) && parent.children.length == 1) tryCollapse(parent);
 
-    let newPath;
-    if (type === 'P') {
-      newPath = meta.path.slice(0, -1);
-      newPath[newPath.length - 1]++;
-    }
-    if (type === 'S') {
-      newPath = [...meta.path];
-      newPath[newPath.length - 1]++;
-    }
-    if (type === 'C') {
-      newPath = [...meta.path, 0];
-    }
-    const data = treeMoveItemToPath(items, oldPath, newPath);
+    const data = treeMoveItemToPath(items, oldPath, target(type));
     if (data) {
       const { oldItemData, newItemData } = data;
       await saveAfterMove(collection, items, oldItemData, newItemData);
@@ -73,15 +81,16 @@
   }
 </script>
 
-{#if show && (parent || sibling || child)}
+{#if parent || sibling || child}
   {@const w = hierarchyCellWidth}
-  {@const blankSpan = meta.depth - (parent ? 1 : 0)}
+  {@const blankSpan = (meta?.depth ?? 0) - (parent ? 1 : 0)}
   {@const blankWidth = blankSpan * w}
   {@const parentWidth = w}
-  {@const siblingWidth = (maxDepth + 1 - meta.depth) * w}
+  {@const siblingWidth = (maxDepth + 1 - (meta?.depth ?? 0)) * w}
   {@const childWidth = w}
   <div class="dropzone" in:slide={{ duration: 100 }} out:slide={{ duration: 300 }}>
-    <div class="blank" style:width={smallestCellWidth + 'rem'} />
+    <!-- under the "add a subcategory" column and the gap after it (see Grid), then the tree column -->
+    <div class="blank" style:width="calc({addCellWidth} + var(--col-gap))" />
     {#if blankSpan != 0}
       <div class="blank" style:width={blankWidth + 'rem'} />
     {/if}
@@ -91,10 +100,12 @@
         class="slot"
         class:hover={hoverParent}
         style:width={parentWidth + 'rem'}
+        role="group"
+        aria-label="Upuść tutaj: poziom wyżej"
         on:drop={(e) => drop(e, 'P')}
         on:dragover={(e) => dragover(e, 'P')}
         on:dragleave={dragleave}>
-        <div class="icon"><Icon fill name="arrow_left" color={'var(--primary)'} /></div>
+        <div class="icon"><Icon fill name="arrow_left" color={'var(--navy-700)'} /></div>
       </div>
     {/if}
 
@@ -103,6 +114,8 @@
         class="slot"
         class:hover={hoverSibling}
         style:width={siblingWidth + 'rem'}
+        role="group"
+        aria-label="Upuść tutaj: za tą pozycją"
         on:drop={(e) => drop(e, 'S')}
         on:dragover={(e) => dragover(e, 'S')}
         on:dragleave={dragleave} />
@@ -115,10 +128,12 @@
         class="slot"
         class:hover={hoverChild}
         style:width={childWidth + 'rem'}
+        role="group"
+        aria-label="Upuść tutaj: jako podkategoria"
         on:drop={(e) => drop(e, 'C')}
         on:dragover={(e) => dragover(e, 'C')}
         on:dragleave={dragleave}>
-        <div class="icon"><Icon fill name="arrow_right" color={'var(--primary)'} /></div>
+        <div class="icon"><Icon fill name="arrow_right" color={'var(--navy-700)'} /></div>
       </div>
     {/if}
   </div>
@@ -127,13 +142,14 @@
 <style>
   .dropzone {
     display: flex;
-    height: 2rem;
+    padding: 0 var(--cell-pad);
+    height: 1.9rem;
   }
   .slot {
     position: relative;
-    --border: 1px solid var(--primary-light);
+    --border: 1px solid var(--navy-500);
     height: 100%;
-    background-color: var(--primary-white);
+    background-color: var(--navy-100);
     border: var(--border);
     border-right: none;
   }
@@ -141,7 +157,7 @@
     border-right: var(--border);
   }
   .slot.hover {
-    background-color: var(--primary-light);
+    background-color: var(--navy-500);
   }
   .icon {
     position: absolute;

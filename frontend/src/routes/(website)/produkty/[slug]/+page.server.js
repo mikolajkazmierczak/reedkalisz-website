@@ -1,7 +1,7 @@
 import api from '$/api';
 import { makeTree } from '%/utils';
 import { preloadSlider } from '#/products/slider';
-import { readProduct, deepestCategory } from './product';
+import { readProduct, deepestCategory } from '#/products/product';
 
 /** Server-side, the same for everyone. A hidden product comes back empty; +page.js takes it from there. */
 export async function load({ params, parent }) {

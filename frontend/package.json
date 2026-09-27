@@ -16,22 +16,27 @@
   },
   "dependencies": {
     "@directus/sdk": "^10.3.1",
-    "@sveltejs/adapter-node": "^5.2.2",
-    "@sveltejs/kit": "^2.5.26",
+    "@sveltejs/adapter-node": "^5.5.7",
+    "@sveltejs/kit": "^2.70.3",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "klona": "^2.0.6",
-    "marked": "^14.1.1",
-    "nanoid": "^5.0.7",
-    "node-fetch": "^3.3.2",
-    "prettier": "^3.8.3",
-    "prettier-plugin-svelte": "^3.5.1",
+    "marked": "^14.1.4",
+    "nanoid": "^5.1.16",
+    "pdfmake": "^0.3.11",
+    "prettier": "^3.9.9",
+    "prettier-plugin-svelte": "^3.5.2",
     "reedkalisz-shared": "file:../shared",
-    "socket.io-client": "^4.7.5",
+    "socket.io-client": "^4.8.4",
     "striptags": "^3.2.0",
-    "svelte": "^4.2.19",
-    "vite": "^5.4.3"
+    "svelte": "^4.2.20",
+    "vite": "^5.4.21"
   },
   "type": "module",
   "engine": {
     "node": ">=18"
+  },
+  "overrides": {
+    "axios": "^0.34.0",
+    "cookie": "^0.7.2"
   }
 }

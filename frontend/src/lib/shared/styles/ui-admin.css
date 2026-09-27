@@ -1,36 +1,118 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700;900&display=swap');
-
 :root {
-  /* material.io/resources/color */
-  /* https://www.colors.tools/lighten-and-darken */
-  --primary-dark: #001b38;
-  --primary: #2b4162;
-  --primary-light: #586c90;
-  --primary-text: #fff;
-  --primary-white: #d3ddec;
-  --accent-dark: #808e95;
-  --accent: #b0bec5;
-  --accent-light: #e2f1f8;
-  --accent-text: #000;
-  --accent-white: #ebeef0;
+  --nav-width: 9rem; /* the menu on the left, the header and the page start after it (set by the menu, see Nav) */
+  --header-height: 4rem; /* the header, fixed above the page (see Header, the admin layout); lower on a phone */
 
-  --success: #a7f8aa;
+  /* The admin's colours: a few families, only the shades something uses (the numbers skip the rest). A coloured
+     button takes 100, 200 on hover, 300 when pressed; text and outlines take the dark ones. Nothing else: a colour
+     that isn't here is one of these. */
+  --navy-50: #dee6f1; /* a box of an element (a variant, a calculation): navy-100 a quarter of the way to white */
+  --navy-100: #d3ddec; /* selected: a picked button, a row, the drop slots */
+  --navy-200: #c4d1e5;
+  --navy-300: #b5c4dc;
+  --navy-500: #526a8e; /* a button's hover */
+  --navy-700: #1b2f4e; /* buttons, the menu (the website's navy, ui-website.css) */
+  --navy-900: #0e1b2f; /* a button pressed, the page you're on in the menu */
 
-  --scroll-thumb: var(--primary);
-  --scroll-track: var(--accent);
+  --grey-50: #f5f7f8; /* a row under the pointer */
+  --grey-100: #ebeef0; /* table heads, the tree's columns */
+  --grey-300: #b0bec5;
+  --grey-500: #808e95; /* muted text, dashed outlines */
 
-  --border-radius: 0.5rem;
-  --border: solid 1px var(--primary);
-  --border-focus: solid 1px var(--main);
-  --border-thick: solid 2px var(--primary);
-  --border-light: solid 1px rgba(0, 0, 0, 0.1);
-  --border-heavy: solid 3px rgba(0, 0, 0, 0.1);
-  --outline-dashed: dashed 2px var(--primary);
-  --shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
+  --black-6: rgba(0, 0, 0, 0.06); /* a hover wash */
+  --black-10: rgba(0, 0, 0, 0.1); /* borders, lines */
+  --black-20: rgba(0, 0, 0, 0.2); /* the backdrop of an editor */
+  --black-50: rgba(0, 0, 0, 0.5); /* the backdrop of a popup, rings */
+
+  --blue-100: #eaf5fa; /* light blue: information, an optional box, the sale's prices, a hover */
+  --blue-200: #cee1e9;
+  --blue-300: #bcd3dd;
+  --blue-500: #6d9ad8; /* a text link under the pointer */
+  --blue-700: #3867a8;
+
+  --green-100: #c9eec9; /* success, done */
+  --green-200: #b6e3b6;
+  --green-300: #a3d8a3;
+  --green-700: #0a9f59;
+
+  --orange-100: #ffdcb8; /* a warning, something to do */
+  --orange-200: #fcc995;
+  --orange-300: #f7b97a;
+  --orange-500: #e8871e;
+  --orange-700: #b26a00;
+
+  --purple-100: #e9d8ff; /* the API's "Hmm" */
+  --purple-700: #6604c2; /* transport (T, TP) in the labelings, as in the pricing infographic */
+
+  --yellow-100: #ffec99; /* the API's "Do edycji" */
+
+  --red-50: #f7e1e3; /* the API's "Ma zamiennik": paler than "Odrzucony" */
+  --red-100: #efc2c7; /* danger, an error */
+  --red-200: #e3939b;
+  --red-300: #d7636f;
+  --red-400: #cb3343;
+  --red-500: #bf0417;
+
+  /* a field's name, and what's said about it: navy seen through, so it darkens with the box it's on (white, grey,
+     the blues of a variant or an option) - contrast 9.9 / 5.2 on white, 7.6 / 4.4 on the variants' navy-100, 6.9 / 4.2 on navy-200 */
+  --ink-label: rgb(27 47 78 / 0.9);
+  --ink-muted: rgb(27 47 78 / 0.7);
+  /* a field's edge: black seen through, so a darker shade of whatever it's on (as the swatches' ring) */
+  --edge: rgba(0, 0, 0, 0.25);
+
+  --scroll-thumb: var(--grey-300); /* see global.css */
+  --scroll-track: transparent;
+
+  /* corners are squircles (corner-shape, rounded where it isn't known): a squircle looks sharper than a rounded
+     corner of the same radius, so the radii are big */
+  --border-radius: 0.7rem; /* small things: a tag, a chip, a tile */
+  --box-radius: 1.1rem; /* a box, a bar, a table, a popup */
+  --field-radius: 0.7rem; /* a field (Input, Select), 2rem high */
+  --field-radius-small: 0.55rem; /* 1.5rem */
+  --field-radius-compact: 0.45rem; /* 1.2rem */
+  --button-radius: 1rem; /* a Button, rounder than a field */
+  --button-radius-small: 0.75rem;
+  --border: solid 1px var(--navy-700);
+  --border-light: solid 1px var(--black-10);
+  --border-ink: solid 1px rgb(27 47 78 / 0.55); /* navy seen through, darkening with the box it's on: a table's lines,
+  a preview's edge */
+  --border-heavy: solid 0.1875rem var(--black-10);
+  --outline-dashed: dashed 2px var(--navy-700);
+  --shadow: #43475545 0 0 0.25em, #5a7dbc0d 0 0.25em 1em;
+}
+
+/* The website's font files under their own name: `swap` (the website's are `optional`; the admin stays open all
+   day). 94%: the admin's sizes were set for the narrower Fira Sans */
+@font-face {
+  font-family: 'Bricolage Admin';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  size-adjust: 94%;
+  src: url('../fonts/bricolage-grotesque-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Bricolage Admin';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  size-adjust: 94%;
+  src: url('../fonts/bricolage-grotesque-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 * {
-  font-family: 'Fira Sans', sans-serif;
+  font-family:
+    'Bricolage Admin',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
   color: var(--text);
 }
 
@@ -44,7 +126,7 @@ body {
 }
 .ui-section__row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(21.875rem, 100%), 1fr)); /* (a phone: one, as wide as it) */
   gap: 1.5rem;
 }
 .ui-section__col {
@@ -57,9 +139,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-}
-.ui-pair--no-gap {
-  gap: 0;
 }
 
 .ui-list {
@@ -76,25 +155,132 @@ body {
   font-size: 1.75rem;
 }
 
+.ui-bar {
+  /* a bar above a page's table: its parts in a row, never lower than a button */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  min-height: calc(2rem + 1rem + 2px); /* a button, the padding and the border (border-box) */
+  border-radius: var(--box-radius);
+  corner-shape: squircle;
+  border: var(--border-light);
+  background-color: var(--light);
+}
+
+/* a field's name over it (Input's, or one over several fields): small, uppercase, spaced out; what's said about it
+   ("Ilość · zapytaj", "Rozmiar · mm") as big, lighter, after a dot */
+.ui-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-bottom: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-label);
+}
+.ui-label small {
+  display: flex;
+  gap: 0.4em;
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.ui-label small::before {
+  content: '·';
+}
+
+/* a value in a bar, labelled: the label small and uppercase on one line, the value (text or a compact field) on the
+   next, no taller together than a button */
+.ui-stat-label {
+  font-size: 0.65rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.ui-stat-value {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* numbers beside a button (what's picked, what it'll do): each over its label, no taller than the button; a line
+   after them (ui-divider) before what else is in the bar */
+.ui-counts {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  align-content: center;
+  gap: 0.1rem 0.35rem;
+  height: 2rem;
+  line-height: 1;
+}
+.ui-counts .ui-stat-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ui-divider {
+  flex: none;
+  align-self: center;
+  width: 1px;
+  height: 2rem;
+  background-color: var(--black-10);
+}
+
+/* the top bars (the page's header, the editor's): the page shows through, blurred */
+.ui-topbar {
+  background-color: rgb(235 238 240 / 50%); /* grey-100, see-through */
+  -webkit-backdrop-filter: blur(0.625rem);
+  backdrop-filter: blur(0.625rem);
+}
+
 .ui-box {
-  --color: var(--light);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  border-radius: var(--border-radius);
+  border-radius: var(--box-radius);
+  corner-shape: squircle;
   border: var(--border-light);
   padding: 1rem;
   background-color: var(--light);
   transition: background-color 200ms ease-in-out;
 }
 .ui-box--element {
-  background-color: var(--primary-white);
+  background-color: var(--navy-50);
 }
 .ui-box--optional {
-  background-color: var(--accent-light);
+  background-color: var(--blue-100);
 }
+/* inside another box: reaching halfway into its padding, so the fields in it line up with the ones around it - and,
+   the first or last thing in it, halfway into its top or bottom one too: as far from the box's edges as beside */
+.ui-box .ui-box--optional {
+  margin-inline: -0.5rem;
+  padding: 0.5rem;
+}
+.ui-box .ui-box--optional:first-child {
+  margin-top: -0.5rem;
+}
+.ui-box .ui-box--optional:last-child {
+  margin-bottom: -0.5rem;
+}
+/* a text link in a box (the website's page of it, a file, where it's used): blue, lighter
+   under the pointer - all of it (every element has its own colour here, see *) */
+.ui-box a,
+.ui-box a * {
+  color: var(--blue-700);
+}
+.ui-box a:hover,
+.ui-box a:hover * {
+  color: var(--blue-500);
+}
+
 .ui-box--uneditable {
-  background-color: var(--accent-white);
+  background-color: var(--grey-100);
 }
 
 .ui-h3 {
@@ -113,17 +299,13 @@ body {
   --brdr: var(--border-light);
   overflow: hidden;
   border-spacing: 0;
-  border-radius: var(--border-radius);
+  border-radius: var(--box-radius);
+  corner-shape: squircle;
   border: var(--brdr);
   width: 100%;
 }
 .ui-table--dark {
-  --brdr: var(--border);
-}
-.ui-table th,
-.ui-table td {
-  border-right: var(--brdr);
-  border-bottom: var(--brdr);
+  --brdr: var(--border-ink);
 }
 .ui-table th:last-child,
 .ui-table td:last-child {
@@ -137,7 +319,7 @@ body {
   background-color: var(--light);
 }
 .ui-table tr:hover {
-  background-color: var(--accent-light);
+  background-color: var(--blue-100);
 }
 .ui-table th,
 .ui-table td {
@@ -148,40 +330,57 @@ body {
   text-align: left;
 }
 .ui-table th {
-  background-color: var(--accent-white);
+  background-color: var(--grey-100);
 }
 .ui-table .input {
   padding: 0;
 }
 .ui-table .fixed {
-  background-color: var(--accent-white);
-}
-.ui-table .actions {
-  padding: 0;
-  width: 3rem;
-  background-color: var(--accent-white);
+  background-color: var(--grey-100);
 }
 
+/* file tiles (the library, its unused files, new images): a phone fits three */
+.ui-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.8125rem, 1fr));
+  gap: 1rem;
+}
+
+/* a squircle like the text field beside it, its edge a price table's */
 .ui-texteditor__render {
-  height: 280px;
+  height: 17.5rem;
   overflow-y: auto;
   padding: 1rem;
-  border: var(--border);
+  border: var(--border-ink);
+  border-radius: var(--field-radius);
+  corner-shape: squircle;
+}
+/* the text field as tall as its preview (outweighs Input's own height) */
+.ui-texteditor > .ui-texteditor__draft:has(+ .ui-texteditor__render) > .wrapper,
+.ui-texteditor > .ui-texteditor__draft:has(+ .ui-texteditor__render) textarea {
+  height: 100%;
 }
 
-::-webkit-scrollbar {
-  width: 15px;
-}
-::-webkit-scrollbar-track {
-  background-color: var(--scroll-track);
-}
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: var(--scroll-thumb);
-  border: solid 3px var(--scroll-track);
-}
-@media screen and (max-width: 600px) {
-  ::-webkit-scrollbar-thumb {
-    border: none;
+/* A phone: one section per row (the spans are inline styles, hence !important), a text's preview under it. Nav,
+   Header and Editor have their own. */
+@media (max-width: 50rem) {
+  :root {
+    --header-height: 3.25rem;
+  }
+  .ui-section__row > * {
+    grid-column: auto !important;
+  }
+  .ui-pair.ui-texteditor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ui-h2 {
+    font-size: 1.5rem;
+  }
+  .ui-bar {
+    gap: 0.5rem;
+  }
+  .ui-tiles {
+    grid-template-columns: repeat(auto-fill, minmax(5.9375rem, 1fr));
+    gap: 0.5rem;
   }
 }

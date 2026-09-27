@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { error } from '@sveltejs/kit';
 import api from '$/api';
-import { readProduct } from './product';
+import { readProduct } from '#/products/product';
 
 export async function load({ data, params }) {
   if (data.product) return data;

@@ -14,4 +14,9 @@ export default {
     },
   },
   plugins: [sveltekit()],
+  // pdfmake is imported on the first "PDF" click (see the product's report.js): known up front, the dev server doesn't
+  // stop to bundle it then and reload the page
+  optimizeDeps: {
+    include: ['pdfmake', 'pdfmake/js/qrEnc.js'],
+  },
 };

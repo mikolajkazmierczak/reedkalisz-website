@@ -1,5 +1,5 @@
 <script>
-  import { beforeNavigate } from '$app/navigation';
+  import { guardLeaving, tell } from '@/dialog';
   import { slide } from 'svelte/transition';
 
   import api from '$/api';
@@ -27,13 +27,10 @@
 
   let inputError;
 
-  beforeNavigate((navigation) => {
-    if (unsaved) {
-      const prompt = `Zmiany w widoku "${item.name} (${item.amounts})" nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
-      if (confirm(prompt)) {
-        cancel();
-      } else navigation.cancel();
-    }
+  guardLeaving(() => unsaved, {
+    message: () =>
+      `Zmiany w widoku "${item.name} (${item.amounts})" nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`,
+    discard: () => cancel(),
   });
 
   async function updateProducts(swapID = null) {
@@ -83,7 +80,9 @@
       items = items.filter((i) => i.id !== item.id);
     } else {
       const defaultID = items.find((i) => i.default).id;
-      swapID = defaultID === item.id ? items[0].id : defaultID;
+      // the default one goes: another (saved) one takes its place
+      swapID = defaultID === item.id ? (items.find((i) => i.id !== item.id && i.id !== '+')?.id ?? null) : defaultID;
+      if (swapID == null) return tell('To jedyny zapisany widok. Najpierw zapisz inny, który zostanie domyślny.');
       deleting = true;
     }
   }
@@ -121,43 +120,48 @@
   $: diff(item, itemOriginal, { fieldsToIgnore }).then(({ changed }) => (unsaved = changed));
 </script>
 
-<div class="ui-list">
-  <div class="wrapper">
-    <div class="item" class:default={item.default}>
-      <Input placeholder="Nazwa..." bind:value={item.name} />
-      <Input
-        type="list"
-        placeholder="np. 100;200"
-        bind:value={item.amounts}
-        bind:error={inputError}
-        listDisallowString
-        listDisallowNegative
-        listDisallowZero />
-    </div>
-
-    {#if unsaved && correct}
-      <div class="ui-pair save-actions" transition:slide={{ duration: 200 }}>
-        <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
-        <Button icon="ok" on:click={save}>
-          {#if saving}Zapisuję...{:else}Zapisz{/if}
-        </Button>
-      </div>
-    {/if}
-  </div>
-
-  <div class="item-actions">
+<!-- the name with its buttons on the right, the amounts under it, then saving (when changed) -->
+<div class="view">
+  <div class="top">
+    <div class="name"><Input size="small" placeholder="Nazwa..." bind:value={item.name} /></div>
+    <!-- the default one is violet with a white star (the one new products get), the others can be made it -->
+    <Button
+      small
+      icon="star"
+      dashed={!item.default}
+      background={item.default ? 'var(--purple-700)' : null}
+      backgroundHover={item.default ? 'var(--purple-700)' : null}
+      backgroundActive={item.default ? 'var(--purple-700)' : null}
+      title={item.default ? 'Domyślny widok' : 'Ustaw jako domyślny'}
+      disabled={item.id === '+'}
+      on:click={() => !item.default && setDefault(item.id)} />
     {#if items.length > 1}
-      <Button icon="delete" square dangerous on:click={removeStart} />
-    {/if}
-    {#if !item.default}
-      <Button icon="star" square on:click={() => setDefault(item.id)} disabled={item.id === '+'} />
+      <Button small icon="delete" dangerous title="Usuń" on:click={removeStart} />
     {/if}
   </div>
+  <Input
+    size="small"
+    type="list"
+    placeholder="np. 100;200"
+    bind:value={item.amounts}
+    bind:error={inputError}
+    listDisallowString
+    listDisallowNegative
+    listDisallowZero />
+
+  {#if unsaved && correct}
+    <div class="save-actions" transition:slide={{ duration: 200 }}>
+      <Button small icon="close" dangerous on:click={cancel}>Anuluj</Button>
+      <Button small icon="ok" on:click={save}>
+        {#if saving}Zapisuję...{:else}Zapisz{/if}
+      </Button>
+    </div>
+  {/if}
 </div>
 
 <Popup
   title="Jesteś pewny, że chcesz usunąć ten widok?"
-  maxWidth={'300px'}
+  maxWidth={'18.75rem'}
   bind:opened={deleting}
   on:close={removeFinish}>
   <small>Produkty, które korzystają z tego widoku potrzebują zamiennika.</small>
@@ -166,7 +170,7 @@
     bind:value={swapID}
     options={items
       .filter(({ id }) => id !== '+' && id !== item.id)
-      .map((i) => ({ id: i.id, text: `${i.default ? '(Domyślny) ' : ''}${i.name} [${i.amounts}]` }))}>
+      .map((i) => ({ id: i.id, text: `${i.default ? '(Domyślny) ' : ''}${i.name}`, note: i.amounts.join(', ') }))}>
     Widok zastępczy
   </Input>
   <div class="ui-pair popup-actions">
@@ -182,27 +186,28 @@
 </Popup>
 
 <style>
-  .item {
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    gap: 0.25rem;
-    border-radius: var(--border-radius);
-    border: var(--border-light);
-    padding: 0.25rem;
-    width: 100%;
-    background-color: var(--primary-white);
-  }
-  .item.default {
-    outline: var(--outline-dashed);
-  }
-
-  .item-actions {
+  .view {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    padding: 0.5rem;
+    border-radius: var(--box-radius);
+    corner-shape: squircle;
+    border: var(--border-light);
+    background-color: var(--navy-100);
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .name {
+    flex: 1;
+    min-width: 0;
   }
   .save-actions {
-    width: 40ch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.25rem;
     margin-top: 0.25rem;
   }

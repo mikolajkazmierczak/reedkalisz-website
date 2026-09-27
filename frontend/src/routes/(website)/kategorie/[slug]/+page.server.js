@@ -1,9 +1,10 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 import api from '$/api';
 import { parseSearchToParams } from '$/searchparams';
-import { makeTree, treeGetAllChildrenIDs } from '%/utils';
+import { makeTree } from '%/utils';
 import { fields, enabledFilter, countProducts } from '#/products/fields';
+import { categoryFilter, LEGACY_SLUGS } from '#/sections';
 
 /** Only what Directus can sort on directly; nothing is sorted in the app. */
 const SORTS = {
@@ -15,16 +16,19 @@ const SORTS = {
 
 function getFilter(query, category, categoriesTree) {
   if (query) {
-    return { ...enabledFilter, _or: [{ name: { _contains: query } }, { code: { _contains: query } }] };
+    // a variant's code too ('R123-10'), as printed on catalogues and offers; `_some` so hidden variants don't match
+    // (the public permission isn't applied inside a plain o2m join)
+    const inVariants = { storage: { _some: { enabled: { _eq: true }, api_color_code: { _contains: query } } } };
+    return { ...enabledFilter, _or: [{ name: { _contains: query } }, { code: { _contains: query } }, inVariants] };
   }
-  if (category) {
-    const ids = [category.id, ...treeGetAllChildrenIDs(categoriesTree, category.id)];
-    return { ...enabledFilter, categories: { category: { _in: ids } } };
-  }
+  if (category) return categoryFilter(category, categoriesTree);
   return { ...enabledFilter };
 }
 
 export async function load({ url, params, parent }) {
+  // NOWOŚCI 2026, BESTSELLERY and PROMOCJE were categories once, now they're made from the product flags
+  if (LEGACY_SLUGS[params.slug]) throw redirect(301, `/kategorie/${LEGACY_SLUGS[params.slug]}${url.search}`);
+
   // Server-side, so the browser doesn't fetch the page again on hydration.
   const { categoriesItems } = await parent();
   const categoriesTree = makeTree(categoriesItems.filter((c) => c.enabled));
@@ -46,8 +50,8 @@ export async function load({ url, params, parent }) {
   ]);
   let products = data;
 
-  // calendars arrive from a fragment as pseudo-tiles
-  if (params.slug === 'kalendarze-Bf4TIYjf') {
+  // calendars arrive from a fragment as pseudo-tiles, on the category named so (not on its copies in the sections)
+  if (category && !category.section && category.name.trim().toLowerCase() === 'kalendarze') {
     const calendars = (await api.items('fragments').readOne(11)).data;
     products = [
       ...calendars.map((c, i) => ({ ...c, id: calendars.length - i - 1, alt: c.title })).filter((p) => p.show),

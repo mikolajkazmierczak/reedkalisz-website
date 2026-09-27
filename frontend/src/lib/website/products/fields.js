@@ -31,9 +31,12 @@ export const fields = [
   'storage.available',
   'storage.color_first.name',
   'storage.color_first.color',
+  'storage.color_first.multicolor',
+  'storage.color_first.transparent',
   'storage.color_second.name',
   'storage.color_second.color',
-  'storage.multicolored',
+  'storage.color_second.multicolor',
+  'storage.color_second.transparent',
   'storage.img.enabled',
   'storage.img.img',
 

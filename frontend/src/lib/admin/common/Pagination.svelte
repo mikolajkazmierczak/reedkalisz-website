@@ -1,4 +1,5 @@
 <script>
+  import { nanoid } from 'nanoid';
   import { range } from '%/utils';
   import Input from '@c/Input.svelte';
   import Icon from '$c/Icon.svelte';
@@ -9,6 +10,8 @@
 
   export let count;
 
+  const limitId = `limit-${nanoid(6)}`; // "Na stronie" labels its list (a click on it opens it)
+
   const setLimit = (l) => {
     searchParams?.set({ l });
     limit = l;
@@ -18,7 +21,7 @@
     page = p;
   };
 
-  const limits = [1, 5, 25, 50, 100];
+  const limits = [1, 5, 15, 25, 50, 100];
   let selectedLimit = limits.findIndex((l) => l === limit) ?? 0;
   $: limitValue = limits[selectedLimit];
   $: limitValue != limit && setLimit(limitValue); // only set if different from the given from above
@@ -31,7 +34,7 @@
 
 <div class="pagination">
   <div class="buttons">
-    <button class="arrow" class:active={page == 1} on:click={prev}>
+    <button class="arrow" aria-label="Poprzednia strona" class:active={page == 1} on:click={prev}>
       <div class="icon"><Icon fill name="arrow_left" dark /></div>
     </button>
 
@@ -65,14 +68,18 @@
       <button class:active={page === pagesCount} on:click={() => setPage(pagesCount)}>{pagesCount}</button>
     {/if}
 
-    <button class="arrow" class:active={page == pagesCount || pagesCount == 0} on:click={next}>
+    <button
+      class="arrow"
+      aria-label="Następna strona"
+      class:active={page == pagesCount || pagesCount == 0}
+      on:click={next}>
       <div class="icon"><Icon fill name="arrow_right" dark /></div>
     </button>
   </div>
 
   <div class="limit">
-    <small>Na stronie</small>
-    <Input type="select" bind:value={selectedLimit} options={limits.map((v, i) => ({ id: i, text: v }))} />
+    <label for={limitId}><small>Na stronie</small></label>
+    <Input id={limitId} type="select" bind:value={selectedLimit} options={limits.map((v, i) => ({ id: i, text: v }))} />
   </div>
 </div>
 
@@ -82,7 +89,8 @@
     align-self: stretch;
     display: flex;
     justify-content: space-between;
-    border-radius: var(--border-radius);
+    border-radius: var(--box-radius);
+    corner-shape: squircle;
     border: var(--border-light);
     margin-top: 1rem;
     padding: 0.5rem;
@@ -100,6 +108,7 @@
     justify-content: center;
     align-items: center;
     border-radius: var(--border-radius);
+    corner-shape: squircle;
     border: var(--border-light);
     padding: 0.35rem 0.75rem;
     width: 2.5rem;
@@ -108,16 +117,16 @@
     transition: background-color 0.1s ease;
   }
   button:hover {
-    background-color: var(--accent-light);
+    background-color: var(--blue-100);
   }
   button.active {
-    background-color: var(--primary-white);
+    background-color: var(--navy-100);
   }
   .arrow {
     width: 3rem;
   }
   .arrow.active {
-    background-color: var(--accent-white);
+    background-color: var(--grey-100);
   }
   .more {
     cursor: default;
@@ -134,10 +143,24 @@
     width: 100%;
   }
 
+  .limit label {
+    cursor: pointer;
+  }
   .limit {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+  }
+
+  /* a phone: the page size under the pages */
+  @media (max-width: 50rem) {
+    .pagination {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .buttons {
+      flex-wrap: wrap;
+    }
   }
 </style>

@@ -1,5 +1,6 @@
 import api from '$/api';
 import { enabledFilter } from '#/products/fields';
+import { flaggedFields, flaggedFilter, withSections } from '#/sections';
 import { SITE } from '#/seo';
 
 /** Every public URL. Category pages show 25 products at a time, so this is how the rest get found. Cached for an hour. */
@@ -7,15 +8,18 @@ const TTL = 60 * 60 * 1000;
 let cache = null;
 
 async function build() {
-  const [{ data: categories }, { data: products }] = await Promise.all([
-    api.items('categories').readByQuery({ filter: { enabled: { _eq: true } }, fields: ['slug'], limit: -1 }),
+  const [{ data: categories }, { data: flagged }, { data: products }] = await Promise.all([
+    api.items('categories').readByQuery({ fields: ['id', 'enabled', 'parent', 'slug'], limit: -1 }),
+    api.items('products').readByQuery({ filter: flaggedFilter, fields: flaggedFields, limit: -1 }),
     api.items('products').readByQuery({ filter: enabledFilter, fields: ['slug'], limit: -1 }),
   ]);
+  // the category pages as the site has them: with NOWOŚCI, BESTSELLERY and PROMOCJE, without the legacy ones
+  const categoryPages = withSections(categories, flagged).filter((c) => c.enabled);
 
   const paths = [
     '/',
     '/kontakt',
-    ...categories.map((c) => `/kategorie/${c.slug}`),
+    ...categoryPages.map((c) => `/kategorie/${c.slug}`),
     ...products.map((p) => `/produkty/${p.slug}`),
     '/polityka-prywatnosci',
     '/obowiazek-informacyjny',

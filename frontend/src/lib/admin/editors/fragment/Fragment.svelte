@@ -2,7 +2,6 @@
   import { marked } from 'marked';
 
   import api from '$/api';
-  import heimdall from '$/heimdall';
   import { edit as fields } from '%/fields/fragments';
   import { deep, diff } from '%/utils';
 
@@ -20,6 +19,12 @@
   async function save(action) {
     await action();
     data = JSON.stringify(item.data, null, 2);
+  }
+  // the text too, once the changes are really gone (as it was, it'd come back with the next edit)
+  async function cancel(action) {
+    const before = item;
+    await action();
+    if (item !== before) data = JSON.stringify(item.data, null, 2);
   }
 
   let data;
@@ -48,12 +53,6 @@
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
     $unsaved = !dataParsingError && changed;
   });
-
-  heimdall.listen(({ match, me }) => {
-    if (match('fragments', id) && !me) {
-      alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
-    }
-  });
 </script>
 
 <Editor
@@ -63,7 +62,8 @@
   collection="fragments"
   bind:item
   bind:itemOriginal
-  {save}>
+  {save}
+  {cancel}>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
@@ -117,7 +117,7 @@
         <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
           <div
             class="ui-pair ui-texteditor"
-            style:background-color={dataParsingError ? 'var(--main-0)' : 'var(--light)'}
+            style:background-color={dataParsingError ? 'var(--red-100)' : 'var(--light)'}
             style:padding-bottom={dataParsingError ? '0.5rem' : 0}>
             <div class="ui-texteditor__draft code">
               <Input

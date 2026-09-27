@@ -1,21 +1,24 @@
 <script>
-  import { globals, colors } from '@/globals';
+  import { globals, colors, companies } from '@/globals';
+  import { isApiCompany } from '@/sync';
   import { moveItem } from '%/utils';
   import { parseAmount, AMOUNT } from '$/storage';
   import Tooltip from '$c/Tooltip.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Picker from '@c/library/Picker.svelte';
+  import { swatch } from '$/colors';
 
   export let product;
+  export let fileContext = null; // { used, history } file ids, for the picker
+  export let scanner = { variant: () => false }; // what the API scanner overwrites (see scannerFields)
 
   $: globals.update(colors);
+  $: apiProduct = isApiCompany($companies?.find((c) => c.id === product.company));
   $: colorsOptions =
     $colors &&
-    [{ id: null, text: '---' }].concat(
-      $colors.map(({ id, enabled, name, color }) => {
-        return { id, text: `${color} | ${enabled ? '' : '[Ukryty] '}${name}` };
-      }),
+    [{ id: null, text: 'Brak', special: true }].concat(
+      $colors.map((c) => ({ id: c.id, text: c.name, swatch: swatch(c) })),
     );
 
   function pushStorage() {
@@ -28,7 +31,6 @@
       api_color_id: '',
       color_first: null,
       color_second: null,
-      multicolored: false,
     });
     product = product;
   }
@@ -59,85 +61,74 @@
 
 {#if $colors}
   <section class="ui-section">
-    <h2 class="ui-h2">Kolory</h2>
+    <h2 class="ui-h2">Warianty</h2>
     <div class="ui-section__row">
       {#each product.storage as storage, i (storage)}
         {@const state = parseAmount({ available: storage.available, amount: storage.amount })}
         <div class="ui-box ui-box--element" class:ui-box--uneditable={!storage.enabled}>
-          <div class="ui-pair storage-actions">
+          <div class="storage-actions">
             <div class="toggles">
-              <Input type="checkbox" bind:value={storage.enabled}>Włączone</Input>
+              <Input type="checkbox" bind:value={storage.enabled}>Widoczny</Input>
               <Input type="checkbox" bind:value={storage.available}>Dostępny</Input>
             </div>
             <div>
               {#if !i == 0}
-                <Button icon="arrow_left" on:click={() => moveStorage(i, -1)} square />
+                <Button small icon="arrow_left" on:click={() => moveStorage(i, -1)} square />
               {/if}
               {#if i < product.storage.length - 1}
-                <Button icon="arrow_right" on:click={() => moveStorage(i, 1)} square />
+                <Button small icon="arrow_right" on:click={() => moveStorage(i, 1)} square />
               {/if}
-              <Button icon="delete" on:click={() => removeStorage(i)} dangerous />
+              <Button small icon="delete" on:click={() => removeStorage(i)} dangerous />
             </div>
           </div>
 
-          <div class="ui-pair">
+          <!-- the amount and the code; a supplier's id too: in thirds -->
+          <div class="ui-pair" class:thirds={apiProduct}>
             <div class="amount" class:amount--overridden={storage.available}>
-              <Input type="number" bind:value={storage.amount} api={product.api_enabled}>
-                Ilość{#if state.state !== AMOUNT}&nbsp;<small style="opacity:0.65">{state.label}</small>{/if}
+              <Input
+                type="number"
+                bind:value={storage.amount}
+                api={scanner.variant(storage)}
+                disabled={scanner.variant(storage)}>
+                Ilość{#if state.state !== AMOUNT}<small>{state.label}</small>{/if}
               </Input>
             </div>
-            <div class="ui-pair">
-              <Input bind:value={storage.api_color_code}>
-                Kod{#if product.api_enabled}&nbsp;<small style="opacity:0.65">API</small>{/if}
-              </Input>
-              {#if product.api_enabled}
-                <Input bind:value={storage.api_color_id}>ID&nbsp;<small style="opacity:0.65">API</small></Input>
-              {/if}
-            </div>
+            <Input bind:value={storage.api_color_code}>
+              Kod{#if apiProduct}<small>API</small>{/if}
+            </Input>
+            {#if apiProduct}
+              <Input bind:value={storage.api_color_id}>ID<small>API</small></Input>
+            {/if}
           </div>
           <div class="ui-pair">
-            <div>
-              <Input type="select" bind:value={storage.color_first} options={colorsOptions}>Kolor 1</Input>
-              {#if storage.color_first}
-                {@const color = $colors.find(({ id }) => id === storage.color_first).color}
-                <div class="color" style:background-color={color} />
-              {/if}
-            </div>
-            <div>
-              <Input type="select" bind:value={storage.color_second} options={colorsOptions}>Kolor 2</Input>
-              {#if storage.color_second}
-                {@const color = $colors.find(({ id }) => id === storage.color_second).color}
-                <div class="color" style:background-color={color} />
-              {/if}
-            </div>
+            {#each ['color_first', 'color_second'] as key, k}
+              <Input type="select" bind:value={storage[key]} options={colorsOptions}>Kolor {k + 1}</Input>
+            {/each}
           </div>
-          <Input type="checkbox" bind:value={storage.multicolored}>Wielokolorowe</Input>
 
           <div class="imgs-wrapper">
             <h3 class="ui-h3">Zdjęcia</h3>
             <div class="imgs">
               {#each storage.img as img, j (img)}
-                <div class="img" class:main={j == 0}>
-                  <div class="img-actions img-actions--buttons">
-                    <div>
-                      {#if !j == 0}
-                        <Button icon="arrow_left" on:click={() => moveStorageImg(i, j, -1)} square />
+                <div class="img" class:hidden={!img.enabled}>
+                  <div class="img-actions img-actions--top">
+                    <Input type="checkbox" size="small" bind:value={img.enabled}>Pokaż</Input>
+                    <Button small icon="delete" on:click={() => removeStorageImg(i, j)} square dangerous />
+                  </div>
+                  <Picker bind:selected={img.img} {fileContext} />
+                  <div class="img-actions img-actions--bottom">
+                    <span class="tip">
+                      <Input type="checkbox" bind:value={img.show_in_gallery}>Galeria</Input>
+                      <Tooltip><small>Dołącza zdjęcie na końcu głównej galerii</small></Tooltip>
+                    </span>
+                    <span class="order">
+                      {#if j > 0}
+                        <Button small icon="arrow_left" on:click={() => moveStorageImg(i, j, -1)} square />
                       {/if}
                       {#if j < storage.img.length - 1}
-                        <Button icon="arrow_right" on:click={() => moveStorageImg(i, j, 1)} square />
+                        <Button small icon="arrow_right" on:click={() => moveStorageImg(i, j, 1)} square />
                       {/if}
-                    </div>
-                    <Button icon="delete" on:click={() => removeStorageImg(i, j)} square dangerous />
-                  </div>
-                  <Picker bind:selected={img.img} />
-                  <div class="img-actions img-actions--switches">
-                    <Input type="checkbox" bind:value={img.enabled}>Włączone</Input>
-                    <Input type="checkbox" bind:value={img.show_in_gallery}>
-                      Galeria
-                      <span class="info">
-                        🛈<Tooltip>Dołącza zdjęcie na końcu głównej galerii</Tooltip>
-                      </span>
-                    </Input>
+                    </span>
                   </div>
                 </div>
               {/each}
@@ -161,19 +152,25 @@
   }
   .imgs {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
     gap: 1rem;
     padding-top: 1rem;
   }
+  /* framed as the variant's box */
   .img {
     padding: 0.25rem;
     border-radius: var(--border-radius);
-    outline: var(--border-light);
-  }
-  .img.main {
-    outline: var(--outline-dashed);
+    corner-shape: squircle;
+    border: var(--border-light);
   }
 
+  /* (not halves: on a phone the buttons go under the toggles) */
+  .storage-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
   .storage-actions > div:last-child {
     display: flex;
     justify-content: flex-end;
@@ -181,7 +178,12 @@
   }
   .toggles {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+
+  .thirds {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .amount--overridden :global(.number-wrapper) {
@@ -190,31 +192,29 @@
 
   .img-actions {
     display: flex;
-  }
-  .img-actions--buttons {
-    justify-content: space-between;
+    align-items: center;
     gap: 0.3rem;
+    --label-size: 0.75rem; /* the small checkbox's name, to fit a narrow tile */
+  }
+  .img-actions--top {
+    justify-content: space-between;
     padding-bottom: 0.25rem;
   }
-  .img-actions--buttons div {
+  .img-actions--bottom {
+    justify-content: space-between;
+    padding-top: 0.25rem;
+  }
+  .order {
     display: flex;
     gap: 0.3rem;
   }
-  .img-actions--switches {
-    flex-direction: column;
-    gap: 0.5rem;
-    padding-top: 0.5rem;
+  /* a hidden one: grey, as a hidden variant's box */
+  .img.hidden {
+    background-color: var(--grey-100);
   }
 
-  .color {
-    position: relative;
-    left: 1px;
-    width: calc(100% - 2px);
-    height: 1rem;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
-    border: var(--border-light);
-  }
-  .info {
-    cursor: help;
+  /* the whole checkbox shows what it does */
+  .tip {
+    display: flex;
   }
 </style>

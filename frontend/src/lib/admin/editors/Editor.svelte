@@ -3,9 +3,11 @@
   import { fade, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
 
+  import heimdall from '$/heimdall';
   import { unsaved } from '@/stores';
+  import { editedElsewhere } from '@/dialog';
   import Icon from '$c/Icon.svelte';
-  import HoverCircle from '$c/HoverCircle.svelte';
+  import BarButton, { barIconStroke } from '@c/BarButton.svelte';
 
   import editing from './editing';
 
@@ -33,6 +35,7 @@
   export let save = async (action) => await action();
   export let cancel = async (action) => await action();
   export let remove = async (action) => await action();
+  export let removable = false; // shows the delete button in the bar (pass it once the item exists)
 
   function checkCollection() {
     if (collection == null) throw new Error('Collection name was not provided to the Editor instance');
@@ -45,27 +48,36 @@
 
   let saving = false;
   async function handleSave() {
+    if (saving) return; // a second click would create a new item twice
     saving = true;
-    await save(async ({ fieldsToIgnore = [] } = {}) => {
-      [item, itemOriginal] = await editing.save(collection, item, itemOriginal, { root, fieldsToIgnore });
-    });
-    saving = false;
+    try {
+      await save(async () => {
+        [item, itemOriginal] = await editing.save(collection, item, itemOriginal, { root });
+      });
+    } finally {
+      saving = false;
+    }
   }
 
   async function handleCancel() {
-    await cancel(async ({ prompt = null } = {}) => {
-      [item, itemOriginal] = await editing.cancel(item, itemOriginal, { root, prompt });
+    await cancel(async () => {
+      [item, itemOriginal] = await editing.cancel(item, itemOriginal, { root });
     });
   }
 
+  // (checked only for the default delete: the library's file editor deletes on its own)
   async function handleRemove() {
-    checkCollection();
-    await remove(async ({ prompt = null } = {}) => {
-      await editing.remove(collection, item.id, { root, prompt });
+    await remove(async () => {
+      checkCollection();
+      return await editing.remove(collection, item.id, { root });
     });
   }
 
   $: if ($unsaved) checkCollection();
+
+  heimdall.listen(({ match, me }) => {
+    if (collection && item?.id != null && item.id !== '+' && match(collection, item.id) && !me) editedElsewhere();
+  });
 </script>
 
 <svelte:head>
@@ -73,37 +85,26 @@
 </svelte:head>
 
 <div class="wrapper" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
-  <div class="outside" on:click|self={handleExit} />
+  <div class="outside" role="presentation" on:click|self={handleExit} />
   <div class="container" in:fly={{ x: 100, duration: 400 }} out:fly={{ x: 50, duration: 100 }}>
-    <div class="bar">
+    <div class="bar ui-topbar">
       <div class="actions">
         {#if $unsaved}
-          <div class="button back" role="button" on:click={handleCancel}>
-            <HoverCircle color={'var(--main-3)'} />
-            <div class="icon" in:spin>
-              <Icon fill name="close" dark />
-            </div>
-          </div>
+          <BarButton square hoverColor="var(--red-300)" title="Anuluj" on:click={handleCancel}>
+            <span slot="icon" class="icon" in:spin><Icon fill name="close" dark strokeWidth={barIconStroke} /></span>
+          </BarButton>
         {:else}
-          <div class="button back" role="button" on:click={handleExit}>
-            <HoverCircle color={'var(--accent-light)'} />
-            <div class="icon" in:spin>
-              <Icon fill name="arrow_left" dark />
-            </div>
-          </div>
+          <BarButton square title="Wróć" on:click={handleExit}>
+            <span slot="icon" class="icon" in:spin
+              ><Icon fill name="arrow_left" dark strokeWidth={barIconStroke} /></span>
+          </BarButton>
         {/if}
 
         <div class="save-wrapper" class:visible={$unsaved}>
           {#if $unsaved}
-            <div class="button save" role="button" on:click={handleSave}>
-              <HoverCircle color={'var(--success)'} />
-              {#if !saving}
-                <div class="icon"><Icon fill name="ok" dark /></div>
-              {/if}
-              <span>
-                {#if saving}Zapisuję...{:else}Zapisz{/if}
-              </span>
-            </div>
+            <BarButton icon={saving ? null : 'ok'} hoverColor="var(--green-200)" on:click={handleSave}>
+              {#if saving}Zapisuję...{:else}Zapisz{/if}
+            </BarButton>
           {/if}
         </div>
       </div>
@@ -114,6 +115,13 @@
         </div>
         <h2>{title ?? 'Wczytywanie...'}</h2>
       </div>
+
+      <div class="end">
+        <slot name="bar" />
+        {#if removable}
+          <BarButton dangerous icon="delete" on:click={handleRemove}>Usuń</BarButton>
+        {/if}
+      </div>
     </div>
     <div class="content">
       <slot />
@@ -122,27 +130,6 @@
 </div>
 
 <style>
-  .button {
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.25rem;
-    border: solid 2px var(--accent-text);
-    padding: 0 1rem;
-    height: 100%;
-  }
-  .button .icon,
-  .button span {
-    z-index: 1;
-    position: relative;
-  }
-  .button .icon {
-    height: 65%;
-  }
-
   .wrapper {
     z-index: 100;
     position: fixed;
@@ -150,7 +137,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: var(--black-20);
   }
 
   .outside {
@@ -169,9 +156,9 @@
     overflow: auto;
     width: 80vw;
     height: 100%;
-    background-color: var(--accent-white);
+    background-color: var(--grey-100);
     background-image: url('/imgs/dot_grid.png');
-    background-size: 160px;
+    background-size: 10rem;
   }
 
   .bar {
@@ -180,12 +167,12 @@
     top: 0;
     left: 0;
     display: grid;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: min-content 1fr auto;
     align-items: center; /* centers actions, for some reason */
     gap: 1rem;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     height: 4rem;
-    background-color: var(--accent);
+    border-bottom: var(--border-light);
   }
 
   .actions {
@@ -193,10 +180,6 @@
     display: flex;
     align-items: center;
     height: 2rem;
-  }
-  .back {
-    padding: 0;
-    aspect-ratio: 1.2 / 1;
   }
   .save-wrapper {
     width: 0;
@@ -206,8 +189,14 @@
   .save-wrapper.visible {
     width: 7.75rem;
   }
-  .save {
+  .save-wrapper :global(.bar-button) {
     margin-left: 1rem;
+  }
+
+  /* what else can be done with the item, then deleting it */
+  .end {
+    display: flex;
+    gap: 0.5rem;
   }
 
   .title {
@@ -218,7 +207,7 @@
     height: 100%;
   }
   .title .icon {
-    background-color: var(--primary-white);
+    background-color: var(--black-6); /* a grey that shows on the see-through bar */
     border-radius: 50%;
     padding: 0.4rem;
     height: 60%;
@@ -228,11 +217,47 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-weight: 900;
+    font-weight: 700;
   }
 
+  /* its own stacking context under the bar: what rises inside it (the API pills) stays under the bar */
   .content {
+    position: relative;
     z-index: 0;
-    padding: 2rem;
+    padding: 1rem 1.5rem 1.5rem; /* like a page (see the admin layout) */
+  }
+
+  /* a phone: full width (the phone's back closes it); the bar one line, scrolled sideways to its buttons, the title
+     cut short so they're in reach */
+  @media (max-width: 50rem) {
+    .container {
+      width: 100%;
+    }
+    .bar {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      gap: 0.75rem;
+      padding: 0 0.75rem;
+      height: 3.25rem;
+    }
+    .bar > * {
+      flex: none;
+    }
+    .title {
+      gap: 0.5rem;
+      max-width: 65vw;
+    }
+    .title .icon {
+      padding: 0.35rem;
+      height: 2rem;
+    }
+    .title h2 {
+      font-size: 1.2rem;
+    }
+    .content {
+      padding: 0.75rem 0.75rem 1.5rem;
+    }
   }
 </style>

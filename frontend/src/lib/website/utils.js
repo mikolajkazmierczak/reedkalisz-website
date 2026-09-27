@@ -8,14 +8,15 @@ export function addLinks(items) {
   }
 }
 
-export function parseColor(multicolored, first, second) {
+export function parseColor(first, second) {
   const bg = first ?? second; // first could be unset
-  const fg = second; // doesnt matter if first is unset
+  const fg = first ? second : null; // with first unset, second is already the background
 
-  const title = bg && fg ? `${bg.name} / ${fg.name}` : bg ? bg.name : fg ? fg.name : null;
-  const label = multicolored ? 'Wielokolorowy' : (title ?? 'Nieokreślony');
+  const title = bg && fg ? `${bg.name} / ${fg.name}` : bg ? bg.name : null;
+  const label = title ?? 'Nieokreślony';
+  const multicolor = !!(bg?.multicolor || fg?.multicolor); // painted as one rainbow
 
-  return { label, bg, fg };
+  return { label, bg, fg, multicolor };
 }
 
 /** Polish plural: `plural(3, ['produkt', 'produkty', 'produktów'])` → 'produkty'. */

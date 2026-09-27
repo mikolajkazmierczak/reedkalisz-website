@@ -11,12 +11,12 @@
 </script>
 
 {#if show}
-  <div class="bg" on:click={hide} />
+  <div class="bg" role="presentation" on:click={hide} />
   <div class="wrapper" transition:fly={{ y: 20, duration: 300 }}>
     <div class="head">
-      <div class="hide" on:click={hide}>
+      <button type="button" class="hide" aria-label="Zamknij" on:click={hide}>
         <Icon fill name="close" />
-      </div>
+      </button>
       <h1>Wystąpił nieoczekiwany błąd</h1>
       <p>Każdemu może się zdarzyć...</p>
     </div>
@@ -37,7 +37,7 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: var(--black-50);
   }
 
   .wrapper {
@@ -46,10 +46,12 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60ch;
-    height: calc(100vh - 4rem);
+    width: min(60ch, 100vw - 1rem);
+    height: calc(100dvh - 4rem);
+    display: flex;
+    flex-direction: column;
     background-color: var(--light);
-    border: solid 5px var(--main-light);
+    border: solid 0.3125rem var(--red-400);
   }
 
   .head {
@@ -64,6 +66,8 @@
   }
   .hide {
     cursor: pointer;
+    border: none;
+    background: none;
     position: absolute;
     top: 0;
     right: 0;
@@ -73,12 +77,13 @@
     aspect-ratio: 1 / 1;
   }
   .hide:hover {
-    background-color: var(--accent-white);
+    background-color: var(--grey-100);
   }
 
   .content {
     overflow-y: auto;
-    height: calc(100vh - 9rem - 10px);
+    flex: 1;
+    min-height: 0;
     padding: 1rem;
     border-top: var(--border-light);
   }

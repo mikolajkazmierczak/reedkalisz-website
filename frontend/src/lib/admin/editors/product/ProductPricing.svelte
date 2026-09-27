@@ -6,13 +6,17 @@
   import Button from '@c/Button.svelte';
 
   import { globals, companies, globalMargins, priceViews, labelings } from '@/globals';
-  import { labelingText } from '@/labelings';
+  import { defaultLabeling, labelingText } from '@/labelings';
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
   import LabelingField from './LabelingField.svelte';
+  import { syncsLabelings, isManagedLabeling } from '@/sync';
 
   export let product;
   export let productOriginal;
+  export let scanner = { variant: () => false }; // what the API scanner overwrites (see scannerFields)
+  // a sale price over the price: said under the price, and the product isn't saved (see Product)
+  export let saleTooHigh = false;
 
   async function read() {
     // $companies loaded in parent component
@@ -21,15 +25,20 @@
     await globals.update(labelings);
   }
 
-  function checkDuplicateLabeling(id) {
-    if (!id) return false;
-    const owners = product.labelings.filter((l) => l.labeling == id);
-    return owners.length > 1;
+  // the same labeling on the same field twice (in other places it's another labeling of the product)
+  const number = (v) => (v === null || v === undefined || v === '' ? null : Number(v));
+  const sameField = (a, b) =>
+    a.labeling == b.labeling &&
+    number(a.labeling_field_x) === number(b.labeling_field_x) &&
+    number(a.labeling_field_y) === number(b.labeling_field_y);
+  function checkDuplicateLabeling(labeling) {
+    if (!labeling.labeling) return false;
+    return product.labelings.filter((l) => sameField(l, labeling)).length > 1;
   }
 
   function pushLabeling() {
     if ($labelings.length == 0) throw new Error('Brak znakowań w bazie danych');
-    const labeling = $labelings.find((l) => l.company.id == product.company && l.default) ?? $labelings[0];
+    const labeling = defaultLabeling($labelings, product.company, { withCode: false }) ?? $labelings[0];
     product.labelings.push({
       index: product.labelings.length,
       enabled: true,
@@ -82,6 +91,14 @@
     return { id, pricesIDs, pricesSaleIDs };
   });
   $: someLabelingsEnabled = product.labelings.some((l) => l.enabled);
+  $: saleTooHigh = !!(
+    product.show_price &&
+    product.sale &&
+    someLabelingsEnabled &&
+    product.price != null &&
+    product.price_sale != null &&
+    product.price_sale > product.price
+  );
   $: if (product.labelings.length) updateLabelingsPrices();
 
   // CUSTOM PRICES
@@ -118,51 +135,53 @@
 
 {#if product && $labelings && $priceViews && $globalMargins}
   {@const company = $companies.find((c) => c.id === product.company)}
+  {@const labelingsSynced = scanner.labelings && syncsLabelings(company)}
   <section class="ui-section">
     <h2 class="ui-h2">Cennik</h2>
     <div class="ui-section__row">
       <div class="ui-section__col">
+        <!-- a price list that isn't shown: just the switch, the rest stays as it was -->
         <div class="ui-box">
-          <Input type="checkbox" bind:value={product.show_price}>Pokaż cenę</Input>
-          <Input type="checkbox" bind:value={product.sale}>Promocja</Input>
-          <Input
-            type="select"
-            bind:value={product.price_view}
-            options={$priceViews.map(({ id, name, amounts }) => ({ id, text: `${name} [${amounts}]` }))}>
-            Widok
-          </Input>
+          <div class="toggles">
+            <Input type="checkbox" bind:value={product.show_price}>Widoczny</Input>
+            {#if product.show_price}
+              <Input type="checkbox" bind:value={product.sale}>Promocja</Input>
+            {/if}
+          </div>
+          {#if product.show_price}
+            <Input
+              type="select"
+              bind:value={product.price_view}
+              options={$priceViews.map(({ id, name, amounts }) => ({ id, text: name, note: amounts.join(', ') }))}>
+              Widok
+            </Input>
+          {/if}
         </div>
 
         {#if product.show_price}
           {#if someLabelingsEnabled}
             <div class="ui-box">
-              <div class="ui-pair">
-                <Input type="number" min={0} step={0.01} bind:value={product.price} api={product.api_enabled}>
-                  Cena
-                </Input>
-
-                {#if company?.api_handling_costs}
+              <!-- the price, and beside it the sale's (the amounts it leaves out under it) -->
+              <div class="ui-pair prices">
+                <div>
                   <Input
-                    type="select"
-                    bind:value={product.handling_cost}
-                    options={[
-                      { id: null, text: '---' }, // deselect
-                      ...company.api_handling_costs.map(({ price, code, name }) => {
-                        const text = `${price} zł (${code}${name ? ` / ${name}` : ''})`;
-                        return { id: price, text };
-                      }),
-                    ]}
-                    api={product.api_enabled}>
-                    Koszty manipulacyjne
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    bind:value={product.price}
+                    api={scanner.price}
+                    disabled={scanner.price}>
+                    Cena
                   </Input>
-                {/if}
-              </div>
-
-              {#if product.sale}
-                <div class="ui-box ui-box--optional">
-                  <h3 class="ui-h3">Promocja</h3>
-                  <div class="ui-pair">
-                    <Input type="number" min={0} step={0.01} bind:value={product.price_sale}>Cena</Input>
+                  {#if saleTooHigh}
+                    <p class="price-error">Cena w promocji nie może być wyższa od zwykłej.</p>
+                  {/if}
+                </div>
+                {#if product.sale}
+                  <div class="ui-box ui-box--optional sale">
+                    <Input type="number" min={0} step={0.01} bind:value={product.price_sale} invalid={saleTooHigh}>
+                      Cena<small>Promocja</small>
+                    </Input>
                     <Input
                       type="list"
                       placeholder="np. 500;1000"
@@ -173,7 +192,24 @@
                       Wykluczenia
                     </Input>
                   </div>
-                </div>
+                {/if}
+              </div>
+
+              {#if company?.api_handling_costs}
+                <Input
+                  type="select"
+                  bind:value={product.handling_cost}
+                  options={[
+                    { id: null, text: 'Brak', special: true }, // deselect
+                    ...company.api_handling_costs.map(({ price, code, name }) => {
+                      const text = `${price} zł (${code}${name ? ` / ${name}` : ''})`;
+                      return { id: price, text };
+                    }),
+                  ]}
+                  api={scanner.handling_cost}
+                  disabled={scanner.handling_cost}>
+                  Koszty manipulacyjne
+                </Input>
               {/if}
 
               <ProductPricingMargins
@@ -211,96 +247,112 @@
         {/if}
       </div>
 
-      <div class="ui-section__col labelings">
-        <div class="ui-box">
-          <h3 class="ui-h3">Kalkulacje</h3>
-          <div class="ui-section__row">
-            {#each product.labelings as labeling, i (labeling)}
-              {@const chosenLabeling = $labelings.find((l) => l.id == labeling.labeling)}
-              {@const duplicateLabeling = checkDuplicateLabeling(labeling.labeling)}
-              <div
-                class="ui-box ui-box--element"
-                class:ui-box--uneditable={!labeling.enabled}
-                class:warning={duplicateLabeling}>
-                <div class="ui-pair actions">
-                  <Input type="checkbox" bind:value={labeling.enabled}>Włączone</Input>
-                  <div>
-                    {#if !i == 0}
-                      <Button icon="arrow_left" on:click={() => moveLabeling(i, -1)} square />
-                    {/if}
-                    {#if i < product.labelings.length - 1}
-                      <Button icon="arrow_right" on:click={() => moveLabeling(i, 1)} square />
-                    {/if}
-                    <Button icon="delete" on:click={() => removeLabeling(i)} dangerous />
+      {#if product.show_price}
+        <div class="ui-section__col labelings">
+          <div class="ui-box">
+            <h3 class="ui-h3">Kalkulacje</h3>
+            <div class="ui-section__row">
+              {#each product.labelings as labeling, i (labeling)}
+                {@const chosenLabeling = $labelings.find((l) => l.id == labeling.labeling)}
+                {@const duplicateLabeling = checkDuplicateLabeling(labeling)}
+                {@const managed = labelingsSynced && isManagedLabeling(labeling, $labelings, company)}
+                <div
+                  class="ui-box ui-box--element"
+                  class:ui-box--uneditable={!labeling.enabled}
+                  class:warning={duplicateLabeling}>
+                  <div class="ui-pair actions">
+                    <div class="enabled">
+                      <Input type="checkbox" bind:value={labeling.enabled}>Włączone</Input>
+                    </div>
+                    <div>
+                      {#if !i == 0}
+                        <Button small icon="arrow_left" on:click={() => moveLabeling(i, -1)} square />
+                      {/if}
+                      {#if i < product.labelings.length - 1}
+                        <Button small icon="arrow_right" on:click={() => moveLabeling(i, 1)} square />
+                      {/if}
+                      <Button small icon="delete" on:click={() => removeLabeling(i)} disabled={managed} dangerous />
+                    </div>
                   </div>
+
+                  {#if duplicateLabeling}
+                    <h4 class="ui-h4" style:color="var(--red-400)">DUPLIKAT</h4>
+                  {/if}
+                  <Input
+                    type="select"
+                    label="Znakowanie"
+                    bind:value={labeling.labeling}
+                    api={managed}
+                    apiText="Prowadzi do niego mapowanie znakowań. Skaner API ustawia znakowanie, pole i miejsce, dodaje je i usuwa."
+                    disabled={managed}
+                    options={$labelings
+                      .filter(({ company: cid }) => {
+                        if (!company) return true; // all labelings
+                        return [company.id, 4].includes(cid); // also include REED labelings
+                      })
+                      .map((l) => {
+                        const { name: cname } = $companies.find((c) => c.id == l.company);
+                        return { id: l.id, text: labelingText(l, cname) };
+                      })} />
+
+                  {#if company?.api_handling_costs && product.handling_cost}
+                    <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
+                  {/if}
+
+                  {#if chosenLabeling && labeling.enabled}
+                    <ProductPricingTable
+                      prices={labeling.prices}
+                      pricesSale={labeling.prices_sale}
+                      sale={product.sale}
+                      fixed />
+                    <ProductPricingMargins
+                      text="na znakowanie"
+                      globalMargin={chosenLabeling.margin}
+                      globalMinimum={chosenLabeling.minimum}
+                      bind:globalEnabled={labeling.global_margin}
+                      bind:margin={labeling.margin}
+                      bind:minimum={labeling.minimum} />
+                  {/if}
+
+                  <LabelingField
+                    bind:x={labeling.labeling_field_x}
+                    bind:y={labeling.labeling_field_y}
+                    bind:place={labeling.labeling_place}
+                    api={managed} />
                 </div>
+              {/each}
 
-                {#if duplicateLabeling}
-                  <h4 class="ui-h4" style:color="var(--main-4)">DUPLIKAT</h4>
-                {/if}
-                <Input
-                  type="select"
-                  bind:value={labeling.labeling}
-                  options={$labelings
-                    .filter(({ company: cid }) => {
-                      if (!company) return true; // all labelings
-                      return [company.id, 4].includes(cid); // also include REED labelings
-                    })
-                    .map((l) => {
-                      const { name: cname } = $companies.find((c) => c.id == l.company);
-                      return { id: l.id, text: labelingText(l, cname) };
-                    })} />
-
-                {#if company?.api_handling_costs && product.handling_cost}
-                  <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
-                {/if}
-
-                {#if chosenLabeling && labeling.enabled}
-                  <ProductPricingTable
-                    prices={labeling.prices}
-                    pricesSale={labeling.prices_sale}
-                    sale={product.sale}
-                    fixed />
-                  <ProductPricingMargins
-                    text="na znakowanie"
-                    globalMargin={chosenLabeling.margin}
-                    globalMinimum={chosenLabeling.minimum}
-                    bind:globalEnabled={labeling.global_margin}
-                    bind:margin={labeling.margin}
-                    bind:minimum={labeling.minimum} />
-                {/if}
-
-                <LabelingField
-                  bind:x={labeling.labeling_field_x}
-                  bind:y={labeling.labeling_field_y}
-                  bind:place={labeling.labeling_place} />
-              </div>
-            {/each}
-
-            <Button icon="add" on:click={pushLabeling}>Dodaj</Button>
+              <Button icon="add" on:click={pushLabeling}>Dodaj</Button>
+            </div>
           </div>
         </div>
-      </div>
+      {/if}
     </div>
-
-    <!-- <pre style="display:flex;">
-      <pre>{JSON.stringify(product.custom_prices, null, 2)}</pre>
-      <pre>{JSON.stringify(product.custom_prices_sale, null, 2)}</pre>
-      {#each product.labelings as labeling}
-        <pre>{JSON.stringify(labeling.prices, null, 2)}</pre>
-        <pre>{JSON.stringify(
-            labeling.prices_sale,
-            null,
-            2
-          )}</pre>
-      {/each}
-    </pre> -->
   </section>
 {/if}
 
 <style>
+  .toggles {
+    display: flex;
+    gap: 1rem;
+  }
+  /* each as tall as it is (the price's API mark stays under its field) */
+  .prices {
+    align-items: start;
+  }
+  /* under the price: what's wrong with the sale's, beside it */
+  .price-error {
+    margin: 0.5rem 0 0 1.5rem; /* (past the price's API mark) */
+    font-size: 0.85rem;
+    color: var(--red-500);
+  }
+  /* the sale's box in its column: its fields level with the price beside it (half its padding above them) */
+  .sale {
+    gap: 0.75rem;
+    margin-top: -0.5rem;
+  }
   .warning {
-    --border: 2px solid var(--main-3);
+    --border: 2px solid var(--red-300);
   }
 
   .labelings {
@@ -310,5 +362,9 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
+  }
+  .actions .enabled {
+    justify-content: flex-start;
+    align-items: center;
   }
 </style>

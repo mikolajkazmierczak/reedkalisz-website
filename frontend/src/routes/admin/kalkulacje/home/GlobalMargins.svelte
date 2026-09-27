@@ -1,5 +1,5 @@
 <script>
-  import { beforeNavigate } from '$app/navigation';
+  import { guardLeaving } from '@/dialog';
   import { slide } from 'svelte/transition';
 
   import api from '$/api';
@@ -7,6 +7,7 @@
   import { deep, diff } from '%/utils';
 
   import { recalculateProducts } from '@/calculations';
+  import { globalMargins } from '@/globals';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
 
@@ -18,13 +19,9 @@
   let unsaved = false;
   let saving = false;
 
-  beforeNavigate((navigation) => {
-    if (unsaved) {
-      const prompt = `Zmiany w marżach nie zostały zapisane. Czy na pewno chcesz opuścić stronę?`;
-      if (confirm(prompt)) {
-        cancel();
-      } else navigation.cancel();
-    }
+  guardLeaving(() => unsaved, {
+    message: 'Zmiany w marżach nie zostały zapisane. Czy na pewno chcesz opuścić stronę?',
+    discard: () => cancel(),
   });
 
   async function save() {
@@ -35,6 +32,7 @@
     const { full_margin, full_minimum, product_margin, product_minimum } = data;
     const updates = { full_margin, full_minimum, product_margin, product_minimum };
     data = await api.singleton('global_margins').update(updates);
+    $globalMargins = data; // the recalculation below reads the store, the echo comes too late
     dataOriginal = deep.copy(data);
     heimdall.emit('global_margins', null, { refresh: true });
 
@@ -60,7 +58,7 @@
 
 <div class="margins">
   <div>
-    <h4 style:color="#f90">Produkt</h4>
+    <h4 style:color="var(--orange-500)">Produkt</h4>
     <div class="ui-pair">
       <div class="input">
         <Input type="number" bind:value={data.product_margin}>Marża</Input>
@@ -73,7 +71,7 @@
     </div>
   </div>
   <div>
-    <h4 style:color="#cc001d">Całość</h4>
+    <h4 style:color="var(--red-500)">Całość</h4>
     <div class="ui-pair">
       <div class="input">
         <Input type="number" bind:value={data.full_margin}>Marża</Input>

@@ -15,9 +15,9 @@
 
   function parseFloat(value) {
     // "top right", "bottom left", ...
-    // "top right" -> { top: true, right: true, bottom: false, left: false, center: false }
+    // "top right" -> { top: true, right: true, bottom: false, left: false }
     let [first, second] = value ? value.split(' ') : [null, null];
-    const values = ['top', 'right', 'bottom', 'left', 'center'];
+    const values = ['top', 'right', 'bottom', 'left'];
     return values.reduce((acc, value) => {
       return { ...acc, [value]: first === value || second === value };
     }, {});
@@ -32,11 +32,10 @@
   style:width
   style:height
   class:float
-  style:top={floats.top ? `${offset}px` : ''}
-  style:right={floats.right ? `${offset}px` : ''}
-  style:bottom={floats.bottom ? `${offset}px` : ''}
-  style:left={floats.left ? `${offset}px` : ''}
-  style:center={floats.left ? `${offset}px` : ''}
+  style:top={floats.top ? `${offset}rem` : ''}
+  style:right={floats.right ? `${offset}rem` : ''}
+  style:bottom={floats.bottom ? `${offset}rem` : ''}
+  style:left={floats.left ? `${offset}rem` : ''}
   on:click={onclick}
   on:mousedown={onmousedown}>
   <Icon width="80%" name={icon} color={bold ? 'var(--main)' : 'var(--main-4)'} strokeWidth={bold ? 0.5 : 0.3} />

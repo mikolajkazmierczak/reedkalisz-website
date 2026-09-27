@@ -4,21 +4,36 @@
   export let x;
   export let y;
   export let place;
+  export let api = false; // the API scanner sets all three: locked, with its pill
 </script>
 
+<!-- one label over both size fields -->
 <div class="labeling-field">
   <div>
-    <h4>Pole znakowania <small>mm</small></h4>
-    <div>
-      <Input type="number" step="1" min="0" bind:value={x} placeholder="w" />
+    <span class="ui-label">Pole znakowania <small>mm</small></span>
+    <div class="size">
+      <Input
+        type="number"
+        step="1"
+        min="0"
+        bind:value={x}
+        placeholder="w"
+        label="Szerokość pola znakowania (mm)"
+        {api}
+        disabled={api} />
       x
-      <Input type="number" step="1" min="0" bind:value={y} placeholder="h" />
+      <Input
+        type="number"
+        step="1"
+        min="0"
+        bind:value={y}
+        placeholder="h"
+        label="Wysokość pola znakowania (mm)"
+        {api}
+        disabled={api} />
     </div>
   </div>
-  <div>
-    <h4>Miejsce znakowania</h4>
-    <Input bind:value={place} />
-  </div>
+  <Input bind:value={place} {api} disabled={api}>Miejsce znakowania</Input>
 </div>
 
 <style>
@@ -27,20 +42,12 @@
     flex-direction: column;
     gap: 1rem;
   }
-  .labeling-field > div {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-  .labeling-field > div > div {
+  .size {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    width: 50%;
   }
-  .labeling-field h4 {
-    font-weight: normal;
-    margin-bottom: 0.25rem;
+  .size > :global(*) {
+    flex: 1; /* the two sides as wide, the "x" between them */
   }
 </style>

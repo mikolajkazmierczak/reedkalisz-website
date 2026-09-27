@@ -5,10 +5,11 @@ export function labelingText({ code, name, type }, companyName = null) {
   return parts.filter(Boolean).join(' · ');
 }
 
-// What a new rule points at before anything is picked: the company's default labeling, or its first.
-export function defaultLabeling(labelings, company) {
-  const own = (labelings ?? []).filter((l) => l.company === company && l.code);
-  return own.find((l) => l.default) ?? own[0] ?? null;
+// A company's default labeling: the first in its calculations (they're ordered there, the first one is the default).
+// `withCode` leaves out the ones without a code (a mapping rule needs one).
+export function defaultLabeling(labelings, company, { withCode = true } = {}) {
+  const own = (labelings ?? []).filter((l) => l.company === company && (!withCode || l.code));
+  return own.sort((a, b) => a.index - b.index)[0] ?? null;
 }
 
 // A labeling of the given company with the given code, if we have one.

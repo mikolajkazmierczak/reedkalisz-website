@@ -3,17 +3,19 @@
 
   import api from '$/api';
   import heimdall from '$/heimdall';
+  import { tell } from '@/dialog';
   import { SearchParams } from '$/searchparams';
   import { edit as fields, defaults } from '%/fields/categories';
-  import { deep, slugify, diff, makeTree, treeFlatten } from '%/utils';
+  import { categoryLabels, categoryOptions } from '@/categories';
+  import { deep, slugify, diff } from '%/utils';
 
   import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { globals, users, categories } from '@/globals';
+  import { globals, categories } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
+  import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import Blame from '@c/Blame.svelte';
   import Picker from '@c/library/Picker.svelte';
   import Popup from '@c/Popup.svelte';
 
@@ -44,6 +46,14 @@
     itemOriginal = item ? deep.copy(item) : null;
   }
 
+  // the bar's delete: the popup (it asks for a replacement), unless there are subcategories
+  function removeFromBar() {
+    if (hasChildren)
+      tell('Najpierw usuń podkategorie albo przenieś je gdzie indziej.', {
+        title: 'Nie można usunąć kategorii, która ma podkategorie',
+      });
+    else removeOpen();
+  }
   function removeOpen() {
     deletingOpen = true;
   }
@@ -60,26 +70,25 @@
     const fields = ['id', 'categories.id', 'categories.category'];
     const products = (await api.items('products').readByQuery({ fields, filter, limit: -1 })).data;
     const productsIds = products.map((p) => p.id);
-    const categoriesIds = products.map((p) => p.categories.map((c) => c.category)).flat();
+    // the replacement for the products that don't have it yet
+    const updates = products
+      .filter((p) => !p.categories.some((c) => c.category === deletingSwapId))
+      .map((p) => ({
+        id: p.id,
+        categories: p.categories.map((c, index) =>
+          c.category == item.id ? { index, category: deletingSwapId } : { index, ...c },
+        ),
+      }));
 
-    // remove category (and it's occurrences in products)
-    const confirmed = await editing.remove('categories', item.id, {
+    // remove category (and it's occurrences in products); the popup has already asked
+    await editing.remove('categories', item.id, {
       root: '/admin/kategorie',
+      prompt: false,
       parent: item.parent,
       index: item.index,
     });
-
-    if (confirmed && productsIds) {
-      if (deletingSwapId && !categoriesIds.includes(deletingSwapId)) {
-        for (const p of products) {
-          const categories = p.categories.map((c, index) => {
-            return c.category == item.id ? { index, category: deletingSwapId } : { index, ...c };
-          });
-          await api.items('products').updateOne(p.id, { categories });
-        }
-      }
-      heimdall.emit('products', productsIds);
-    }
+    if (deletingSwapId && updates.length) await api.items('products').updateBatch(updates);
+    if (productsIds.length) heimdall.emit('products', productsIds);
 
     deleting = false;
     removeClose();
@@ -98,26 +107,16 @@
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
     $unsaved = correctSlug && changed;
   });
-
-  heimdall.listen(({ match, me, data }) => {
-    if (match('categories', item.id) && !me) {
-      // alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
-      console.log('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.', data);
-    }
-  });
 </script>
 
-<Popup title="Na pewno?" maxWidth={'300px'} bind:opened={deletingOpen} on:close={removeClose}>
+<Popup title="Na pewno?" maxWidth={'18.75rem'} bind:opened={deletingOpen} on:close={removeClose}>
   <small>Kategoria zostanie usunięta z powiązanych produktów.</small>
   <Input
     type="select"
     bind:value={deletingSwapId}
     options={[
-      { id: null, text: 'Brak zamiennika' },
-      ...treeFlatten(makeTree($categories)).map(({ id, name, _meta }) => {
-        const path = _meta.path.map((p) => p + 1).join('.');
-        return { id, text: `${path} ${name}` };
-      }),
+      { id: null, text: 'Brak zamiennika', special: true },
+      ...categoryOptions(categoryLabels($categories)).filter((o) => o.id !== item?.id),
     ]}>
     Możesz wybrać zamiennik
   </Input>
@@ -134,6 +133,8 @@
   icon="categories"
   title={item?.name}
   collection="categories"
+  removable={!!itemOriginal?.date_created}
+  remove={removeFromBar}
   bind:item
   bind:itemOriginal>
   {#if item}
@@ -141,32 +142,17 @@
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">
-            <div class="ui-pair">
-              <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
-            </div>
-            <Input bind:value={item.name}>Nazwa</Input>
+            <h3 class="ui-h3">Nazwa</h3>
+            <Input bind:value={item.name} />
           </div>
-
           <div class="ui-box">
-            <h3 class="ui-h3">SEO</h3>
-            <Input bind:value={item.seo_title}>Tytuł</Input>
-            <Input type="textarea" bind:value={item.seo_description}>Opis</Input>
+            <div class="ui-pair">
+              <Input type="checkbox" bind:value={item.enabled}>Widoczna</Input>
+            </div>
           </div>
         </div>
 
         <div class="ui-section__col">
-          <div class="ui-box">
-            <Button icon="delete" on:click={removeOpen} dangerous disabled={item.id === '+' || hasChildren}>
-              Usuń
-            </Button>
-            {#if hasChildren}
-              <p>
-                Nie można usunąć kategorii, która ma podkategorie.<br />
-                <small>Najpierw usuń lub wysuń wszystkie podkategorie na zewnątrz.</small>
-              </p>
-            {/if}
-          </div>
-
           <div class="ui-box ui-box--uneditable">
             <h3 class="ui-h3">Link do strony</h3>
             {#if item.date_created}
@@ -174,28 +160,13 @@
             {:else}
               /kategorie/{item.slug || '...'}
             {/if}
-            <h3 class="ui-h3">Utworzenie</h3>
-            <p>
-              {#if $users && item.date_created}
-                <Blame user={item.user_created} datetime={item.date_created} />
-              {:else}
-                Tu będziesz ty
-              {/if}
-            </p>
-            <h3 class="ui-h3">Aktualizacja</h3>
-            <p>
-              {#if $users && item.date_updated}
-                <Blame user={item.user_updated} datetime={item.date_updated} />
-              {:else}
-                Nie aktualizowano
-              {/if}
-            </p>
+            <Blames {item} />
           </div>
         </div>
 
         <div class="ui-section__col">
           <div class="img">
-            <Picker bind:selected={item.img} />
+            <Picker bind:selected={item.img} backing="var(--grey-100)" />
           </div>
         </div>
       </div>
@@ -229,7 +200,7 @@
 <style>
   .img {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(10.9375rem, 1fr));
     gap: 1rem;
   }
 </style>

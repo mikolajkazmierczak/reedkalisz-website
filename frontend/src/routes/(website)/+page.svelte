@@ -507,13 +507,13 @@
     color: var(--red);
   }
   .map__leaves {
-    margin-top: 3px;
+    margin-top: 0.1875rem;
     padding-left: var(--sp-3);
     border-left: 1px solid var(--border);
   }
   .map__leaves a {
     display: block;
-    padding: 1px 0;
+    padding: 0.0625rem 0;
     color: var(--ink-500);
     font-size: var(--fs-xs);
     line-height: 1.4;

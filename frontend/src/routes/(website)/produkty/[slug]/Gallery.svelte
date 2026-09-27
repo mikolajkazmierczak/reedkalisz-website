@@ -1,15 +1,18 @@
 <script>
   import { fly } from 'svelte/transition';
   import { baseUrl } from '$/api';
+  import Lightbox from './Lightbox.svelte';
 
   export let imgs = [];
+  export let variant = null; // all the photos' variant (a variant's card); else each photo's own, if any
   /** Product name, for alt text. */
   export let alt = '';
   export let small = false;
 
   // A disabled image is disabled for everyone, admin included.
-  $: shown = imgs.filter((i) => i.enabled !== false);
+  $: shown = imgs.filter((i) => i.img && i.enabled !== false);
   $: index = shown.length ? 0 : null;
+  $: (shown, (zoomed = null)); // another product's photos (back/forward reuses the page) close the lightbox
   $: main = shown.length ? shown[index] : null;
 
   // Variant cards show thumbnails only; a single image needs no strip.
@@ -18,27 +21,25 @@
 
   const label = (i) => (shown.length > 1 ? `${alt} — zdjęcie ${i + 1} z ${shown.length}` : alt);
 
-  // The lightbox takes focus and returns it on close.
+  // The lightbox takes focus and returns it on close, leaving the main photo at the one looked at last.
   let zoomed = null;
   let opener = null;
   function openLightbox(i) {
     opener = document.activeElement;
-    zoomed = { img: shown[i].img, alt: label(i) };
+    zoomed = i;
   }
-  function closeLightbox() {
+  function closeLightbox(e) {
+    if (zoomed == null) return; // (a second close while it fades away)
+    index = e.detail;
     zoomed = null;
     opener?.focus?.({ preventScroll: true });
   }
-  const focus = (node) => node.focus();
+  $: photos = variant ? shown.map((i) => ({ ...i, variant })) : shown;
 </script>
 
-<svelte:window on:keydown={(e) => zoomed && e.key === 'Escape' && closeLightbox()} />
-
 {#if shown.length}
-  {#if zoomed}
-    <button class="lightbox" type="button" aria-label="Zamknij powiększenie" use:focus on:click={closeLightbox}>
-      <img src="{baseUrl}/assets/{zoomed.img}" alt={zoomed.alt} />
-    </button>
+  {#if zoomed != null}
+    <Lightbox imgs={photos} index={zoomed} {label} on:close={closeLightbox} />
   {/if}
 
   <div class="gallery">
@@ -134,26 +135,6 @@
     height: 100%;
     object-fit: contain;
     mix-blend-mode: multiply;
-  }
-
-  /* --- lightbox --- */
-
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    display: grid;
-    place-items: center;
-    padding: var(--gutter);
-    background-color: color-mix(in srgb, var(--ink) 82%, transparent);
-    cursor: zoom-out;
-  }
-  .lightbox img {
-    max-width: min(100%, 68.75rem);
-    max-height: 88vh;
-    object-fit: contain;
-    border-radius: var(--r-md);
-    background-color: #fff;
   }
 
   @media (min-width: 56.25rem) {

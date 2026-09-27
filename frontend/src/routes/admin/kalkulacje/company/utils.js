@@ -3,6 +3,7 @@ import { defaults, read as fields } from '%/fields/labelings';
 import { deep, diffSync, uid } from '%/utils';
 import { recalculateProducts } from '@/calculations';
 import { globals } from '@/globals';
+import { ask } from '@/dialog';
 
 const fieldsToIgnore = ['user_created', 'date_created', 'user_updated', 'date_updated'];
 
@@ -51,11 +52,11 @@ export function reindex(items) {
   return items.sort((a, b) => a.index - b.index);
 }
 
-function tryRemoveEmptyAmounts(items) {
+async function tryRemoveEmptyAmounts(items) {
   // Check if there are empty amounts, ask the user if he wants to continue, remove empty ones.
   if (items.some((item) => item.prices.some((p) => !p.amount))) {
-    const prompt = `Nie zdefiniowano nakładów w niektórych kolumnach. Jeśli kontynuujesz, zostaną usunięte!`;
-    if (!confirm(prompt)) return false;
+    const prompt = 'Niektóre kolumny nie mają nakładu. Jeśli zapiszesz, zostaną usunięte.';
+    if (!(await ask(prompt, { ok: 'Usuń je i zapisz', danger: true }))) return false;
     for (const item of items) {
       item.prices = item.prices.filter((p) => p.amount);
     }
@@ -63,7 +64,7 @@ function tryRemoveEmptyAmounts(items) {
   return true;
 }
 
-function tryRemoveDuplicateAmounts(items) {
+async function tryRemoveDuplicateAmounts(items) {
   // Check if there are duplicate amounts, ask the user if he wants to continue, only keep the first occurences.
   const amounts = [];
   const duplicates = [];
@@ -78,9 +79,8 @@ function tryRemoveDuplicateAmounts(items) {
   }
   if (duplicates.length) {
     const prompt =
-      `Wykryto powtarzające się nakłady: "${duplicates.join(', ')}". ` +
-      `Jeśli kontynuujesz zostaną zachowane tylko pierwsze wystąpienia.`;
-    if (!confirm(prompt)) return false;
+      `Nakłady się powtarzają: ${duplicates.join(', ')}. ` + 'Jeśli zapiszesz, zostaną tylko pierwsze z tych kolumn.';
+    if (!(await ask(prompt, { ok: 'Usuń powtórzone i zapisz', danger: true }))) return false;
     for (const item of items) {
       item.prices = item.prices.filter((_, i) => firstIndexes.includes(i));
     }
@@ -88,8 +88,8 @@ function tryRemoveDuplicateAmounts(items) {
   return true;
 }
 
-export function tryCleanItems(items) {
-  return tryRemoveEmptyAmounts(items) && tryRemoveDuplicateAmounts(items);
+export async function tryCleanItems(items) {
+  return (await tryRemoveEmptyAmounts(items)) && (await tryRemoveDuplicateAmounts(items));
 }
 
 async function saveItem(item, itemsOriginal) {

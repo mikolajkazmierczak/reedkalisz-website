@@ -60,7 +60,11 @@ io.on('connection', (socket) => {
       log(`   - success`);
     } catch (err) {
       log(`   - error ${err}`);
-      socket.emit('fetch', { error: String(err), company: company.id });
+      // a supplier's own refusal (HappyBrands: one scan per 10 minutes): its bare message, not an error
+      socket.emit(
+        'fetch',
+        err.notice ? { notice: err.message, company: company.id } : { error: String(err), company: company.id },
+      );
     }
   });
 });

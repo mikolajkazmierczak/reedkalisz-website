@@ -11,6 +11,9 @@ export const search = [
   'api_discount',
   'api_handling_costs',
   'api_labelings_mappings',
+  'api_categories_mappings',
+  'api_places_mappings',
+  'api_labelings_codes',
 ];
 export const show = [...search];
 
@@ -30,6 +33,9 @@ export const defaults = () => ({
   api_discount: null,
   api_handling_costs: null, // object
   api_labelings_mappings: null, // object
+  api_categories_mappings: null, // object
+  api_places_mappings: null, // object
+  api_labelings_codes: null, // [code] from the last scan
 });
 
 export default { search, show, read, edit, defaults };

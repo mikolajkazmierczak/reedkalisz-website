@@ -23,7 +23,6 @@ class Socket {
     this.socket.off('changes', listener);
   }
   emitChanges(collection, ids = null, { refresh = false, selfBroadcast = true } = {}) {
-    // TODO: test the additional options
     if (ids && !Array.isArray(ids)) ids = [ids];
     const data = {
       collection,
@@ -41,8 +40,8 @@ class Socket {
   offFetch(listener) {
     this.socket.off('fetch', listener);
   }
-  emitFetch(company, data) {
-    this.socket.emit('fetch', { company, data });
+  emitFetch(company) {
+    this.socket.emit('fetch', { company });
   }
 }
 
@@ -57,9 +56,8 @@ class Heimdall {
   listen(func, root = false) {
     const listener = (data) => {
       const match = (collection, ids) => this.match(data, collection, ids);
-      const filter = (ids) => this.filter(data, ids);
-      const isMe = get(me).id == data.user;
-      func({ match, filter, me: isMe, data });
+      const isMe = get(me)?.id == data.user; // (logged out: a listener that outlives the admin, e.g. the menu's)
+      func({ match, me: isMe, data });
     };
 
     this.socket.onChanges(listener);
@@ -70,16 +68,12 @@ class Heimdall {
     });
   }
 
-  ask(company, data) {
-    this.socket.emitFetch(company, data);
+  ask(company) {
+    this.socket.emitFetch(company);
   }
-  get(func, root = false) {
+  get(func) {
     this.socket.onFetch(func);
-
-    onDestroy(() => {
-      this.socket.offFetch(func);
-      if (root) this.socket.close();
-    });
+    onDestroy(() => this.socket.offFetch(func));
   }
 
   filter(data, ids = null) {

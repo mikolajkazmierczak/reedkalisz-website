@@ -35,12 +35,11 @@
   globals.update(categories);
   $: $categories && read(limit, page, query);
   // TODO: it seems like the list doesn't update when sometimes (e.g. when adding new items), why?
-  // $: $categories && console.log('categories', $categories);
 </script>
 
 {#if $categories}
   <div class="wrapper">
-    <div class="actions">
+    <div class="actions ui-bar">
       <Button on:click={() => goto(`/admin/kategorie/+?index=${itemsTree.length}`)} icon="add">Dodaj</Button>
       <Search {searchParams} {query} />
     </div>
@@ -51,21 +50,20 @@
       {items}
       head={[
         { checkbox: true, icon: 'eye', label: 'Widoczność' },
-        { id: true, label: 'ID' },
-        { label: 'Nazwa' },
-        { blame: true, label: 'Utworzenie' },
-        { blame: true, label: 'Aktualizacja' },
+        { label: 'Nazwa', float: true, category: true },
+        { blame: true, label: 'Utworzenie', float: true },
+        { blame: true, label: 'Aktualizacja', float: true },
       ]}
       mapper={($) => {
         const treeItem = treeGetItem(itemsTree, $.id);
-        const itemLabel = treeItem._meta.path.map((p) => p + 1).join('.') + ' ' + $.name;
+        const code = treeItem._meta.path.map((p) => p + 1).join('.');
         return {
           href: '/admin/kategorie/' + $.slug,
           hrefNew: `/admin/kategorie/+?parent=${$.id}&index=${treeItem.children.length}`,
+          codeNew: `${code}.${treeItem.children.length + 1}`,
           values: [
             $.enabled,
-            $.id,
-            itemLabel,
+            { code, name: $.name },
             { user: $.user_created, datetime: $.date_created },
             { user: $.user_updated, datetime: $.date_updated },
           ],
@@ -83,16 +81,5 @@
 <style>
   .wrapper {
     overflow-x: auto;
-  }
-  .actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border-radius: var(--border-radius);
-    border: var(--border-light);
-    background-color: var(--light);
   }
 </style>

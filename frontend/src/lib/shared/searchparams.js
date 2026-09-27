@@ -4,17 +4,19 @@ import { get, writable } from 'svelte/store';
 
 export const searchparams = writable(
   new Map([
-    ['/admin/produkty', { values, defaults: { l: 50, p: 1, q: null, c: null } }], // limit, page, query, category
-    ['/admin/kolory', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
+    ['/admin/produkty', { values, defaults: { l: 50, p: 1, q: null, c: null, s: null } }], // limit, page, query, category, sort
+    ['/admin/kolory', { values, defaults: { l: 50, p: 1, q: null, s: null } }], // limit, page, query, sort
     ['/admin/kategorie', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/informacje-handlowe', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/menu', { values, defaults: { l: 50, p: 1, q: null, m: null } }], // limit, page, query, menu
-    ['/admin/strony', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/fragmenty', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/kalkulacje', { values, defaults: { c: null } }], // company
+    ['/admin/paragrafy', { values, defaults: { l: 50, p: 1, q: null, s: null } }], // limit, page, query, sort (commercial_details)
+    ['/admin/strony', { values, defaults: { l: 50, p: 1, q: null, s: null } }], // limit, page, query, sort
+    ['/admin/fragmenty', { values, defaults: { l: 50, p: 1, q: null, s: null } }], // limit, page, query, sort
+    ['/admin/kalkulacje/znakowania', { values, defaults: { c: null } }], // company
     ['/admin/biblioteka', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
-    ['/admin/api', { values, defaults: { l: 25, p: 1, q: null, c: null } }], // limit, page, query, company
+    ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null, s: null } }], // limit, page, query, sort
+    ['/admin/api/produkty', { values, defaults: { l: 25, p: 1, q: null, c: null } }], // limit, page, query, company
+    ['/admin/api/znakowania', { values, defaults: { c: null } }], // company
+    ['/admin/api/miejsca', { values, defaults: { c: null } }], // company
+    ['/admin/api/kategorie', { values, defaults: { c: null } }], // company
   ]),
 );
 
@@ -48,16 +50,6 @@ export function parseSearchToParams(search) {
     params[key] = v ? (isNaN(Number(v)) ? v : Number(v)) : null;
   }
   return params;
-}
-
-export function parseParamsToSearch(params) {
-  // Parse an object with the specified search params and return a URL.
-  // `params`: { number: 42, string: 'excalibur' } -> '?number=42&string=excalibur'
-  const searchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    if (value != null) searchParams.set(key, value);
-  }
-  return '?' + searchParams.toString();
 }
 
 export class SearchParams {
@@ -95,9 +87,8 @@ export class SearchParams {
     if (this.pathname != url.pathname) return;
 
     const { defaults, params } = this.get();
-    const newParams = SearchParams.parseSearchToParams(url.search);
+    const newParams = parseSearchToParams(url.search);
 
-    // const unsetByDefault = Object.values(defaults).every(v => v == null);
     const unset = Object.keys(newParams).length === 0; // newParams == {}
     if (unset) {
       const paramsUnset = Object.values(params).filter((v) => v != null).length === 0;
@@ -105,10 +96,8 @@ export class SearchParams {
       this.writeURL(params); // ? -> ?p=1
     } else {
       // enforces defaults above nulls
-      // TODO: enforces defaults value types (number -> number, string -> string)
-      // TODO: ?param=# sets param to null
       // ?p=2&x=2 -> ?p=2&x=2
-      // ?p=1     -> ?p=1&x=3 (defaults.x is 3)W
+      // ?p=1     -> ?p=1&x=3 (defaults.x is 3)
       this.set({ ...defaults, ...params, ...newParams });
     }
   }
@@ -164,16 +153,8 @@ export class SearchParams {
     return { params, defaults, values };
   }
 
-  static parseParamsToSearch(params) {
-    return parseParamsToSearch(params);
-  }
-
-  static parseSearchToParams(search) {
-    return parseSearchToParams(search);
-  }
-
   static read() {
     const url = get(page).url;
-    return SearchParams.parseSearchToParams(url.search);
+    return parseSearchToParams(url.search);
   }
 }

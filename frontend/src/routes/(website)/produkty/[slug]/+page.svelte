@@ -16,7 +16,7 @@
   import QuestionForm from '#c/QuestionForm.svelte';
   import Icon from '$c/Icon.svelte';
   import Recommended from './Recommended.svelte';
-  import { deepestCategory } from './product';
+  import { deepestCategory } from '#/products/product';
   import { plural } from '#/utils';
   import { describe, jsonLd, breadcrumbList } from '#/seo';
 
@@ -33,8 +33,6 @@
     coming_soon,
     out_of_stock,
     categories,
-    seo_title,
-    seo_description,
     description,
     commercial_details,
     size_x,
@@ -55,12 +53,14 @@
 
   $: mainGalleryImgs = getMainGalleryImgs(gallery, storage);
   $: showCustomPrices = custom_prices && custom_prices.some((p) => p.enabled);
-  $: showLabelingsPrices = labelings && labelings.some((l) => l.prices.some((p) => p.enabled));
+  $: showLabelingsPrices = labelings && labelings.some((l) => l.enabled && l.prices.some((p) => p.enabled));
+  // the paragraph (net or gross, what's binding) is about the prices: over them, under the description without them
+  $: post = commercial_details?.content ?? null;
+  $: pricesShown = showCustomPrices || showLabelingsPrices;
   $: size = [size_x, size_y, size_z].filter((s) => s).join(' x ') + 'mm';
 
   $: enabledStorage = storage?.filter((s) => s.enabled) ?? [];
-  $: summaryColors = enabledStorage.map(({ multicolored, color_first, color_second, amount, available }) => ({
-    multicolored,
+  $: summaryColors = enabledStorage.map(({ color_first, color_second, amount, available }) => ({
     first: color_first,
     second: color_second,
     amount,
@@ -69,7 +69,7 @@
   // Each price with whether it includes marking: labeling prices always do, custom ones when flagged.
   $: allPrices = [
     ...[...(custom_prices ?? []), ...(custom_prices_sale ?? [])].map((p) => [p, !!custom_prices_with_labeling]),
-    ...(labelings ?? []).flatMap((l) => [...l.prices, ...l.prices_sale].map((p) => [p, true])),
+    ...(labelings ?? []).filter((l) => l.enabled).flatMap((l) => [...l.prices, ...l.prices_sale].map((p) => [p, true])),
   ]
     .filter(([p]) => p.enabled && p.price)
     .sort(([a], [b]) => a.price - b.price);
@@ -77,8 +77,30 @@
   $: priceFromWithLabeling = allPrices[0]?.[1] ?? false;
   $: inStock = enabledStorage.some((s) => parseAmount({ available: s.available, amount: s.amount }).state !== NONE);
 
-  $: metaTitle = `${seo_title || name} — ${code}`;
-  $: metaDescription = describe(seo_description || description);
+  // made in this browser; report.js (and pdfmake) load on the first click
+  let carding = false;
+  let cardFailed = false;
+  $: (data.product, (cardFailed = false));
+  async function downloadCard() {
+    if (carding) return;
+    carding = true;
+    cardFailed = false;
+    const { product, categoriesItems, hidden } = data;
+    try {
+      const { downloadReport } = await import('#/report/report.js');
+      await downloadReport(product, { categories: categoriesItems, enabled: !hidden });
+    } catch (e) {
+      console.error(e);
+      cardFailed = product === data.product; // not on another product's page, gone to meanwhile
+    } finally {
+      carding = false;
+    }
+  }
+
+  // SEO comes from the product itself: its name, and an excerpt of its description
+  $: metaTitle = `${name} — ${code}`;
+  $: metaDescription =
+    describe(description) || `${name} (${code}) z Twoim logo. Ceny ze znakowaniem, wycena na zapytanie.`;
   $: ogImage = mainGalleryImgs[0] ? `${baseUrl}/assets/${mainGalleryImgs[0].img}?key=medium` : null;
 
   $: breadcrumbs = getBreadcrumbs(categories);
@@ -94,8 +116,9 @@
     for (const s of storage) {
       // disabled variants' photos stay out
       if (!s.enabled) continue;
+      const variant = { code: s.api_color_code || code, first: s.color_first, second: s.color_second };
       for (const img of s.img) {
-        if (img.show_in_gallery && img.img) imgs.push(img);
+        if (img.show_in_gallery && img.img) imgs.push({ ...img, variant }); // the lightbox names its variant
       }
     }
     return imgs;
@@ -178,18 +201,20 @@
             <Gallery imgs={mainGalleryImgs} alt={name} />
 
             {#if description}
-              {@const post = commercial_details ? commercial_details.content : null}
               <section class="sec sec--desc">
                 <h2 class="sec__title">Opis</h2>
                 <div class="prose">
-                  {@html marked.parse(description + (post ? '\n' + post : ''))}
+                  {@html marked.parse(description + (post && !pricesShown ? '\n\n---\n\n' + post : ''))}
                 </div>
               </section>
             {/if}
 
-            {#if showCustomPrices || showLabelingsPrices}
+            {#if pricesShown}
               <section class="sec sec--pricing">
                 <h2 class="sec__title" id="cennik">Cennik</h2>
+                {#if post}
+                  <div class="prose pricings__post">{@html marked.parse(post + '\n\n---')}</div>
+                {/if}
                 <div class="pricings">
                   {#if showCustomPrices}
                     <div class="pricing">
@@ -250,15 +275,15 @@
                     <span class="buy__unit">/ szt</span>
                     {#if priceFromWithLabeling}<span class="buy__with">ze znakowaniem</span>{/if}
                   </p>
-                  {#if showCustomPrices || showLabelingsPrices}
+                  {#if pricesShown}
                     <a class="buy__tocennik" href="#cennik" on:click={glide}>Pełny cennik według nakładu ↓</a>
                   {/if}
                 {/if}
 
                 {#if summaryColors.length}
                   <div class="buy__colors">
-                    {#each summaryColors as { multicolored, first, second, amount, available }}
-                      <Color {multicolored} {first} {second} {amount} {available} size="1.25rem" />
+                    {#each summaryColors as { first, second, amount, available }}
+                      <Color {first} {second} {amount} {available} size="1.25rem" />
                     {/each}
                     <span class="buy__colors-n tnum">
                       {summaryColors.length}
@@ -283,6 +308,18 @@
                     {/if}
                   </dl>
                 {/if}
+
+                <button class="btn buy__card" disabled={carding} aria-busy={carding} on:click={downloadCard}>
+                  {#if carding}
+                    <span class="buy__card-spin" aria-hidden="true"></span>
+                  {:else}
+                    <Icon name="arrow_download" color="currentColor" strokeWidth={0.6} width="1.1rem" height="1.1rem" />
+                  {/if}
+                  Karta produktu / PDF
+                </button>
+                {#if cardFailed}<p class="buy__card-error" role="alert">
+                    Nie udało się przygotować karty. Spróbuj jeszcze raz.
+                  </p>{/if}
               </div>
 
               <div class="buy__ask" id="zapytaj" bind:this={askEl}>
@@ -301,7 +338,7 @@
             <h2 class="sec__title">Kolory i dostępność</h2>
             <div class="storages">
               {#each enabledStorage as s}
-                <Storage {company} {code} storage={s} />
+                <Storage {code} storage={s} />
               {/each}
             </div>
           </section>
@@ -559,6 +596,39 @@
     font-weight: 600;
   }
 
+  .buy__card {
+    align-self: flex-start;
+    margin-top: var(--sp-4);
+    border-color: var(--ink);
+    background-color: transparent;
+    color: var(--ink);
+  }
+  .buy__card:hover:not(:disabled) {
+    background-color: var(--ink);
+    color: #fff;
+  }
+  .buy__card:disabled {
+    cursor: progress;
+  }
+  .buy__card-spin {
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: buy-card-spin 0.7s linear infinite;
+  }
+  @keyframes buy-card-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .buy__card-error {
+    margin-top: var(--sp-2);
+    color: var(--red);
+    font-size: var(--fs-xs);
+  }
+
   /* --- detail ------------------------------------------------------------- */
 
   .detail {
@@ -584,6 +654,9 @@
     display: flex;
     flex-direction: column;
     gap: var(--sp-8);
+  }
+  .pricings__post {
+    margin-bottom: var(--sp-6);
   }
   .pricing {
     position: relative;

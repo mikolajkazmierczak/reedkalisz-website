@@ -17,6 +17,7 @@ const createTile = ($) => ({
   dark: $?.dark ?? false, // dark text
   contrast: $?.contrast ?? false, // dark or light background depending on text color
   red: $?.red ?? false, // red background
+  hide: $?.hide ?? false,
 });
 
 export const create = {

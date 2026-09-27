@@ -1,25 +1,20 @@
 <script>
+  import { swatch, colorMissing } from '$/colors';
   import api from '$/api';
-  import heimdall from '$/heimdall';
   import { edit as fields, defaults } from '%/fields/colors';
   import { deep, diff } from '%/utils';
 
-  import editing from '@/editors/editing';
   import { unsaved } from '@/stores';
-  import { globals, companies, users } from '@/globals';
+  import { globals, companies } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
+  import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
-  import Button from '@c/Button.svelte';
-  import Blame from '@c/Blame.svelte';
+  import Tooltip from '$c/Tooltip.svelte';
 
   export let id;
 
   let item;
   let itemOriginal;
-
-  function remove() {
-    editing.remove('colors', id, { root: '/admin/kolory' });
-  }
 
   async function read() {
     await globals.update(companies);
@@ -37,62 +32,79 @@
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
     $unsaved = changed;
   });
-
-  heimdall.listen(({ match, me }) => {
-    if (match('colors', id) && !me) {
-      alert('UWAGA!\nKtoś właśnie wprowadził tu zmiany!\nZapisując nadpiszesz je.');
-    }
-  });
 </script>
 
-<Editor root="/admin/kolory" icon="colors" title={item?.name} collection="colors" bind:item bind:itemOriginal>
+<Editor
+  root="/admin/kolory"
+  icon="colors"
+  title={item?.name}
+  collection="colors"
+  removable={!!itemOriginal?.date_created}
+  bind:item
+  bind:itemOriginal>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
         <div class="ui-section__col">
           <div class="ui-box">
+            <h3 class="ui-h3">Nazwa</h3>
+            <Input bind:value={item.name} />
+          </div>
+          <div class="ui-box">
             <div class="ui-pair">
-              <Input type="checkbox" bind:value={item.enabled}>Widoczny</Input>
-            </div>
-            <Input bind:value={item.name}>Nazwa</Input>
-            <div class="ui-pair">
-              <Input bind:value={item.color}>Kolor <small>HEX</small></Input>
-              <Input type="color" bind:value={item.color}>Wybierz</Input>
+              <div class="column">
+                <Input bind:value={item.color}>Kolor <small>HEX</small></Input>
+                <Input type="checkbox" bind:value={item.multicolor}>Wielokolorowy</Input>
+                <Input type="checkbox" bind:value={item.transparent}>Przezroczysty</Input>
+              </div>
+              <div class="column">
+                <Input type="color" bind:value={item.color}>Wybierz</Input>
+                <!-- the colour as the website paints it, with its name on hover like there -->
+                <div class="swatch" style:background={swatch(item)}>
+                  <Tooltip backgroundColor="var(--light)" border="1px solid var(--black-50)">
+                    <b>{item.name || 'Bez nazwy'}</b><br />
+                    <small>Tak wygląda na stronie</small>
+                  </Tooltip>
+                </div>
+                {#if colorMissing(item)}
+                  <small class="missing">Brak koloru: na stronie jest biały</small>
+                {/if}
+              </div>
             </div>
             <Input
               type="select"
               bind:value={item.company}
               options={$companies.map(({ id, name }) => ({ id, text: name }))}>
-              Firma
+              Producent
             </Input>
           </div>
         </div>
 
         <div class="ui-section__col">
-          <div class="ui-box">
-            <Button icon="delete" on:click={remove} dangerous>Usuń</Button>
-          </div>
-
           <div class="ui-box ui-box--uneditable">
-            <h3 class="ui-h3">Utworzenie</h3>
-            <p>
-              {#if $users && item.date_created}
-                <Blame user={item.user_created} datetime={item.date_created} />
-              {:else}
-                Tu będziesz ty
-              {/if}
-            </p>
-            <h3 class="ui-h3">Aktualizacja</h3>
-            <p>
-              {#if $users && item.date_updated}
-                <Blame user={item.user_updated} datetime={item.date_updated} />
-              {:else}
-                Nie aktualizowano
-              {/if}
-            </p>
+            <Blames {item} />
           </div>
         </div>
       </div>
     </section>
   {/if}
 </Editor>
+
+<style>
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .missing {
+    color: var(--orange-700);
+  }
+  .swatch {
+    cursor: help;
+    position: relative;
+    width: 3rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--black-20); /* over the colour, so it reaches the edge (see the table's) */
+  }
+</style>

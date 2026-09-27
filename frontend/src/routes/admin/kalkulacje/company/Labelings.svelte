@@ -3,13 +3,13 @@
   import { deep, uid } from '%/utils';
   import { tick } from 'svelte';
 
-  import HoverCircle from '$c/HoverCircle.svelte';
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
   import Button from '@c/Button.svelte';
   import Input from '@c/Input.svelte';
   import Labeling from './Labeling.svelte';
   import { createNewLabeling, getChanged, save, tryCleanItems } from './utils';
+  import { ask } from '@/dialog';
 
   export let unsaved;
   export let saving;
@@ -23,6 +23,15 @@
   // _remove: true, // item marked for deletion
   // _swap: id, // item that will be swapped with this one when deleted
 
+  // the first labeling (in the order of the table) is the company's default; `default` in the database follows it,
+  // for whatever reads it (once saved: the loaded rows are marked too, so an old flag isn't an edit)
+  $: items && markDefault(items);
+  $: itemsOriginal && markDefault(itemsOriginal);
+  function markDefault(items) {
+    const first = items.filter((item) => !item._remove).sort((a, b) => a.index - b.index)[0];
+    for (const item of items) item.default = item === first;
+  }
+
   $: changed = getChanged(items, itemsOriginal);
   $: unsaved = changed.length > 0;
 
@@ -32,7 +41,7 @@
 
     const labelingIDs = [];
     const productIDs = [];
-    if (tryCleanItems(items)) {
+    if (await tryCleanItems(items)) {
       for await (const { uid, ids } of save(changed, itemsOriginal)) {
         changed = changed.filter((c) => c._uid !== uid);
         labelingIDs.push(...ids.labelings);
@@ -45,8 +54,8 @@
     saving = false;
   }
 
-  function cancel() {
-    if (confirm('Jesteś pewny? Ta akcja jest nieodwracalna.')) {
+  async function cancel() {
+    if (await ask('Cofnąć wszystkie niezapisane zmiany?', { ok: 'Cofnij zmiany', danger: true })) {
       items = deep.copy(itemsOriginal);
     }
   }
@@ -67,8 +76,8 @@
     items = items;
   }
 
-  function removeAmount(i) {
-    if (confirm(`Czy na pewno chcesz usunąć tę kolumnę?`)) {
+  async function removeAmount(i) {
+    if (await ask('Usunąć tę kolumnę?', { ok: 'Usuń', danger: true })) {
       for (const item of items) {
         item.prices.splice(i, 1);
       }
@@ -108,47 +117,41 @@
     <table class="ui-table">
       <thead>
         <tr>
-          <th width="60" class="col-sticky col-index">
-            <Tooltip>Kolejność</Tooltip>
-            <Icon width="15" name="arrow_down" />
+          <th style:width="2.25rem" class="col-sticky col-remove">
+            <span class="head-icon"><Tooltip>Usuwanie</Tooltip><Icon width={15} name="delete" /></span>
           </th>
-          <th width="30">
-            <Tooltip>Domyślne dla producenta</Tooltip>
-            <Icon width="15" name="star" />
-          </th>
-          <th width="30" class="heavy-border">
-            <Icon width="15" name="delete" />
+          <th style:width="3.75rem" class="col-sticky col-index heavy-border">
+            <span class="head-icon">
+              <Tooltip>Kolejność (pierwsze jest domyślne dla producenta)</Tooltip>
+              <Icon width={15} name="arrow_down" />
+            </span>
           </th>
 
-          <th width="140">Nazwa</th>
-          <th width="100" class="col-sticky col-code">Kod</th>
-          <th width="100" class="heavy-border">Typ</th>
+          <th style:width="8.75rem">Nazwa</th>
+          <th style:width="6.25rem" class="col-sticky col-code">Kod</th>
+          <th style:width="6.25rem" class="heavy-border">Typ</th>
 
-          <th width="60">
-            <Tooltip>Marża</Tooltip>
-            <b style:color="#0A9f59">M</b>
+          <th style:width="3.75rem">
+            <span class="head-icon"><Tooltip>Marża</Tooltip><b style:color="var(--green-700)">M</b></span>
           </th>
-          <th width="60">
-            <Tooltip>Minimum</Tooltip>
-            <b style:color="#0A9f59">MIN</b>
+          <th style:width="3.75rem">
+            <span class="head-icon"><Tooltip>Minimum</Tooltip><b style:color="var(--green-700)">MIN</b></span>
           </th>
-          <th width="60">
-            <Tooltip>Przygotowalnia</Tooltip>
-            <b style:color="#0089ff">P</b>
+          <th style:width="3.75rem">
+            <span class="head-icon"><Tooltip>Przygotowalnia</Tooltip><b style:color="var(--blue-700)">P</b></span>
           </th>
-          <th width="60">
-            <Tooltip>Cena transportu</Tooltip>
-            <b style:color="#6604C2">T</b>
+          <th style:width="3.75rem">
+            <span class="head-icon"><Tooltip>Cena transportu</Tooltip><b style:color="var(--purple-700)">T</b></span>
           </th>
-          <th width="70" class="heavy-border">
-            <Tooltip>Próg dla uwzględnienia transportu</Tooltip>
-            <b style:color="#6604C2">TP</b>
+          <th style:width="4.375rem" class="heavy-border">
+            <span class="head-icon"
+              ><Tooltip>Próg dla uwzględnienia transportu</Tooltip><b style:color="var(--purple-700)">TP</b></span>
           </th>
 
           {#each items[0].prices as p, i (p._uid)}
             {@const isLumpsum = p.amount == 1}
 
-            <th width="80" class="amount" class:amount--lumpsum={isLumpsum}>
+            <th style:width="5rem" class="amount" class:amount--lumpsum={isLumpsum}>
               <div class="amount-actions">
                 <Button icon="delete" on:click={() => removeAmount(i)} square dangerous />
               </div>
@@ -170,12 +173,12 @@
             </th>
           {/each}
 
-          <th width="30" rowspan={items.length + 1} class="action action-amount-push">
-            <button on:click={() => addAmount()}>
-              <HoverCircle />
-              <div class="icon"><Icon fill name="add" light /></div>
-            </button>
+          <th style:width="5.625rem" class="add-amount">
+            <span class="head-icon"
+              ><Button small icon="add" title="Dodaj nakład" on:click={addAmount}>Dodaj</Button></span>
           </th>
+          <!-- no width: the rest of the box, so the lines of the rows go all the way (nothing when it scrolls) -->
+          <th class="filler" />
         </tr>
       </thead>
 
@@ -188,9 +191,14 @@
   </div>
 {/if}
 
-{#if unsaved}
-  <div class="edit-actions">
-    <div class:ui-pair={!saving}>
+<!-- adding stays there while there are changes: several can be added before saving -->
+<div class="edit-actions">
+  {#if !saving}
+    <Button icon="add" on:click={addLabeling}>Dodaj</Button>
+  {/if}
+  {#if unsaved}
+    {#if !saving}<span class="divider" />{/if}
+    <div class="save">
       {#if !saving}
         <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
       {/if}
@@ -201,15 +209,15 @@
     {#each changed as { code, name, type }}
       <small>{code || name || type || '???'}</small>
     {/each}
-  </div>
+  {/if}
+</div>
+{#if unsaved}
   <div class="edit-info">
     <small>
       <b>Zapisywanie może (bardzo) długo potrwać.</b><br />
       Czas zapisywania zależy od ilości powiązanych produktów.<br />
     </small>
   </div>
-{:else}
-  <Button icon="add" on:click={addLabeling}>Dodaj</Button>
 {/if}
 
 <style>
@@ -218,7 +226,10 @@
     max-width: 100%;
     max-height: 70vh;
     margin-bottom: 0.75rem;
+    border-radius: var(--box-radius);
+    corner-shape: squircle;
     border: var(--border-light);
+    background-color: var(--grey-100); /* where the table doesn't reach, to the right of its last column */
   }
   table {
     overflow: auto;
@@ -226,22 +237,24 @@
     table-layout: fixed;
     border: none;
     width: 1px; /* makes the table respect column widths... yes :) */
+    min-width: 100%; /* the filler column takes what's left */
   }
   thead {
     position: sticky;
-    /* top: 4rem; */
     top: 0;
     z-index: 2;
   }
   .col-sticky {
     position: sticky;
-    /* left: 4rem; */
     left: 0;
     z-index: 2;
   }
+  /* the first columns stay while the amounts scroll: delete (2.25rem), order (3.75rem), code */
+  .col-index {
+    left: 2.25rem;
+  }
   .col-code {
-    /* left: calc(4rem + 60px); */
-    left: 60px;
+    left: 6rem;
   }
   th {
     border-bottom: var(--border-heavy);
@@ -264,7 +277,7 @@
     padding-left: 0.45rem;
     width: 100%;
     height: 100%;
-    background-color: var(--accent-white);
+    background-color: var(--grey-100);
     transition: opacity 200ms;
   }
   th.amount--lumpsum:hover .lumpsum {
@@ -272,27 +285,29 @@
     opacity: 0;
   }
 
-  .heavy-border {
+  /* between the column groups, in the head and in every row (Labeling) */
+  .wrapper :global(.heavy-border) {
     border-right: var(--border-heavy);
   }
+  /* the columns of buttons (delete, add an amount) are grey all the way down, like the head, and so is the rest */
+  .wrapper :global(.col-remove),
+  .wrapper :global(.add-amount),
+  .wrapper :global(.filler) {
+    background-color: var(--grey-100);
+  }
+  .wrapper :global(.add-amount) {
+    border-right: none; /* one grey area with the filler */
+  }
 
-  .action button {
-    overflow: hidden;
+  .head-icon {
     position: relative;
-    top: 2px;
-    cursor: pointer;
-    padding: 0 0.4rem;
-    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100%;
-    border: none;
-    background-color: var(--light);
   }
-  .action-amount-push {
-    border: none;
+  .add-amount {
     padding: 0;
-  }
-  .action-amount-push button {
-    background-color: var(--primary);
   }
 
   .amount {
@@ -308,26 +323,31 @@
     justify-content: center;
     gap: 0.25rem;
     border-radius: var(--border-radius);
+    corner-shape: squircle;
     border: var(--border-light);
     padding: 0.25rem;
-    background-color: var(--primary-white);
+    background-color: var(--navy-100);
   }
   .amount:hover .amount-actions {
     display: flex;
   }
 
+  /* adding, a line, then cancelling and saving side by side (and what's changed) */
   .edit-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+  }
+  .divider {
+    align-self: stretch;
+    border-left: var(--border-light);
+  }
+  .save {
+    display: flex;
+    gap: 0.5rem;
   }
   .edit-info {
     margin-top: 0.5rem;
-  }
-
-  .icon {
-    position: relative;
-    height: 100%;
   }
 </style>

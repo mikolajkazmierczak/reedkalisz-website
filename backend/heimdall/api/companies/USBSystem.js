@@ -1,6 +1,6 @@
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
-import { parseItems } from '../common.js';
+import { mergePositions, parseItems, printPosition } from '../common.js';
 import { fetchSimpleApi, xmlToJson } from '../utils.js';
 import { parseSize } from './EasyGifts.js';
 
@@ -101,6 +101,23 @@ export const buildProductDescription = (item) => {
   return blocks.join('\n\n');
 };
 
+function parseMarking($) {
+  // znakowanie: 'Grawer, Tampondruk' (names, no codes); powierzchnia_logo: '35 x 13 mm', or per side
+  // 'str. A: 39,7 x 14,4 mm / str. B: 25 x 13 mm' or '85 x 14 mm; 40 x 28 mm' - every technique on every side
+  const techniques = splitCsv($?.productAttributeZnakowanie);
+  const area = typeof $?.productAttributePowierzchniaLogo === 'string' ? $.productAttributePowierzchniaLogo : '';
+  const sides = area
+    .split(/[/;]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return mergePositions(
+    (sides.length ? sides : ['']).map((side) => {
+      const [, label, size] = side.match(/^(?:([^:]+):)?\s*(.*)$/);
+      return printPosition(techniques, label, size);
+    }),
+  );
+}
+
 function parse(company, products) {
   // the xml is malformed (great stuff), so we need to fix it before parsing
   products = xmlToJson(fixXml(products));
@@ -138,6 +155,8 @@ function parse(company, products) {
         size_y: size?.y,
         size_z: size?.z,
         materials: splitCsv($?.productAttributeMaterial),
+        _categories: splitCsv($?.categories).map((c) => [c]), // flat, comma separated
+        _labelings: parseMarking($),
         _storage: {
           img: $?.imageUrl,
           amount: null, // ask for stock

@@ -115,8 +115,9 @@
 
   function getSize(size, otherSize) {
     if (fill) return '100%'; // fill overwrites the size
-    if (size !== defaultSize) return typeof size === 'string' ? size : size + 'px';
-    return otherSize !== defaultSize ? 'auto' : defaultSize + 'px'; // if the other size is set, this one will conform
+    const rem = (px) => `${px / 16}rem`; // a number is px at the default font size
+    if (size !== defaultSize) return typeof size === 'string' ? size : rem(size);
+    return otherSize !== defaultSize ? 'auto' : rem(defaultSize); // if the other size is set, this one will conform
   }
 </script>
 

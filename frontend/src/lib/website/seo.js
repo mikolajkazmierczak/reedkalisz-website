@@ -53,7 +53,10 @@ export const breadcrumbList = (items) => ({
 /* Marked escapes these; Svelte escapes attribute values again on output. */
 const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" };
 
-/** Plain text of a markdown or HTML field, cut at a word to fit a meta description. */
+/**
+ * Plain text of a markdown or HTML field, cut to fit a meta description: after the last whole sentence
+ * that fits, when that keeps most of it, otherwise at a word.
+ */
 export function describe(text, max = 158) {
   if (!text) return '';
   const plain = striptags(marked.parse(text))
@@ -61,5 +64,9 @@ export function describe(text, max = 158) {
     .replace(/\s+/g, ' ')
     .trim();
   if (plain.length <= max) return plain;
+  // a sentence ends where a capital follows, so abbreviations ('ok.', 'np.', 'wym.') don't count
+  const ends = [...plain.matchAll(/[.!?](?=\s+\p{Lu})/gu)].filter((m) => m.index < max);
+  const lastSentence = ends.at(-1)?.index;
+  if (lastSentence >= max * 0.6) return plain.slice(0, lastSentence + 1);
   return plain.slice(0, plain.lastIndexOf(' ', max - 1)).replace(/[\s,;:—–-]+$/, '') + '…';
 }
