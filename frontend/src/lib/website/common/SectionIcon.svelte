@@ -63,10 +63,12 @@
       <path class="soft" d="M19 27h10" />
     {:else if kind === 'new'}
       <path d="M10 24h28v18H10z" />
-      <path class="soft" d="M10 24l-4-5M38 24l4-5" />
-      <rect class="mark mark--fill" x="22" y="24" width="4" height="18" rx="2" />
-      <path class="mark mark--fill" d="M24 5q1 5 6 6q-5 1-6 6q-1-5-6-6q5-1 6-6z" />
-      <path class="soft" d="M34 8v4M32 10h4M13 12v3M11.5 13.5h3" />
+      <path class="soft" d="M10 24l-4-5M38 24l4-5M24 24v18" />
+      <circle class="mark mark--fill" cx="31" cy="35.5" r="3.5" />
+      <!-- the sparkles as the menu's (MenuIcon) -->
+      <path class="mark mark--fill" d="M19.5 4q1 6 7 7q-6 1-7 7q-1-6-7-7q6-1 7-7z" />
+      <path class="fill" d="M29.5 1.5q.4 2.6 3 3q-2.6.4-3 3q-.4-2.6-3-3q2.6-.4 3-3z" />
+      <path class="soft" d="M30.5 14v4M28.5 16h4" />
     {:else if kind === 'best'}
       <path d="M18 26h12v16H18zM8 32h10v10H8zM30 35h10v7H30z" />
       <path d="M19 4l3.5 7.5M29 4l-3.5 7.5" />
@@ -110,6 +112,10 @@
   }
   .mark {
     stroke: var(--red);
+  }
+  .fill {
+    fill: currentColor;
+    stroke: none;
   }
   .mark--fill {
     fill: var(--red);
