@@ -78,8 +78,11 @@
   --r-pill: 62.4375rem;
 
   /* layout */
+  /* every page's column */
   --page: 97.5rem;
   --gutter: clamp(0.875rem, 0.4rem + 1.8vw, 2rem);
+  /* how far a ground reaches past the column, its text staying in it (the catalogue's cells, the banners) */
+  --bleed: clamp(0.625rem, 0.75 * var(--gutter), 1.5rem);
   --rail: 16.5rem;
   /* page titles stand on the logo */
   --logo-h: 4.4375rem;
@@ -289,9 +292,10 @@ textarea {
   background-color: var(--orange-bright);
   color: var(--ink);
 }
+/* on navy (the hero, the phone menu): the contact orange's bright shade, the dark one doesn't read there */
 .btn--ghost-orange {
-  border-color: var(--orange-light);
-  color: var(--orange-light);
+  border-color: var(--orange-bright);
+  color: var(--orange-bright);
 }
 .btn--ghost-orange:hover {
   border-color: var(--orange-bright);
@@ -550,11 +554,6 @@ textarea.field {
   max-width: var(--page);
   margin-inline: auto;
   padding-inline: var(--gutter);
-}
-
-/* In the shell the measure is the content column. */
-.shell__main .wrap {
-  max-width: none;
 }
 
 /* Two-tone display line: second clause in ink. */

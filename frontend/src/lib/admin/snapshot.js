@@ -60,6 +60,7 @@ export function scannerFields(product, company, scanned) {
   return {
     name: has('name'),
     nameEdited: !loading && has('name') && product.name?.trim() !== details.name,
+    apiName: loading ? null : details.name,
     description: has('description'),
     size_x: has('size_x'),
     size_y: has('size_y'),

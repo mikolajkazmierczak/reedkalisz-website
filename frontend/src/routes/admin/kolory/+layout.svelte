@@ -79,7 +79,7 @@
       head={[
         { color: true, label: 'Kolor', sort: 'color' },
         { label: 'Nazwa', sort: 'name', float: true },
-        { label: 'Producent', sort: 'company.name', float: true },
+        { company: true, label: 'Producent', sort: 'company.name', float: true },
         { blame: true, label: 'Utworzenie', sort: 'date_created', float: true },
         { blame: true, label: 'Aktualizacja', sort: 'date_updated', float: true },
       ]}

@@ -2,24 +2,28 @@
   import { createEventDispatcher, tick } from 'svelte';
   import { nanoid } from 'nanoid';
   import { portal } from '@/portal';
+  import Icon from '$c/Icon.svelte';
   import Button from '@c/Button.svelte';
   import CategoryCode from '@c/CategoryCode.svelte';
 
   // The admin's select: a button showing the chosen option and, under it, the options in a white box, a search field
   // over them (always: open, type, Enter). Like the browser's own: a click beside the box only closes it, the arrows
   // move, Enter picks, Escape closes; typing on the closed button opens it, searching.
-  //   options: [{ id, text, disabled, color, special, depth, code, swatch, note, chosen }]
+  //   options: [{ id, text, disabled, color, special, depth, code, swatch, image, note, chosen }]
   //     color   - the option's background (e.g. a status)
-  //     special - a choice beside the list ("Wszyscy", "Bez producenta"): a button over it, as the products' "Wszystkie"
+  //     special - a choice beside the list ("Wszystkie", "Brak"): a button over it, as the products' "Wszystkie"
   //               and "Bez kategorii", never searched away
   //     depth   - a tree (the categories): its level, drawn with the lines of the ones above, all open
   //     code    - its number in the tree ("4.5.3"), before its name (searched too)
   //     swatch  - a colour (a css background, see $/colors swatch): a pill of it before its name
+  //     image   - a picture's url (a company's favicon) before its name
   //     note    - more about it, on a line of its own under its name in the list, smaller (searched too)
-  //     chosen  - already had (e.g. the product's categories, a select adding another): outlined as the one chosen,
+  //     chosen  - already had (e.g. the product's categories, a select adding another): marked as the one chosen,
   //               picked again it's let go (on:unchoose)
   //   on:change - { detail: { value } }, only when picked by hand
   //   on:unchoose - { detail: { value } }, a `chosen` one picked again: to take it away
+  // `multiple`: `value` is a list, a pick toggles the option in it and the box stays open (e.g. a table's columns);
+  // `icon`: the button is just that icon (see Table); `search={false}`: no search field.
   // The one chosen, picked again, is let go too - back to `clearTo` (by default the special with no value: "Brak",
   // "Wszyscy"; none there, a select that needs a value, keeps it).
   const dispatch = createEventDispatcher();
@@ -40,6 +44,10 @@
   $: empty = clearTo !== undefined ? clearTo : specials.find((o) => o.id === null || o.id === '')?.id;
   export let open = false; // opened right away, e.g. by a "+ add" that shows it
   export let button = null; // the element (focus)
+  export let multiple = false;
+  export let icon = null;
+  export let title = null; // what an icon button is for, on hover
+  export let search = true;
 
   const GAP = 6; // between the button and the box
   const EDGE = 8; // from the window's edges
@@ -61,7 +69,7 @@
   let active = -1; // index in `shown`
   let box;
   let list;
-  let search;
+  let searchField;
   let place = null; // { left, top | bottom, minWidth, maxHeight }
 
   $: if (open && button && !place) show();
@@ -92,14 +100,12 @@
     // as wide as its options: moved left when that runs past the window's edge (a select on the right of a phone)
     const over = place.left + box.offsetWidth - (innerWidth - EDGE);
     if (over > 0) place = { ...place, left: Math.max(EDGE, place.left - over) };
-    search?.focus();
+    (searchField ?? list)?.focus();
     reveal();
   }
 
-  // outlined (see .selected): next to another at the same level they're one block, sharing the line between them
-  // (`sel` passed in, so the class directives below update when only `value` changes)
-  const outlined = (o, sel) => o && (o === sel || o.chosen);
-  const joins = (a, b, sel) => outlined(a, sel) && outlined(b, sel) && (a.depth ?? 0) === (b.depth ?? 0);
+  // marked as chosen (see .selected) (`sel` and `val` passed in, so the class directive updates when only `value` does)
+  const marked = (o, sel, val) => (multiple ? val.includes(o.id) : o === sel || o.chosen);
 
   // white fades over the list's ends while there's more to scroll that way
   let fadeTop = false;
@@ -122,6 +128,11 @@
 
   function pick(option) {
     if (!option || option.disabled) return;
+    if (multiple) {
+      value = value.includes(option.id) ? value.filter((id) => id !== option.id) : [...value, option.id];
+      dispatch('change', { value });
+      return;
+    }
     if (option.chosen) {
       dispatch('unchoose', { value: option.id });
       if (!keepOpen) close();
@@ -199,11 +210,14 @@
   {id}
   type="button"
   class="select {size}"
+  class:iconic={icon}
+  class:pictured={!icon && selected?.image}
   class:error
   class:borderless
   class:placeholder={!selected && placeholder}
   role="combobox"
-  aria-label={label}
+  aria-label={label ?? title}
+  {title}
   aria-haspopup="listbox"
   aria-expanded={!!place}
   aria-controls="{id}-list"
@@ -213,11 +227,16 @@
   bind:this={button}
   on:click={() => (place ? close() : show())}
   on:keydown={keydownButton}>
-  <span class="text">
-    {#if selected?.swatch}<span class="swatch" style:background={selected.swatch} />{/if}
-    {#if selected?.code}<CategoryCode code={selected.code} />{/if}
-    {selected?.text ?? placeholder ?? ''}
-  </span>
+  {#if !icon && selected?.image}<img class="image picture" src={selected.image} alt="" />{/if}
+  {#if icon}
+    <Icon fill name={icon} color="currentColor" strokeWidth={0.3} />
+  {:else}
+    <span class="text">
+      {#if selected?.swatch}<span class="swatch" style:background={selected.swatch} />{/if}
+      {#if selected?.code}<CategoryCode code={selected.code} />{/if}
+      {selected?.text ?? placeholder ?? ''}
+    </span>
+  {/if}
 </button>
 
 {#if place}
@@ -258,22 +277,26 @@
         {/each}
       </div>
     {/if}
-    <input
-      class="search"
-      type="text"
-      placeholder="Szukaj..."
-      aria-label="Szukaj"
-      aria-controls="{id}-list"
-      aria-activedescendant={active >= 0 ? `${id}-${active}` : null}
-      bind:this={search}
-      bind:value={query} />
+    {#if search}
+      <input
+        class="search"
+        type="text"
+        placeholder="Szukaj..."
+        aria-label="Szukaj"
+        aria-controls="{id}-list"
+        aria-activedescendant={active >= 0 ? `${id}-${active}` : null}
+        bind:this={searchField}
+        bind:value={query} />
+    {/if}
     <div class="scroll" class:fade-top={fadeTop} class:fade-bottom={fadeBottom}>
       <div
         class="list"
         id="{id}-list"
         role="listbox"
         tabindex="-1"
-        aria-label={label}
+        aria-label={label ?? title}
+        aria-multiselectable={multiple || null}
+        aria-activedescendant={!search && active >= 0 ? `${id}-${active}` : null}
         bind:this={list}
         on:scroll={fades}>
         {#each shown.slice(specials.length) as option, j (option.id)}
@@ -284,19 +307,18 @@
             id="{id}-{i}"
             class="option"
             class:active={i === active}
-            class:selected={outlined(option, selected)}
-            class:join-up={joins(option, shown[i - 1], selected)}
-            class:join-down={joins(option, shown[i + 1], selected)}
+            class:selected={marked(option, selected, value)}
             class:disabled={option.disabled}
             class:colored={option.color}
             role="option"
-            aria-selected={option === selected}
+            aria-selected={multiple ? value.includes(option.id) : option === selected}
             aria-disabled={option.disabled}
             on:pointermove={() => !option.disabled && (active = i)}
             on:click={() => pick(option)}>
             {#each { length: option.depth ?? 0 } as _}<span class="guide" />{/each}
             <span class="label" style:background-color={option.color}>
               {#if option.swatch}<span class="swatch" style:background={option.swatch} />{/if}
+              {#if option.image}<img class="image" src={option.image} alt="" />{/if}
               {#if option.code}<CategoryCode code={option.code} />{/if}
               <span class="name" class:coded={option.code}>
                 {option.text}
@@ -365,6 +387,37 @@
   .select.error:hover {
     --line: var(--red-500);
   }
+  /* just an icon, as a table head's SortButton: navy while open */
+  .select.iconic {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.2rem;
+    height: 1.2rem;
+    padding: 0.15rem;
+    border: none;
+    border-radius: 0.4rem;
+    color: var(--grey-500);
+    background-color: transparent;
+  }
+  .select.iconic::after {
+    content: none;
+  }
+  .select.iconic :global(svg),
+  .select.iconic :global(use) {
+    color: inherit; /* the admin gives every element its own text colour */
+  }
+  .select.iconic:not([disabled]):hover {
+    color: var(--navy-700);
+    background-color: var(--black-6);
+  }
+  .select.iconic[aria-expanded='true'] {
+    color: var(--light);
+    background-color: var(--navy-700);
+  }
+  .select.iconic:focus-visible {
+    outline: solid 2px var(--navy-700);
+  }
   .text {
     min-width: 0; /* cut with "…" when the button is narrower than the option */
     overflow: hidden;
@@ -382,7 +435,30 @@
     border-radius: 50%;
     box-shadow: inset 0 0 0 1px var(--black-20);
   }
-  .label .swatch {
+  .image {
+    flex: none;
+    width: 1em;
+    height: 1em;
+    object-fit: contain;
+  }
+  /* the chosen one's picture in the button's padding, as far from the text as in the list (the label's gap) */
+  .select.pictured {
+    padding-left: calc(0.5rem + 1.35em);
+  }
+  .select.small.pictured {
+    padding-left: calc(0.35rem + 1.35em);
+  }
+  .picture {
+    position: absolute;
+    top: 50%;
+    left: 0.5rem;
+    transform: translateY(-50%);
+  }
+  .select.small .picture {
+    left: 0.35rem;
+  }
+  .label .swatch,
+  .label .image {
     align-self: center;
     margin-right: 0;
   }
@@ -558,24 +634,30 @@
   .option.active .label {
     background-color: var(--blue-100); /* as a button under the pointer */
   }
-  /* the one chosen: bold, and outlined (a coloured one keeps its colour inside) */
+  /* the one chosen: bold, on a selected button's ground (a coloured one keeps its colour, outlined instead) */
   .option.selected {
     font-weight: 600;
   }
   .option.selected .label {
+    background-color: var(--navy-100);
+  }
+  .option.selected.active .label {
+    background-color: var(--navy-200);
+  }
+  .option.selected.colored .label {
     box-shadow: inset 0 0 0 1.5px var(--navy-700);
   }
-  /* one line between two outlined ones, not two: the lower one up over it, square where they meet */
-  .option.join-up {
-    margin-top: -1.5px;
-  }
-  .option.join-up .label {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-  .option.join-down .label {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+  /* and a check at its end, as big as the button's arrow: it says so under the pointer too, where the ground changes */
+  .option.selected .label::after {
+    content: '';
+    flex: none;
+    align-self: center;
+    margin-left: auto;
+    width: 0.65rem;
+    aspect-ratio: 10 / 8;
+    background-color: var(--black-50);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l3 3 5-6' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E")
+      center / contain no-repeat;
   }
   /* a coloured one keeps its colour: under the pointer it's framed instead */
   .option.colored.active .label {
@@ -590,6 +672,10 @@
   }
   .option.disabled .name {
     color: var(--grey-500);
+  }
+  /* chosen and can't be let go (e.g. a table's last column) */
+  .option.selected.disabled .label {
+    background-color: var(--navy-100);
   }
   .option.disabled :global(.code) {
     opacity: 0.5;

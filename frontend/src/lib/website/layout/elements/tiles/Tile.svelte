@@ -347,12 +347,21 @@
     border-radius: var(--r-sm);
     text-decoration: none;
   }
+  /* see Tiles */
+  @media (min-width: 118rem) {
+    .tile {
+      border-radius: 4rem;
+      corner-shape: squircle;
+    }
+  }
   /* Hover frame on its own layer: the tile's box-shadow painted under the image. */
   .tile::after {
     content: '';
     z-index: 0;
     position: absolute;
     inset: 0;
+    border-radius: inherit;
+    corner-shape: inherit;
     box-shadow: inset 0 0 0 0 var(--ink);
     transition: box-shadow var(--dur) var(--ease);
     pointer-events: none;
@@ -389,9 +398,16 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: var(--sp-2);
-    padding: clamp(0.75rem, 4cqw, 1.75rem);
+    /* the text lines up with the column's */
+    padding: clamp(0.75rem, 4cqw, 1.75rem) var(--gutter);
     width: 100%;
     min-height: 100%;
+  }
+
+  @media (min-width: 118rem) {
+    .content {
+      padding-inline: var(--reach);
+    }
   }
 
   .title,

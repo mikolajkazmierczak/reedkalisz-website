@@ -808,10 +808,10 @@ export function reportDocument(product, { categories, images = {}, logo, date = 
             stack: [
               logoOf(L),
               {
-                // as the website's: the phone (without +48) in bold, then the email
+                // as the website's: the phone (with +48) in bold, then the email
                 text: [
                   {
-                    text: business.telephone.replace(/^\+48\s*/, ''),
+                    text: business.telephone,
                     link: `tel:${business.telephone.replace(/\s/g, '')}`,
                     bold: true,
                     decoration: 'underline',

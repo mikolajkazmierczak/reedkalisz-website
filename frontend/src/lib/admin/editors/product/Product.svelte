@@ -14,6 +14,7 @@
   import Editor from '@/editors/Editor.svelte';
   import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
+  import { companyOptions } from '@c/CompanySelect.svelte';
   import Button from '@c/Button.svelte';
   import ProductPricing from './ProductPricing.svelte';
   import ProductStorage from './ProductStorage.svelte';
@@ -257,7 +258,9 @@
                   edited={scanner.nameEdited}
                   text={scanner.nameEdited
                     ? 'Nazwa różni się od tej w API, więc skaner jej nie zmieni.'
-                    : 'Skaner API ustawia nazwę, dopóki nie zostanie zmieniona tutaj.'} />
+                    : 'Skaner API ustawia nazwę, dopóki nie zostanie zmieniona tutaj.'}
+                  restore={scanner.apiName}
+                  on:click={() => (item.name = scanner.apiName)} />
               {/if}
             </div>
             <Input bind:value={item.name} />
@@ -270,7 +273,7 @@
               <Input
                 type="select"
                 bind:value={item.company}
-                options={$companies.map(({ id, name }) => ({ id, text: name }))}
+                options={companyOptions($companies)}
                 placeholder="Wybierz producenta"
                 error={item.company == null ? 'Wybierz producenta' : null}>
                 Producent

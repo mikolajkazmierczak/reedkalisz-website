@@ -1,45 +1,54 @@
 <script context="module">
+  import { companyIcon } from '@c/CompanyIcon.svelte';
+
   export const NONE = 'none'; // nobody's (see `none`)
 
-  // the companies as a Select's options, by name
+  // the companies as a Select's options, by name, each with its favicon
   export const companyOptions = (list) =>
-    [...(list ?? [])].sort((a, b) => a.name.localeCompare(b.name, 'pl')).map(({ id, name }) => ({ id, text: name }));
+    [...(list ?? [])]
+      .sort((a, b) => a.name.localeCompare(b.name, 'pl'))
+      .map((c) => ({ id: c.id, text: c.name, image: companyIcon(c) }));
 </script>
 
 <script>
-  import { nanoid } from 'nanoid';
   import globals, { companies } from '@/globals';
-  import Input from '@c/Input.svelte';
+  import Select from '@c/Select.svelte';
 
-  // A list's "Producent" in its bar: everyone's (''), a company's (its id), or - with `none` - nobody's (NONE)
+  // A list's producer filter in its bar: all of them (''), a company's (its id), or - with `none` - nobody's (NONE).
+  // No label: the favicon of the one picked says what it is, and "Producent" is its name on hover.
   export let value = '';
   export let none = false;
 
-  const id = `producer-${nanoid(6)}`; // its label's (a click on it opens the list)
-
   globals.update(companies);
   $: options = [
-    { id: '', text: 'Wszyscy', special: true },
+    { id: '', text: 'Wszystkie', special: true },
     ...companyOptions($companies),
-    ...(none ? [{ id: NONE, text: '❌ Bez producenta', special: true }] : []),
+    ...(none ? [{ id: NONE, text: 'Brak', special: true }] : []),
   ];
 </script>
 
+<!-- as wide as its longest option: each one's text, unseen, in the same cell -->
 <div class="producer">
-  <label class="ui-stat-label" for={id}>Producent</label>
-  <Input {id} size="compact" type="select" bind:value {options} />
+  <Select bind:value {options} label="Producent" title="Producent" />
+  {#each options as { text }}<span class="sizer" aria-hidden="true">{text}</span>{/each}
 </div>
 
 <style>
-  label {
-    cursor: pointer;
-  }
   .producer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.1rem;
-    height: 2rem;
-    line-height: 1;
+    flex: none;
+    display: grid;
+  }
+  .producer > :global(*) {
+    grid-area: 1 / 1;
+  }
+  /* a normal Select's button with a picture (see Select's .pictured), no height */
+  .sizer {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    padding: 0 1.5rem 0 calc(0.5rem + 1.35em);
+    border-inline: solid 1px;
+    font-size: 0.95rem;
+    white-space: nowrap;
   }
 </style>

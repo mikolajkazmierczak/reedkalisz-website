@@ -7,6 +7,7 @@
 
   import { globals, companies, globalMargins, priceViews, labelings } from '@/globals';
   import { defaultLabeling, labelingText } from '@/labelings';
+  import { companyIcon } from '@c/CompanyIcon.svelte';
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
   import LabelingField from './LabelingField.svelte';
@@ -292,7 +293,7 @@
                       })
                       .map((l) => {
                         const { name: cname } = $companies.find((c) => c.id == l.company);
-                        return { id: l.id, text: labelingText(l, cname) };
+                        return { id: l.id, text: labelingText(l, cname), image: companyIcon(cname) };
                       })} />
 
                   {#if company?.api_handling_costs && product.handling_cost}

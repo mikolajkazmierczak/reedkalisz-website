@@ -5,6 +5,7 @@
   import heimdall from '$/heimdall';
   import { header } from '@/stores';
   import { searchparams, SearchParams } from '$/searchparams';
+  import { makeTree, treeGetAllChildrenIDs } from '%/utils';
 
   import globals, { categories, companies } from '@/globals';
   import { search as fields } from '%/fields/products';
@@ -72,10 +73,12 @@
       return;
     }
 
+    // a category and everything under it, as on the website (a CSV, see categoryFilter)
     const inCategory = () => {
       if (category == -1) return { categories: { _null: true } };
       if (category == null) return {};
-      return { categories: { category: { _eq: category } } };
+      const ids = [category, ...treeGetAllChildrenIDs(makeTree($categories), category)];
+      return { categories: { category: { _in: ids.join(',') } } };
     };
     // the search looks in the name, code and description, and in the codes of the variants ('R123-10')
     const q = String(query ?? '').trim(); // a number when the url has only digits (?q=12345)

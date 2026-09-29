@@ -174,7 +174,7 @@
           types={labels}
           {type}
           fixed={FIXED.includes(type)}
-          bleed={type === 'tiles' || FIXED.includes(type)}
+          bleed={type === 'tiles' || type === 'headquarters'}
           on:delete={() => handleDelete(id)}
           on:move={(e) => handleMove(e, id)}>
           {#if type === 'title'}
@@ -334,7 +334,7 @@
 
   .hero {
     border-bottom: var(--rule);
-    background-color: var(--red);
+    background-color: var(--navy);
     color: #fff;
   }
   .hero__inner {
@@ -342,6 +342,8 @@
     grid-template-columns: minmax(0, 1fr);
     gap: var(--sp-8);
     align-items: center;
+    max-width: var(--page);
+    margin-inline: auto;
     padding: var(--sp-10) var(--gutter) var(--sp-8);
   }
   .hero__copy {
@@ -358,8 +360,9 @@
     aspect-ratio: 3 / 2;
     object-fit: contain;
   }
+  /* as .btn--ghost-orange */
   .hero__title em {
-    color: var(--orange-light);
+    color: var(--orange-bright);
   }
   .hero__title {
     font-size: var(--fs-hero);
@@ -371,7 +374,7 @@
   .hero__lede {
     margin-top: var(--sp-5);
     max-width: 50ch;
-    color: #f6cdd1;
+    color: #cfdcee;
     font-size: clamp(1rem, 0.95rem + 0.35vw, 1.125rem);
     line-height: 1.45;
   }
@@ -530,7 +533,7 @@
     padding-top: var(--sp-10);
     padding-bottom: var(--sp-12);
   }
-  /* Each block carries its own measure, so banners can go full-bleed. */
+  /* Each block carries its own measure, so a band can go full-bleed. */
   .blocks > :global(*) {
     width: 100%;
     max-width: var(--page);
@@ -541,12 +544,12 @@
     max-width: none;
     padding-inline: 0;
   }
-  /* The fixed bands are ruled top and bottom, but never twice where one follows the hero or another band. */
-  .blocks > :global([data-fixed]) {
+  /* Siedziba is ruled top and bottom, but never twice where it follows the hero or another band. */
+  .blocks > :global([data-type='headquarters']) {
     border-block: var(--rule);
   }
-  .blocks > :global([data-fixed]:first-child),
-  .blocks > :global([data-fixed] + [data-fixed]) {
+  .blocks > :global([data-type='headquarters']:first-child),
+  .blocks > :global([data-bleed] + [data-type='headquarters']) {
     border-top: 0;
   }
   .blocks > :global(* + *) {
@@ -567,6 +570,20 @@
   }
   .blocks > :global([data-bleed]:first-child) {
     margin-top: calc(var(--sp-10) * -1);
+  }
+  /* With 4rem of room beside the column (the rail, --page and 4rem), the banners go in it, apart (see Tiles). */
+  @media (min-width: 118rem) {
+    .blocks > :global([data-type='tiles']) {
+      max-width: var(--page);
+      padding-inline: var(--gutter);
+    }
+    .blocks > :global([data-type='tiles'] + [data-bleed]),
+    .blocks > :global([data-bleed] + [data-type='tiles']) {
+      margin-top: var(--sp-10);
+    }
+    .blocks > :global([data-type='tiles']:first-child) {
+      margin-top: 0;
+    }
   }
 
   @media (min-width: 38.75rem) {
@@ -590,7 +607,7 @@
       background-image: linear-gradient(
         var(--paper) 0 var(--topbar-h),
         var(--ink) var(--topbar-h) var(--bar),
-        var(--red) var(--bar)
+        var(--navy) var(--bar)
       );
     }
     .hero__inner {

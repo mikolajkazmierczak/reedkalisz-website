@@ -210,6 +210,9 @@
       <small>{code || name || type || '???'}</small>
     {/each}
   {/if}
+  {#if company?.api_handling_costs}
+    <small class="handling">Koszty manipulacyjne dodawane są automatycznie</small>
+  {/if}
 </div>
 {#if unsaved}
   <div class="edit-info">
@@ -338,6 +341,9 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
+  }
+  .handling {
+    margin-left: auto;
   }
   .divider {
     align-self: stretch;

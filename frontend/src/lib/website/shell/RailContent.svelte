@@ -47,7 +47,9 @@
 
   <div class="reach">
     <p>
-      <a class="tel" href="tel:+48627531591">62&nbsp;753&nbsp;15&nbsp;91</a><span class="sep" aria-hidden="true">/</span
+      <a class="tel" href="tel:+48627531591">+48&nbsp;62&nbsp;753&nbsp;15&nbsp;91</a><span
+        class="sep"
+        aria-hidden="true">/</span
       ><a href="mailto:info@reed.kalisz.pl">info@reed.kalisz.pl</a>
     </p>
   </div>
@@ -136,10 +138,11 @@
     align-self: flex-start;
     margin-bottom: var(--sp-4);
   }
+  /* 12px: the phone with +48 and the email fit the rail on one line */
   .reach {
     order: 2;
     color: #a9bcd6;
-    font-size: var(--fs-xs);
+    font-size: 0.75rem;
     line-height: 1.45;
   }
   .reach a {

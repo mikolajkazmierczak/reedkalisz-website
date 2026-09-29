@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import Filters from '@c/Filters.svelte';
+  import { companyIcon } from '@c/CompanyIcon.svelte';
   import Bar from './mappings/Bar.svelte';
 
   // The bar of every API tab: the tab's main action (slot "before") with the company picker right next to it,
@@ -23,7 +24,7 @@
   {/if}
   <fieldset class="companies" {disabled}>
     <Filters
-      filters={shown.map((c) => ({ label: c.name, value: c }))}
+      filters={shown.map((c) => ({ label: c.name, value: c, image: companyIcon(c) }))}
       selected={shown.find((c) => c.id === selected?.id)}
       on:change={(e) => dispatch('change', e.detail.value)} />
   </fieldset>

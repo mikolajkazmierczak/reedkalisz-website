@@ -10,6 +10,11 @@ const checkboxCellWidth = 1.4; // the flag columns: narrow, there are many of th
 // its middle
 export const addCellWidth = 'calc(1.5rem + 2 * var(--row-pad) + 0.6rem - var(--cell-pad) - var(--col-gap))';
 
+// the room of a head's button (see Table): the button (1.2rem) and the gap before it; the columns menu's has a line
+// before it too, as far from it on both sides
+export const headButtonWidth = 1.2 + 0.4;
+export const columnsButtonWidth = headButtonWidth + 0.4;
+
 // a row of the table is being dragged (it carries its path, see TableRow), not a file or a text from elsewhere: only
 // the row's dragend closes a drop zone, nothing would close one opened for those
 export const draggingRow = (e) => e.dataTransfer?.types.includes('path');
@@ -29,16 +34,25 @@ export function getColumnWidths(head, tree, order, maxDepth) {
   let widths = [];
   if (tree) widths.push(addCellWidth);
   if (tree || order) widths.push(hierarchyCellWidth * (maxDepth + 1) + 'rem');
+  const width = (h) => {
+    if (h.width) return h.width;
+    if (h.checkbox) return checkboxCellWidth + 'rem';
+    // a Blame pill (an avatar, a name, a date), cut when short: it gives way to the text (a name, a title), both
+    // when the table is narrow (a smaller minimum) and wide (half the share). Shares, not a cap like 16.5rem: a
+    // column with a set maximum grows to it before the shares get anything
+    if (h.blame) return 'minmax(7rem, 1fr)';
+    return 'minmax(10rem, 2fr)';
+  };
+  // the head's buttons widen a column's minimum: a blame column's settings, the last column's columns menu
+  const wider = (w, extra) => {
+    if (!extra) return w;
+    const [, min, max] = w.match(/^minmax\((.+?),\s*(.+)\)$/) ?? [];
+    return min ? `minmax(calc(${min} + ${extra}rem), ${max})` : `calc(${w} + ${extra}rem)`;
+  };
   widths.push(
-    ...head.map((h) => {
-      if (h.width) return h.width;
-      if (h.checkbox) return checkboxCellWidth + 'rem';
-      // a Blame pill (an avatar, a name, a date), cut when short: it gives way to the text (a name, a title), both
-      // when the table is narrow (a smaller minimum) and wide (half the share). Shares, not a cap like 16.5rem: a
-      // column with a set maximum grows to it before the shares get anything
-      if (h.blame) return 'minmax(7rem, 1fr)';
-      return 'minmax(10rem, 2fr)';
-    }),
+    ...head.map((h, i) =>
+      wider(width(h), (h.blame ? headButtonWidth : 0) + (i === head.length - 1 ? columnsButtonWidth : 0)),
+    ),
   );
   return widths.join(' ');
 }

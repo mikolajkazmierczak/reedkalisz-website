@@ -3,6 +3,7 @@
   import { labelingText } from '@/labelings';
 
   import Input from '@c/Input.svelte';
+  import { companyIcon } from '@c/CompanyIcon.svelte';
 
   // The labeling to import. Stored as a company + its labeling code, but picked as one option,
   // just like in the product editor - only REED and the api company are offered.
@@ -22,7 +23,11 @@
   $: options = [
     // keep the current value selectable even if the labeling no longer exists (or is not picked yet)
     ...(current === -1 ? [{ id: -1, text: code ? `${companyName(company)} · ${code} (nie istnieje)` : '—' }] : []),
-    ...available.map((l, i) => ({ id: i, text: labelingText(l, companyName(l.company)) })),
+    ...available.map((l, i) => ({
+      id: i,
+      text: labelingText(l, companyName(l.company)),
+      image: companyIcon(companyName(l.company)),
+    })),
   ];
 
   // two-way: the select follows the stored labeling, and picking an option writes it back

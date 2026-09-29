@@ -6,6 +6,7 @@
   import Blame from '@c/Blame.svelte';
   import Button from '@c/Button.svelte';
   import CategoryCode from '@c/CategoryCode.svelte';
+  import CompanyIcon from '@c/CompanyIcon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
   import Dropzone from './Dropzone.svelte';
   import { draggingRow, hierarchyCellWidth } from './utils';
@@ -13,7 +14,7 @@
 
   // A row of Table (a `.row` of the Grid), then the drop zone under it, then its children when it's open.
   export let collection = null;
-  export let head;
+  export let head; // the columns shown, each with its place among the row's values (`i`, see Table)
 
   export let items = null;
   export let item = null;
@@ -137,8 +138,8 @@
       </span>
     </span>
   {/if}
-  {#each row.values as value, i}
-    {@const { checkbox, blame, color, category, float: floating } = head[i]}
+  {#each head as { i, checkbox, blame, show, color, category, company, float: floating } (i)}
+    {@const value = row.values[i]}
     {#if checkbox}
       <span class="center">
         <span class="check">
@@ -153,11 +154,14 @@
       <!-- `float` in the column's head: its text, when cut, shows whole on hover -->
       <Float enabled={!!floating} fade={!!blame}>
         {#if blame}
-          <Blame {...value} />
+          <Blame {...value} {show} />
         {:else if category}
           <!-- { code, name } -->
           <CategoryCode code={value.code} />
           {value.name}
+        {:else if company}
+          <CompanyIcon company={value} />
+          {value}
         {:else if color}
           <!-- the whole colour: { color, multicolor, transparent } -->
           <span class="color" class:missing={colorMissing(value)} style:background={swatch(value, null)} />

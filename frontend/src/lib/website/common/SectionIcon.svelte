@@ -7,7 +7,8 @@
   $: kind = sectionKind(name) ?? 'box';
 </script>
 
-<!-- Shop-drawing line work, like the hero's: ink on a ground line, and one red part — the mark REED puts on it. -->
+<!-- Shop-drawing line work, like the hero's: ink on a ground line, and one red part — the mark REED puts on it, a
+     filled circle or pill (the percent sign's is outlined). -->
 <svg class="icon" viewBox="0 0 48 48" fill="none" aria-hidden="true">
   <g stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <!-- plates, prints and calendars hang on a wall, everything else stands on the ground -->
@@ -17,7 +18,7 @@
       <path d="M11 17h20v22a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3z" />
       <path d="M31 22h3a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4h-3" />
       <path class="soft" d="M17 12q2-2 0-4M23 12q2-2 0-4" />
-      <rect class="mark" x="16.5" y="25" width="9" height="9" rx="1.5" />
+      <circle class="mark mark--fill" cx="21" cy="29.5" r="4" />
     {:else if kind === 'print'}
       <!-- a poster unrolling from its roll behind the page, faded as one layer so its crossings don't darken -->
       <g class="faded">
@@ -27,7 +28,7 @@
       </g>
       <path d="M11 13h15l6 6v23H11z" />
       <path d="M26 13v6h6" />
-      <rect class="mark mark--fill" x="15" y="21" width="8" height="6" rx="0.5" />
+      <circle class="mark mark--fill" cx="19" cy="24" r="3.5" />
       <path class="soft" d="M15 32h13M15 36h9" />
     {:else if kind === 'calendar'}
       <rect x="9" y="13" width="30" height="29" rx="2" />
@@ -39,14 +40,14 @@
         <circle cx="33" cy="32" r="1.1" /><circle cx="15" cy="37" r="1.1" />
         <circle cx="21" cy="37" r="1.1" /><circle cx="27" cy="37" r="1.1" />
       </g>
-      <circle class="mark" cx="27" cy="32" r="3.2" />
+      <circle class="mark mark--fill" cx="27" cy="32" r="3.3" />
     {:else if kind === 'stamp'}
       <circle cx="24" cy="9" r="4" />
       <path d="M22 13l-1 7h6l-1-7" />
       <rect x="13" y="20" width="22" height="6" rx="1.5" />
       <path d="M15 26v2h18v-2" />
       <path class="soft" d="M18 33v2M24 32v3M30 33v2" />
-      <path class="mark" d="M15 42h18" stroke-width="3" />
+      <rect class="mark mark--fill" x="15" y="40" width="18" height="4" rx="2" />
     {:else if kind === 'outdoor'}
       <rect x="6" y="8" width="36" height="20" rx="1.5" />
       <path d="M16 28v14M32 28v14" />
@@ -58,11 +59,12 @@
         <circle cx="11.5" cy="17.5" r="1" /><circle cx="36.5" cy="17.5" r="1" />
         <circle cx="11.5" cy="30.5" r="1" /><circle cx="36.5" cy="30.5" r="1" />
       </g>
-      <path class="mark" d="M16 22h16" stroke-width="2.5" />
+      <rect class="mark mark--fill" x="16" y="20" width="16" height="4" rx="2" />
       <path class="soft" d="M19 27h10" />
     {:else if kind === 'new'}
       <path d="M10 24h28v18H10z" />
-      <path class="soft" d="M10 24l-4-5M38 24l4-5M24 24v18" />
+      <path class="soft" d="M10 24l-4-5M38 24l4-5" />
+      <rect class="mark mark--fill" x="22" y="24" width="4" height="18" rx="2" />
       <path class="mark mark--fill" d="M24 5q1 5 6 6q-5 1-6 6q-1-5-6-6q5-1 6-6z" />
       <path class="soft" d="M34 8v4M32 10h4M13 12v3M11.5 13.5h3" />
     {:else if kind === 'best'}
@@ -80,7 +82,7 @@
     {:else}
       <path d="M10 20h28v22H10z" />
       <path class="soft" d="M10 26h28" />
-      <path class="mark" d="M24 20v9" stroke-width="3" />
+      <rect class="mark mark--fill" x="22" y="19" width="4" height="10" rx="2" />
     {/if}
   </g>
 </svg>

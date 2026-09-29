@@ -30,7 +30,7 @@
     imgError = false; // a replaced file gets its try
     if (!before || company === before.company) company = file.company; // not undoing an unsaved choice
   }
-  $: options = [{ id: null, text: '❌ Bez producenta', special: true }, ...companyOptions($companies)];
+  $: options = [{ id: null, text: 'Brak', special: true }, ...companyOptions($companies)];
   $: $unsaved = !!file && company !== file.company;
   async function save() {
     await api.files.updateOne(id, { company });

@@ -24,6 +24,67 @@
       ],
       "cwd": "frontend",
       "port": 5011
+    },
+    {
+      "name": "directus",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["directus", "start"],
+      "cwd": "backend/directus",
+      "port": 8055
+    },
+    {
+      "name": "heimdall",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["index.js"],
+      "cwd": "backend/heimdall",
+      "port": 9999
+    },
+    {
+      "name": "directus-test",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "CONFIG_PATH=$HOME/reed-temp/save-tests/directus.env npx directus start"],
+      "cwd": "backend/directus",
+      "port": 8056
+    },
+    {
+      "name": "heimdall-test",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "PORT=9998 node index.js"],
+      "cwd": "backend/heimdall",
+      "port": 9998
+    },
+    {
+      "name": "reed-website-test",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "PUBLIC_API_URL=http://localhost:8056 PUBLIC_HEIMDALL_URL=http://localhost:9998 npm run dev -- --port 5012 --strictPort"
+      ],
+      "cwd": "frontend",
+      "port": 5012
+    },
+    {
+      "name": "directus-rehearsal",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "CONFIG_PATH=$HOME/_reed/api/migration-rehersal/directus.env npx directus start"],
+      "cwd": "backend/directus",
+      "port": 8057
+    },
+    {
+      "name": "heimdall-rehearsal",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd $HOME/_reed/api/migration-rehersal/repo/backend/heimdall && node index.js"],
+      "port": 9997
+    },
+    {
+      "name": "reed-website-rehearsal",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "PUBLIC_API_URL=http://localhost:8057 PUBLIC_HEIMDALL_URL=http://localhost:9997 npm run dev -- --port 5013 --strictPort"
+      ],
+      "cwd": "frontend",
+      "port": 5013
     }
   ]
 }

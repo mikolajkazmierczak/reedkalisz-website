@@ -99,7 +99,8 @@
   let dbItems;
   let apiItems;
   let sort = {
-    nameFirst: true,
+    by: 'name',
+    desc: false,
     dbFirst: false,
     notInApiFirst: true,
   };
@@ -1014,8 +1015,6 @@
         <span class="ui-divider" />
       {/if}
       <div class="sorting">
-        <label><input type="radio" bind:group={sort.nameFirst} name="sortNameFirst" value={false} />Kod (A-Z)</label>
-        <label><input type="radio" bind:group={sort.nameFirst} name="sortNameFirst" value={true} />Nazwa (A-Z)</label>
         <Input size="small" type="checkbox" bind:value={sort.notInApiFirst}>Najpierw wycofane</Input>
         <Input size="small" type="checkbox" bind:value={sort.dbFirst}>Najpierw zaimportowane</Input>
       </div>
@@ -1040,7 +1039,7 @@
       {#if pagedItems.length === 0}
         <p>Brak wyników</p>
       {:else}
-        <Items items={pagedItems} company={selectedCompany} total={mergedItems.length} />
+        <Items items={pagedItems} company={selectedCompany} total={mergedItems.length} bind:sort />
       {/if}
     </div>
     <Pagination {searchParams} {limit} {page} count={mergedItems.length} />
@@ -1064,14 +1063,6 @@
 {/if}
 
 <style>
-  /* like a small checkbox's (Input), e.g. the flags next to the products */
-  .sorting label {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    font-size: 0.85rem;
-    gap: 0.4rem;
-  }
   /* no taller than the buttons (2rem), so the bar keeps its height */
   .stats {
     display: grid;
@@ -1093,33 +1084,6 @@
   }
   .discount :global(.wrapper) {
     width: 3rem;
-  }
-  /* as a small checkbox (Input): navy when picked, a white dot in it */
-  input[type='radio'] {
-    flex: none;
-    cursor: pointer;
-    appearance: none;
-    width: 1rem;
-    height: 1rem;
-    margin: 0;
-    border: solid 1px var(--edge);
-    border-radius: 50%;
-    background-color: var(--light);
-    transition:
-      background-color 100ms,
-      border-color 100ms,
-      box-shadow 100ms;
-  }
-  label:hover input[type='radio'] {
-    border-color: var(--navy-500);
-  }
-  input[type='radio']:checked {
-    border-color: var(--navy-700);
-    box-shadow: inset 0 0 0 0.25rem var(--navy-700);
-  }
-  input[type='radio']:focus-visible {
-    outline: solid 2px var(--navy-500);
-    outline-offset: 1px;
   }
   p {
     display: flex;
@@ -1153,7 +1117,7 @@
     gap: 0.5rem;
     margin-left: auto;
   }
-  /* like the flags next to the products (the radios made to match), each option in one piece */
+  /* like the flags next to the products, each option in one piece */
   .sorting {
     padding-left: 0.25rem;
     display: flex;
@@ -1161,7 +1125,6 @@
     align-items: center;
     gap: 0.25rem 1rem;
   }
-  .sorting label,
   .sorting :global(label) {
     white-space: nowrap;
   }

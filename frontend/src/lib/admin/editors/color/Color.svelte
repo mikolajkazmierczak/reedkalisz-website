@@ -9,6 +9,7 @@
   import Editor from '@/editors/Editor.svelte';
   import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
+  import { companyOptions } from '@c/CompanySelect.svelte';
   import Tooltip from '$c/Tooltip.svelte';
 
   export let id;
@@ -71,12 +72,7 @@
                 {/if}
               </div>
             </div>
-            <Input
-              type="select"
-              bind:value={item.company}
-              options={$companies.map(({ id, name }) => ({ id, text: name }))}>
-              Producent
-            </Input>
+            <Input type="select" bind:value={item.company} options={companyOptions($companies)}>Producent</Input>
           </div>
         </div>
 

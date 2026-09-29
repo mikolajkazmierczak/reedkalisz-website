@@ -17,13 +17,14 @@ function queryItems(items, query = null) {
 }
 
 function sortItems(items, sort) {
-  // nameFirst: by name, then code (else the other way round); dbFirst: ours first;
+  // by: 'name' (then the code) or 'code' (then the name), `desc` the other way round; dbFirst: ours first;
   // notInApiFirst: products or variants the api no longer has first
 
   const compare = (a, b) => (typeof a === 'string' ? a.localeCompare(b) : 0);
-  sort.nameFirst
-    ? items.sort((a, b) => compare(a.name, b.name) || compare(a.code ?? '', b.code ?? ''))
-    : items.sort((a, b) => compare(a.code ?? '', b.code ?? '') || compare(a.name, b.name));
+  const way = sort.desc ? -1 : 1;
+  sort.by === 'code'
+    ? items.sort((a, b) => way * (compare(a.code ?? '', b.code ?? '') || compare(a.name, b.name)))
+    : items.sort((a, b) => way * (compare(a.name, b.name) || compare(a.code ?? '', b.code ?? '')));
 
   if (sort.dbFirst) {
     // bubble items that are in the db

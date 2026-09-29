@@ -530,7 +530,7 @@
     font-size: var(--fs-sm);
   }
   .buy__price strong {
-    color: var(--red);
+    color: var(--ink);
     font-size: clamp(1.875rem, 1.5rem + 1.4vw, 2.5rem);
     font-weight: 800;
     letter-spacing: -0.035em;
@@ -704,9 +704,10 @@
       display: block;
       padding-bottom: var(--sp-12);
     }
+    /* the gallery's column: half the page, 40rem at most */
     .product__top {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, min(40rem, calc(50% - var(--sp-4)))) minmax(0, 1fr);
       gap: var(--sp-8);
       align-items: start;
     }

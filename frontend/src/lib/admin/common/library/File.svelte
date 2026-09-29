@@ -28,6 +28,7 @@
 <script>
   import { baseUrl } from '$/api';
   import { companies } from '@/globals';
+  import CompanyIcon from '@c/CompanyIcon.svelte';
   import { filetypeToReadable, bytesToReadable } from '%/utils';
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
@@ -125,7 +126,8 @@
   {#if id || src}
     <Tooltip>
       <small>
-        <b>{title ?? filename_download ?? id}</b><br />{#if companyName}{companyName} ·
+        <b>{title ?? filename_download ?? id}</b><br />{#if companyName}<CompanyIcon company={companyName} />
+          {companyName} ·
         {/if}{meta}
         {#if filename_download && filename_download !== title}<br />{filename_download}{/if}
         {#if note}<br />{note}{/if}

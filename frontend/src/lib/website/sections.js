@@ -8,9 +8,9 @@ import { enabledFilter } from '#/products/fields';
 // its breadcrumbs and the sliders take them like any other category.
 // `id` is also the product flag a section is made from.
 export const SECTIONS = [
-  { id: 'new', name: 'NOWOŚCI', slug: 'nowosci' },
-  { id: 'bestseller', name: 'BESTSELLERY', slug: 'bestsellery' },
-  { id: 'sale', name: 'PROMOCJE', slug: 'promocje' },
+  { id: 'new', name: 'Nowości', slug: 'nowosci' },
+  { id: 'bestseller', name: 'Bestsellery', slug: 'bestsellery' },
+  { id: 'sale', name: 'Promocje', slug: 'promocje' },
 ];
 
 // the categories they used to be, for old links (and hidden while they still exist)

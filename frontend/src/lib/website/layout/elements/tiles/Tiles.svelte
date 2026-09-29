@@ -75,6 +75,18 @@
     aspect-ratio: var(--tile-cols) / var(--tile-rows);
     width: 100%;
   }
+  /* Flush below 118rem (see the page's blocks); above, apart and squircled, reaching past the column by --reach while
+     the text stays in it (see Tile) */
+  @media (min-width: 118rem) {
+    .tiles:not(.editing) {
+      gap: var(--sp-5);
+    }
+    .tiles {
+      --reach: calc(1.7 * var(--bleed));
+      width: calc(100% + 2 * var(--reach));
+      margin-inline: calc(-1 * var(--reach));
+    }
+  }
 
   @media (max-width: 56.1875rem) {
     .tiles:not(.editing) {

@@ -41,13 +41,6 @@
 
 {#if items}
   <div class="company">
-    <div class="title">
-      <h1>{company.name}</h1>
-      {#if company?.api_handling_costs}
-        <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
-      {/if}
-    </div>
-
     <Labelings bind:unsaved bind:saving {company} {itemsOriginal} {items} />
   </div>
 {/if}
@@ -57,14 +50,5 @@
     position: relative;
     margin-bottom: 2rem;
     width: 100%;
-  }
-  .title {
-    display: flex;
-    align-items: flex-end;
-    margin-bottom: 0.5rem;
-  }
-  .title small {
-    margin-bottom: 0.3125rem;
-    margin-left: 1rem;
   }
 </style>

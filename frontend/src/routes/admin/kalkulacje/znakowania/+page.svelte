@@ -3,6 +3,7 @@
   import { searchparams, SearchParams } from '$/searchparams';
   import { globals, companies } from '@/globals';
   import Filters from '@c/Filters.svelte';
+  import { companyIcon } from '@c/CompanyIcon.svelte';
   import Company from '../company/Company.svelte';
 
   const searchParams = new SearchParams('/admin/kalkulacje/znakowania');
@@ -14,7 +15,9 @@
   // a sorted copy: sorting the shared list itself would reorder it on every other page
   $: pages =
     $companies &&
-    [...$companies].sort((a, b) => a.name.localeCompare(b.name)).map((c) => ({ label: c.name, value: c }));
+    [...$companies]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((c) => ({ label: c.name, value: c, image: companyIcon(c) }));
   $: pages && selectPage(company); // may cause problems when editing calculations and a company updates
 
   function selectPage(id) {

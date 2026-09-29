@@ -12,11 +12,20 @@
   import Input from '@c/Input.svelte';
   import Float from '@c/table/Float.svelte';
   import HeadIcon from '@c/table/HeadIcon.svelte';
+  import SortButton from '@c/table/SortButton.svelte';
   import Grid from '@c/table/Grid.svelte';
 
   export let items;
   export let company;
   export let total = items.length; // of the whole list, so the number column fits its longest number
+  export let sort; // { by: 'name' | 'code', desc, ... } (see items.js), set by the head's buttons
+
+  // as a Table's: up, down, then back to by name
+  function sortBy(by) {
+    if (sort.by !== by) sort = { ...sort, by, desc: false };
+    else if (!sort.desc) sort = { ...sort, desc: true };
+    else sort = { ...sort, by: 'name', desc: false };
+  }
 
   let expanded = new Set();
   $: flags = (() => {
@@ -161,8 +170,12 @@
     <HeadIcon icon="hierarchy" label="Kolory" />
     <HeadIcon icon="add" label="Dodawanie / zaimportowany produkt" />
     <HeadIcon icon="eye" label="Widoczność" />
-    <span>Kod</span>
-    <span>Nazwa</span>
+    {#each [{ by: 'code', label: 'Kod' }, { by: 'name', label: 'Nazwa' }] as { by, label }}
+      <span class="sortable">
+        <span>{label}</span>
+        <SortButton {label} active={sort.by === by} desc={sort.desc} on:click={() => sortBy(by)} />
+      </span>
+    {/each}
   </svelte:fragment>
 
   {#each items as item}
@@ -309,6 +322,11 @@
 </Grid>
 
 <style>
+  .sortable {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
   span {
     font-size: 0.9rem;
   }

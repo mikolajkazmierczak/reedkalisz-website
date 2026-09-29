@@ -1,3 +1,14 @@
+<script context="module">
+  // what a pill can show (a table's blame column picks it, see Table), and a table's until then
+  export const blameParts = [
+    { id: 'first_name', text: 'Imię' },
+    { id: 'last_name', text: 'Nazwisko' },
+    { id: 'date', text: 'Data' },
+    { id: 'time', text: 'Godzina' },
+  ];
+  export const defaultBlame = ['first_name', 'date'];
+</script>
+
 <script>
   import { parseDatetime } from '%/datetime';
   import { baseUrl } from '$/api';
@@ -5,28 +16,32 @@
 
   export let user;
   export let datetime;
+  // of blameParts; the avatar comes with either name
+  export let show = ['first_name', 'date', 'time'];
 
   $: userData = $users?.find((u) => u.id == user);
+  $: names = !!userData && (show.includes('first_name') || show.includes('last_name'));
+  $: parsed = datetime ? parseDatetime(datetime) : null;
+  $: when = [show.includes('date') && parsed?.date, show.includes('time') && parsed?.time].filter(Boolean).join(' ');
 </script>
 
 <!-- nothing at all (never updated): no empty pill -->
-{#if userData || datetime}
-  <div class="wrapper" class:no-user={!userData}>
-    {#if userData}
+{#if names || when}
+  <div class="wrapper" class:no-user={!names} class:no-time={!when}>
+    {#if names}
       {@const { first_name, last_name, avatar } = userData}
-      <!-- just the first name, it's short (the whole name on hover) -->
+      {@const shown = [show.includes('first_name') && first_name, show.includes('last_name') && last_name]}
+      <!-- the whole name on hover -->
       <div class="user" title={[first_name, last_name].filter(Boolean).join(' ')}>
         <div class="img">
           <img src="{baseUrl}/assets/{avatar}" alt="avatar" />
         </div>
-        {first_name ?? last_name ?? ''}
+        {shown.filter(Boolean).join(' ')}
       </div>
     {/if}
 
-    {#if datetime}
-      <div class="time">
-        {parseDatetime(datetime).str()}
-      </div>
+    {#if when}
+      <div class="time">{when}</div>
     {/if}
   </div>
 {/if}
@@ -51,6 +66,9 @@
     display: flex;
     align-items: center;
     margin-right: 0.5em;
+  }
+  .no-time .user {
+    margin-right: 0;
   }
   .img {
     overflow: hidden;
