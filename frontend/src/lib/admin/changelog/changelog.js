@@ -5,6 +5,20 @@
 // a change is its text, or { label, text, big }: a short name before it ("Historia zmian: ..."), bold when `big`
 export const changelog = [
   {
+    version: '1.24.1',
+    date: '2026-10-02',
+    title: 'Poprawki',
+    synopsis: 'błąd przy otwieraniu produktu, data wersji w menu.',
+    changes: [
+      {
+        label: 'Poprawka',
+        text: 'otwarcie produktu nie pokazuje już błędu „Cannot read properties of null”; zapis działał mimo niego.',
+      },
+      'Obok wersji na dole menu widać datę jej wydania.',
+      'W przeglądarce, w której historii zmian jeszcze nie otwierano, nowe są wersje z ostatniego tygodnia.',
+    ],
+  },
+  {
     version: '1.24.0',
     date: '2026-10-02',
     title: 'Produkty, Zapytania i API',

@@ -146,7 +146,7 @@
   $: loadScanned(itemOriginal, company);
   async function loadScanned(product, company) {
     const key = [company?.id, company?.api_snapshot, company?.api_last_scan].join('|');
-    if (scannedFor?.product === product && scannedFor.key === key) return;
+    if (scannedFor && scannedFor.product === product && scannedFor.key === key) return;
     const run = (scannedFor = { product, key });
     scanned = undefined;
     const found = await scannedProduct(product, company);

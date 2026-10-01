@@ -10,7 +10,7 @@
   import NavButton from './NavButton.svelte';
   import { goto } from '$app/navigation';
   import Icon from '$c/Icon.svelte';
-  import Changelog, { compare, readSeen } from '../changelog/Changelog.svelte';
+  import Changelog, { compare, date, readSeen } from '../changelog/Changelog.svelte';
   import { changelog as versions, version } from '../changelog/changelog.js';
 
   // the menu, in groups (spaced apart); `section`: the pages under it light the button up too
@@ -76,11 +76,12 @@
   };
 
   // the changelog: from the version under the name, and by itself once after a new version (see Changelog); a
-  // browser without one seen yet counts as having seen the one before the newest - only the newest is new to it
+  // browser without one seen yet counts as having seen the last one from over a week ago - the week's are new to it
   let changelog = false;
   let seen = null;
   $: if ($me) openIfNew();
-  const lastSeen = () => readSeen() ?? versions[1]?.version ?? null;
+  const lastSeen = () => readSeen() ?? versions.find((v) => v.date < daysAgo(7))?.version ?? null;
+  const daysAgo = (n) => new Date(Date.now() - n * 864e5).toLocaleDateString('sv'); // (as YYYY-MM-DD, here)
   function openIfNew() {
     seen = lastSeen();
     if (compare(version, seen) > 0) changelog = true;
@@ -139,7 +140,9 @@
           <span>{$me.last_name ?? ''}</span>
         </span>
       </div>
-      <button class="version" on:click={() => ((seen = lastSeen()), (changelog = true))}>v{version}</button>
+      <button class="version" on:click={() => ((seen = lastSeen()), (changelog = true))}>
+        v{version} · {date(versions[0].date)}
+      </button>
     </div>
   </nav>
   {#if changelog}<Changelog {seen} on:close={() => (changelog = false)} />{/if}
@@ -197,7 +200,7 @@
     padding: var(--pad) 0.5rem var(--pad) var(--pad); /* as much above and below as on the left */
     background-color: var(--navy-900);
   }
-  /* under the name, darker still, the faint version: it opens the changelog */
+  /* under the name, darker still, the faint version and its date: it opens the changelog */
   .version {
     margin: -0.15rem -0.75rem -0.75rem -0.5rem; /* (right under it: over the group's gap) */
     padding: 0.2rem 0.5rem 0.25rem var(--pad);

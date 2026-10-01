@@ -22,6 +22,9 @@
     const [x, y] = [parts(a), parts(b)];
     return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
   }
+
+  // 2026-10-02 -> 02.10.2026
+  export const date = (iso) => iso.split('-').reverse().join('.');
 </script>
 
 <script>
@@ -38,7 +41,6 @@
   let scroller; // what scrolls: the bar over it frosts as the versions go under it, as the pages' bars do
 
   const isNew = (v) => !!seen && compare(v, seen) > 0;
-  const date = (iso) => iso.split('-').reverse().join('.');
 
   function close() {
     writeSeen(version);
