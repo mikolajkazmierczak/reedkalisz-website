@@ -1,0 +1,957 @@
+{
+  "places": [
+    {
+      "pattern": "Bilecik",
+      "to": "bilecik"
+    },
+    {
+      "pattern": "Blaszka",
+      "to": "blaszka"
+    },
+    {
+      "pattern": "Bok",
+      "to": "bok"
+    },
+    {
+      "pattern": "Brelok",
+      "to": "brelok"
+    },
+    {
+      "pattern": "Długopis",
+      "to": "długopis"
+    },
+    {
+      "pattern": "Długopis góra tył",
+      "to": "długopis - na górze"
+    },
+    {
+      "pattern": "Długopis klip",
+      "to": "długopis - klip"
+    },
+    {
+      "pattern": "Dół",
+      "to": "na dole"
+    },
+    {
+      "pattern": "Dół tył",
+      "to": "tył - na dole"
+    },
+    {
+      "pattern": "Drewniana pokrywka",
+      "to": "drewniana pokrywka"
+    },
+    {
+      "pattern": "Etui przód",
+      "to": "etui - przód"
+    },
+    {
+      "pattern": "Etui tył",
+      "to": "etui - tył"
+    },
+    {
+      "pattern": "Góra",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "Góra tył",
+      "to": "tył - na górze"
+    },
+    {
+      "pattern": "Kartonik",
+      "to": "kartonik"
+    },
+    {
+      "pattern": "Kartonik przód",
+      "to": "kartonik - przód"
+    },
+    {
+      "pattern": "Kartonik tył",
+      "to": "kartonik - tył"
+    },
+    {
+      "pattern": "Kieliszek",
+      "to": "kieliszek"
+    },
+    {
+      "pattern": "Kieszeń",
+      "to": "kieszeń"
+    },
+    {
+      "pattern": "Klamra",
+      "to": "klamra"
+    },
+    {
+      "pattern": "Klip",
+      "to": "klip"
+    },
+    {
+      "pattern": "Korek",
+      "to": "korek"
+    },
+    {
+      "pattern": "Kubek",
+      "to": "kubek"
+    },
+    {
+      "pattern": "Latarka",
+      "to": "latarka"
+    },
+    {
+      "pattern": "Łopatka",
+      "to": "łopatka"
+    },
+    {
+      "pattern": "Narzędzie",
+      "to": "narzędzie"
+    },
+    {
+      "pattern": "Notes przód",
+      "to": "notes - przód"
+    },
+    {
+      "pattern": "Nóż",
+      "to": "nóż"
+    },
+    {
+      "pattern": "Okienko",
+      "to": "okienko"
+    },
+    {
+      "pattern": "Ołówek",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "Opakowanie",
+      "to": "opakowanie"
+    },
+    {
+      "pattern": "Organizer",
+      "to": "organizer"
+    },
+    {
+      "pattern": "Panel",
+      "to": "panel"
+    },
+    {
+      "pattern": "Pasek",
+      "to": "pasek"
+    },
+    {
+      "pattern": "Pilot",
+      "to": "pilot"
+    },
+    {
+      "pattern": "Pióro dół",
+      "to": "pióro - na dole"
+    },
+    {
+      "pattern": "Pióro góra",
+      "to": "pióro - na górze"
+    },
+    {
+      "pattern": "Podkładka",
+      "to": "podkładka"
+    },
+    {
+      "pattern": "Poduszka",
+      "to": "poduszka"
+    },
+    {
+      "pattern": "Portfel",
+      "to": "portfel"
+    },
+    {
+      "pattern": "Przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "Pudełko",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "Rakietka",
+      "to": "rakietka"
+    },
+    {
+      "pattern": "Rączka",
+      "to": "rączka"
+    },
+    {
+      "pattern": "Rękaw",
+      "to": "rękaw"
+    },
+    {
+      "pattern": "Skórka",
+      "to": "skórka"
+    },
+    {
+      "pattern": "Słuchawka",
+      "to": "słuchawka"
+    },
+    {
+      "pattern": "Spód",
+      "to": "spód"
+    },
+    {
+      "pattern": "Szpikulec",
+      "to": "szpikulec"
+    },
+    {
+      "pattern": "Środek",
+      "to": "środek"
+    },
+    {
+      "pattern": "Termos",
+      "to": "termos"
+    },
+    {
+      "pattern": "Torba",
+      "to": "torba"
+    },
+    {
+      "pattern": "Tył",
+      "to": "tył"
+    },
+    {
+      "pattern": "Uchwyt",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "Wierzch",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "Wizytownik przód",
+      "to": "wizytownik"
+    },
+    {
+      "pattern": "Woreczek",
+      "to": "woreczek"
+    },
+    {
+      "pattern": "Wstążka",
+      "to": "wstążka"
+    },
+    {
+      "pattern": "Wtyczka",
+      "to": "wtyczka"
+    },
+    {
+      "pattern": "Zakrętka",
+      "to": "nakrętka"
+    },
+    {
+      "pattern": "Zawieszka",
+      "to": "zawieszka"
+    },
+    {
+      "pattern": "Żeton",
+      "to": "żeton"
+    }
+  ],
+  "categories": [
+    {
+      "path": [
+        "Biuro i praca",
+        "Akcesoria"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Do komputera"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Karteczki samoprzylepne"
+      ],
+      "categories": [
+        274
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Na biurko"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Portfele, etui na karty"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Teczki konferencyjne"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Wizytowniki"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Biuro i praca",
+        "Zestawy upominkowe"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Długopisy ekologiczne"
+      ],
+      "categories": [
+        81
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Długopisy metalowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Długopisy plastikowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Etui piśmiennicze"
+      ],
+      "categories": [
+        280
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Kredki i zakreślacze"
+      ],
+      "categories": [
+        98,
+        82
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Ołówki"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Pióra i wskaźniki"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Touch peny"
+      ],
+      "categories": [
+        2,
+        97
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Wkłady"
+      ],
+      "categories": [
+        1
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Zestawy piśmiennicze"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Akcesoria do alkoholi"
+      ],
+      "categories": [
+        4
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Bidony"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Butelki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Kubki"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Kubki termicze"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Kuchenne"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Na grill"
+      ],
+      "categories": [
+        120,
+        121
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Piersiówki"
+      ],
+      "categories": [
+        124
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Pojemniki"
+      ],
+      "categories": [
+        134
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Termosy i dzbanki"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "Materiały promocyjne"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Akcesoria"
+      ],
+      "categories": [
+        92
+      ]
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Breloki"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Latarki"
+      ],
+      "categories": [
+        62
+      ]
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Miary"
+      ],
+      "categories": [
+        90
+      ]
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Narzędzia wielofunkcyjne"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Odblaskowe"
+      ],
+      "categories": [
+        72
+      ]
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Skrobaczki"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "Narzędzia i breloki",
+        "Zestawy narzędzi"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "Oferta świąteczna"
+      ],
+      "categories": [
+        139
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Dla dzieci"
+      ],
+      "categories": [
+        98
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Dla zwierząt"
+      ],
+      "categories": [
+        255
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Domowe SPA"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Gry"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Koce i termofory"
+      ],
+      "categories": [
+        121
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Rowerowe"
+      ],
+      "categories": [
+        61
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Sport"
+      ],
+      "categories": [
+        119
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "W podróży"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "Sport i Wypoczynek",
+        "Zdrowie"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Akcesoria"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Do telefonu"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Głośniki"
+      ],
+      "categories": [
+        201
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Lampy i lampki"
+      ],
+      "categories": [
+        62
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Pamięci USB"
+      ],
+      "categories": [
+        86
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Power banki"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Stacje pogody"
+      ],
+      "categories": [
+        89,
+        117
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Słuchawki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Zegary i smartwatche"
+      ],
+      "categories": [
+        142
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Ładowarki i kable"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Biznesowe"
+      ],
+      "categories": [
+        287
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Do segregowania"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Kosmetyczki"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Na zakupy"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Opakowania prezentowe"
+      ],
+      "categories": [
+        129
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Parasole"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Plecaki"
+      ],
+      "categories": [
+        23
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Sportowe"
+      ],
+      "categories": [
+        9
+      ]
+    },
+    {
+      "path": [
+        "Torby i parasole",
+        "Worki"
+      ],
+      "categories": [
+        85
+      ]
+    }
+  ],
+  "labelings": [
+    {
+      "code": "G0",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L0"
+      }
+    },
+    {
+      "code": "G1",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L0"
+      }
+    },
+    {
+      "code": "G3",
+      "type": "direct",
+      "data": {
+        "company": 3,
+        "code": "G3_G5"
+      }
+    },
+    {
+      "code": "G5",
+      "type": "direct",
+      "data": {
+        "company": 3,
+        "code": "G3_G5"
+      }
+    }
+  ],
+  "replaceCategories": [
+    {
+      "path": [
+        "Do pisania",
+        "Touch peny"
+      ],
+      "from": [
+        2
+      ],
+      "to": [
+        2,
+        97
+      ]
+    },
+    {
+      "path": [
+        "Do pisania",
+        "Kredki i zakreślacze"
+      ],
+      "from": [
+        98
+      ],
+      "to": [
+        98,
+        82
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Stacje pogody"
+      ],
+      "from": [
+        89
+      ],
+      "to": [
+        89,
+        117
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Na grill"
+      ],
+      "from": [
+        120
+      ],
+      "to": [
+        120,
+        121
+      ]
+    },
+    {
+      "path": [
+        "Technologia",
+        "Słuchawki"
+      ],
+      "from": [
+        89
+      ],
+      "to": [
+        69
+      ]
+    }
+  ]
+}

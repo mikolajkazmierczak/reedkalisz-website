@@ -15,7 +15,8 @@
   import Select from '@c/Select.svelte';
 
   // A list's producer filter in its bar: all of them (''), a company's (its id), or - with `none` - nobody's (NONE).
-  // No label: the favicon of the one picked says what it is, and "Producent" is its name on hover.
+  // No label over it: while it's all of them it shows its name ("PRODUCENT"), after that the favicon of the one picked
+  // says what it is (and "Producent" is its name on hover).
   export let value = '';
   export let none = false;
 
@@ -29,7 +30,7 @@
 
 <!-- as wide as its longest option: each one's text, unseen, in the same cell -->
 <div class="producer">
-  <Select bind:value {options} label="Producent" title="Producent" />
+  <Select bind:value {options} label="Producent" title="Producent" emptyLabel="Producent" />
   {#each options as { text }}<span class="sizer" aria-hidden="true">{text}</span>{/each}
 </div>
 

@@ -40,15 +40,15 @@
 </script>
 
 {#if items}
-  <div class="company">
+  <div class="company ui-fill-col">
     <Labelings bind:unsaved bind:saving {company} {itemsOriginal} {items} />
   </div>
 {/if}
 
 <style>
+  /* the table and what's under it in a column, the table giving way when the page is short (see .ui-fill) */
   .company {
     position: relative;
-    margin-bottom: 2rem;
     width: 100%;
   }
 </style>

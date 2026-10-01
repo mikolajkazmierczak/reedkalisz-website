@@ -1,0 +1,2485 @@
+{
+  "places": [
+    {
+      "pattern": "ballpen",
+      "to": "długopis"
+    },
+    {
+      "pattern": "Bidon - bok",
+      "to": "bidon - bok"
+    },
+    {
+      "pattern": "bidon - personalizacja",
+      "to": "bidon - personalizacja"
+    },
+    {
+      "pattern": "Bidon - pod ustnikiem",
+      "to": "bidon - pod ustnikiem"
+    },
+    {
+      "pattern": "bidon - str",
+      "to": "bidon"
+    },
+    {
+      "pattern": "bidon - strona",
+      "to": "bidon"
+    },
+    {
+      "pattern": "bidon pod ustnikiem",
+      "to": "bidon pod ustnikiem"
+    },
+    {
+      "pattern": "bidon str 1",
+      "to": "bidon"
+    },
+    {
+      "pattern": "bidonie",
+      "to": "na bidonie"
+    },
+    {
+      "pattern": "blaszka - str",
+      "to": "blaszka"
+    },
+    {
+      "pattern": "blaszka str 2",
+      "to": "blaszka"
+    },
+    {
+      "pattern": "blok - str. 1",
+      "to": "blok"
+    },
+    {
+      "pattern": "blok - str. 2",
+      "to": "blok"
+    },
+    {
+      "pattern": "Boczna ścianka",
+      "to": "boczna ścianka"
+    },
+    {
+      "pattern": "boczna ścianka - ucho po lewej stronie",
+      "to": "boczna ścianka - ucho po lewej stronie"
+    },
+    {
+      "pattern": "boczna ścianka - ucho po prawej stronie",
+      "to": "boczna ścianka - ucho po prawej stronie"
+    },
+    {
+      "pattern": "bocznej ściance",
+      "to": "na bocznej ściance"
+    },
+    {
+      "pattern": "Bok",
+      "to": "bok"
+    },
+    {
+      "pattern": "bok - kieszonka",
+      "to": "bok - kieszonka"
+    },
+    {
+      "pattern": "bok - personalizacja",
+      "to": "bok - personalizacja"
+    },
+    {
+      "pattern": "bok - po przeciwnej stronie uchwytu",
+      "to": "bok - po przeciwnej stronie uchwytu"
+    },
+    {
+      "pattern": "bok - pod ustnikiem",
+      "to": "bok - pod ustnikiem"
+    },
+    {
+      "pattern": "bok - str",
+      "to": "bok"
+    },
+    {
+      "pattern": "bok - str. 1 - obracarka",
+      "to": "bok - obracarka"
+    },
+    {
+      "pattern": "bok - str. 1 - zalecany nadruk w kolorze srebrnym lub czarnym",
+      "to": "bok (zalecany nadruk w kolorze srebrnym lub czarnym)"
+    },
+    {
+      "pattern": "bok - str. 2 - zalecany nadruk w kolorze srebrnym lub czarnym",
+      "to": "bok (zalecany nadruk w kolorze srebrnym lub czarnym)"
+    },
+    {
+      "pattern": "bok - uchwyt po przeciwnej stronie",
+      "to": "bok - uchwyt po przeciwnej stronie"
+    },
+    {
+      "pattern": "bok - ustnik po przeciwnej stronie",
+      "to": "bok - ustnik po przeciwnej stronie"
+    },
+    {
+      "pattern": "bok guma - str. 1",
+      "to": "bok guma"
+    },
+    {
+      "pattern": "bok pudełka",
+      "to": "bok pudełka"
+    },
+    {
+      "pattern": "bok str. 1",
+      "to": "bok"
+    },
+    {
+      "pattern": "bok str. 1 - obudowa",
+      "to": "obudowa"
+    },
+    {
+      "pattern": "bok str. 2",
+      "to": "bok"
+    },
+    {
+      "pattern": "bok str. 2 - obudowa",
+      "to": "obudowa"
+    },
+    {
+      "pattern": "bok. str. 2",
+      "to": "bok"
+    },
+    {
+      "pattern": "boku",
+      "to": "na boku"
+    },
+    {
+      "pattern": "Brelok",
+      "to": "brelok"
+    },
+    {
+      "pattern": "brelok - metal",
+      "to": "brelok - metal"
+    },
+    {
+      "pattern": "brelok - personalizacja",
+      "to": "brelok - personalizacja"
+    },
+    {
+      "pattern": "brelok - str",
+      "to": "brelok"
+    },
+    {
+      "pattern": "brelok - strona",
+      "to": "brelok"
+    },
+    {
+      "pattern": "brelok - zawieszka",
+      "to": "brelok - zawieszka"
+    },
+    {
+      "pattern": "breloku",
+      "to": "na breloku"
+    },
+    {
+      "pattern": "bryt",
+      "to": "bryt"
+    },
+    {
+      "pattern": "bryt - 8, z uwzględnieniem wysokości wszycia troczka zabezpieczającego.",
+      "to": "bryt (z uwzględnieniem wysokości wszycia troczka zabezpieczającego)"
+    },
+    {
+      "pattern": "bryt - str. 1",
+      "to": "bryt"
+    },
+    {
+      "pattern": "bryt - str. 2",
+      "to": "bryt"
+    },
+    {
+      "pattern": "butelce",
+      "to": "na butelce"
+    },
+    {
+      "pattern": "butelka",
+      "to": "butelka"
+    },
+    {
+      "pattern": "butelka - 360",
+      "to": "butelka - na okrągło"
+    },
+    {
+      "pattern": "Butelka - dolna część",
+      "to": "butelka - dolna część"
+    },
+    {
+      "pattern": "Butelka - Górna część - str. 2",
+      "to": "górna część"
+    },
+    {
+      "pattern": "butelka 360",
+      "to": "butelka - na okrągło"
+    },
+    {
+      "pattern": "choinka",
+      "to": "choinka"
+    },
+    {
+      "pattern": "czapka - przód",
+      "to": "czapka - przód"
+    },
+    {
+      "pattern": "części bawełnianej",
+      "to": "na części bawełnianej"
+    },
+    {
+      "pattern": "części korkowej",
+      "to": "na części korkowej"
+    },
+    {
+      "pattern": "desce",
+      "to": "na desce"
+    },
+    {
+      "pattern": "Długopis",
+      "to": "długopis"
+    },
+    {
+      "pattern": "długopis - klip",
+      "to": "długopis - klip"
+    },
+    {
+      "pattern": "długopis - personalizacja",
+      "to": "długopis - personalizacja"
+    },
+    {
+      "pattern": "długopis - skuwka",
+      "to": "długopis - skuwka"
+    },
+    {
+      "pattern": "długopis - str. 1 - korpus",
+      "to": "długopis - korpus"
+    },
+    {
+      "pattern": "długopis - str. 1 - zalecany kolor zdobienia srebrny",
+      "to": "długopis (zalecany nadruk w kolorze srebrnym)"
+    },
+    {
+      "pattern": "długopis - strona 2",
+      "to": "długopis"
+    },
+    {
+      "pattern": "długopis - wzdłuż skuwki",
+      "to": "długopis - wzdłuż skuwki"
+    },
+    {
+      "pattern": "długopis na boku",
+      "to": "długopis na boku"
+    },
+    {
+      "pattern": "długopis strona",
+      "to": "długopis"
+    },
+    {
+      "pattern": "długopisie",
+      "to": "na długopisie"
+    },
+    {
+      "pattern": "dolna część długopisu - str. 1 - efekt lustra",
+      "to": "dolna część długopisu (efekt lustra)"
+    },
+    {
+      "pattern": "dolna część długopisu - str. 2 - efekt lustra",
+      "to": "dolna część długopisu (efekt lustra)"
+    },
+    {
+      "pattern": "Dolna część okładki",
+      "to": "dolna część okładki"
+    },
+    {
+      "pattern": "dolna kieszeń",
+      "to": "dolna kieszeń"
+    },
+    {
+      "pattern": "Etui",
+      "to": "etui"
+    },
+    {
+      "pattern": "etui - dół --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "etui - spód (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui - góra --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "etui - wierzch (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui - przód",
+      "to": "etui - przód"
+    },
+    {
+      "pattern": "etui - str",
+      "to": "etui"
+    },
+    {
+      "pattern": "etui - UWAGA NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "etui (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui - XL --- NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "etui (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui - XL --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "etui (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui - ZNAKOWANIE TYLKO W KOLORZE SREBRNYM",
+      "to": "etui (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui --- NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "etui (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "etui (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "etui str. 1",
+      "to": "etui"
+    },
+    {
+      "pattern": "etui str. 2",
+      "to": "etui"
+    },
+    {
+      "pattern": "góra",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "górna kieszeń",
+      "to": "górna kieszeń"
+    },
+    {
+      "pattern": "gra - bok",
+      "to": "gra - bok"
+    },
+    {
+      "pattern": "grzebień",
+      "to": "grzebień"
+    },
+    {
+      "pattern": "gwiazdka",
+      "to": "gwiazdka"
+    },
+    {
+      "pattern": "kartonie",
+      "to": "na kartonie"
+    },
+    {
+      "pattern": "kieliszek",
+      "to": "kieliszek"
+    },
+    {
+      "pattern": "kieszen",
+      "to": "kieszeń"
+    },
+    {
+      "pattern": "kieszeni - str",
+      "to": "na kieszeni"
+    },
+    {
+      "pattern": "Kieszeń",
+      "to": "kieszeń"
+    },
+    {
+      "pattern": "kieszeń dolna część",
+      "to": "kieszeń dolna część"
+    },
+    {
+      "pattern": "kieszeń górna część",
+      "to": "kieszeń górna część"
+    },
+    {
+      "pattern": "kieszeń z przodu",
+      "to": "kieszeń z przodu"
+    },
+    {
+      "pattern": "klips",
+      "to": "klip"
+    },
+    {
+      "pattern": "komin - str",
+      "to": "komin"
+    },
+    {
+      "pattern": "Konfekcjonowanie",
+      "to": "konfekcjonowanie"
+    },
+    {
+      "pattern": "Korkociąg - metalowa część",
+      "to": "korkociąg - metalowa część"
+    },
+    {
+      "pattern": "kosmmetyczka",
+      "to": "kosmetyczka"
+    },
+    {
+      "pattern": "Kosz - str. 1",
+      "to": "kosz"
+    },
+    {
+      "pattern": "Kosz - str. 2",
+      "to": "kosz"
+    },
+    {
+      "pattern": "koszulka - przód",
+      "to": "koszulka - przód"
+    },
+    {
+      "pattern": "Koszulka maskotki",
+      "to": "koszulka maskotki"
+    },
+    {
+      "pattern": "koszulka tył",
+      "to": "koszulka - tył"
+    },
+    {
+      "pattern": "Kubek",
+      "to": "kubek"
+    },
+    {
+      "pattern": "kubek - 360",
+      "to": "kubek - na okrągło"
+    },
+    {
+      "pattern": "kubek - personalizacja",
+      "to": "kubek - personalizacja"
+    },
+    {
+      "pattern": "kubek - str",
+      "to": "kubek"
+    },
+    {
+      "pattern": "kubek - sylikon",
+      "to": "kubek - silikon"
+    },
+    {
+      "pattern": "kubek - ścianka",
+      "to": "kubek - ścianka"
+    },
+    {
+      "pattern": "kubku",
+      "to": "na kubku"
+    },
+    {
+      "pattern": "latarce",
+      "to": "na latarce"
+    },
+    {
+      "pattern": "latarka",
+      "to": "latarka"
+    },
+    {
+      "pattern": "lewa str",
+      "to": "lewa strona"
+    },
+    {
+      "pattern": "linijka",
+      "to": "linijka"
+    },
+    {
+      "pattern": "Ładowarka",
+      "to": "ładowarka"
+    },
+    {
+      "pattern": "ładowarka - nad ikoną",
+      "to": "ładowarka - nad ikoną"
+    },
+    {
+      "pattern": "ładowarka - pod ikoną",
+      "to": "ładowarka - pod ikoną"
+    },
+    {
+      "pattern": "miarka - bok str. 1",
+      "to": "miarka - bok"
+    },
+    {
+      "pattern": "miarka - bok str. 2",
+      "to": "miarka - bok"
+    },
+    {
+      "pattern": "miarka - str. 1",
+      "to": "miarka"
+    },
+    {
+      "pattern": "miarka - str. 2",
+      "to": "miarka"
+    },
+    {
+      "pattern": "miarka - strona 2",
+      "to": "miarka"
+    },
+    {
+      "pattern": "młotek - str. 2",
+      "to": "młotek"
+    },
+    {
+      "pattern": "młynek",
+      "to": "młynek"
+    },
+    {
+      "pattern": "na boku - str 1",
+      "to": "na boku"
+    },
+    {
+      "pattern": "na boku - str. 1",
+      "to": "na boku"
+    },
+    {
+      "pattern": "na boku - str. 2",
+      "to": "na boku"
+    },
+    {
+      "pattern": "na boku - strona 1",
+      "to": "na boku"
+    },
+    {
+      "pattern": "na boku zestawu kluczy",
+      "to": "na boku zestawu kluczy"
+    },
+    {
+      "pattern": "na breloku - strona 1",
+      "to": "na breloku"
+    },
+    {
+      "pattern": "na breloku - strona 2",
+      "to": "na breloku"
+    },
+    {
+      "pattern": "Na butelce - górna część",
+      "to": "na butelce - górna część"
+    },
+    {
+      "pattern": "Na butelce - personalizacja",
+      "to": "na butelce - personalizacja"
+    },
+    {
+      "pattern": "Na butelce - tył",
+      "to": "na butelce - tył"
+    },
+    {
+      "pattern": "na dole pudełka --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "na dole pudełka (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Na etui",
+      "to": "na etui"
+    },
+    {
+      "pattern": "na etui - personalizacja",
+      "to": "na etui - personalizacja"
+    },
+    {
+      "pattern": "na etui - str. 2",
+      "to": "na etui"
+    },
+    {
+      "pattern": "na etui - tył",
+      "to": "na etui - tył"
+    },
+    {
+      "pattern": "na etui --- NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "na etui (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na etui miękkim",
+      "to": "na etui miękkim"
+    },
+    {
+      "pattern": "na etui str. 1",
+      "to": "na etui"
+    },
+    {
+      "pattern": "na etui str. 2",
+      "to": "na etui"
+    },
+    {
+      "pattern": "na etui twardym",
+      "to": "na etui twardym"
+    },
+    {
+      "pattern": "na górze - str. 2",
+      "to": "na górze"
+    },
+    {
+      "pattern": "na górze pudełka --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "na górze pudełka (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na kieszeni (do 100cm2)",
+      "to": "na kieszeni"
+    },
+    {
+      "pattern": "na kieszeni (do 400cm2)",
+      "to": "na kieszeni"
+    },
+    {
+      "pattern": "Na klatce piersiowej",
+      "to": "na klatce piersiowej"
+    },
+    {
+      "pattern": "na korpusie",
+      "to": "na korpusie"
+    },
+    {
+      "pattern": "na koszulce - przód",
+      "to": "na koszulce - przód"
+    },
+    {
+      "pattern": "na koszulce przód",
+      "to": "na koszulce - przód"
+    },
+    {
+      "pattern": "na koszulce tył",
+      "to": "na koszulce - tył"
+    },
+    {
+      "pattern": "na kubku - str. 1",
+      "to": "na kubku"
+    },
+    {
+      "pattern": "na kubku - str. 2",
+      "to": "na kubku"
+    },
+    {
+      "pattern": "Na ładowarce",
+      "to": "na ładowarce"
+    },
+    {
+      "pattern": "Na misiu",
+      "to": "na misiu"
+    },
+    {
+      "pattern": "Na narzędziu",
+      "to": "na narzędziu"
+    },
+    {
+      "pattern": "Na notesie - metalowa część",
+      "to": "na notesie - metalowa część"
+    },
+    {
+      "pattern": "Na nożu",
+      "to": "na nożu"
+    },
+    {
+      "pattern": "Na obudowie",
+      "to": "na obudowie"
+    },
+    {
+      "pattern": "na obudowie - przód",
+      "to": "na obudowie - przód"
+    },
+    {
+      "pattern": "na okładce - nadruk XL",
+      "to": "na okładce"
+    },
+    {
+      "pattern": "na okładce (XL)",
+      "to": "na okładce"
+    },
+    {
+      "pattern": "na okładce tył",
+      "to": "na okładce - tył"
+    },
+    {
+      "pattern": "Na parasolu",
+      "to": "na parasolu"
+    },
+    {
+      "pattern": "Na pendrive",
+      "to": "na pendrive"
+    },
+    {
+      "pattern": "na piersi",
+      "to": "na piersi"
+    },
+    {
+      "pattern": "na piórze - str. 1",
+      "to": "na piórze"
+    },
+    {
+      "pattern": "na piórze - str. 2",
+      "to": "na piórze"
+    },
+    {
+      "pattern": "na plecaku - górna część",
+      "to": "na plecaku - górna część"
+    },
+    {
+      "pattern": "na pokrowcu",
+      "to": "na pokrowcu"
+    },
+    {
+      "pattern": "na powierzchni",
+      "to": "na powierzchni"
+    },
+    {
+      "pattern": "na przyborniku - tył --- NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "na przyborniku - tył (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na przyborniku --- NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "na przyborniku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na przyborniku (XL) - tył --- NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "na przyborniku - tył (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na przyborniku (XL) --- NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "na przyborniku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na pudełku - nadruk XL --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Na pudełku ---- NADRUK TYLKO NA SREBRNY",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Na pudełku ---- NADRUK TYLKO SREBRNY",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Na pudełku ----- NADRUK TYLKO NA SREBRNO",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Na pudełku (XL) -- KOLOR TYLKO SREBRNY",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Na pudełku (XL) --- NADRUK TYLKO SREBRNY",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Na pudełku (XL) ---- NADRUK TYLKO SREBRNY",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na pudełku. ---- ZNAKOWANIE TYLKO NA KOLOR SREBRNY",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na ręczniku",
+      "to": "na ręczniku"
+    },
+    {
+      "pattern": "Na smyczy",
+      "to": "na smyczy"
+    },
+    {
+      "pattern": "Na szkle",
+      "to": "na szkle"
+    },
+    {
+      "pattern": "na środku - strona 2",
+      "to": "na środku"
+    },
+    {
+      "pattern": "na torbie - nadruk widoczny po rozłożeniem",
+      "to": "na torbie - nadruk widoczny po rozłożeniu"
+    },
+    {
+      "pattern": "na torbie (XL)",
+      "to": "na torbie"
+    },
+    {
+      "pattern": "na wieczku - zalecany nadruk w kolorze srebrnym",
+      "to": "na wieczku (zalecany nadruk w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na wieczku --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "na wieczku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "na worku - str. 1",
+      "to": "na worku"
+    },
+    {
+      "pattern": "na worku - str. 2",
+      "to": "na worku"
+    },
+    {
+      "pattern": "na zakrętce - personalizacja",
+      "to": "na zakrętce - personalizacja"
+    },
+    {
+      "pattern": "na zewnątrz",
+      "to": "na zewnątrz"
+    },
+    {
+      "pattern": "nakrętka",
+      "to": "nakrętka"
+    },
+    {
+      "pattern": "narzędzie",
+      "to": "narzędzie"
+    },
+    {
+      "pattern": "Notes",
+      "to": "notes"
+    },
+    {
+      "pattern": "notes - blaszka",
+      "to": "notes - blaszka"
+    },
+    {
+      "pattern": "notes - drewniana część",
+      "to": "notes - drewniana część"
+    },
+    {
+      "pattern": "Notes - Personalizacja",
+      "to": "notes - personalizacja"
+    },
+    {
+      "pattern": "notes - przód",
+      "to": "notes - przód"
+    },
+    {
+      "pattern": "notes - przód, pod wzorem",
+      "to": "notes - przód - pod wzorem"
+    },
+    {
+      "pattern": "Notes - str",
+      "to": "notes"
+    },
+    {
+      "pattern": "notes - tył",
+      "to": "notes - tył"
+    },
+    {
+      "pattern": "Notes - z tyłu (XL)",
+      "to": "notes - z tyłu"
+    },
+    {
+      "pattern": "notes --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "notes (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "notes (nadruk XL) - tył",
+      "to": "notes - tył"
+    },
+    {
+      "pattern": "notes str. 1",
+      "to": "notes"
+    },
+    {
+      "pattern": "notes tył",
+      "to": "notes - tył"
+    },
+    {
+      "pattern": "notesie",
+      "to": "na notesie"
+    },
+    {
+      "pattern": "Nóź prostokątny",
+      "to": "nóż"
+    },
+    {
+      "pattern": "nóż",
+      "to": "nóż"
+    },
+    {
+      "pattern": "Obudowa",
+      "to": "obudowa"
+    },
+    {
+      "pattern": "obudowa - bok",
+      "to": "obudowa - bok"
+    },
+    {
+      "pattern": "obudowa - prostokąt",
+      "to": "obudowa - prostokąt"
+    },
+    {
+      "pattern": "obudowa - przód",
+      "to": "obudowa - przód"
+    },
+    {
+      "pattern": "Obudowa - tył",
+      "to": "obudowa - tył"
+    },
+    {
+      "pattern": "obudowa strona",
+      "to": "obudowa"
+    },
+    {
+      "pattern": "okładce - przód",
+      "to": "na okładce - przód"
+    },
+    {
+      "pattern": "okładce - str",
+      "to": "na okładce"
+    },
+    {
+      "pattern": "okładce - tył",
+      "to": "na okładce - tył"
+    },
+    {
+      "pattern": "okładka - przód",
+      "to": "okładka - przód"
+    },
+    {
+      "pattern": "okładka - str",
+      "to": "okładka"
+    },
+    {
+      "pattern": "okładka - tył",
+      "to": "okładka - tył"
+    },
+    {
+      "pattern": "okładka (nadruk XL)",
+      "to": "okładka"
+    },
+    {
+      "pattern": "okładka (XL)",
+      "to": "okładka"
+    },
+    {
+      "pattern": "okładka przód",
+      "to": "okładka - przód"
+    },
+    {
+      "pattern": "okładka tył",
+      "to": "okładka - tył"
+    },
+    {
+      "pattern": "ołówek",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "ołówek - str. 1",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "ołówek - str. 2",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "on the box",
+      "to": "na pudełku"
+    },
+    {
+      "pattern": "on the notepad",
+      "to": "na notesie"
+    },
+    {
+      "pattern": "Opakowanie",
+      "to": "opakowanie"
+    },
+    {
+      "pattern": "opakowanie - góra - NADRUK TYLKO NA SREBRNO (XL)",
+      "to": "opakowanie - wierzch (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "opakowanie - góra --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "opakowanie - wierzch (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "opakowanie przód",
+      "to": "opakowanie - przód"
+    },
+    {
+      "pattern": "opakowaniu",
+      "to": "na opakowaniu"
+    },
+    {
+      "pattern": "opasce",
+      "to": "na opasce"
+    },
+    {
+      "pattern": "Organizer",
+      "to": "organizer"
+    },
+    {
+      "pattern": "Organizer do kabli",
+      "to": "organizer do kabli"
+    },
+    {
+      "pattern": "ostrze - str. 1",
+      "to": "ostrze"
+    },
+    {
+      "pattern": "ostrze - str. 2",
+      "to": "ostrze"
+    },
+    {
+      "pattern": "Paletka",
+      "to": "paletka"
+    },
+    {
+      "pattern": "panel",
+      "to": "panel"
+    },
+    {
+      "pattern": "panelu",
+      "to": "na panelu"
+    },
+    {
+      "pattern": "Parasol - panel",
+      "to": "parasol - panel"
+    },
+    {
+      "pattern": "Personalizacja",
+      "to": "personalizacja"
+    },
+    {
+      "pattern": "personalizacja - pionowo",
+      "to": "personalizacja - pionowo"
+    },
+    {
+      "pattern": "personalizacja - poziomo",
+      "to": "personalizacja - poziomo"
+    },
+    {
+      "pattern": "piersiówka - personalizacja",
+      "to": "piersiówka - personalizacja"
+    },
+    {
+      "pattern": "piersiówka - str",
+      "to": "piersiówka"
+    },
+    {
+      "pattern": "pionowo - druga strona",
+      "to": "pionowo"
+    },
+    {
+      "pattern": "pionowo - pierwsza strona",
+      "to": "pionowo"
+    },
+    {
+      "pattern": "piórnik",
+      "to": "piórnik"
+    },
+    {
+      "pattern": "piórniku",
+      "to": "na piórniku"
+    },
+    {
+      "pattern": "Pióro",
+      "to": "pióro"
+    },
+    {
+      "pattern": "pióro - personalizacja",
+      "to": "pióro - personalizacja"
+    },
+    {
+      "pattern": "pióro - str",
+      "to": "pióro"
+    },
+    {
+      "pattern": "Plansza",
+      "to": "plansza"
+    },
+    {
+      "pattern": "Plecak",
+      "to": "plecak"
+    },
+    {
+      "pattern": "plecak - przód",
+      "to": "plecak - przód"
+    },
+    {
+      "pattern": "plecak - str",
+      "to": "plecak"
+    },
+    {
+      "pattern": "Plecak - środkowa kieszeń z przodu",
+      "to": "plecak - środkowa kieszeń z przodu"
+    },
+    {
+      "pattern": "plecaku",
+      "to": "na plecaku"
+    },
+    {
+      "pattern": "płaska część",
+      "to": "płaska część"
+    },
+    {
+      "pattern": "Po całości długopisu",
+      "to": "po całości długopisu"
+    },
+    {
+      "pattern": "pod buźką",
+      "to": "pod buźką"
+    },
+    {
+      "pattern": "pod linijką",
+      "to": "pod linijką"
+    },
+    {
+      "pattern": "Pod ustnikiem",
+      "to": "pod ustnikiem"
+    },
+    {
+      "pattern": "Pod zapięciem",
+      "to": "pod zapięciem"
+    },
+    {
+      "pattern": "podkładka",
+      "to": "podkładka"
+    },
+    {
+      "pattern": "podstawa - przód",
+      "to": "podstawa - przód"
+    },
+    {
+      "pattern": "podstawka",
+      "to": "podstawka"
+    },
+    {
+      "pattern": "podstawka - pod ikoną",
+      "to": "podstawka - pod ikoną"
+    },
+    {
+      "pattern": "pojemnik - bok",
+      "to": "pojemnik - bok"
+    },
+    {
+      "pattern": "pokrowiec",
+      "to": "pokrowiec"
+    },
+    {
+      "pattern": "pokrywie",
+      "to": "na pokrywie"
+    },
+    {
+      "pattern": "pokrywka",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "power bank",
+      "to": "power bank"
+    },
+    {
+      "pattern": "poziomo - druga strona",
+      "to": "poziomo"
+    },
+    {
+      "pattern": "poziomo - pierwsza strona",
+      "to": "poziomo"
+    },
+    {
+      "pattern": "poziomo - strona",
+      "to": "poziomo"
+    },
+    {
+      "pattern": "prawa str.",
+      "to": "prawa strona"
+    },
+    {
+      "pattern": "przeciwległa strona miarki",
+      "to": "przeciwległa strona miarki"
+    },
+    {
+      "pattern": "Przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "przód - lewy panel",
+      "to": "przód - panel"
+    },
+    {
+      "pattern": "przód - na kieszeni",
+      "to": "przód - na kieszeni"
+    },
+    {
+      "pattern": "przód - prawy panel",
+      "to": "przód - panel"
+    },
+    {
+      "pattern": "Pudełko",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "pudełko - bok",
+      "to": "pudełko - bok"
+    },
+    {
+      "pattern": "Pudełko - DRUK TYLKO NA SREBRNO (XL)",
+      "to": "pudełko (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "pudełko - przód",
+      "to": "pudełko - przód"
+    },
+    {
+      "pattern": "Pudełko - TYLKO KOLOR SREBRNY",
+      "to": "pudełko (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "pudełko - tył",
+      "to": "pudełko - tył"
+    },
+    {
+      "pattern": "pudełko - wnętrze",
+      "to": "pudełko - wnętrze"
+    },
+    {
+      "pattern": "Pudełko --- NADRUK TYLKO SREBRNY",
+      "to": "pudełko (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "pudełko --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "pudełko (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "pudełko (srebrny)",
+      "to": "pudełko (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "pudełko (XL) --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "pudełko (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "Pudełko (XL) --- TYLKO KOLOR SREBRNY",
+      "to": "pudełko (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "pudełku",
+      "to": "na pudełku"
+    },
+    {
+      "pattern": "pudełku --- NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "na pudełku (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "renifer",
+      "to": "renifer"
+    },
+    {
+      "pattern": "rękojeści",
+      "to": "na rękojeści"
+    },
+    {
+      "pattern": "saszetka - przód",
+      "to": "saszetka - przód"
+    },
+    {
+      "pattern": "Saszetka str",
+      "to": "saszetka"
+    },
+    {
+      "pattern": "scyzoryk - str",
+      "to": "scyzoryk"
+    },
+    {
+      "pattern": "scyzoryk - strona",
+      "to": "scyzoryk"
+    },
+    {
+      "pattern": "serce",
+      "to": "serce"
+    },
+    {
+      "pattern": "Shaker",
+      "to": "shaker"
+    },
+    {
+      "pattern": "Shaker - str. 2",
+      "to": "shaker"
+    },
+    {
+      "pattern": "skrzydło",
+      "to": "skrzydło"
+    },
+    {
+      "pattern": "słuchawce",
+      "to": "na słuchawce"
+    },
+    {
+      "pattern": "słuchawki - opakowanie",
+      "to": "słuchawki - opakowanie"
+    },
+    {
+      "pattern": "stojak",
+      "to": "stojak"
+    },
+    {
+      "pattern": "str 1",
+      "to": "strona 1"
+    },
+    {
+      "pattern": "str. 1",
+      "to": "strona 1"
+    },
+    {
+      "pattern": "str. 1 - dolna część",
+      "to": "dolna część"
+    },
+    {
+      "pattern": "str. 1 - górna część",
+      "to": "górna część"
+    },
+    {
+      "pattern": "str. 2",
+      "to": "strona 2"
+    },
+    {
+      "pattern": "str.1 - część nie odblaskowa",
+      "to": "część nieodblaskowa"
+    },
+    {
+      "pattern": "str.1 - część odblaskowa",
+      "to": "część odblaskowa"
+    },
+    {
+      "pattern": "Strona 1",
+      "to": "strona 1"
+    },
+    {
+      "pattern": "strona 1 - na boku",
+      "to": "na boku"
+    },
+    {
+      "pattern": "strona 1 - na ołówku",
+      "to": "na ołówku"
+    },
+    {
+      "pattern": "Strona 2",
+      "to": "strona 2"
+    },
+    {
+      "pattern": "strona 2 - na boku",
+      "to": "na boku"
+    },
+    {
+      "pattern": "szachy - str. 1",
+      "to": "szachy"
+    },
+    {
+      "pattern": "szachy - str. 2",
+      "to": "szachy"
+    },
+    {
+      "pattern": "szczotka",
+      "to": "szczotka"
+    },
+    {
+      "pattern": "Świeca",
+      "to": "świeca"
+    },
+    {
+      "pattern": "świeca - bok",
+      "to": "świeca - bok"
+    },
+    {
+      "pattern": "świeca - przód",
+      "to": "świeca - przód"
+    },
+    {
+      "pattern": "Świeczka",
+      "to": "świeczka"
+    },
+    {
+      "pattern": "świeczka - bok",
+      "to": "świeczka - bok"
+    },
+    {
+      "pattern": "świeczka - na szkle",
+      "to": "świeczka - na szkle"
+    },
+    {
+      "pattern": "świeczka - przód",
+      "to": "świeczka - przód"
+    },
+    {
+      "pattern": "świeczka - wieczko",
+      "to": "świeczka - wieczko"
+    },
+    {
+      "pattern": "tarczy",
+      "to": "na tarczy"
+    },
+    {
+      "pattern": "tasiemce",
+      "to": "na tasiemce"
+    },
+    {
+      "pattern": "teczka - przód",
+      "to": "teczka - przód"
+    },
+    {
+      "pattern": "termos - personalizacja",
+      "to": "termos - personalizacja"
+    },
+    {
+      "pattern": "termos - str",
+      "to": "termos"
+    },
+    {
+      "pattern": "termos - str. 1 - dolna część",
+      "to": "termos - dolna część"
+    },
+    {
+      "pattern": "termos - str. 2 - dolna część",
+      "to": "termos - dolna część"
+    },
+    {
+      "pattern": "termosie",
+      "to": "na termosie"
+    },
+    {
+      "pattern": "tobra - str. 2",
+      "to": "torba"
+    },
+    {
+      "pattern": "Torba",
+      "to": "torba"
+    },
+    {
+      "pattern": "torba - bok",
+      "to": "torba - bok"
+    },
+    {
+      "pattern": "torba - kieszeń",
+      "to": "torba - kieszeń"
+    },
+    {
+      "pattern": "torba - przód",
+      "to": "torba - przód"
+    },
+    {
+      "pattern": "torba - str",
+      "to": "torba"
+    },
+    {
+      "pattern": "torba - tył",
+      "to": "torba - tył"
+    },
+    {
+      "pattern": "trofeum - drewno",
+      "to": "trofeum - drewno"
+    },
+    {
+      "pattern": "trofeum - szkło",
+      "to": "trofeum - szkło"
+    },
+    {
+      "pattern": "tył (XL)",
+      "to": "tył"
+    },
+    {
+      "pattern": "uchwycie",
+      "to": "na uchwycie"
+    },
+    {
+      "pattern": "uchwyt - 1",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "uchwyt - 2",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "uchwyt - str",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "układanka",
+      "to": "układanka"
+    },
+    {
+      "pattern": "waga",
+      "to": "waga"
+    },
+    {
+      "pattern": "wewnątrz - str",
+      "to": "wewnątrz"
+    },
+    {
+      "pattern": "widelec",
+      "to": "widelec"
+    },
+    {
+      "pattern": "wieczko - góra",
+      "to": "wieczko"
+    },
+    {
+      "pattern": "wieczko - lewa strona",
+      "to": "wieczko"
+    },
+    {
+      "pattern": "wieczko - obudowa",
+      "to": "wieczko - obudowa"
+    },
+    {
+      "pattern": "wieczko - prawa strona",
+      "to": "wieczko"
+    },
+    {
+      "pattern": "wieczko (nadruk XL)",
+      "to": "wieczko"
+    },
+    {
+      "pattern": "woreczek",
+      "to": "woreczek"
+    },
+    {
+      "pattern": "worek",
+      "to": "worek"
+    },
+    {
+      "pattern": "worek - str. 1",
+      "to": "worek"
+    },
+    {
+      "pattern": "worek - str. 2",
+      "to": "worek"
+    },
+    {
+      "pattern": "wskaźniku",
+      "to": "na wskaźniku"
+    },
+    {
+      "pattern": "wspornik - przód",
+      "to": "wspornik - przód"
+    },
+    {
+      "pattern": "wstążce",
+      "to": "na wstążce"
+    },
+    {
+      "pattern": "Z boku kosza",
+      "to": "z boku kosza"
+    },
+    {
+      "pattern": "Z przodu u spodu plecaka",
+      "to": "z przodu u spodu plecaka"
+    },
+    {
+      "pattern": "zakładka przód",
+      "to": "zakładka - przód"
+    },
+    {
+      "pattern": "zakładka tył",
+      "to": "zakładka - tył"
+    },
+    {
+      "pattern": "zapięcie - NADRUK TYLKO W KOLORZE SREBRNYM",
+      "to": "zapięcie (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "zapięcie - NADRUK WYŁĄCZNIE W KOLORZE SREBRNYM",
+      "to": "zapięcie (nadruk wyłącznie w kolorze srebrnym)"
+    },
+    {
+      "pattern": "zastaw spód",
+      "to": "zestaw - spód"
+    },
+    {
+      "pattern": "zegar",
+      "to": "zegar"
+    },
+    {
+      "pattern": "zestaw",
+      "to": "zestaw"
+    },
+    {
+      "pattern": "zestawie",
+      "to": "na zestawie"
+    },
+    {
+      "pattern": "żeton str",
+      "to": "żeton"
+    }
+  ],
+  "categories": [
+    {
+      "path": [
+        "Akcesoria do telefonów",
+        "Akcesoria"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Akcesoria do telefonów",
+        "Powerbank"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "Akcesoria do telefonów",
+        "Touch"
+      ],
+      "categories": [
+        2,
+        97
+      ]
+    },
+    {
+      "path": [
+        "Akcesoria osobiste",
+        "Dla fanów"
+      ],
+      "categories": [
+        119
+      ]
+    },
+    {
+      "path": [
+        "Akcesoria osobiste",
+        "Niezbędne w podróży"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "Akcesoria osobiste",
+        "Rowerowe"
+      ],
+      "categories": [
+        61
+      ]
+    },
+    {
+      "path": [
+        "Akcesoria osobiste",
+        "Upominiki ze skóry i ekoskóry"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Biodegradowalne"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Bottle Your Water"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Breloki"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "Breloki",
+        "Odblaskowe, Antystresowe"
+      ],
+      "categories": [
+        72,
+        91
+      ]
+    },
+    {
+      "path": [
+        "Bądź samowystarczalny"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Christmas Time"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Design"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Dla dzieci",
+        "Gry"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "Dla dzieci",
+        "Odblaski"
+      ],
+      "categories": [
+        72
+      ]
+    },
+    {
+      "path": [
+        "Dla dzieci",
+        "Pluszaki maskotki"
+      ],
+      "categories": [
+        74
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Akcesoria komputerowe i smartfonowe"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Na biurko"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Notesy, Notatniki"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Teczki i torby na dokumenty"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Teczki konferencyjne"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Wizytowniki"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Zegary"
+      ],
+      "categories": [
+        133,
+        142
+      ]
+    },
+    {
+      "path": [
+        "Do domu",
+        "Do kuchni"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Do domu",
+        "Do łazienki"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "Do domu",
+        "Gry"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "Do domu",
+        "Ozdoby domowe"
+      ],
+      "categories": [
+        136
+      ]
+    },
+    {
+      "path": [
+        "Do domu",
+        "SPA"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "Do domu",
+        "Zestawy do wina"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "Do recyklingu"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Gadżety do 20 zł"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Gadżety do pracy zdalnej"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Gadżety klasy PREMIUM"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Kids Time"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Butelki, Bidony"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Izotermiczne"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Kubki"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Opaski do R08394"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Pojemniki próżniowe"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Szklane"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Termosy"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "Kubki, Butelki, Termosy",
+        "Zestawy"
+      ],
+      "categories": [
+        4
+      ]
+    },
+    {
+      "path": [
+        "Latarki, Narzędzia",
+        "Akcesoria samochodowe"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "Latarki, Narzędzia",
+        "Latarki"
+      ],
+      "categories": [
+        62
+      ]
+    },
+    {
+      "path": [
+        "Latarki, Narzędzia",
+        "Miarki, Ołówki stolarskie"
+      ],
+      "categories": [
+        90
+      ]
+    },
+    {
+      "path": [
+        "Latarki, Narzędzia",
+        "Zestawy narzędzi, Scyzoryki"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "Leak Proof"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "Materiały naturalne"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Mug Story"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Na Święta",
+        "Artykuły świąteczne"
+      ],
+      "categories": [
+        139
+      ]
+    },
+    {
+      "path": [
+        "Na Święta",
+        "Opakowania prezentowe"
+      ],
+      "categories": [
+        129
+      ]
+    },
+    {
+      "path": [
+        "Nie dotykaj nic ręką"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Nie łap chandry"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Niższe ceny katalogowe"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Noś kawę we własnym kubku"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Opakowania upominkowe"
+      ],
+      "categories": [
+        129
+      ]
+    },
+    {
+      "path": [
+        "Parasole"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Długopisy aluminiowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Długopisy eko"
+      ],
+      "categories": [
+        81
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Długopisy metalowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Długopisy plastikowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Etui"
+      ],
+      "categories": [
+        280
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Ołówki"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Touch"
+      ],
+      "categories": [
+        2,
+        97
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Zestawy piśmiennicze"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "Sherlock"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Sport & Outdoor",
+        "Rower"
+      ],
+      "categories": [
+        61
+      ]
+    },
+    {
+      "path": [
+        "Sport & Outdoor",
+        "Sport & Outdoor"
+      ],
+      "categories": [
+        119
+      ]
+    },
+    {
+      "path": [
+        "Sport & Outdoor",
+        "Słuchawki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Stationery Story"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Stay Fit"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Torby, Plecaki, Kosze",
+        "Kosze"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Torby, Plecaki, Kosze",
+        "Plecaki"
+      ],
+      "categories": [
+        23
+      ]
+    },
+    {
+      "path": [
+        "Torby, Plecaki, Kosze",
+        "Torby i plecaki na laptopa"
+      ],
+      "categories": [
+        23,
+        130
+      ]
+    },
+    {
+      "path": [
+        "Torby, Plecaki, Kosze",
+        "Torby na zakupy"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Torby, Plecaki, Kosze",
+        "Torby podróżne i sportowe"
+      ],
+      "categories": [
+        9
+      ]
+    },
+    {
+      "path": [
+        "Torby, Plecaki, Kosze",
+        "Torby termoizolacyjne"
+      ],
+      "categories": [
+        128
+      ]
+    },
+    {
+      "path": [
+        "Wielokrotnego użytku"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Z certyfikatem"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "Z recyklingu"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Zestawy upominkowe",
+        "Biznesowe"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "Zestawy upominkowe",
+        "Do domu"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Zestawy upominkowe",
+        "Do wina i whisky"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "Zestawy upominkowe",
+        "Piśmiennicze"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "Zestawy upominkowe",
+        "Pudełka prezentowe"
+      ],
+      "categories": [
+        129
+      ]
+    },
+    {
+      "path": [
+        "Zorganizuj się"
+      ],
+      "categories": []
+    }
+  ],
+  "labelings": [
+    {
+      "code": "D0 PRINT",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "D0"
+      }
+    },
+    {
+      "code": "K",
+      "type": "ignore",
+      "data": null
+    },
+    {
+      "code": "L0",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L0"
+      }
+    },
+    {
+      "code": "L0+",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L0"
+      }
+    },
+    {
+      "code": "LP0",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L0"
+      }
+    },
+    {
+      "code": "LP1",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "L1"
+      }
+    },
+    {
+      "code": "LP2",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "L2"
+      }
+    },
+    {
+      "code": "LP3",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "L3"
+      }
+    },
+    {
+      "code": "LP5",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "L5"
+      }
+    },
+    {
+      "code": "N1",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "U1"
+      }
+    },
+    {
+      "code": "N2",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "U2"
+      }
+    },
+    {
+      "code": "N3",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "U3"
+      }
+    }
+  ],
+  "replaceCategories": [
+    {
+      "path": [
+        "Dla dzieci",
+        "Szkoła i dom"
+      ],
+      "from": [
+        82
+      ],
+      "to": [
+        82,
+        98
+      ]
+    },
+    {
+      "path": [
+        "Piśmiennicze",
+        "Touch"
+      ],
+      "from": [
+        2
+      ],
+      "to": [
+        2,
+        97
+      ]
+    },
+    {
+      "path": [
+        "Akcesoria do telefonów",
+        "Touch"
+      ],
+      "from": [
+        2
+      ],
+      "to": [
+        2,
+        97
+      ]
+    },
+    {
+      "path": [
+        "Torby, Plecaki, Kosze",
+        "Torby i plecaki na laptopa"
+      ],
+      "from": [
+        23
+      ],
+      "to": [
+        23,
+        130
+      ]
+    },
+    {
+      "path": [
+        "Do biura",
+        "Zegary"
+      ],
+      "from": [
+        133
+      ],
+      "to": [
+        133,
+        142
+      ]
+    }
+  ],
+  "removeLabelings": [
+    {
+      "code": "A0",
+      "type": "direct",
+      "data": {
+        "company": 1,
+        "code": "A0"
+      }
+    }
+  ]
+}

@@ -42,16 +42,15 @@
     product.storage = moveItem(product.storage, i, d);
   }
 
+  // in the order shown (`index`: they're read back sorted by it, a photo without one first)
   function pushStorageImg(i) {
-    product.storage[i].img.push({
-      img: null,
-      enabled: true,
-      show_in_gallery: true,
-    });
+    const img = product.storage[i].img;
+    img.push({ img: null, enabled: true, show_in_gallery: true, index: img.length });
     product = product;
   }
   function removeStorageImg(i, j) {
     product.storage[i].img.splice(j, 1);
+    product.storage[i].img.forEach((img, k) => (img.index = k));
     product = product;
   }
   function moveStorageImg(i, j, d) {
@@ -73,12 +72,12 @@
             </div>
             <div>
               {#if !i == 0}
-                <Button small icon="arrow_left" on:click={() => moveStorage(i, -1)} square />
+                <Button size="sm" icon="arrow_left" on:click={() => moveStorage(i, -1)} square />
               {/if}
               {#if i < product.storage.length - 1}
-                <Button small icon="arrow_right" on:click={() => moveStorage(i, 1)} square />
+                <Button size="sm" icon="arrow_right" on:click={() => moveStorage(i, 1)} square />
               {/if}
-              <Button small icon="delete" on:click={() => removeStorage(i)} dangerous />
+              <Button size="sm" icon="delete" on:click={() => removeStorage(i)} dangerous />
             </div>
           </div>
 
@@ -110,24 +109,23 @@
             <h3 class="ui-h3">Zdjęcia</h3>
             <div class="imgs">
               {#each storage.img as img, j (img)}
-                <div class="img" class:hidden={!img.enabled}>
+                <div class="img">
                   <div class="img-actions img-actions--top">
-                    <Input type="checkbox" size="small" bind:value={img.enabled}>Pokaż</Input>
-                    <Button small icon="delete" on:click={() => removeStorageImg(i, j)} square dangerous />
+                    <span class="order">
+                      {#if j > 0}
+                        <Button size="sm" icon="arrow_left" on:click={() => moveStorageImg(i, j, -1)} square />
+                      {/if}
+                      {#if j < storage.img.length - 1}
+                        <Button size="sm" icon="arrow_right" on:click={() => moveStorageImg(i, j, 1)} square />
+                      {/if}
+                    </span>
+                    <Button size="sm" icon="delete" on:click={() => removeStorageImg(i, j)} square dangerous />
                   </div>
                   <Picker bind:selected={img.img} {fileContext} />
                   <div class="img-actions img-actions--bottom">
                     <span class="tip">
                       <Input type="checkbox" bind:value={img.show_in_gallery}>Galeria</Input>
                       <Tooltip><small>Dołącza zdjęcie na końcu głównej galerii</small></Tooltip>
-                    </span>
-                    <span class="order">
-                      {#if j > 0}
-                        <Button small icon="arrow_left" on:click={() => moveStorageImg(i, j, -1)} square />
-                      {/if}
-                      {#if j < storage.img.length - 1}
-                        <Button small icon="arrow_right" on:click={() => moveStorageImg(i, j, 1)} square />
-                      {/if}
                     </span>
                   </div>
                 </div>
@@ -201,16 +199,11 @@
     padding-bottom: 0.25rem;
   }
   .img-actions--bottom {
-    justify-content: space-between;
     padding-top: 0.25rem;
   }
   .order {
     display: flex;
     gap: 0.3rem;
-  }
-  /* a hidden one: grey, as a hidden variant's box */
-  .img.hidden {
-    background-color: var(--grey-100);
   }
 
   /* the whole checkbox shows what it does */

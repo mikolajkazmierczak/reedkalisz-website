@@ -1,0 +1,162 @@
+{
+  "places": [
+    {
+      "pattern": "str. A",
+      "to": "strona A"
+    },
+    {
+      "pattern": "str. A1",
+      "to": "strona A1"
+    },
+    {
+      "pattern": "str. A2",
+      "to": "strona A2"
+    },
+    {
+      "pattern": "str. B",
+      "to": "strona B"
+    }
+  ],
+  "categories": [
+    {
+      "path": [
+        "Akcesoria"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Bezpieczeństwo i higiena"
+      ],
+      "categories": [
+        219
+      ]
+    },
+    {
+      "path": [
+        "Myszki"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Opakowania personalizowane"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Pamięci USB"
+      ],
+      "categories": [
+        86
+      ]
+    },
+    {
+      "path": [
+        "Plecaki z logo"
+      ],
+      "categories": [
+        23
+      ]
+    },
+    {
+      "path": [
+        "Power Banki"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "Torby z logo"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Ładowarki indukcyjne"
+      ],
+      "categories": [
+        69
+      ]
+    }
+  ],
+  "labelings": [
+    {
+      "code": "Grawer",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "Grawer 3D",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "Tampondruk",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "RT"
+      }
+    }
+  ]
+}

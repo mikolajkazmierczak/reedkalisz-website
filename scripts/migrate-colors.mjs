@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 //
-// Moves "multicoloured" from product variants to colours, and marks the transparent colours.
+// Moves "multicoloured" from product variants to colours, and marks the transparent, wooden and neutral colours.
 //
 //   node scripts/migrate-colors.mjs           # dry run: prints what would change
 //   node scripts/migrate-colors.mjs --apply   # makes the changes
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env),
 // never the database file, so Directus validates and logs it like an edit in the admin panel.
-// Needs the `multicolor` and `transparent` fields on colours first (see the instructions).
+// Needs the `multicolor` and `transparent` fields on colours first (see the instructions), and `wood` / `neutral`
+// (migrate-schema-2.mjs; without them those two are skipped).
 //
 // - colours named like "przezroczysty", "transparent", "bezbarwny" get `transparent`
 // - colours named like "wielokolorowy", "multicolor" get `multicolor`
+// - colours named "drewno", "drewna", "wood" get `wood`; "neutralny", "naturalny", "natural" get `neutral`
 // - variants with the old `multicolored` flag get the multicolour colour as their first colour
 //   (their second colour is cleared, the list shows what they had)
 //
@@ -41,13 +43,16 @@ if (!fields.includes('multicolor') || !fields.includes('transparent')) {
   process.exit(1);
 }
 
-console.log(apply ? 'APPLYING\n' : 'DRY RUN (add --apply to make the changes)\n');
-
-const colors = await call('GET', '/items/colors?fields=id,name,color,multicolor,transparent&limit=-1');
 const flags = [
   ['transparent', /przezroczyst|transparent|bezbarwn/i],
   ['multicolor', /wielokolor|multi-?colou?r/i],
-];
+  ['wood', /^\s*(drewn[oa]|wood)\s*$/i],
+  ['neutral', /^\s*(neutraln|natural)\w*\s*$/i],
+].filter(([f]) => fields.includes(f));
+
+console.log(apply ? 'APPLYING\n' : 'DRY RUN (add --apply to make the changes)\n');
+
+const colors = await call('GET', `/items/colors?fields=${['id', 'name', 'color', ...flags.map(([f]) => f)]}&limit=-1`);
 for (const color of colors) {
   const data = Object.fromEntries(flags.filter(([f, re]) => re.test(color.name) && !color[f]).map(([f]) => [f, true]));
   if (!Object.keys(data).length) continue;

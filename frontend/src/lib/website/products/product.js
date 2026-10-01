@@ -55,6 +55,13 @@ const fields = [
   'gallery.enabled',
   'gallery.img',
 
+  'attachments.enabled',
+  'attachments.file.id',
+  'attachments.file.title',
+  'attachments.file.filename_download',
+  'attachments.file.type',
+  'attachments.file.filesize',
+
   'storage.enabled',
   'storage.amount',
   'storage.available',
@@ -64,10 +71,14 @@ const fields = [
   'storage.color_first.color',
   'storage.color_first.multicolor',
   'storage.color_first.transparent',
+  'storage.color_first.wood',
+  'storage.color_first.neutral',
   'storage.color_second.name',
   'storage.color_second.color',
   'storage.color_second.multicolor',
   'storage.color_second.transparent',
+  'storage.color_second.wood',
+  'storage.color_second.neutral',
 
   'storage.img.enabled',
   'storage.img.img',

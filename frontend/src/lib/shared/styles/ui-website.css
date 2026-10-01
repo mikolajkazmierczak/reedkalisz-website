@@ -79,7 +79,7 @@
 
   /* layout */
   /* every page's column */
-  --page: 97.5rem;
+  --page: 80rem; /* 1280px */
   --gutter: clamp(0.875rem, 0.4rem + 1.8vw, 2rem);
   /* how far a ground reaches past the column, its text staying in it (the catalogue's cells, the banners) */
   --bleed: clamp(0.625rem, 0.75 * var(--gutter), 1.5rem);

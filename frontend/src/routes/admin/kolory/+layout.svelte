@@ -63,7 +63,7 @@
 </script>
 
 {#if items}
-  <div class="wrapper">
+  <div class="wrapper ui-fill">
     <div class="actions ui-bar">
       <div class="start">
         <Button on:click={() => goto(`/admin/kolory/+`)} icon="add">Dodaj</Button>
@@ -95,6 +95,7 @@
         ],
       })}
       {searchParams}
+      scrollKey={[query, company]}
       {sort}
       {limit}
       {page} />
@@ -103,9 +104,6 @@
 <slot />
 
 <style>
-  .wrapper {
-    overflow-x: auto;
-  }
   .start {
     display: flex;
     align-items: center;

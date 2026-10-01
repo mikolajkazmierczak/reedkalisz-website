@@ -12,6 +12,7 @@
   --navy-500: #526a8e; /* a button's hover */
   --navy-700: #1b2f4e; /* buttons, the menu (the website's navy, ui-website.css) */
   --navy-900: #0e1b2f; /* a button pressed, the page you're on in the menu */
+  --navy-950: #08111e; /* the version under the name in the menu */
 
   --grey-50: #f5f7f8; /* a row under the pointer */
   --grey-100: #ebeef0; /* table heads, the tree's columns */
@@ -232,11 +233,38 @@ body {
   background-color: var(--black-10);
 }
 
-/* the top bars (the page's header, the editor's): the page shows through, blurred */
+/* the top bars (the page's header, the editor's): the page shows through, blurred - once it's scrolled under them
+   (--scrolled, 0 to 1, see scrolled.js), the ground and the line under them coming in with it */
 .ui-topbar {
-  background-color: rgb(235 238 240 / 50%); /* grey-100, see-through */
-  -webkit-backdrop-filter: blur(0.625rem);
-  backdrop-filter: blur(0.625rem);
+  --scrolled: 1;
+  border-bottom: solid 1px rgb(0 0 0 / calc(0.1 * var(--scrolled)));
+  background-color: rgb(235 238 240 / calc(50% * var(--scrolled))); /* grey-100, see-through */
+  -webkit-backdrop-filter: blur(calc(0.625rem * var(--scrolled)));
+  backdrop-filter: blur(calc(0.625rem * var(--scrolled)));
+}
+
+/* A list page: as tall as the window under the header, it doesn't scroll - its table does (a Grid scrolls when it has
+   to give way), what's above and under the table (the bar, the pagination) stays in view. Its parts in a column: the
+   pagination follows the table, and stays at the bottom once the table fills the page. (A phone: the page scrolls.) */
+.ui-fill {
+  height: calc(100dvh - var(--header-height) - 1.5rem); /* the page's padding under it (see the admin layout) */
+}
+/* a column inside it (.ui-fill-col) the same; only the table (a Grid's .table), what's marked to (.ui-fill-scroll) and
+   the columns holding them give way, the rest keeps its height */
+.ui-fill,
+.ui-fill-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.ui-fill > *,
+.ui-fill-col > * {
+  flex-shrink: 0;
+}
+.ui-fill > :is(.table, .ui-fill-col, .ui-fill-scroll),
+.ui-fill-col > :is(.table, .ui-fill-col, .ui-fill-scroll) {
+  flex-shrink: 1;
+  min-height: 0;
 }
 
 .ui-box {
@@ -383,4 +411,16 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(5.9375rem, 1fr));
     gap: 0.5rem;
   }
+}
+
+/* a product's picture before its name in a list (see Thumb), as far from it as a swatch */
+.ui-thumbed {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+.ui-thumbed > .float {
+  flex: 1;
+  min-width: 0;
 }

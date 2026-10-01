@@ -51,7 +51,7 @@
   $: parseData(data);
 
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    $unsaved = !dataParsingError && changed;
+    unsaved.set(!dataParsingError && changed);
   });
 </script>
 

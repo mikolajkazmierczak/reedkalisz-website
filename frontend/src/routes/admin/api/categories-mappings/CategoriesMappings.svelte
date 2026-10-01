@@ -73,6 +73,8 @@
 
   // the supplier's categories with a mapping, of their own or from above
   $: mapped = nodes.filter((n) => byPath.has(pathKey(n.path)) || inherited(n.path)).length;
+  // the products that get one of ours (not every one does: "ignoruj", categories not mapped yet)
+  $: productsMapped = (apiItems ?? []).filter((i) => resolveCategories(mappings, i._categories, index).length).length;
 
   // the mapping a category takes after: its own, or the closest one above it
   function inherited(path) {
@@ -151,7 +153,10 @@
 <Panel title="Mapowanie kategorii" {unsaved} on:save={save} on:cancel={cancel}>
   <svelte:fragment slot="summary">
     {#if nodes.length}
-      <small>Zmapowano <b>{mapped}</b> / {nodes.length}</small>
+      <small class="counts">
+        <span>Kategorie <b>{mapped}</b> / {nodes.length}</span>
+        <span>Produkty <b>{productsMapped}</b> / {apiItems?.length ?? 0}</span>
+      </small>
       <small class="muted">Kategorie, które nie występują w regułach, nie są usuwane przez skaner.</small>
     {/if}
   </svelte:fragment>
@@ -179,7 +184,7 @@
           <span class="tree">
             <span class="step">
               <Button
-                small
+                size="sm"
                 ghost
                 icon="hierarchy"
                 title={expanded.size ? 'Zwiń wszystko' : 'Rozwiń wszystko'}
@@ -187,7 +192,8 @@
             </span>
             Kategoria producenta
           </span>
-          <span class="count" class:unmapped={unmapped.size}>Produkty</span>
+          <!-- red until the first mapping: after it, the red counts in the rows say which -->
+          <span class="count" class:unmapped={unmapped.size && !mapped}>Produkty</span>
           <span />
           <span>Kategorie u nas</span>
         </svelte:fragment>
@@ -203,7 +209,7 @@
               {#if node.hasChildren && !q}
                 <span class="toggle" title={node.path.join(' › ')}>
                   <Button
-                    small
+                    size="sm"
                     ghost
                     start
                     width="100%"
@@ -247,7 +253,7 @@
                   on:unpick={(e) => remove(node.path, e.detail)}
                   on:close={() => (picking = null)} />
               {:else}
-                <Button small dashed icon="add" on:click={() => (picking = pathKey(node.path))}>kategoria</Button>
+                <Button size="sm" dashed icon="add" on:click={() => (picking = pathKey(node.path))}>kategoria</Button>
               {/if}
             </span>
           </div>
@@ -304,16 +310,16 @@
   .row .tree {
     min-height: var(--height);
   }
-  .toggle :global(button.small) {
+  .toggle :global(button.sm) {
     height: var(--height);
   }
-  .toggle :global(button.small .content.small) {
+  .toggle :global(button.sm .content.sm) {
     gap: var(--gap);
     padding-left: var(--pad-start);
     font-size: var(--font);
   }
   /* its size, not 58% of the button's height (Icon sets it inline, hence !important) */
-  .toggle :global(button.small .content.small > svg) {
+  .toggle :global(button.sm .content.sm > svg) {
     flex: none;
     width: var(--icon) !important;
     height: var(--icon) !important;
@@ -332,6 +338,16 @@
   }
   .row.mapped .name {
     font-weight: bold;
+  }
+  /* the two counts one over the other, the panel's dot before them in their middle */
+  .counts {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    vertical-align: top;
+  }
+  small.counts::before {
+    grid-row: 1 / span 2;
   }
   .count {
     font-size: 0.85rem;

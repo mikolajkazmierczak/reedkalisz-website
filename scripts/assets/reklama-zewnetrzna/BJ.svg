@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" fill="none">
+  <g stroke="#141821" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-opacity="0.3" d="M70 700H730" />
+    <path fill="#ffffff" d="M80 700V166a16 16 0 0 1 32 0V700" />
+    <path fill="#ffffff" d="M688 700V166a16 16 0 0 1 32 0V700" />
+    <path stroke-opacity="0.45" d="M188 220H112M80 207L112 217M80 223L112 233" />
+    <path stroke-opacity="0.45" d="M612 220H688M688 207L720 217M688 223L720 233" />
+    <path stroke-opacity="0.45" d="M188 340H112M80 327L112 337M80 343L112 353" />
+    <path stroke-opacity="0.45" d="M612 340H688M688 327L720 337M688 343L720 353" />
+    <path stroke-opacity="0.45" d="M188 460H112M80 447L112 457M80 463L112 473" />
+    <path stroke-opacity="0.45" d="M612 460H688M688 447L720 457M688 463L720 473" />
+    <rect x="170" y="190" width="460" height="300" rx="4" fill="#ffffff" />
+    <circle cx="200" cy="220" r="14" fill="#ffffff" />
+    <circle cx="200" cy="340" r="14" fill="#ffffff" />
+    <circle cx="200" cy="460" r="14" fill="#ffffff" />
+    <circle cx="400" cy="220" r="14" fill="#ffffff" />
+    <circle cx="400" cy="460" r="14" fill="#ffffff" />
+    <circle cx="600" cy="220" r="14" fill="#ffffff" />
+    <circle cx="600" cy="340" r="14" fill="#ffffff" />
+    <circle cx="600" cy="460" r="14" fill="#ffffff" />
+    <path stroke-opacity="0.45" d="M387.2 295H553.3M387.2 377.5H502.2" />
+    <circle cx="285" cy="340" r="51.1" fill="#bf0417" stroke="none" />
+  </g>
+</svg>

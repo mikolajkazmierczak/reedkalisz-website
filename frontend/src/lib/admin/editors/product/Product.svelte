@@ -18,7 +18,7 @@
   import Button from '@c/Button.svelte';
   import ProductPricing from './ProductPricing.svelte';
   import ProductStorage from './ProductStorage.svelte';
-  import ProductGallery from './ProductGallery.svelte';
+  import ProductFiles from './ProductFiles.svelte';
   import ApiBadge from '@c/ApiBadge.svelte';
   import {
     ancestorIds,
@@ -139,11 +139,18 @@
   $: company = $companies?.find((c) => c.id === item?.company);
   // what the API scanner overwrites (the product as saved, found in the company's last scan): locked, with a pill
   let scanned; // undefined while it loads
+  // looked up again only for another product (opened or saved) or another scan of the company: re-run for the same
+  // ones (Svelte sees every object as changed), it would go undefined and back on every update - and keep a product
+  // editor being left busy forever, so it never went away (the page froze)
+  let scannedFor = null;
   $: loadScanned(itemOriginal, company);
   async function loadScanned(product, company) {
+    const key = [company?.id, company?.api_snapshot, company?.api_last_scan].join('|');
+    if (scannedFor?.product === product && scannedFor.key === key) return;
+    const run = (scannedFor = { product, key });
     scanned = undefined;
     const found = await scannedProduct(product, company);
-    if (product === itemOriginal) scanned = found; // (not one saved or opened since)
+    if (scannedFor === run) scanned = found; // (not one saved, opened or scanned since)
   }
   $: scanner = scannerFields(item, company, scanned);
   $: categoriesSynced = scanner.categories && syncsCategories(company);
@@ -208,7 +215,9 @@
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    $unsaved = !errors.materials && correctSlug && item.company != null && changed;
+    // (set, not `$unsaved =`: that would make the store an input of this statement, and two editors open at once
+    // - the one being left and the next - would set it back and forth forever)
+    unsaved.set(!errors.materials && correctSlug && item.company != null && changed);
   });
 </script>
 
@@ -306,7 +315,7 @@
                     <ApiBadge text="Prowadzi do niej mapowanie kategorii. Skaner API ją dodaje i usuwa." />
                   {/if}
                   <Button
-                    small
+                    size="sm"
                     icon="delete"
                     on:click={() => removeCategory(i)}
                     disabled={isManaged(productCategory)}
@@ -416,8 +425,9 @@
     </section>
 
     <ProductPricing bind:product={item} productOriginal={itemOriginal} {scanner} bind:saleTooHigh />
-    <ProductGallery bind:gallery={item.gallery} {fileContext} />
+    <ProductFiles title="Galeria" main bind:items={item.gallery} {fileContext} />
     <ProductStorage bind:product={item} {fileContext} {scanner} />
+    <ProductFiles title="Załączniki" key="file" bind:items={item.attachments} {fileContext} />
   {/if}
 </Editor>
 

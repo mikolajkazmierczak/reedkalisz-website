@@ -43,20 +43,64 @@ export function placeCounts(apiItems) {
   return [...counts].map(([place, count]) => ({ place, count })).sort((a, b) => b.count - a.count);
 }
 
-// how many places each rule translates (the ones it wins): rule -> count
-export function countHits(rules, places) {
-  const hits = new Map();
+// a rule's translation as it's shown and compared (its spaces tidied)
+export const normal = (to) => to.replace(/\s+/g, ' ').trim();
+
+// the places each rule translates (the ones it wins): rule -> [place] - matched once, for the counts and the useless
+// rules alike (a page of rules does it on every keystroke)
+export function placeWins(rules, places) {
+  const wins = new Map();
   for (const { place } of places) {
     const rule = matchRule(rules, place);
-    if (rule) hits.set(rule, (hits.get(rule) ?? 0) + 1);
+    if (rule) (wins.get(rule) ?? wins.set(rule, []).get(rule)).push(place);
   }
-  return hits;
+  return wins;
+}
+
+// how many places each rule translates: rule -> count
+export const countHits = (wins) => new Map([...wins].map(([rule, won]) => [rule, won.length]));
+
+// The rules that change nothing: every place they translate would come out the same without them - left as the api
+// has it ("przód" -> "przód"), or translated the same by a shorter rule ("Lewy bok" -> "bok" next to "Bok" -> "bok":
+// "Bok" is a word of "Lewy bok" too). (A rule keeping a place as it is, so a shorter one doesn't change it, isn't one
+// of them; nor is a rule translating no place: it's counted as matching nothing.)
+// -> Map(rule -> what does the same instead: [the one rule], [] when the places would just stay as they are, or
+// null when that's several rules - or some rule and some places left as they are)
+export function uselessRules(rules, wins) {
+  const useless = new Map();
+  for (const [rule, won] of wins) {
+    const others = rules.filter((r) => r !== rule);
+    const same = (place) => !tied(others, place) && translatePlace(others, place) === normal(rule.to);
+    if (!won.every(same)) continue;
+    const instead = new Set(won.map((place) => matchRule(others, place)));
+    useless.set(rule, instead.size > 1 ? null : [...instead].filter(Boolean));
+  }
+  return useless;
+}
+
+// Whether the longest rules a place matches are several, translating it differently: which one wins then depends on
+// their order (and the order changes - the page sorts them by how much they translate). A rule settling that (a longer
+// one, for exactly that place) is needed, even when the rule winning now says the same.
+function tied(rules, place) {
+  let length = 0;
+  let results = new Set();
+  for (const rule of rules ?? []) {
+    const re = compileRule(rule);
+    if (!re || !rule.to?.trim() || !re.test(place)) continue;
+    const l = rule.pattern.trim().length;
+    if (l > length) {
+      length = l;
+      results = new Set();
+    }
+    if (l === length) results.add(normal(rule.to));
+  }
+  return results.size > 1;
 }
 
 export function translatePlace(mappings, place) {
   const text = (place ?? '').trim();
   const rule = matchRule(mappings, text);
-  return rule ? rule.to.replace(/\s+/g, ' ').trim() : text;
+  return rule ? normal(rule.to) : text;
 }
 
 // Places of the same labeling with the same field size are one labeling: "przód / tył".

@@ -51,7 +51,7 @@
     <small class="useless">Zbędna reguła: znakowanie zaimportuje się według kodu.</small>
   {/if}
 
-  <div class="c-remove"><Button small dangerous square icon="delete" on:click={remove} /></div>
+  <div class="c-remove"><Button size="sm" dangerous square icon="delete" on:click={remove} /></div>
   <div class="c-code" class:missing={apiCodes.length && codeMissing}>{mapping.code || '—'}</div>
   <div class="c-type"><Input size="small" type="select" label="Typ" bind:value={mapping.type} options={types} /></div>
 

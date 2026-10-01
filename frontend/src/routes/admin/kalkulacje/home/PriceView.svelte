@@ -126,7 +126,7 @@
     <div class="name"><Input size="small" placeholder="Nazwa..." bind:value={item.name} /></div>
     <!-- the default one is violet with a white star (the one new products get), the others can be made it -->
     <Button
-      small
+      size="sm"
       icon="star"
       dashed={!item.default}
       background={item.default ? 'var(--purple-700)' : null}
@@ -136,7 +136,7 @@
       disabled={item.id === '+'}
       on:click={() => !item.default && setDefault(item.id)} />
     {#if items.length > 1}
-      <Button small icon="delete" dangerous title="Usuń" on:click={removeStart} />
+      <Button size="sm" icon="delete" dangerous title="Usuń" on:click={removeStart} />
     {/if}
   </div>
   <Input
@@ -151,8 +151,8 @@
 
   {#if unsaved && correct}
     <div class="save-actions" transition:slide={{ duration: 200 }}>
-      <Button small icon="close" dangerous on:click={cancel}>Anuluj</Button>
-      <Button small icon="ok" on:click={save}>
+      <Button size="sm" icon="close" dangerous on:click={cancel}>Anuluj</Button>
+      <Button size="sm" icon="ok" on:click={save}>
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
     </div>

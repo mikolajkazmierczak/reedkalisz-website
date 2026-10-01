@@ -3,7 +3,9 @@
   import heimdall from '$/heimdall';
   import { ask } from '@/dialog';
   import { removeUnusedFiles, usedFiles } from '@/files';
-  import { colors } from '@/globals';
+  import globals, { colors, labelings, categories } from '@/globals';
+  import { categoryIndex } from '@/categories';
+  import { itemHealth } from './health.js';
   import { selected, toggleItemSelected, toggleStorageSelected } from './selected.js';
   import { getFlag, parseColors } from './utils.js';
 
@@ -14,11 +16,16 @@
   import HeadIcon from '@c/table/HeadIcon.svelte';
   import SortButton from '@c/table/SortButton.svelte';
   import Grid from '@c/table/Grid.svelte';
+  import { productCodeWidth } from '@c/table/utils';
+  import Tooltip from '$c/Tooltip.svelte';
+  import Thumb from '@c/Thumb.svelte';
+  import { productThumb, scanThumb } from '@/thumb';
 
   export let items;
   export let company;
-  export let total = items.length; // of the whole list, so the number column fits its longest number
+  export let apiItems = null; // the whole scan: whether the supplier has categories at all
   export let sort; // { by: 'name' | 'code', desc, ... } (see items.js), set by the head's buttons
+  export let scrollKey = null; // the page, search, company: another one scrolls the list back up (see Grid)
 
   // as a Table's: up, down, then back to by name
   function sortBy(by) {
@@ -26,6 +33,22 @@
     else if (!sort.desc) sort = { ...sort, desc: true };
     else sort = { ...sort, by: 'name', desc: false };
   }
+
+  // what a product will be missing (the "Stan" column, see health.js): once per list, not per row update, and only
+  // once our labelings and categories are there (without them every product would look like missing everything)
+  globals.update(labelings);
+  globals.update(categories);
+  $: index = categoryIndex($categories);
+  $: withCategories = (apiItems ?? []).some((i) => i._categories?.length);
+  $: health =
+    $labelings && $categories
+      ? new Map(
+          items.map((item) => [
+            item,
+            itemHealth(company, item._scan, { labelings: $labelings, index, withCategories }),
+          ]),
+        )
+      : new Map();
 
   let expanded = new Set();
   $: flags = (() => {
@@ -157,19 +180,19 @@
   }
 </script>
 
-<!-- the number column fits 5 digits, more if a supplier ever has that many products (rem, not ch: the head's text is
-     smaller than the rows', ch would make the columns differ) -->
+<!-- the number's 2rem fits 4 digits: no supplier has 10,000 products -->
 <Grid
-  columns="1.5rem 8.5rem {Math.max(5, String(total).length) *
-    0.5}rem 1.5rem 2.75rem 1.5rem 1.5rem 7rem minmax(18rem, 1fr)">
+  columns="1.5rem 8.5rem 2rem 1.5rem 2.75rem 1.5rem 1.5rem 1.5rem {productCodeWidth} minmax(18rem, 1fr)"
+  scrollKey={[scrollKey, sort]}>
   <svelte:fragment slot="head">
     <HeadIcon icon="delete" label="Usuwanie" />
     <span>Status</span>
     <span class="index head-index"><HeadIcon icon="number_symbol" label="Numer na liście" /></span>
-    <HeadIcon icon="cloud" label="Dostępność u producenta (otwiera jego wyszukiwarkę)" />
-    <HeadIcon icon="hierarchy" label="Kolory" />
-    <HeadIcon icon="add" label="Dodawanie / zaimportowany produkt" />
+    <HeadIcon icon="cloud" label={'Dostępność u producenta.\nKliknięcie otwiera jego wyszukiwarkę.'} />
+    <HeadIcon icon="hierarchy" label="Warianty" />
+    <HeadIcon icon="add" label="Importuj / Otwórz zaimportowany" />
     <HeadIcon icon="eye" label="Widoczność" />
+    <HeadIcon icon="heart_pulse" label="Stan" />
     {#each [{ by: 'code', label: 'Kod' }, { by: 'name', label: 'Nazwa' }] as { by, label }}
       <span class="sortable">
         <span>{label}</span>
@@ -188,7 +211,7 @@
     <div class="row" class:selected={itemSelected}>
       <span>
         {#if item._db}
-          <Button small dangerous icon="delete" title="Usuń produkt" on:click={() => removeItem(item)} />
+          <Button size="sm" dangerous icon="delete" title="Usuń produkt" on:click={() => removeItem(item)} />
         {/if}
       </span>
       <span>
@@ -206,14 +229,14 @@
       </span>
       <span class="index">{item._index + 1}</span>
       <Button
-        small
+        size="sm"
         icon={itemNotInApi ? 'cloud_off' : 'cloud'}
         tone={itemNotInApi ? 'danger' : itemNotAllInApi ? 'warning' : 'success'}
         title={itemNotInApi ? 'Wycofany' : itemNotAllInApi ? 'Wycofane kolory' : 'Dostępny'}
         on:click={() => openApi(item.code, item.name)} />
       <span class="expand">
         {#if item.storage.length}
-          <Button small dashed width="100%" on:click={() => toggleExpanded(item._uid)}>
+          <Button size="sm" dashed width="100%" on:click={() => toggleExpanded(item._uid)}>
             {itemExpanded ? '−' : `+${item.storage.length}`}
           </Button>
         {/if}
@@ -221,7 +244,7 @@
       <span>
         {#if item._db}
           <Button
-            small
+            size="sm"
             tone="info"
             icon="cube"
             title="Otwórz zaimportowany produkt"
@@ -230,7 +253,7 @@
           {@const all = item.storage.every((s) => $selected.has(s._uid))}
           {@const some = item.storage.some((s) => $selected.has(s._uid))}
           <Button
-            small
+            size="sm"
             dashed={!some}
             icon={all ? 'checkmark' : some ? 'subtract' : 'add'}
             title="Zaznacz do dodania"
@@ -240,7 +263,7 @@
       <span>
         {#if item._db}
           <Button
-            small
+            size="sm"
             tone={item.enabled ? 'info' : null}
             ghost={!item.enabled}
             icon={item.enabled ? 'eye' : 'eye_off'}
@@ -248,8 +271,25 @@
             on:click={() => toggleVisible(item)} />
         {/if}
       </span>
+      <span class="state">
+        {#if health.get(item)}
+          {@const { level, notes } = health.get(item)}
+          <span class="warning">
+            <Icon fill name="warning" color={level === 'red' ? 'var(--red-500)' : 'var(--orange-500)'} />
+            <Tooltip
+              >{#each notes as note, i}{#if i}<br />{/if}<small>{note}</small>{/each}</Tooltip>
+          </span>
+        {/if}
+      </span>
       <span class="code"><Float title={item.code}>{item.code}</Float></span>
-      <span class="name" class:hidden={item._db && !item.enabled}>
+      <!-- its picture before its name: ours when imported, else the supplier's (straight from them, as in its scan) -->
+      <span class="name ui-thumbed" class:hidden={item._db && !item.enabled}>
+        <Thumb
+          file={item._db ? productThumb(item) : null}
+          src={item._db ? null : scanThumb(item._scan)}
+          size="1.5rem"
+          zoom
+          blank />
         <Float>
           {item.name}
           {#if !itemCompatible}
@@ -266,13 +306,18 @@
         <div class="row variant" class:selected={storageSelected}>
           <span>
             {#if storage._db}
-              <Button small dangerous icon="delete" title="Usuń kolor" on:click={() => removeStorage(item, storage)} />
+              <Button
+                size="sm"
+                dangerous
+                icon="delete"
+                title="Usuń kolor"
+                on:click={() => removeStorage(item, storage)} />
             {/if}
           </span>
           <span />
           <span class="index">{storage._index + 1}</span>
           <Button
-            small
+            size="sm"
             icon={storage._api ? 'cloud' : 'cloud_off'}
             tone={storage._api ? 'success' : 'danger'}
             title={storage._api ? 'Dostępny' : 'Wycofany'}
@@ -281,14 +326,14 @@
           <span>
             {#if storage._db}
               <Button
-                small
+                size="sm"
                 tone="info"
                 icon="cube"
                 title="Otwórz zaimportowany produkt"
                 on:click={() => openProduct(item)} />
             {:else if storageCompatible}
               <Button
-                small
+                size="sm"
                 dashed={!storageSelected}
                 icon={storageSelected ? 'checkmark' : 'add'}
                 title="Zaznacz do dodania"
@@ -298,7 +343,7 @@
           <span>
             {#if storage._db}
               <Button
-                small
+                size="sm"
                 tone={storage.enabled ? 'info' : null}
                 ghost={!storage.enabled}
                 icon={storage.enabled ? 'eye' : 'eye_off'}
@@ -306,6 +351,7 @@
                 on:click={() => toggleStorageVisible(item, storage)} />
             {/if}
           </span>
+          <span />
           <span class="code"><Float title={storage.api_color_code}>{storage.api_color_code}</Float></span>
           <span class="name" class:hidden={storage._db && !storage.enabled}>
             <Float>
@@ -339,6 +385,17 @@
   .head-index {
     display: flex;
     justify-content: flex-end;
+  }
+  /* a warning, as big as a small button's icon, in the middle of the column */
+  .state {
+    display: flex;
+    justify-content: center;
+  }
+  .warning {
+    cursor: help;
+    display: flex;
+    width: 1.1rem;
+    height: 1.1rem;
   }
   .variant .index {
     opacity: 0.65;

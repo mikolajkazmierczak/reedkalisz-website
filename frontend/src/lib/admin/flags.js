@@ -6,6 +6,6 @@ export const productFlags = [
   { key: 'bestseller', label: 'Bestseller', icon: 'medal' },
   { key: 'coming_soon', label: 'Już wkrótce', icon: 'clock' },
   { key: 'out_of_stock', label: 'Koniec nakładu', icon: 'flag_checkered' },
-  { key: 'show_price', label: 'Cennik', icon: 'shopping_bag' },
+  { key: 'show_price', label: 'Cennik', icon: 'money' },
   { key: 'sale', label: 'Promocja', icon: 'text_percent' },
 ];

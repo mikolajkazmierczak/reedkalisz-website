@@ -31,7 +31,7 @@
   read();
 
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    $unsaved = changed;
+    unsaved.set(changed);
   });
 </script>
 
@@ -57,6 +57,8 @@
                 <Input bind:value={item.color}>Kolor <small>HEX</small></Input>
                 <Input type="checkbox" bind:value={item.multicolor}>Wielokolorowy</Input>
                 <Input type="checkbox" bind:value={item.transparent}>Przezroczysty</Input>
+                <Input type="checkbox" bind:value={item.wood}>Drewno</Input>
+                <Input type="checkbox" bind:value={item.neutral}>Neutralny</Input>
               </div>
               <div class="column">
                 <Input type="color" bind:value={item.color}>Wybierz</Input>

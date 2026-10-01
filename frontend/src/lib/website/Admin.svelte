@@ -76,18 +76,18 @@
     <div class="strip" transition:slide={{ duration: 200 }}>
       {#if edit?.url}
         <a href={edit.url} rel="noreferrer" target="_blank">
-          <HoverCircle color="var(--main-2)" />
+          <HoverCircle color="var(--red-deep)" />
           <Tooltip>{edit.label}</Tooltip>
           <div class="content">
-            <Icon name={edit.icon} width={iconSize} />
+            <Icon name={edit.icon} width={iconSize} color="#fff" />
           </div>
         </a>
       {:else if $editing !== undefined}
         <button on:click={handleToggle}>
-          <HoverCircle color="var(--main-2)" />
+          <HoverCircle color="var(--red-deep)" />
           <Tooltip>{$editing ? ($modified ? 'Zapisz' : 'Anuluj') : edit.label}</Tooltip>
           <div class="content">
-            <Icon name={$editing ? ($modified ? 'save' : 'edit') : edit.icon} width={iconSize} />
+            <Icon name={$editing ? ($modified ? 'save' : 'edit') : edit.icon} width={iconSize} color="#fff" />
           </div>
         </button>
       {/if}
@@ -95,10 +95,10 @@
   {/if}
   <div class="strip" transition:slide={{ duration: 200 }}>
     <a href="/admin" rel="noreferrer" target="_blank">
-      <HoverCircle color="var(--main-2)" />
+      <HoverCircle color="var(--red-deep)" />
       <Tooltip>Panel admina</Tooltip>
       <div class="content">
-        <Icon name="slide_settings" width={iconSize} />
+        <Icon name="content_settings" width={iconSize} color="#fff" />
       </div>
     </a>
     <div class="avatar">
@@ -127,7 +127,7 @@
     gap: var(--padding);
     border-radius: var(--r-pill);
     padding: var(--padding);
-    background-color: var(--main-1);
+    background-color: var(--red); /* the admin's, over the website: red, its icons white */
   }
   .strip > * {
     overflow: hidden;
@@ -142,7 +142,7 @@
     padding: 0;
     width: 2.5rem;
     aspect-ratio: 1 / 1;
-    background-color: var(--main-1);
+    background-color: var(--red);
   }
 
   .content {

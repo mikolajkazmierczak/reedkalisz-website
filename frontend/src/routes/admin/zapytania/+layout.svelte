@@ -37,7 +37,7 @@
 </script>
 
 {#if items}
-  <div class="wrapper">
+  <div class="wrapper ui-fill">
     <div class="actions ui-bar">
       <Button on:click={() => goto(`/admin/zapytania/+`)} icon="add">Dodaj</Button>
       <Search {searchParams} {query} />
@@ -60,8 +60,8 @@
         href: `/admin/zapytania/${$.id}`,
         warn: !$.read, // unread: an orange row
         values: [
-          $.from_contact,
-          $.from_product,
+          !$.product && !$.user_created, // sent from the website, about no product (or one deleted since)
+          !!$.product,
           $.name ?? '',
           $.email,
           $.phone ?? '',
@@ -70,6 +70,7 @@
         ],
       })}
       {searchParams}
+      scrollKey={[query]}
       {sort}
       {defaultSort}
       {limit}
@@ -77,9 +78,3 @@
   </div>
 {/if}
 <slot />
-
-<style>
-  .wrapper {
-    overflow-x: auto;
-  }
-</style>

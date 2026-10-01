@@ -15,7 +15,7 @@
   export let icon = null;
   export let active = false;
   export let dangerous = false; // red outline and icon: the only colour the bars have
-  export let warn = false; // something to look at there: a thin orange ring inside its outline
+  export let warn = false; // something to look at there: an orange ring around its outline
   export let square = false; // just the icon
   export let disabled = false;
   export let hoverColor = null;
@@ -95,10 +95,10 @@
     cursor: default;
     pointer-events: none;
   }
-  /* inside the border, which stays as it is, a little gap between them (the border 2px, the gap 1.5px) */
+  /* right around the border, as thick */
   .warn {
-    outline: solid 1.5px var(--orange-500);
-    outline-offset: -5px;
+    outline: solid 2px var(--orange-500);
+    outline-offset: 0;
   }
   .dangerous {
     border-color: var(--red-500);

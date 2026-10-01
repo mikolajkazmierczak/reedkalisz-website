@@ -2,8 +2,8 @@
   import { tick } from 'svelte';
   import api from '$/api';
 
-  /** The product asked about, prefixed onto the message; without one it is a contact-page inquiry. */
-  export let code = null;
+  /** The product asked about (its id), linked to the question; without one it is a contact-page inquiry. */
+  export let product = null;
 
   let email = '';
   let phone = '';
@@ -18,7 +18,7 @@
 
   /** Last sent payload; resending unchanged content is blocked. */
   let sentSignature = null;
-  $: signature = JSON.stringify({ email, phone, name, content: content.trim(), code });
+  $: signature = JSON.stringify({ email, phone, name, content: content.trim(), product });
   $: alreadySent = sentSignature !== null && sentSignature === signature;
   $: blocked = !consent || sending || alreadySent;
 
@@ -39,15 +39,7 @@
     const payload = signature;
     try {
       sending = true;
-      const prefix = code ? `# Kod: ${code}\n\n` : '';
-      await api.items('questions').createOne({
-        email,
-        phone,
-        name,
-        content: prefix + content.trim(),
-        from_product: !!code,
-        from_contact: !code,
-      });
+      await api.items('questions').createOne({ email, phone, name, content: content.trim(), product });
       sentSignature = payload;
     } catch (e) {
       errors = { form: `Nie udało się wysłać wiadomości: ${e.message}` };

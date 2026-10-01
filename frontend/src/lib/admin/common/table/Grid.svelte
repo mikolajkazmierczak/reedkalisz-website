@@ -6,9 +6,21 @@
   export let columns;
   export let empty = null;
   export let indentFirst = false; // the first column is text: set in from the edge like the empty text, not a cell's pad
+  // what's asked of the list (its page, sort, search, filters): another one scrolls it back to the top - not the rows
+  // themselves, which change with every refresh (heimdall), where it stays
+  export let scrollKey = null;
+
+  let table;
+  let lastKey;
+  $: resetScroll(scrollKey);
+  function resetScroll(key) {
+    const k = JSON.stringify(key);
+    if (lastKey !== undefined && k !== lastKey && table) table.scrollTop = 0;
+    lastKey = k;
+  }
 </script>
 
-<div class="table" class:indent-first={indentFirst} style:--columns={columns}>
+<div class="table" class:indent-first={indentFirst} style:--columns={columns} bind:this={table}>
   <!-- as wide as the table, wider only when the columns' minimums don't fit: the grey head goes on while scrolling -->
   <div class="grid">
     <div class="head" role="presentation" on:dragenter><slot name="head" /></div>
@@ -25,7 +37,7 @@
     --cell-pad: 0.5rem;
     --col-gap: calc(2 * var(--row-pad)); /* as far apart side by side as one above the other */
     --row-border: solid 1px var(--black-6);
-    overflow-x: auto;
+    overflow: auto; /* sideways when the columns don't fit, down when the page gives it less than its rows (.ui-fill) */
     border-radius: var(--box-radius);
     corner-shape: squircle;
     border: var(--border-light);
@@ -52,7 +64,11 @@
   .indent-first :global(.row) {
     padding-left: 0.75rem;
   }
+  /* stays at the top of a table that scrolls (see .ui-fill), over the rows (and a floating cell, see Float) */
   .head {
+    z-index: 3;
+    position: sticky;
+    top: 0;
     padding-top: 0.4rem;
     padding-bottom: 0.4rem;
     border-bottom: var(--border-light);

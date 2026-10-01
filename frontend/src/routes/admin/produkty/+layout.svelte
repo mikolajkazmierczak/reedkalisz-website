@@ -7,14 +7,19 @@
   import { searchparams, SearchParams } from '$/searchparams';
   import { makeTree, treeGetAllChildrenIDs } from '%/utils';
 
-  import globals, { categories, companies } from '@/globals';
+  import globals, { categories, companies, colors } from '@/globals';
+  import { swatch, COLOR_KINDS } from '$/colors';
+  import { companyIcon } from '@c/CompanyIcon.svelte';
+  import { thumbDeep, thumbFields, productThumb } from '@/thumb';
   import { search as fields } from '%/fields/products';
   import { productFlags } from '@/flags';
   import Button from '@c/Button.svelte';
   import Tooltip from '$c/Tooltip.svelte';
   import FlagFilter from '@c/FlagFilter.svelte';
-  import CompanySelect from '@c/CompanySelect.svelte';
+  import { companyOptions } from '@c/CompanySelect.svelte';
+  import FilterSelect, { NONE } from '@c/FilterSelect.svelte';
   import Table from '@c/table/Table.svelte';
+  import { productCodeWidth } from '@c/table/utils';
   import Search from '@c/Search.svelte';
   import Categories from './Categories.svelte';
 
@@ -35,14 +40,37 @@
     setTimeout(() => searchParams.set({ p: 1 }));
   }
 
-  // The producer the list is narrowed to ('' for all), like the flags only while the list is open. A product added
-  // meanwhile gets it too.
-  let company = '';
+  // The producers and colours the list is narrowed to (none: all of them; NONE: the products without any), like the
+  // flags only while the list is open. A product added meanwhile gets the producer, when there's just one.
+  let producers = [];
+  let colorIds = [];
   globals.update(companies);
-  let lastCompany = '';
-  $: if (company !== lastCompany) {
-    lastCompany = company;
+  globals.update(colors);
+  let lastChoices = '|'; // (as it is at first: a link's page stays)
+  $: if ([producers, colorIds].join('|') !== lastChoices) {
+    lastChoices = [producers, colorIds].join('|');
     setTimeout(() => searchParams.set({ p: 1 }));
+  }
+  $: company = producers.length === 1 && producers[0] !== NONE ? producers[0] : null;
+  // the colours of the producers chosen (and the ones chosen already), each with its producer and what it is:
+  // "<favicon> PAR · #ff0000" ("wielokolorowy", ...; without a colour yet, the crossed-out swatch)
+  $: colorOptions = colorChoices($colors, $companies, producers, colorIds);
+  const colorValue = (c) => [COLOR_KINDS.find(([key]) => c[key])?.[1], c.color].filter(Boolean).join(' ');
+  function colorChoices(list, companiesList, producers, chosen) {
+    const narrowed = producers.filter((p) => p !== NONE);
+    return (list ?? [])
+      .filter((c) => !narrowed.length || narrowed.includes(c.company) || chosen.includes(c.id))
+      .map((c) => {
+        const company = companiesList?.find((co) => co.id === c.company);
+        return {
+          id: c.id,
+          text: c.name,
+          swatch: swatch(c, null) ?? true,
+          note: [company?.name, colorValue(c)].filter(Boolean).join(' · ') || null,
+          noteImage: companyIcon(company),
+        };
+      })
+      .sort((a, b) => a.text.localeCompare(b.text, 'pl') || (a.note ?? '').localeCompare(b.note ?? '', 'pl'));
   }
   // what a product added now gets from the list's choices (not the flags)
   $: addHint = [
@@ -65,7 +93,7 @@
   let products;
   let lastRead = 0; // several reads can be in flight (every change of the url starts one): only the newest counts
 
-  async function read(limit, page, query, category, flags, company, sort) {
+  async function read(limit, page, query, category, flags, producers, colorIds, sort) {
     const readId = ++lastRead;
     if (category !== null && category !== -1 && !$categories.find((c) => c.id == category)) {
       // TODO: doesn't work after deleting a category you're in
@@ -93,10 +121,33 @@
             ],
           }
         : {};
+    // any of the producers chosen (or none)
+    const byProducer = () => {
+      if (!producers.length) return {};
+      const ids = producers.filter((p) => p !== NONE);
+      const or = [
+        ...(ids.length ? [{ company: { _in: ids.join(',') } }] : []),
+        ...(producers.includes(NONE) ? [{ company: { _null: true } }] : []),
+      ];
+      return { _or: or };
+    };
+    // a variant in any of the colours chosen (or no variant with a colour)
+    const byColor = () => {
+      if (!colorIds.length) return {};
+      const ids = colorIds.filter((c) => c !== NONE).join(',');
+      const or = [
+        ...(ids ? [{ storage: { color_first: { _in: ids } } }, { storage: { color_second: { _in: ids } } }] : []),
+        ...(colorIds.includes(NONE)
+          ? [{ storage: { _none: { _or: [{ color_first: { _nnull: true } }, { color_second: { _nnull: true } }] } } }]
+          : []),
+      ];
+      return { _or: or };
+    };
     const parts = [
       inCategory(),
       searching(),
-      company ? { company: { _eq: company } } : {},
+      byProducer(),
+      byColor(),
       // (without: false or never set)
       ...flags.map(([key, on]) =>
         on ? { [key]: { _eq: true } } : { _or: [{ [key]: { _eq: false } }, { [key]: { _null: true } }] },
@@ -104,7 +155,8 @@
     ].filter((f) => Object.keys(f).length);
     const filter = parts.length ? { _and: parts } : {};
     const options = {
-      fields,
+      fields: [...fields, ...thumbFields],
+      deep: thumbDeep,
       ...(sort && { sort: [sort] }),
       filter,
       limit,
@@ -115,18 +167,18 @@
     if (readId === lastRead) products = result;
   }
 
-  $: $categories && read(limit, page, query, category, activeFlags, company, sort);
+  $: $categories && read(limit, page, query, category, activeFlags, producers, colorIds, sort);
 
   heimdall.listen(({ match }) => {
-    if (match('products')) read(limit, page, query, category, activeFlags, company, sort);
+    if (match('products')) read(limit, page, query, category, activeFlags, producers, colorIds, sort);
   });
 </script>
 
-<div class="wrapper">
+<div class="wrapper ui-fill">
   <Categories {searchParams} {category} />
 
   {#if products}
-    <div class="items">
+    <div class="items ui-fill-col">
       <div class="actions ui-bar">
         <div>
           <span class="add">
@@ -134,7 +186,13 @@
               >Dodaj</Button>
             {#if addHint}<Tooltip><small>Nowy produkt {addHint}</small></Tooltip>{/if}
           </span>
-          <CompanySelect bind:value={company} />
+          <FilterSelect
+            label="Producent"
+            all="Wszyscy"
+            none="Brak"
+            bind:value={producers}
+            options={companyOptions($companies)} />
+          <FilterSelect label="Kolor" none="Brak" bind:value={colorIds} options={colorOptions} />
         </div>
         <div class="flags">
           {#each productFlags as { key, label } (key)}
@@ -150,8 +208,8 @@
         items={products.data}
         head={[
           ...productFlags.map(({ icon, label }) => ({ checkbox: true, icon, label })),
-          { label: 'Kod', sort: 'code', width: 'minmax(6rem, 0.8fr)', float: true },
-          { label: 'Nazwa', sort: 'name', float: true },
+          { label: 'Kod', sort: 'code', width: productCodeWidth, float: true },
+          { label: 'Nazwa', sort: 'name', float: true, thumb: true },
           { blame: true, label: 'Utworzenie', sort: 'date_created', float: true },
           { blame: true, label: 'Aktualizacja', sort: 'date_updated', float: true },
         ]}
@@ -160,12 +218,13 @@
           values: [
             ...productFlags.map(({ key }) => $[key]),
             $.code,
-            $.name,
+            { thumb: productThumb($), text: $.name },
             { user: $.user_created, datetime: $.date_created },
             { user: $.user_updated, datetime: $.date_updated },
           ],
         })}
         {searchParams}
+        scrollKey={[query, category, activeFlags, producers, colorIds]}
         {sort}
         {limit}
         {page} />
@@ -176,21 +235,21 @@
 <slot />
 
 <style>
+  /* the categories beside the products, both as tall as the page at most (see .ui-fill) */
   .wrapper {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: 1rem;
   }
 
-  .items {
-    overflow-x: auto;
-  }
   .actions > div {
     display: flex;
     gap: 0.5rem;
   }
+  /* on a line of their own when there isn't room for them beside the rest */
   .actions > .flags {
-    flex: 1;
+    flex: 1 1 22rem;
     flex-wrap: wrap;
     gap: 0.25rem 1rem;
   }
@@ -198,6 +257,7 @@
   @media (max-width: 50rem) {
     .wrapper {
       grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto;
     }
     .actions > div {
       flex-wrap: wrap;

@@ -47,7 +47,7 @@
 </script>
 
 {#if items}
-  <div class="wrapper">
+  <div class="wrapper ui-fill">
     <div class="actions ui-bar">
       <Button on:click={() => goto(`/admin/paragrafy/+`)} icon="add">Dodaj</Button>
       <Search {searchParams} {query} />
@@ -71,15 +71,10 @@
         ],
       })}
       {searchParams}
+      scrollKey={[query]}
       {sort}
       {limit}
       {page} />
   </div>
 {/if}
 <slot />
-
-<style>
-  .wrapper {
-    overflow-x: auto;
-  }
-</style>

@@ -77,8 +77,13 @@
       list = value === null ? '' : value.join(';');
       valueCopy = deep.copy(value);
     } else {
+      // typed: the parsed list - only when it says something else (a new array every time would go back and forth
+      // with a bound value forever: the parent hands it back, it's "changed", it's parsed again...)
       const array = parseList(list);
-      if (array) value = array;
+      if (array && !deep.same(array, value)) {
+        value = array;
+        valueCopy = deep.copy(array);
+      }
     }
   }
 

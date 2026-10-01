@@ -10,7 +10,9 @@
   import BarButton from '@c/BarButton.svelte';
   import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
-  import Picker from '@c/library/Picker.svelte';
+  import Thumb from '@c/Thumb.svelte';
+  import Button from '@c/Button.svelte';
+  import { thumbDeep, thumbFields, productThumb } from '@/thumb';
 
   export let id;
 
@@ -20,7 +22,6 @@
   async function read() {
     if (id == '+') {
       item = defaults();
-      item.spam_chance = 0; // admin user is creating this so...
     } else {
       const question = await api.items('questions').readOne(id, { fields });
       // opened: marked read (the menu stops asking for it) before it's shown
@@ -36,6 +37,22 @@
 
   read();
 
+  // the product it's about (a question keeps only its id: saving it doesn't touch the product); undefined while it
+  // loads, null when it can't be read (a deleted product leaves no id behind: the link is cleared with it)
+  let product;
+  $: readProduct(item?.product);
+  async function readProduct(id) {
+    if (!id) return (product = null);
+    if (product?.id === id) return;
+    product = undefined;
+    const fields = ['id', 'name', 'code', 'slug', ...thumbFields];
+    const found = await api
+      .items('products')
+      .readOne(id, { fields, deep: thumbDeep })
+      .catch(() => null);
+    if (item?.product === id) product = found;
+  }
+
   // back to the list, unread, to come back to
   let marking = false;
   async function unread() {
@@ -50,7 +67,7 @@
   }
 
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    $unsaved = changed;
+    unsaved.set(changed);
   });
 </script>
 
@@ -76,7 +93,7 @@
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
-        <div class="ui-section__col">
+        <div class="ui-section__col" style:grid-column={'1 / span 2'}>
           <div class="ui-box">
             <Input bind:value={item.name}>Imię i nazwisko</Input>
             <Input bind:value={item.email}>Email</Input>
@@ -87,20 +104,68 @@
 
         <div class="ui-section__col">
           <div class="ui-box ui-box--uneditable">
-            {#if item.from_contact || item.from_product}
-              <h2>Zapytanie z formularza ({item.from_contact ? 'Kontakt' : 'Produkt'})</h2>
-              Szansa na spam:<span style:color={item.spam_chance > 80 ? 'var(--red-500)' : 'var(--text)'}>
-                {item.spam_chance}%
-              </span>
-            {/if}
+            <h2>Zapytanie</h2>
             <Blames {item} />
+            {#if item.product}
+              <h3 class="ui-h3">Produkt</h3>
+              {#if product}
+                <!-- the product asked about: opens it in a new tab (the question stays open here) -->
+                <Button
+                  size="lg"
+                  dashed
+                  start
+                  width="100%"
+                  title="Otwórz produkt"
+                  on:click={() => window.open(`/admin/produkty/${product.slug}`, '_blank', 'noopener')}>
+                  <span class="product">
+                    <Thumb file={productThumb(product)} size="2.5rem" />
+                    <span class="product__text">
+                      <span class="product__name">{product.name}</span>
+                      <span class="product__code">{product.code}</span>
+                    </span>
+                  </span>
+                </Button>
+              {:else if product === null}
+                <p class="gone">Nie udało się wczytać produktu #{item.product}.</p>
+              {/if}
+            {/if}
           </div>
-        </div>
-
-        <div class="ui-section__col">
-          <Picker bind:selected={item.file} backing="var(--grey-100)" />
         </div>
       </div>
     </section>
   {/if}
 </Editor>
+
+<style>
+  /* the product's thumbnail beside its name over its code (in a big dashed button) */
+  .product {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    text-align: left;
+  }
+  .product__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+  }
+  .product .product__name,
+  .product .product__code {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .product .product__name {
+    font-weight: 700;
+  }
+  .product .product__code {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+  }
+  .gone {
+    margin: 0;
+    color: var(--grey-500);
+  }
+</style>

@@ -1,5 +1,6 @@
 <script>
   import { fly } from 'svelte/transition';
+  import { scrolled } from '@/scrolled';
   import { header } from '@/stores';
   import Icon from '$c/Icon.svelte';
   import BarButton from '@c/BarButton.svelte';
@@ -11,7 +12,7 @@
   $: buttons = $header?.buttons ?? []; // on the right: [{ label, onClick }]
 </script>
 
-<header class="ui-topbar">
+<header class="ui-topbar" use:scrolled>
   <div class="text">
     {#key icon}
       <div class="icon" in:fly={{ y: 50, duration: 350 }}>
@@ -59,13 +60,15 @@
     display: flex;
     padding: var(--gap) 1.5rem var(--gap) calc(var(--nav-width) + 0.75rem);
     height: var(--header-height); /* see ui-admin.css */
-    border-bottom: var(--border-light);
   }
 
+  /* the icon's drawing starts where the first box's content does (the page's padding, the box's border and its
+     0.5rem padding - a bar's first button, the categories' "Wszystkie"): the icons are drawn 2 of their 20 units in,
+     0.1 of the icon (2.1rem) */
   .text {
     display: flex;
     gap: 1rem;
-    margin-left: 1rem;
+    margin-left: calc(0.75rem + 1px + 0.5rem - 0.21rem);
   }
   /* as tall as the title's line, and a little lower: the line leaves room under the letters (for "y"), so its middle is
      above the middle of the capitals, which the eye lines the icon up with */

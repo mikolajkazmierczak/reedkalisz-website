@@ -1,0 +1,1778 @@
+{
+  "places": [
+    {
+      "pattern": "body",
+      "to": "korpus"
+    },
+    {
+      "pattern": "długopis/pióro",
+      "to": "długopis lub pióro"
+    },
+    {
+      "pattern": "front",
+      "to": "przód"
+    },
+    {
+      "pattern": "klips",
+      "to": "klip"
+    },
+    {
+      "pattern": "okładka przód",
+      "to": "okładka - przód"
+    }
+  ],
+  "categories": [
+    {
+      "path": [
+        "Nowości"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Akcesoria"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Apaszki i szale"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Breloki"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Portfele i portmonetki"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Teczki i notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Torby i torebki"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Zegarki i biżuteria"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CACHAREL",
+        "Zestawy upominkowe"
+      ],
+      "categories": [
+        164
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Akcesoria"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Breloki"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Długopisy"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Elektronika"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Parasole"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Pióra"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Pióra kulkowe"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Pióra wieczne"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Teczki i notesy"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Walizki i torby"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "CERRUTI 1881",
+        "Zestawy upominkowe"
+      ],
+      "categories": [
+        164
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Dopper"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA"
+      ],
+      "categories": [
+        164
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Akcesoria"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Długopisy"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Pióra"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Pióra kulkowe"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Pióra wieczne"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Portfele i portmonetki"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Teczki i notesy"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Torby"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "FESTINA",
+        "Zestawy upominkowe"
+      ],
+      "categories": [
+        164
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Akcesoria"
+      ],
+      "categories": [
+        164
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Breloki"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Butelki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Długopisy"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Elektronika"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Opakowania"
+      ],
+      "categories": [
+        280
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Parasole"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Pióra"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Pióra kulkowe"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Pióra wieczne"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Portfele i etui"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Teczki i notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Torby i walizki"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hugo Boss",
+        "Zestawy upominkowe"
+      ],
+      "categories": [
+        164
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hydro Flask",
+        "Akcesoria"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hydro Flask",
+        "Butelki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hydro Flask",
+        "Kubki"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hydro Flask",
+        "Pojemniki na żywność"
+      ],
+      "categories": [
+        134
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Hydro Flask",
+        "Termosy"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Pierre Cardin"
+      ],
+      "categories": [
+        254
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Schwarzwolf",
+        "Latarki"
+      ],
+      "categories": [
+        62
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Schwarzwolf",
+        "Noże i narzędzia"
+      ],
+      "categories": [
+        141
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Schwarzwolf",
+        "Picie i jedzenie"
+      ],
+      "categories": [
+        4
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Schwarzwolf",
+        "Torby i plecaki"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Schwarzwolf",
+        "Turystyka"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Sigg",
+        "Butelki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Sigg",
+        "Kubki"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Stanley"
+      ],
+      "categories": [
+        4
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Stanley",
+        "Butelki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Stanley",
+        "Kubki"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Stanley",
+        "Piersiówki"
+      ],
+      "categories": [
+        124
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Stanley",
+        "Pojemniki na żywność"
+      ],
+      "categories": [
+        134
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Stanley",
+        "Termosy"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Stanley",
+        "Zestawy"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Vanilla Season",
+        "Dom"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Vanilla Season",
+        "Kuchnia"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Oferta markowa",
+        "Vanilla Season",
+        "Szkło"
+      ],
+      "categories": [
+        4,
+        122
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze"
+      ],
+      "categories": [
+        1
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze",
+        "Długopisy Eco-friendly"
+      ],
+      "categories": [
+        81
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze",
+        "Długopisy metalowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze",
+        "Długopisy plastikowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze",
+        "Długopisy z touch penem"
+      ],
+      "categories": [
+        97
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze",
+        "Opakowania &amp; Akcesoria"
+      ],
+      "categories": [
+        280
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze",
+        "Ołówki"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Artykuły piśmiennicze",
+        "Zestawy Piśmiennicze"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "BLACK MONTH"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje"
+      ],
+      "categories": [
+        68
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Identyfikatory"
+      ],
+      "categories": [
+        281
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Linijki"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Na Dokumenty"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Podkładka z Klipsem / Clipboard"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Podkładki pod Mysz"
+      ],
+      "categories": [
+        250
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Smycze"
+      ],
+      "categories": [
+        6
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Biuro i Konferencje",
+        "Teczki"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Breloki"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Butelki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Czapki i Kapelusze"
+      ],
+      "categories": [
+        135
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Deszcz i Zima",
+        "Kapelusze Wodoodporne"
+      ],
+      "categories": [
+        135
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Deszcz i Zima",
+        "Parasole"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Deszcz i Zima",
+        "Płaszcze przeciwdeszczowe"
+      ],
+      "categories": [
+        206
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dla Dzieci"
+      ],
+      "categories": [
+        92
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dla Dzieci",
+        "Kredki"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dom i Kuchnia",
+        "Chłodzenie butelek"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dom i Kuchnia",
+        "Korkociągi &amp; Otwieracze"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dom i Kuchnia",
+        "Kubki"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dom i Kuchnia",
+        "Kuchnia i bar"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dom i Kuchnia",
+        "Torby na Wino"
+      ],
+      "categories": [
+        129
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Dom i Kuchnia",
+        "Zestawy do Wina"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "ECO"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Elektronika i akcesoria"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Elektronika i akcesoria",
+        "Kable &amp; Ładowarki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Elektronika i akcesoria",
+        "Power Banki"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Elektronika i akcesoria",
+        "Uchwyty na Telefon"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Kamizelki odblaskowe"
+      ],
+      "categories": [
+        72
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Bransoletki identyfikacyjne"
+      ],
+      "categories": [
+        92
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Butelki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Nerki"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Plaża"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Różańce"
+      ],
+      "categories": [
+        92
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Składane kubeczki"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Termosy"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Torby termiczne"
+      ],
+      "categories": [
+        128
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Lato, Outdoor i Eventy",
+        "Trofea i Medale"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Narzędzia i Samochód",
+        "Etui na bilety parkingowe"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Narzędzia i Samochód",
+        "Kamizelki"
+      ],
+      "categories": [
+        72
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Narzędzia i Samochód",
+        "Miarki"
+      ],
+      "categories": [
+        90
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Narzędzia i Samochód",
+        "Narzędzia"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Narzędzia i Samochód",
+        "Osłony przciwsłoneczne do auta"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Narzędzia i Samochód",
+        "Uchwyty do Tablic Rej."
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Osobiste"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Osobiste",
+        "Pojemniki na Tabletki"
+      ],
+      "categories": [
+        219
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Osobiste",
+        "Portfele"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Outdoor"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Technologia i akcesoria"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Identyfikatory walizek"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Kosmetyczki"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Plecaki"
+      ],
+      "categories": [
+        23
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby Bawełniane"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby Na Zakupy"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby Non-Woven"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby Prezentowe"
+      ],
+      "categories": [
+        129
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby Sportowe"
+      ],
+      "categories": [
+        9
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby termiczne"
+      ],
+      "categories": [
+        128
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby z Juty"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby z Siatki"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "WYPRZEDAŻ"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Zapalniczki"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "STANLEY 24h"
+      ],
+      "categories": []
+    }
+  ],
+  "labelings": [
+    {
+      "code": "C1",
+      "type": "direct",
+      "data": {
+        "company": 8,
+        "code": "A"
+      }
+    },
+    {
+      "code": "C2",
+      "type": "direct",
+      "data": {
+        "company": 8,
+        "code": "C2"
+      }
+    },
+    {
+      "code": "DC0",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DC0"
+      }
+    },
+    {
+      "code": "DC1",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DC1"
+      }
+    },
+    {
+      "code": "DC2",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DC2"
+      }
+    },
+    {
+      "code": "DTF1",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DTF1"
+      }
+    },
+    {
+      "code": "DTF2",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DTF2"
+      }
+    },
+    {
+      "code": "DTF3",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DTF3"
+      }
+    },
+    {
+      "code": "DTG1",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DTG1"
+      }
+    },
+    {
+      "code": "DTG3",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "DTG3"
+      }
+    },
+    {
+      "code": "HF",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "HF"
+      }
+    },
+    {
+      "code": "HS",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "HS"
+      }
+    },
+    {
+      "code": "L0",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "L1",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "L2",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "L3",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "S1",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "S1"
+      }
+    },
+    {
+      "code": "S2",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "S2"
+      }
+    },
+    {
+      "code": "ST1",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "ST1"
+      }
+    },
+    {
+      "code": "ST2",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "ST2"
+      }
+    },
+    {
+      "code": "T1",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "T1"
+      }
+    },
+    {
+      "code": "T2",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "T2"
+      }
+    },
+    {
+      "code": "T3",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "T3"
+      }
+    },
+    {
+      "code": "T4",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "T4"
+      }
+    },
+    {
+      "code": "T4+V",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "T4"
+      }
+    },
+    {
+      "code": "TT1",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "TT1"
+      }
+    },
+    {
+      "code": "TT2",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "TT2"
+      }
+    },
+    {
+      "code": "TT3",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "TT3"
+      }
+    }
+  ],
+  "replaceCategories": [
+    {
+      "path": [
+        "Oferta markowa",
+        "Vanilla Season",
+        "Szkło"
+      ],
+      "from": [
+        4
+      ],
+      "to": [
+        4,
+        122
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby Bawełniane"
+      ],
+      "from": [
+        30
+      ],
+      "to": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby Non-Woven"
+      ],
+      "from": [
+        30
+      ],
+      "to": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Oferta podstawowa",
+        "Torby, Walizki &amp; Podróże",
+        "Torby z Juty"
+      ],
+      "from": [
+        30
+      ],
+      "to": [
+        29
+      ]
+    }
+  ]
+}

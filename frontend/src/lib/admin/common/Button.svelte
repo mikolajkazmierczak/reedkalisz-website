@@ -16,7 +16,9 @@
   // a state in colour: 'info' (light blue), 'selected' (purplish), 'success' (green), 'warning' (orange), 'danger' (red)
   export let tone = null;
   export let square = false;
-  export let small = false;
+  // 'sm' (1.5rem, in tables and next to small fields), 'md' (2rem, the default), 'lg' (as tall as what's in it, at
+  // least 3.5rem: e.g. a product with its picture, name and code); more as they're needed
+  export let size = 'md';
 
   export let background = null;
   export let backgroundHover = null;
@@ -54,14 +56,21 @@
   class:tone-danger={shade === 'danger'}
   class:dark
   class:square={squared}
-  class:small
+  class:sm={size === 'sm'}
+  class:lg={size === 'lg'}
   {disabled}
   style:--bg={background}
   style:--bg-hover={backgroundHover}
   style:--bg-active={backgroundActive}
   style:border-radius={borderRadius}
   style:width>
-  <div class="content" class:label={$$slots.default} class:square={squared} class:small class:start>
+  <div
+    class="content"
+    class:label={$$slots.default}
+    class:square={squared}
+    class:sm={size === 'sm'}
+    class:lg={size === 'lg'}
+    class:start>
     {#if icon}<Icon height="58%" name={icon} light={!dark} {dark} color={disabled ? 'var(--grey-500)' : null} />{/if}
     {#if $$slots.default}<slot />{/if}
   </div>
@@ -92,7 +101,7 @@
     flex-shrink: 0; /* a row running out of room squeezes it out of shape otherwise */
     aspect-ratio: 1 / 1;
   }
-  button.small {
+  button.sm {
     border-radius: var(--button-radius-small);
     height: 1.5rem;
   }
@@ -181,13 +190,25 @@
   .content.square {
     padding: 0;
   }
-  .content.small {
+  .content.sm {
     gap: 0.25rem;
     font-size: 0.85rem;
   }
-  .content.small:not(.square) {
+  .content.sm:not(.square) {
     /* `:not` so it doesn't override the square padding and squeeze the icon sideways */
     padding: 0 0.5rem;
+  }
+  /* as tall as what's in it, padded all round */
+  button.lg {
+    border-radius: var(--box-radius);
+    height: auto;
+    min-height: 3.5rem;
+  }
+  .content.lg {
+    gap: 0.75rem;
+  }
+  .content.lg:not(.square) {
+    padding: 0.5rem 0.75rem;
   }
 
   [disabled],

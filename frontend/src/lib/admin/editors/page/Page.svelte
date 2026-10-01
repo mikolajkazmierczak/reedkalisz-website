@@ -36,7 +36,7 @@
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    $unsaved = correctSlug && changed;
+    unsaved.set(correctSlug && changed);
   });
 </script>
 

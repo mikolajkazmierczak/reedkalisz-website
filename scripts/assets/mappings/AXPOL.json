@@ -1,0 +1,2441 @@
+{
+  "places": [
+    {
+      "pattern": "biały panel",
+      "to": "biały panel"
+    },
+    {
+      "pattern": "biały panel - przód",
+      "to": "biały panel - przód"
+    },
+    {
+      "pattern": "casing - front - left",
+      "to": "opakowanie - przód"
+    },
+    {
+      "pattern": "casing - front - right",
+      "to": "opakowanie - przód"
+    },
+    {
+      "pattern": "casing - right side",
+      "to": "opakowanie - bok"
+    },
+    {
+      "pattern": "front",
+      "to": "przód"
+    },
+    {
+      "pattern": "item  -glass",
+      "to": "szkło"
+    },
+    {
+      "pattern": "item - badge",
+      "to": "naszywka"
+    },
+    {
+      "pattern": "item - front - right [one color only]",
+      "to": "przód - po prawej stronie (tylko jeden kolor)"
+    },
+    {
+      "pattern": "item 1 - barrel",
+      "to": "korpus"
+    },
+    {
+      "pattern": "item 2 - barrel",
+      "to": "korpus"
+    },
+    {
+      "pattern": "item 3 - barrel",
+      "to": "korpus"
+    },
+    {
+      "pattern": "item top",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "korpus - tył [biały kolor]",
+      "to": "korpus - tył (biały kolor)"
+    },
+    {
+      "pattern": "korpus - tył [efekt lustra]",
+      "to": "korpus - tył (efekt lustra)"
+    },
+    {
+      "pattern": "korpus [efekt lustra]",
+      "to": "korpus (efekt lustra)"
+    },
+    {
+      "pattern": "korpus [tylko biały kolor]",
+      "to": "korpus (tylko biały kolor)"
+    },
+    {
+      "pattern": "lewy bok",
+      "to": "bok"
+    },
+    {
+      "pattern": "maska - przód [czarny kolor]",
+      "to": "maska - przód (czarny kolor)"
+    },
+    {
+      "pattern": "opakowanie - lewy bok",
+      "to": "opakowanie"
+    },
+    {
+      "pattern": "panel",
+      "to": "panel"
+    },
+    {
+      "pattern": "pojedynczy biały panel",
+      "to": "pojedynczy biały panel"
+    },
+    {
+      "pattern": "prawy bok",
+      "to": "bok"
+    },
+    {
+      "pattern": "produkt - z przodu - na dole z lewej strony",
+      "to": "przód - w lewym dolnym narożniku"
+    },
+    {
+      "pattern": "produkt 1 - na górze",
+      "to": "na górze"
+    },
+    {
+      "pattern": "produkt 1 - po lewej stronie",
+      "to": "po lewej stronie"
+    },
+    {
+      "pattern": "produkt 1 - po prawej stronie",
+      "to": "po prawej stronie"
+    },
+    {
+      "pattern": "produkt 1 - przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "produkt 1 - tył",
+      "to": "tył"
+    },
+    {
+      "pattern": "produkt 2 - na górze",
+      "to": "na górze"
+    },
+    {
+      "pattern": "produkt 2 - po lewej stronie",
+      "to": "po lewej stronie"
+    },
+    {
+      "pattern": "produkt 2 - po prawej stronie",
+      "to": "po prawej stronie"
+    },
+    {
+      "pattern": "produkt 2 - przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "produkt 2 - tył",
+      "to": "tył"
+    },
+    {
+      "pattern": "produkt 3 - na górze",
+      "to": "na górze"
+    },
+    {
+      "pattern": "produkt 3 - po lewej stronie",
+      "to": "po lewej stronie"
+    },
+    {
+      "pattern": "produkt 3 - po prawej stronie",
+      "to": "po prawej stronie"
+    },
+    {
+      "pattern": "produkt 3 - przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "produkt 4 - na górze",
+      "to": "na górze"
+    },
+    {
+      "pattern": "produkt 4 - przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "produkt 5 - przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "przód - po lewej stronie [dwa kolory]",
+      "to": "przód - po lewej stronie (dwa kolory)"
+    },
+    {
+      "pattern": "przód - po prawej stronie [dwa kolory]",
+      "to": "przód - po prawej stronie (dwa kolory)"
+    },
+    {
+      "pattern": "przód [czarny kolor]",
+      "to": "przód (czarny kolor)"
+    },
+    {
+      "pattern": "transparentny panel",
+      "to": "transparentny panel"
+    },
+    {
+      "pattern": "tył - lewa strona",
+      "to": "tył"
+    },
+    {
+      "pattern": "tył - prawa strona",
+      "to": "tył"
+    }
+  ],
+  "categories": [
+    {
+      "path": [
+        "BIURO"
+      ],
+      "categories": [
+        68
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "akcesoria do elektroniki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "antystresy"
+      ],
+      "categories": [
+        63
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "biuro: akcesoria"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "karteczki samoprzylepne"
+      ],
+      "categories": [
+        274
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "lampki na biurko, lampki do czytania"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "lupy"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "notatniki i notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "podkładki pod mysz"
+      ],
+      "categories": [
+        250
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "pojemniki na długopisy"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "smycze i identyfikatory"
+      ],
+      "categories": [
+        6
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "stojaki na telefon"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "teczki konferencyjne"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "BIURO",
+        "wizytowniki, etui na wizytówki"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "BRELOKI"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "bidony"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "butelki sportowe"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "butelki termiczne"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "inne akcesoria do picia"
+      ],
+      "categories": [
+        4
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "kubki ceramiczne"
+      ],
+      "categories": [
+        84
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "kubki inne"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "kubki podróżne"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "kubki termiczne"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "piersiówki"
+      ],
+      "categories": [
+        124
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "szklane kubki i butelki, szklanki"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "słoiki do picia"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "termosy"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "długopisy inne"
+      ],
+      "categories": [
+        81
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "długopisy metalowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "długopisy plastikowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "długopisy touch peny"
+      ],
+      "categories": [
+        97
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "długopisy wielofunkcyjne"
+      ],
+      "categories": [
+        1
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "etui na długopisy"
+      ],
+      "categories": [
+        280
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "inne zestawy piśmienne"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "ołówki"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "pióra kulkowe, rollery"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "pióra wieczne"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "zakreślacze i flamastry"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "zestawy: długopis i ołówek"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "DO PISANIA",
+        "zestawy: długopis i pióro kulkowe, roller"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "akcesoria barmańskie"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "bombki i zawieszki świąteczne"
+      ],
+      "categories": [
+        139
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "coolery do wina"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "dom: akcesoria"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "doniczki, kwiaty, zioła"
+      ],
+      "categories": [
+        120
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "fartuchy kuchenne"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "karafki i dzbanki"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "kartoniki na wino"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "koce domowe"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "korkociągi"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "kuchnia: akcesoria"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "miary do ciała"
+      ],
+      "categories": [
+        90
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "minutniki kuchenne"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "minutniki pod prysznic"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "miętówki"
+      ],
+      "categories": [
+        4,
+        133
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "noże kelnerskie"
+      ],
+      "categories": [
+        137,
+        141
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "noże kuchenne"
+      ],
+      "categories": [
+        141,
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "otwieracze do butelek"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "ozdoby świąteczne i akcesoria"
+      ],
+      "categories": [
+        139
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "podkładki kuchenne"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "pojemniki na tabletki"
+      ],
+      "categories": [
+        219
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "pudełka śniadaniowe, lunch box"
+      ],
+      "categories": [
+        134
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "ramki do zdjęć"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "sól i pieprz"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "termometry"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "torby do segregacji"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "wino: akcesoria"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "wino: opakowania"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "zapalniczki i zapalarki"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "zestawy do sera"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "zestawy do wina"
+      ],
+      "categories": [
+        137
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "łazienka: akcesoria"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "świeczki"
+      ],
+      "categories": [
+        136
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "adaptery podróżne"
+      ],
+      "categories": [
+        247
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "akcesoria do elektroniki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "głośniki"
+      ],
+      "categories": [
+        201
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "huby USB"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "inne akcesoria elektroniczne"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "kable do ładowania"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "kalkulatory"
+      ],
+      "categories": [
+        249
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "komputer: akcesoria"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "lokalizatory kluczy"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "monitory aktywności"
+      ],
+      "categories": [
+        89,
+        119
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "myszy komputerowe"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "pamięci USB"
+      ],
+      "categories": [
+        86
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "power banki"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "power banki bezprzewodowe"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "stacje pogodowe"
+      ],
+      "categories": [
+        89,
+        117
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "słuchawki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "słuchawki bezprzewodowe"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "telefon: akcesoria"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "uchwyty do selfie"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "wskaźniki laserowe"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "zegary i zegarki"
+      ],
+      "categories": [
+        142
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "ładowarki bezprzewodowe"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "ładowarki samochodowe"
+      ],
+      "categories": [
+        94,
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "ładowarki słoneczne"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "ładowarki ścienne"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "MOLESKINE"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "MOLESKINE",
+        "długopisy plastikowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "MOLESKINE",
+        "kalendarze (Large)"
+      ],
+      "categories": [
+        245
+      ]
+    },
+    {
+      "path": [
+        "MOLESKINE",
+        "kalendarze (Pocket)"
+      ],
+      "categories": [
+        245
+      ]
+    },
+    {
+      "path": [
+        "MOLESKINE",
+        "kalendarze (XL)"
+      ],
+      "categories": [
+        245
+      ]
+    },
+    {
+      "path": [
+        "MOLESKINE",
+        "pióra kulkowe, rollery"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "bezpieczeństwo"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "inne narzędzia"
+      ],
+      "categories": [
+        120,
+        75
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "lampki rowerowe"
+      ],
+      "categories": [
+        61
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "latarki bezpieczeństwa"
+      ],
+      "categories": [
+        62,
+        94
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "latarki i lampki"
+      ],
+      "categories": [
+        62
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "miarki"
+      ],
+      "categories": [
+        90
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "narzędzia wielofunkcyjne"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "noże do tapet"
+      ],
+      "categories": [
+        141
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "organizery samochodowe"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "ołówki stolarskie i długopisy"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "rower: akcesoria"
+      ],
+      "categories": [
+        61
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "rowerowe uchwyty do telefonu"
+      ],
+      "categories": [
+        61,
+        69
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "samochodowe uchwyty do telefonu"
+      ],
+      "categories": [
+        94,
+        69
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "samochód: akcesoria"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "scyzoryki"
+      ],
+      "categories": [
+        75,
+        141
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "skrobaczki"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "zestawy narzędzi"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "śrubokręty"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "PARASOLE I PELERYNY",
+        "parasole automatyczne"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "PARASOLE I PELERYNY",
+        "parasole manualne"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "PARASOLE I PELERYNY",
+        "peleryny, poncza"
+      ],
+      "categories": [
+        206
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "akcesoria podróżne"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "apteczki"
+      ],
+      "categories": [
+        112,
+        219
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "chusteczki i żele do rąk"
+      ],
+      "categories": [
+        219
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "etui na karty kredytowe"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "kosmetyczki"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "lusterka"
+      ],
+      "categories": [
+        110
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "pilniki i zestawy do manicure"
+      ],
+      "categories": [
+        219
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "portfele"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "saszetki, nerki"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "szczoteczki do zębów"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "szczotki do włosów"
+      ],
+      "categories": [
+        219
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "wagi bagażowe"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "zagłówki"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "zawieszki do bagażu"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "bańki mydlane"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "gry"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "gumki do mazania"
+      ],
+      "categories": [
+        98
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "jojo"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "kolorowanie"
+      ],
+      "categories": [
+        125,
+        82
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "kredki"
+      ],
+      "categories": [
+        82,
+        98
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "linijki"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "piórniki i zestawy szkolne"
+      ],
+      "categories": [
+        98
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "puzzle"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "skarbonki"
+      ],
+      "categories": [
+        92
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "szkoła: akcesoria"
+      ],
+      "categories": [
+        98
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "zabawa"
+      ],
+      "categories": [
+        98
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "zabawki pluszowe"
+      ],
+      "categories": [
+        74
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "zestawy do malowania"
+      ],
+      "categories": [
+        125
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "czapki z daszkiem"
+      ],
+      "categories": [
+        135
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "czapki zimowe"
+      ],
+      "categories": [
+        135
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "inne tekstylia i odzież"
+      ],
+      "categories": [
+        67
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "kamizelki"
+      ],
+      "categories": [
+        72
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "kapelusze"
+      ],
+      "categories": [
+        135
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "koszulki"
+      ],
+      "categories": [
+        67
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "kurtki"
+      ],
+      "categories": [
+        67
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "rękawiczki"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "TEKSTYLIA",
+        "szaliki"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "inne torby"
+      ],
+      "categories": [
+        132
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "plecaki"
+      ],
+      "categories": [
+        23
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "torby na laptopa i dokumenty"
+      ],
+      "categories": [
+        130
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "torby na ramię"
+      ],
+      "categories": [
+        287
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "torby na zakupy"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "torby papierowe"
+      ],
+      "categories": [
+        162
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "torby podróżne i sportowe"
+      ],
+      "categories": [
+        112,
+        9
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "torby termoizolacyjne"
+      ],
+      "categories": [
+        128
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "walizki, torby na kółkach"
+      ],
+      "categories": [
+        112,
+        30
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "worki ze sznurkiem i żeglarskie"
+      ],
+      "categories": [
+        85
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "akcesoria do biegania"
+      ],
+      "categories": [
+        119
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "akcesoria kibica"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "akcesoria sportowe"
+      ],
+      "categories": [
+        119
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "etui na telefon"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "grill i piknik"
+      ],
+      "categories": [
+        121
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "gry plażowe"
+      ],
+      "categories": [
+        93,
+        78
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "inne akcesoria wypoczynkowe"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "koce piknikowe"
+      ],
+      "categories": [
+        121
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "kompasy"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "krokomierze"
+      ],
+      "categories": [
+        119
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "lato"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "lornetki"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "maty plażowe i inne"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "okulary przeciwsłoneczne"
+      ],
+      "categories": [
+        112,
+        95
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "parasole plażowe"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "pies: akcesoria"
+      ],
+      "categories": [
+        255
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "piłki plażowe i inne dmuchane akcesoria"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "ręczniki sportowe"
+      ],
+      "categories": [
+        119,
+        118
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "skakanki"
+      ],
+      "categories": [
+        119
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "ski passy"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "ZESTAWY UPOMINKOWE"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "Zabawki pluszowe"
+      ],
+      "categories": [
+        74
+      ]
+    }
+  ],
+  "labelings": [
+    {
+      "code": "DTF4",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "DFT4"
+      }
+    },
+    {
+      "code": "H1",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "DTF1"
+      }
+    },
+    {
+      "code": "H2",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "DTF1"
+      }
+    },
+    {
+      "code": "L0",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L1"
+      }
+    },
+    {
+      "code": "L1A",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L1"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 2000,
+          "company": 4,
+          "code": "L5"
+        }
+      ]
+    },
+    {
+      "code": "L1P",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L1"
+      }
+    },
+    {
+      "code": "L2A",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L2"
+        },
+        {
+          "type": "gt",
+          "threshold": 200,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 700,
+          "company": 10,
+          "code": "L2A"
+        },
+        {
+          "type": "gt",
+          "threshold": 1400,
+          "company": 4,
+          "code": "L4"
+        }
+      ]
+    },
+    {
+      "code": "L2P",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L3"
+      }
+    },
+    {
+      "code": "L3",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L3"
+      }
+    },
+    {
+      "code": "L3A",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L3"
+      }
+    },
+    {
+      "code": "L3P",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "L3"
+      }
+    },
+    {
+      "code": "S1A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "S0"
+      }
+    },
+    {
+      "code": "S2A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "S0"
+      }
+    },
+    {
+      "code": "S3A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "S3"
+      }
+    },
+    {
+      "code": "S4A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "S4"
+      }
+    },
+    {
+      "code": "T2A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "T2"
+      }
+    },
+    {
+      "code": "T3A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "T3"
+      }
+    },
+    {
+      "code": "T4A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "T4"
+      }
+    },
+    {
+      "code": "TF3A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "TF3"
+      }
+    },
+    {
+      "code": "UV360-A",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "UV360A"
+      }
+    },
+    {
+      "code": "UV360-B",
+      "type": "direct",
+      "data": {
+        "company": 10,
+        "code": "UV360B"
+      }
+    }
+  ],
+  "replaceCategories": [
+    {
+      "path": [
+        "DOM",
+        "miętówki"
+      ],
+      "from": [
+        4
+      ],
+      "to": [
+        4,
+        133
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "noże kuchenne"
+      ],
+      "from": [
+        141
+      ],
+      "to": [
+        141,
+        122
+      ]
+    },
+    {
+      "path": [
+        "DOM",
+        "noże kelnerskie"
+      ],
+      "from": [
+        137
+      ],
+      "to": [
+        137,
+        141
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "inne narzędzia"
+      ],
+      "from": [
+        120
+      ],
+      "to": [
+        120,
+        75
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "stacje pogodowe"
+      ],
+      "from": [
+        89
+      ],
+      "to": [
+        89,
+        117
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "monitory aktywności"
+      ],
+      "from": [
+        89
+      ],
+      "to": [
+        89,
+        119
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "ładowarki samochodowe"
+      ],
+      "from": [
+        94
+      ],
+      "to": [
+        94,
+        69
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "samochodowe uchwyty do telefonu"
+      ],
+      "from": [
+        94
+      ],
+      "to": [
+        94,
+        69
+      ]
+    },
+    {
+      "path": [
+        "NARZĘDZIA",
+        "rowerowe uchwyty do telefonu"
+      ],
+      "from": [
+        61
+      ],
+      "to": [
+        61,
+        69
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "walizki, torby na kółkach"
+      ],
+      "from": [
+        112
+      ],
+      "to": [
+        112,
+        30
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "kredki"
+      ],
+      "from": [
+        82
+      ],
+      "to": [
+        82,
+        98
+      ]
+    },
+    {
+      "path": [
+        "ROZRYWKA I SZKOŁA",
+        "kolorowanie"
+      ],
+      "from": [
+        125
+      ],
+      "to": [
+        125,
+        82
+      ]
+    },
+    {
+      "path": [
+        "TORBY I PLECAKI",
+        "torby podróżne i sportowe"
+      ],
+      "from": [
+        112
+      ],
+      "to": [
+        112,
+        9
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "gry plażowe"
+      ],
+      "from": [
+        93
+      ],
+      "to": [
+        93,
+        78
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "okulary przeciwsłoneczne"
+      ],
+      "from": [
+        112
+      ],
+      "to": [
+        112,
+        95
+      ]
+    },
+    {
+      "path": [
+        "WYPOCZYNEK",
+        "ręczniki sportowe"
+      ],
+      "from": [
+        119
+      ],
+      "to": [
+        119,
+        118
+      ]
+    },
+    {
+      "path": [
+        "PODRÓŻ",
+        "apteczki"
+      ],
+      "from": [
+        112
+      ],
+      "to": [
+        112,
+        219
+      ]
+    },
+    {
+      "path": [
+        "DO PICIA",
+        "kubki podróżne"
+      ],
+      "from": [
+        25
+      ],
+      "to": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "huby USB"
+      ],
+      "from": [
+        89
+      ],
+      "to": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "ładowarki ścienne"
+      ],
+      "from": [
+        89
+      ],
+      "to": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "ELEKTRONIKA",
+        "myszy komputerowe"
+      ],
+      "from": [
+        89
+      ],
+      "to": [
+        69
+      ]
+    }
+  ]
+}

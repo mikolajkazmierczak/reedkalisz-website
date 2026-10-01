@@ -572,7 +572,7 @@
     margin-top: calc(var(--sp-10) * -1);
   }
   /* With 4rem of room beside the column (the rail, --page and 4rem), the banners go in it, apart (see Tiles). */
-  @media (min-width: 118rem) {
+  @media (min-width: 100.5rem) {
     .blocks > :global([data-type='tiles']) {
       max-width: var(--page);
       padding-inline: var(--gutter);
@@ -583,6 +583,14 @@
     }
     .blocks > :global([data-type='tiles']:first-child) {
       margin-top: 0;
+    }
+    /* Banners right under the hero lie partly on it: its navy goes on behind their top (no rule between them). */
+    :global(.shell__main:has(> .blocks > [data-type='tiles']:first-child) > .hero) {
+      border-bottom: 0;
+    }
+    :global(.shell__main > .blocks:has(> [data-type='tiles']:first-child)) {
+      --overlap: clamp(4rem, 3vw + 1rem, 6rem);
+      background-image: linear-gradient(var(--navy) calc(var(--sp-10) + var(--overlap)), transparent 0);
     }
   }
 

@@ -267,12 +267,12 @@
                     </div>
                     <div>
                       {#if !i == 0}
-                        <Button small icon="arrow_left" on:click={() => moveLabeling(i, -1)} square />
+                        <Button size="sm" icon="arrow_left" on:click={() => moveLabeling(i, -1)} square />
                       {/if}
                       {#if i < product.labelings.length - 1}
-                        <Button small icon="arrow_right" on:click={() => moveLabeling(i, 1)} square />
+                        <Button size="sm" icon="arrow_right" on:click={() => moveLabeling(i, 1)} square />
                       {/if}
-                      <Button small icon="delete" on:click={() => removeLabeling(i)} disabled={managed} dangerous />
+                      <Button size="sm" icon="delete" on:click={() => removeLabeling(i)} disabled={managed} dangerous />
                     </div>
                   </div>
 

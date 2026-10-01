@@ -113,7 +113,7 @@
 </script>
 
 {#if items.length}
-  <div class="wrapper">
+  <div class="wrapper ui-fill-scroll">
     <table class="ui-table">
       <thead>
         <tr>
@@ -175,7 +175,7 @@
 
           <th style:width="5.625rem" class="add-amount">
             <span class="head-icon"
-              ><Button small icon="add" title="Dodaj nakład" on:click={addAmount}>Dodaj</Button></span>
+              ><Button size="sm" icon="add" title="Dodaj nakład" on:click={addAmount}>Dodaj</Button></span>
           </th>
           <!-- no width: the rest of the box, so the lines of the rows go all the way (nothing when it scrolls) -->
           <th class="filler" />
@@ -224,10 +224,10 @@
 {/if}
 
 <style>
+  /* scrolls both ways: the page gives it what's left (see .ui-fill), its head and first columns stay */
   .wrapper {
     overflow: auto;
     max-width: 100%;
-    max-height: 70vh;
     margin-bottom: 0.75rem;
     border-radius: var(--box-radius);
     corner-shape: squircle;

@@ -38,7 +38,7 @@
 </script>
 
 {#if $categories}
-  <div class="wrapper">
+  <div class="wrapper ui-fill">
     <div class="actions ui-bar">
       <Button on:click={() => goto(`/admin/kategorie/+?index=${itemsTree.length}`)} icon="add">Dodaj</Button>
       <Search {searchParams} {query} />
@@ -70,6 +70,7 @@
         };
       }}
       {searchParams}
+      scrollKey={[query]}
       {limit}
       {page}
       order={!query} />
@@ -77,9 +78,3 @@
 {/if}
 
 <slot />
-
-<style>
-  .wrapper {
-    overflow-x: auto;
-  }
-</style>

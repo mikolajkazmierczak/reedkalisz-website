@@ -1,5 +1,5 @@
 <script>
-  import { swatch, colorMissing } from '$/colors';
+  import { swatch, colorMissing, COLOR_KINDS } from '$/colors';
   import { goto } from '$app/navigation';
 
   import Icon from '$c/Icon.svelte';
@@ -7,6 +7,7 @@
   import Button from '@c/Button.svelte';
   import CategoryCode from '@c/CategoryCode.svelte';
   import CompanyIcon from '@c/CompanyIcon.svelte';
+  import Thumb from '@c/Thumb.svelte';
   import Tooltip from '$c/Tooltip.svelte';
   import Dropzone from './Dropzone.svelte';
   import { draggingRow, hierarchyCellWidth } from './utils';
@@ -95,7 +96,7 @@
     <span class="center tree-cell add">
       <span class="add__button">
         <Button
-          small
+          size="sm"
           dashed
           icon="add"
           label="Dodaj podkategorię {row.codeNew ?? ''}"
@@ -138,7 +139,7 @@
       </span>
     </span>
   {/if}
-  {#each head as { i, checkbox, blame, show, color, category, company, float: floating } (i)}
+  {#each head as { i, checkbox, blame, show, color, category, company, thumb, float: floating } (i)}
     {@const value = row.values[i]}
     {#if checkbox}
       <span class="center">
@@ -149,6 +150,13 @@
             <Icon fill name="close" color={'var(--grey-300)'} />
           {/if}
         </span>
+      </span>
+    {:else if thumb}
+      <!-- { thumb, text }: a product's picture (as tall as the cell, outside the text's line: it'd be cut there) before
+           its name -->
+      <span class="ui-thumbed">
+        <Thumb file={value.thumb} size="1.5rem" zoom blank />
+        <Float enabled={!!floating}>{value.text}</Float>
       </span>
     {:else}
       <!-- `float` in the column's head: its text, when cut, shows whole on hover -->
@@ -163,10 +171,10 @@
           <CompanyIcon company={value} />
           {value}
         {:else if color}
-          <!-- the whole colour: { color, multicolor, transparent } -->
+          <!-- the whole colour: { color, multicolor, transparent, wood, neutral } -->
           <span class="color" class:missing={colorMissing(value)} style:background={swatch(value, null)} />
-          {#if value?.color}<span>{value.color}</span>{/if}{#if value?.multicolor}<span class="pill">wielokolorowy</span
-            >{/if}{#if value?.transparent}<span class="pill">przezroczysty</span>{/if}
+          {#if value?.color}<span>{value.color}</span
+            >{/if}{#each COLOR_KINDS.filter(([key]) => value?.[key]) as [, kind]}<span class="pill">{kind}</span>{/each}
         {:else}
           {value}
         {/if}

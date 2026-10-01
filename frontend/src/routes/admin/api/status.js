@@ -2,6 +2,7 @@ import { categoryIndex } from '@/categories';
 import { findLabeling } from '@/labelings';
 import { listApiCategories, mappingAt, pathKey } from './categories.js';
 import { hasPrintData, labelingCodes } from './company.js';
+import { placeCounts, placeWins, uselessRules as uselessPlaceRules } from './places.js';
 import { retiredOf } from './items.js';
 
 // What's left to do in the API tabs, from a company's saved mappings, its last scan and our products. The tabs show it
@@ -105,9 +106,23 @@ function categoriesStatus(company, apiItems, categories) {
   ]);
 }
 
+// places
+
+function placesStatus(company, apiItems) {
+  if (!hasPrintData(apiItems)) return null;
+  const rules = company.api_places_mappings ?? [];
+  const places = placeCounts(apiItems);
+  const wins = placeWins(rules, places);
+  return status([
+    ['Reguły, które niczego nie tłumaczą', rules.filter((r) => r.pattern?.trim() && !wins.has(r)).length],
+    ['Zbędne reguły', uselessPlaceRules(rules, wins).size],
+  ]);
+}
+
 // the tabs' statuses by their path
 export const tabStatuses = (company, apiItems, labelings, categories, dbItems) => ({
   '/admin/api/produkty': productsStatus(company, dbItems, apiItems),
   '/admin/api/znakowania': labelingsStatus(company, apiItems, labelings),
   '/admin/api/kategorie': categoriesStatus(company, apiItems, categories),
+  '/admin/api/miejsca': placesStatus(company, apiItems),
 });

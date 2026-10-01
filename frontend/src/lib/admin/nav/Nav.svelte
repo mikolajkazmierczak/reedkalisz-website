@@ -10,6 +10,8 @@
   import NavButton from './NavButton.svelte';
   import { goto } from '$app/navigation';
   import Icon from '$c/Icon.svelte';
+  import Changelog, { compare, readSeen } from '../changelog/Changelog.svelte';
+  import { changelog as versions, version } from '../changelog/changelog.js';
 
   // the menu, in groups (spaced apart); `section`: the pages under it light the button up too
   const buttons = [
@@ -53,6 +55,8 @@
         { _or: [{ color: { _null: true } }, { color: { _empty: true } }] }, // (9.22's _empty is only '')
         { multicolor: { _neq: true } },
         { transparent: { _neq: true } },
+        { wood: { _neq: true } },
+        { neutral: { _neq: true } },
       ],
     }));
   // again on every page: a question sent from the website doesn't come through heimdall
@@ -70,6 +74,17 @@
       : null,
     '/kolory': colorless ? plural(colorless, 'kolor', 'kolory', 'kolorów') + ' bez wartości' : null,
   };
+
+  // the changelog: from the version under the name, and by itself once after a new version (see Changelog); a
+  // browser without one seen yet counts as having seen the one before the newest - only the newest is new to it
+  let changelog = false;
+  let seen = null;
+  $: if ($me) openIfNew();
+  const lastSeen = () => readSeen() ?? versions[1]?.version ?? null;
+  function openIfNew() {
+    seen = lastSeen();
+    if (compare(version, seen) > 0) changelog = true;
+  }
 
   // On a phone the menu is off the screen, a button in the bottom left corner brings it over the page (under an
   // editor and the popups: they have their own ways back). Going somewhere, or tapping beside it, puts it away.
@@ -124,8 +139,10 @@
           <span>{$me.last_name ?? ''}</span>
         </span>
       </div>
+      <button class="version" on:click={() => ((seen = lastSeen()), (changelog = true))}>v{version}</button>
     </div>
   </nav>
+  {#if changelog}<Changelog {seen} on:close={() => (changelog = false)} />{/if}
 {/if}
 
 <svelte:window on:keydown={(e) => open && e.key === 'Escape' && (open = false)} />
@@ -160,7 +177,6 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    margin-top: 1rem; /* where the page's first box starts (see the admin layout) */
   }
   .group {
     display: flex;
@@ -170,16 +186,34 @@
   .bottom {
     margin-top: auto;
   }
-  /* in a band like the lit button's, flush with the menu's sides and bottom (over its padding); the avatar's middle
-     under the buttons' icons' (1.6rem to their 1.3rem, see NavButton) */
+  /* in a band like the lit button's, flush with the menu's sides (over its padding), the version under it; the
+     avatar's middle under the buttons' icons' (1.6rem to their 1.3rem, see NavButton) */
   .me {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 0.5rem -0.75rem -0.75rem -0.5rem;
+    margin: 0.5rem -0.75rem 0 -0.5rem;
     --pad: calc(0.5rem + var(--nav-button-pad) - (1.6rem - 1.3rem) / 2);
     padding: var(--pad) 0.5rem var(--pad) var(--pad); /* as much above and below as on the left */
     background-color: var(--navy-900);
+  }
+  /* under the name, darker still, the faint version: it opens the changelog */
+  .version {
+    margin: -0.15rem -0.75rem -0.75rem -0.5rem; /* (right under it: over the group's gap) */
+    padding: 0.2rem 0.5rem 0.25rem var(--pad);
+    --pad: calc(0.5rem + var(--nav-button-pad) - (1.6rem - 1.3rem) / 2);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.625rem;
+    font-variant-numeric: tabular-nums;
+    color: rgb(255 255 255 / 0.3);
+    background-color: var(--navy-950);
+    transition: color 150ms;
+  }
+  .version:hover,
+  .version:focus-visible {
+    color: rgb(255 255 255 / 0.75);
   }
   /* beside the name's two lines, in their middle */
   .avatar {

@@ -12,7 +12,7 @@
   import { readSettings, writeSettings } from './settings';
 
   // A list of the admin, from data: `head` says the columns ({ label, icon, checkbox, blame, color, category, company,
-  // float, width, sort }), `mapper` turns an item into { href, values } (and `hrefNew`, `codeNew` for "add a
+  // thumb, float, width, sort }), `mapper` turns an item into { href, values } (and `hrefNew`, `codeNew` for "add a
   // subcategory"). Drawn in the Grid of every admin table; items with `children` make a tree, `order` lets them be
   // dragged into place.
 
@@ -27,6 +27,8 @@
   export let mapper;
 
   export let order = false;
+  // the list's filters beyond the page and sort (search, category...): another one scrolls it back up (see Grid)
+  export let scrollKey = null;
 
   // The columns shown and what each blame column shows: picked in the head, kept in this browser per list, by the
   // columns' labels. At least one column stays, and a blame column shows at least one thing.
@@ -90,6 +92,7 @@
 
 <Grid
   {columns}
+  scrollKey={[page, limit, sort, scrollKey]}
   indentFirst={textFirst}
   empty={items.length ? null : 'Brak elementów o podanych parametrach'}
   on:dragenter={(e) => draggingRow(e) && (dropzone = -1)}>

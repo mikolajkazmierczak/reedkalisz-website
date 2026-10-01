@@ -10,6 +10,9 @@
   import BarButton, { barIconStroke } from '@c/BarButton.svelte';
 
   import editing from './editing';
+  import { scrolled } from '@/scrolled';
+
+  let container; // what scrolls (the bar over it comes in with the scroll, see scrolled.js)
 
   function spin(node, { duration }) {
     return {
@@ -86,8 +89,8 @@
 
 <div class="wrapper" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
   <div class="outside" role="presentation" on:click|self={handleExit} />
-  <div class="container" in:fly={{ x: 100, duration: 400 }} out:fly={{ x: 50, duration: 100 }}>
-    <div class="bar ui-topbar">
+  <div class="container" bind:this={container} in:fly={{ x: 100, duration: 400 }} out:fly={{ x: 50, duration: 100 }}>
+    <div class="bar ui-topbar" use:scrolled={container}>
       <div class="actions">
         {#if $unsaved}
           <BarButton square hoverColor="var(--red-300)" title="Anuluj" on:click={handleCancel}>
@@ -172,7 +175,6 @@
     gap: 1rem;
     padding: 0 1.5rem;
     height: 4rem;
-    border-bottom: var(--border-light);
   }
 
   .actions {
@@ -224,7 +226,7 @@
   .content {
     position: relative;
     z-index: 0;
-    padding: 1rem 1.5rem 1.5rem; /* like a page (see the admin layout) */
+    padding: 0 1.5rem 1.5rem; /* like a page, right under the bar (see the admin layout) */
   }
 
   /* a phone: full width (the phone's back closes it); the bar one line, scrolled sideways to its buttons, the title
@@ -257,7 +259,7 @@
       font-size: 1.2rem;
     }
     .content {
-      padding: 0.75rem 0.75rem 1.5rem;
+      padding: 0 0.75rem 1.5rem;
     }
   }
 </style>

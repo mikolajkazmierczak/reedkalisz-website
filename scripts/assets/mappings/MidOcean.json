@@ -1,0 +1,2703 @@
+{
+  "places": [
+    {
+      "pattern": "360",
+      "to": "na okrągło"
+    },
+    {
+      "pattern": "360 BIG CUP",
+      "to": "kubek - na okrągło"
+    },
+    {
+      "pattern": "360 PEPPER",
+      "to": "pieprzniczka - na okrągło"
+    },
+    {
+      "pattern": "360 SALT",
+      "to": "solniczka - na okrągło"
+    },
+    {
+      "pattern": "360 SMALL CUP",
+      "to": "kubek - na okrągło"
+    },
+    {
+      "pattern": "360 UPPER",
+      "to": "na okrągło - na górze"
+    },
+    {
+      "pattern": "ABOVE BUTTON",
+      "to": "nad przyciskiem"
+    },
+    {
+      "pattern": "ABOVE DISPLAY",
+      "to": "nad wyświetlaczem"
+    },
+    {
+      "pattern": "ABOVE POCKET",
+      "to": "nad kieszenią"
+    },
+    {
+      "pattern": "ABOVE SCREEN",
+      "to": "nad wyświetlaczem"
+    },
+    {
+      "pattern": "ABOVE UTENSILS",
+      "to": "nad sztućcami"
+    },
+    {
+      "pattern": "AIRPLANE",
+      "to": "samolot"
+    },
+    {
+      "pattern": "ANTI DRIP COLLAR",
+      "to": "pierścień"
+    },
+    {
+      "pattern": "APRON",
+      "to": "fartuch"
+    },
+    {
+      "pattern": "APRON POCKET",
+      "to": "fartuch - kieszeń"
+    },
+    {
+      "pattern": "ARM 1",
+      "to": "ramię"
+    },
+    {
+      "pattern": "ARM 2",
+      "to": "ramię"
+    },
+    {
+      "pattern": "ARM 3",
+      "to": "ramię"
+    },
+    {
+      "pattern": "ARM 4",
+      "to": "ramię"
+    },
+    {
+      "pattern": "ARM LEFT",
+      "to": "rękaw"
+    },
+    {
+      "pattern": "ARM RIGHT",
+      "to": "rękaw"
+    },
+    {
+      "pattern": "AXE SIDE",
+      "to": "siekiera"
+    },
+    {
+      "pattern": "BACK",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK BAG",
+      "to": "torba - tył"
+    },
+    {
+      "pattern": "BACK BOTTOM",
+      "to": "tył - na dole"
+    },
+    {
+      "pattern": "BACK CENTER",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK COLORED PART",
+      "to": "tył - kolorowa część"
+    },
+    {
+      "pattern": "BACK COLOUR PART",
+      "to": "tył - kolorowa część"
+    },
+    {
+      "pattern": "BACK COLOURDED",
+      "to": "tył - kolorowa część"
+    },
+    {
+      "pattern": "BACK DOMING",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK EMBROIDERY",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK FOLDER",
+      "to": "teczka - tył"
+    },
+    {
+      "pattern": "BACK HEAD",
+      "to": "główka"
+    },
+    {
+      "pattern": "BACK LEATHER PART",
+      "to": "tył - skórzana część"
+    },
+    {
+      "pattern": "BACK LEFT",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK MIDDLE",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK NOTEBOOK",
+      "to": "notatnik - tył"
+    },
+    {
+      "pattern": "BACK OF CHAIR",
+      "to": "oparcie"
+    },
+    {
+      "pattern": "BACK POCKET",
+      "to": "kieszeń - tył"
+    },
+    {
+      "pattern": "BACK POUCH",
+      "to": "worek - tył"
+    },
+    {
+      "pattern": "BACK RED PART",
+      "to": "tył - czerwona część"
+    },
+    {
+      "pattern": "BACK REST",
+      "to": "oparcie"
+    },
+    {
+      "pattern": "BACK RIGHT",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK ROOF",
+      "to": "dach"
+    },
+    {
+      "pattern": "BACK SIDE",
+      "to": "tył"
+    },
+    {
+      "pattern": "BACK SILVER PART",
+      "to": "tył - srebrna część"
+    },
+    {
+      "pattern": "BACK UPPER",
+      "to": "tył - na górze"
+    },
+    {
+      "pattern": "BACK WHITE",
+      "to": "tył - biała część"
+    },
+    {
+      "pattern": "BACK WHITE PART",
+      "to": "tył - biała część"
+    },
+    {
+      "pattern": "BAG",
+      "to": "torba"
+    },
+    {
+      "pattern": "BAG BACK",
+      "to": "torba - tył"
+    },
+    {
+      "pattern": "BAG FRONT",
+      "to": "torba - przód"
+    },
+    {
+      "pattern": "BAG FRONT FLAP",
+      "to": "torba - klapa"
+    },
+    {
+      "pattern": "BAG SIDE",
+      "to": "torba"
+    },
+    {
+      "pattern": "BALL",
+      "to": "piłka"
+    },
+    {
+      "pattern": "BALL PEN LEFT HANDED",
+      "to": "długopis"
+    },
+    {
+      "pattern": "BALLPEN RIGHT HANDED",
+      "to": "długopis"
+    },
+    {
+      "pattern": "BAMBOO",
+      "to": "bambusowa część"
+    },
+    {
+      "pattern": "BAND",
+      "to": "opaska"
+    },
+    {
+      "pattern": "BAND BACK",
+      "to": "opaska - tył"
+    },
+    {
+      "pattern": "BAND FRONT",
+      "to": "opaska - przód"
+    },
+    {
+      "pattern": "BAND SIDE",
+      "to": "opaska"
+    },
+    {
+      "pattern": "BAND SUBLIMATION",
+      "to": "opaska"
+    },
+    {
+      "pattern": "BARELL RIGHT",
+      "to": "korpus"
+    },
+    {
+      "pattern": "BARREL",
+      "to": "korpus"
+    },
+    {
+      "pattern": "BARREL RH PEN",
+      "to": "długopis"
+    },
+    {
+      "pattern": "BARREL RH PENCIL",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "BARREL RIGHT HANDED",
+      "to": "korpus"
+    },
+    {
+      "pattern": "BASE",
+      "to": "podstawa"
+    },
+    {
+      "pattern": "BASE BACK",
+      "to": "podstawa - tył"
+    },
+    {
+      "pattern": "BASE CORK",
+      "to": "podstawa - korek"
+    },
+    {
+      "pattern": "BASE FRONT",
+      "to": "podstawa - przód"
+    },
+    {
+      "pattern": "BASE LEFT",
+      "to": "podstawa"
+    },
+    {
+      "pattern": "BASE RIGHT",
+      "to": "podstawa"
+    },
+    {
+      "pattern": "BASE SIDE",
+      "to": "podstawa"
+    },
+    {
+      "pattern": "BEANIE",
+      "to": "czapka"
+    },
+    {
+      "pattern": "BELL",
+      "to": "dzwonek"
+    },
+    {
+      "pattern": "BELL SIDE",
+      "to": "dzwonek"
+    },
+    {
+      "pattern": "BELLOW DISPLAY",
+      "to": "pod wyświetlaczem"
+    },
+    {
+      "pattern": "BELOW BUTTON",
+      "to": "pod przyciskiem"
+    },
+    {
+      "pattern": "BELOW BUTTONS",
+      "to": "pod przyciskiem"
+    },
+    {
+      "pattern": "BELOW DISPLAY",
+      "to": "pod wyświetlaczem"
+    },
+    {
+      "pattern": "BELOW KEYBOARD",
+      "to": "pod klawiaturą"
+    },
+    {
+      "pattern": "BELOW POCKET",
+      "to": "pod kieszenią"
+    },
+    {
+      "pattern": "BELOW THE HOOD",
+      "to": "pod kapturem"
+    },
+    {
+      "pattern": "BLADE",
+      "to": "ostrze"
+    },
+    {
+      "pattern": "BLANKET",
+      "to": "koc"
+    },
+    {
+      "pattern": "BLANKET CARD",
+      "to": "koc - karta"
+    },
+    {
+      "pattern": "BLENDER",
+      "to": "blender"
+    },
+    {
+      "pattern": "BOARD",
+      "to": "deska"
+    },
+    {
+      "pattern": "BODY",
+      "to": "korpus"
+    },
+    {
+      "pattern": "BODY LEFT",
+      "to": "korpus"
+    },
+    {
+      "pattern": "BODY OF BEAR",
+      "to": "miś"
+    },
+    {
+      "pattern": "BODY RIGHT",
+      "to": "korpus"
+    },
+    {
+      "pattern": "BOTTLE",
+      "to": "butelka"
+    },
+    {
+      "pattern": "BOTTLE 360",
+      "to": "butelka - na okrągło"
+    },
+    {
+      "pattern": "BOTTLE LID",
+      "to": "butelka - pokrywka"
+    },
+    {
+      "pattern": "BOTTLE OPENER",
+      "to": "otwieracz"
+    },
+    {
+      "pattern": "BOTTOM",
+      "to": "spód"
+    },
+    {
+      "pattern": "BOTTOM BOX",
+      "to": "pudełko - spód"
+    },
+    {
+      "pattern": "BOTTOM LEFT",
+      "to": "na dole"
+    },
+    {
+      "pattern": "BOTTOM PART DL",
+      "to": "na dole"
+    },
+    {
+      "pattern": "BOTTOM POCKET LEFT",
+      "to": "dolna kieszeń"
+    },
+    {
+      "pattern": "BOTTOM POCKET RIGHT",
+      "to": "dolna kieszeń"
+    },
+    {
+      "pattern": "BOTTOM RIGHT",
+      "to": "na dole"
+    },
+    {
+      "pattern": "BOWL SIDE",
+      "to": "miska"
+    },
+    {
+      "pattern": "BOX",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "BOX 1",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "BOX 2",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "BOX BACK",
+      "to": "pudełko - tył"
+    },
+    {
+      "pattern": "BOX BOTTOM",
+      "to": "pudełko - spód"
+    },
+    {
+      "pattern": "BOX CORNER",
+      "to": "pudełko - narożnik"
+    },
+    {
+      "pattern": "BOX FRONT",
+      "to": "pudełko - przód"
+    },
+    {
+      "pattern": "BOX LID",
+      "to": "pudełko - pokrywka"
+    },
+    {
+      "pattern": "BOX PAD",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "BOX SIDE",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "BOX TOP",
+      "to": "pudełko - wierzch"
+    },
+    {
+      "pattern": "BOX TOP PAD",
+      "to": "pudełko - wierzch"
+    },
+    {
+      "pattern": "BRACE",
+      "to": "szelka"
+    },
+    {
+      "pattern": "BREAST LEFT",
+      "to": "na piersi"
+    },
+    {
+      "pattern": "BREAST RIGHT",
+      "to": "na piersi"
+    },
+    {
+      "pattern": "BRIM",
+      "to": "daszek"
+    },
+    {
+      "pattern": "BRUSH",
+      "to": "szczotka"
+    },
+    {
+      "pattern": "BUCKET",
+      "to": "wiaderko"
+    },
+    {
+      "pattern": "BUCKLE",
+      "to": "klamra"
+    },
+    {
+      "pattern": "BUSINESSCART HOLDER",
+      "to": "etui na karty"
+    },
+    {
+      "pattern": "BUTTON",
+      "to": "przycisk"
+    },
+    {
+      "pattern": "CANDLE SIDE 1",
+      "to": "świeca"
+    },
+    {
+      "pattern": "CAP",
+      "to": "nakrętka"
+    },
+    {
+      "pattern": "CAP FRONT",
+      "to": "nakrętka - przód"
+    },
+    {
+      "pattern": "CAP OF PEN",
+      "to": "skuwka"
+    },
+    {
+      "pattern": "CAP SIDE",
+      "to": "nakrętka"
+    },
+    {
+      "pattern": "CAP TOP",
+      "to": "nakrętka - wierzch"
+    },
+    {
+      "pattern": "CARABINER",
+      "to": "karabińczyk"
+    },
+    {
+      "pattern": "CARAFE",
+      "to": "karafka"
+    },
+    {
+      "pattern": "CARD HOLDER",
+      "to": "etui na karty"
+    },
+    {
+      "pattern": "CARD HOLDER METAL",
+      "to": "etui na karty - metalowa część"
+    },
+    {
+      "pattern": "CARDBOARD",
+      "to": "kartonik"
+    },
+    {
+      "pattern": "CARDS",
+      "to": "karty"
+    },
+    {
+      "pattern": "CART HOLDER METAL",
+      "to": "etui na karty - metalowa część"
+    },
+    {
+      "pattern": "CARTON",
+      "to": "kartonik"
+    },
+    {
+      "pattern": "CARTON BACK",
+      "to": "kartonik - tył"
+    },
+    {
+      "pattern": "CARTON PART BACK",
+      "to": "kartonik - tył"
+    },
+    {
+      "pattern": "CARTON PART FRONT",
+      "to": "kartonik - przód"
+    },
+    {
+      "pattern": "CASE",
+      "to": "etui"
+    },
+    {
+      "pattern": "CASE SIDE",
+      "to": "etui"
+    },
+    {
+      "pattern": "CENTER",
+      "to": "środek"
+    },
+    {
+      "pattern": "CENTER POCKET",
+      "to": "środkowa kieszeń"
+    },
+    {
+      "pattern": "CHARGER",
+      "to": "ładowarka"
+    },
+    {
+      "pattern": "CHEST",
+      "to": "na piersi"
+    },
+    {
+      "pattern": "CHEST RIGHT",
+      "to": "na piersi"
+    },
+    {
+      "pattern": "CHIMNEY",
+      "to": "komin"
+    },
+    {
+      "pattern": "CIRCLE AT TOP",
+      "to": "kółko na górze"
+    },
+    {
+      "pattern": "CLIP",
+      "to": "klip"
+    },
+    {
+      "pattern": "CLIP BACK",
+      "to": "klip"
+    },
+    {
+      "pattern": "CLIP FRONT",
+      "to": "klip"
+    },
+    {
+      "pattern": "CLIP LEFT",
+      "to": "klip"
+    },
+    {
+      "pattern": "CLIP RIGHT",
+      "to": "klip"
+    },
+    {
+      "pattern": "CLIP RIGHT HANDED",
+      "to": "klip"
+    },
+    {
+      "pattern": "CLOSURE",
+      "to": "zapięcie"
+    },
+    {
+      "pattern": "CLOTH",
+      "to": "ściereczka"
+    },
+    {
+      "pattern": "CLOTH CENTER",
+      "to": "ściereczka - środek"
+    },
+    {
+      "pattern": "CM SIDE",
+      "to": "strona z centymetrami"
+    },
+    {
+      "pattern": "COASTER",
+      "to": "podkładka"
+    },
+    {
+      "pattern": "COIN BACK",
+      "to": "żeton"
+    },
+    {
+      "pattern": "COIN FRONT",
+      "to": "żeton"
+    },
+    {
+      "pattern": "COLOURED PART BACK",
+      "to": "tył - kolorowa część"
+    },
+    {
+      "pattern": "COLOURED PART FRONT",
+      "to": "przód - kolorowa część"
+    },
+    {
+      "pattern": "COMPASS",
+      "to": "kompas"
+    },
+    {
+      "pattern": "CONTAINER",
+      "to": "pojemnik"
+    },
+    {
+      "pattern": "CORK FRONT",
+      "to": "korek - przód"
+    },
+    {
+      "pattern": "CORNER",
+      "to": "narożnik"
+    },
+    {
+      "pattern": "COVER",
+      "to": "okładka"
+    },
+    {
+      "pattern": "COVER RIGHT",
+      "to": "okładka"
+    },
+    {
+      "pattern": "CRANK",
+      "to": "korbka"
+    },
+    {
+      "pattern": "CUBE",
+      "to": "kostka"
+    },
+    {
+      "pattern": "CUP",
+      "to": "kubek"
+    },
+    {
+      "pattern": "CUP LEFT",
+      "to": "kubek"
+    },
+    {
+      "pattern": "CUP RIGHT",
+      "to": "kubek"
+    },
+    {
+      "pattern": "CUP SIDE",
+      "to": "kubek"
+    },
+    {
+      "pattern": "CUP TOP",
+      "to": "kubek - wierzch"
+    },
+    {
+      "pattern": "CUP1",
+      "to": "kubek"
+    },
+    {
+      "pattern": "CUP2",
+      "to": "kubek"
+    },
+    {
+      "pattern": "CUTTER",
+      "to": "nóż"
+    },
+    {
+      "pattern": "DATA BLOCKER",
+      "to": "bloker danych"
+    },
+    {
+      "pattern": "DIFFUSER LABEL",
+      "to": "dyfuzor - etykieta"
+    },
+    {
+      "pattern": "DIFFUSER SIDE 1",
+      "to": "dyfuzor"
+    },
+    {
+      "pattern": "DIGITAL PRINT",
+      "to": "druk cyfrowy"
+    },
+    {
+      "pattern": "DISPLAY SIDE 1",
+      "to": "wyświetlacz"
+    },
+    {
+      "pattern": "DIVOT TOOL",
+      "to": "narzędzie"
+    },
+    {
+      "pattern": "DOMING",
+      "to": "doming"
+    },
+    {
+      "pattern": "DOOR LEFT",
+      "to": "drzwi"
+    },
+    {
+      "pattern": "DOOR RIGHT",
+      "to": "drzwi"
+    },
+    {
+      "pattern": "DRONIE TOP",
+      "to": "dron"
+    },
+    {
+      "pattern": "EAR LEFT",
+      "to": "nausznik"
+    },
+    {
+      "pattern": "EAR RIGHT",
+      "to": "nausznik"
+    },
+    {
+      "pattern": "EARBUD",
+      "to": "słuchawka"
+    },
+    {
+      "pattern": "EARFLAP",
+      "to": "nausznik"
+    },
+    {
+      "pattern": "EGG",
+      "to": "jajko"
+    },
+    {
+      "pattern": "EGG TRAY",
+      "to": "pojemnik na jajka"
+    },
+    {
+      "pattern": "EMBROIDERY",
+      "to": "haft"
+    },
+    {
+      "pattern": "EMBROIDERY CENTER",
+      "to": "środek"
+    },
+    {
+      "pattern": "ENVELOP BACK",
+      "to": "koperta"
+    },
+    {
+      "pattern": "FAN",
+      "to": "wiatrak"
+    },
+    {
+      "pattern": "FAN FRONT",
+      "to": "wiatrak - przód"
+    },
+    {
+      "pattern": "FILTER FRONT",
+      "to": "filtr"
+    },
+    {
+      "pattern": "FIRESTARTER",
+      "to": "krzesiwo"
+    },
+    {
+      "pattern": "FIRST AID KIT",
+      "to": "apteczka"
+    },
+    {
+      "pattern": "FIRST PAGE",
+      "to": "pierwsza strona"
+    },
+    {
+      "pattern": "FLAP",
+      "to": "klapa"
+    },
+    {
+      "pattern": "FLAP EMBROIDERY",
+      "to": "klapa"
+    },
+    {
+      "pattern": "FOLDER",
+      "to": "teczka"
+    },
+    {
+      "pattern": "FOLDER INSIDE",
+      "to": "teczka - wewnątrz"
+    },
+    {
+      "pattern": "FORK",
+      "to": "widelec"
+    },
+    {
+      "pattern": "FORK HANDLE",
+      "to": "widelec - uchwyt"
+    },
+    {
+      "pattern": "FRISBEE",
+      "to": "frisbee"
+    },
+    {
+      "pattern": "FRONT",
+      "to": "przód"
+    },
+    {
+      "pattern": "FRONT  RIGHT",
+      "to": "przód"
+    },
+    {
+      "pattern": "FRONT ABOVE POCKET",
+      "to": "przód - nad kieszenią"
+    },
+    {
+      "pattern": "FRONT ABOVE POCKETS",
+      "to": "przód - nad kieszenią"
+    },
+    {
+      "pattern": "FRONT BAG",
+      "to": "torba - przód"
+    },
+    {
+      "pattern": "FRONT BAND",
+      "to": "opaska - przód"
+    },
+    {
+      "pattern": "FRONT BELOW BUTTON",
+      "to": "przód - pod przyciskiem"
+    },
+    {
+      "pattern": "FRONT BELOW POCKET",
+      "to": "przód - pod kieszenią"
+    },
+    {
+      "pattern": "FRONT BOTTOM",
+      "to": "przód - na dole"
+    },
+    {
+      "pattern": "FRONT BOX",
+      "to": "pudełko - przód"
+    },
+    {
+      "pattern": "FRONT CENTER",
+      "to": "przód"
+    },
+    {
+      "pattern": "FRONT COLORED PART",
+      "to": "przód - kolorowa część"
+    },
+    {
+      "pattern": "FRONT COLOUR PART",
+      "to": "przód - kolorowa część"
+    },
+    {
+      "pattern": "FRONT COLOURED",
+      "to": "przód - kolorowa część"
+    },
+    {
+      "pattern": "FRONT CORK",
+      "to": "korek - przód"
+    },
+    {
+      "pattern": "FRONT DOMING",
+      "to": "przód"
+    },
+    {
+      "pattern": "FRONT EMBROIDERY",
+      "to": "przód"
+    },
+    {
+      "pattern": "FRONT FLAP",
+      "to": "klapa"
+    },
+    {
+      "pattern": "FRONT FOLDER",
+      "to": "teczka - przód"
+    },
+    {
+      "pattern": "FRONT GLASS",
+      "to": "szkło"
+    },
+    {
+      "pattern": "FRONT HEAD",
+      "to": "główka"
+    },
+    {
+      "pattern": "FRONT INLAY",
+      "to": "wkładka - przód"
+    },
+    {
+      "pattern": "FRONT INSIDE",
+      "to": "przód - wewnątrz"
+    },
+    {
+      "pattern": "FRONT LABEL",
+      "to": "etykieta - przód"
+    },
+    {
+      "pattern": "FRONT LEATHER PART",
+      "to": "przód - skórzana część"
+    },
+    {
+      "pattern": "FRONT LIGHT",
+      "to": "przód - światło"
+    },
+    {
+      "pattern": "FRONT LOCKER",
+      "to": "przód - zamek"
+    },
+    {
+      "pattern": "FRONT LOWER LEFT",
+      "to": "przód - na dole"
+    },
+    {
+      "pattern": "FRONT LOWER POCKET",
+      "to": "dolna kieszeń"
+    },
+    {
+      "pattern": "FRONT LOWER RIGHT",
+      "to": "przód - na dole"
+    },
+    {
+      "pattern": "FRONT MIDDLE RIGHT",
+      "to": "przód"
+    },
+    {
+      "pattern": "FRONT NOTEBOOK",
+      "to": "notatnik - przód"
+    },
+    {
+      "pattern": "FRONT PATCH",
+      "to": "przód - naszywka"
+    },
+    {
+      "pattern": "FRONT PEPPER",
+      "to": "pieprzniczka"
+    },
+    {
+      "pattern": "FRONT PLATE",
+      "to": "płytka"
+    },
+    {
+      "pattern": "FRONT POCKET",
+      "to": "kieszeń - przód"
+    },
+    {
+      "pattern": "FRONT POUCH",
+      "to": "worek - przód"
+    },
+    {
+      "pattern": "FRONT RED LIGHT",
+      "to": "przód - światło"
+    },
+    {
+      "pattern": "FRONT RED PART",
+      "to": "przód - czerwona część"
+    },
+    {
+      "pattern": "FRONT RIGHT",
+      "to": "przód"
+    },
+    {
+      "pattern": "FRONT RING",
+      "to": "przód - pierścień"
+    },
+    {
+      "pattern": "FRONT ROOF",
+      "to": "dach"
+    },
+    {
+      "pattern": "FRONT SALT",
+      "to": "solniczka - przód"
+    },
+    {
+      "pattern": "FRONT SILVER PART",
+      "to": "przód - srebrna część"
+    },
+    {
+      "pattern": "FRONT SMALL BAG",
+      "to": "torebka - przód"
+    },
+    {
+      "pattern": "FRONT TOP PAD",
+      "to": "przód - na górze"
+    },
+    {
+      "pattern": "FRONT UPPER",
+      "to": "przód - na górze"
+    },
+    {
+      "pattern": "FRONT UPPER POCKET",
+      "to": "górna kieszeń"
+    },
+    {
+      "pattern": "FRONT WHITE PART",
+      "to": "przód - biała część"
+    },
+    {
+      "pattern": "GLASS",
+      "to": "szkło"
+    },
+    {
+      "pattern": "GLASS 1",
+      "to": "szklanka"
+    },
+    {
+      "pattern": "GLASS 2",
+      "to": "szklanka"
+    },
+    {
+      "pattern": "GLASS 3",
+      "to": "szklanka"
+    },
+    {
+      "pattern": "GLASS 4",
+      "to": "szklanka"
+    },
+    {
+      "pattern": "GLASS BOTTOM",
+      "to": "szkło - spód"
+    },
+    {
+      "pattern": "GLOVE",
+      "to": "rękawiczka"
+    },
+    {
+      "pattern": "GLOVE FRONT",
+      "to": "rękawiczka - przód"
+    },
+    {
+      "pattern": "GLOVE RIGHT",
+      "to": "rękawiczka"
+    },
+    {
+      "pattern": "GOOGLES SIDE 1",
+      "to": "gogle"
+    },
+    {
+      "pattern": "GOOGLES STRAP",
+      "to": "gogle - pasek"
+    },
+    {
+      "pattern": "GRASS LEFT",
+      "to": "trawa"
+    },
+    {
+      "pattern": "GRASS RIGHT",
+      "to": "trawa"
+    },
+    {
+      "pattern": "GREEN PATCH",
+      "to": "zielony panel"
+    },
+    {
+      "pattern": "HAMMOCK",
+      "to": "hamak"
+    },
+    {
+      "pattern": "HAND OF FILTER FRONT",
+      "to": "filtr - uchwyt"
+    },
+    {
+      "pattern": "HANDLE",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "HANDLE 1 END",
+      "to": "uchwyt - koniec"
+    },
+    {
+      "pattern": "HANDLE 2 END",
+      "to": "uchwyt - koniec"
+    },
+    {
+      "pattern": "HANDLE BOTTOM",
+      "to": "uchwyt - spód"
+    },
+    {
+      "pattern": "HANDLE FORK",
+      "to": "widelec - uchwyt"
+    },
+    {
+      "pattern": "HANDLE METAL",
+      "to": "uchwyt - metalowa część"
+    },
+    {
+      "pattern": "HANDLE RIGHT HANDED",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "HANDLE SPATULA",
+      "to": "łopatka - uchwyt"
+    },
+    {
+      "pattern": "HANDLE TONGS",
+      "to": "szczypce - uchwyt"
+    },
+    {
+      "pattern": "HAT",
+      "to": "czapka"
+    },
+    {
+      "pattern": "HAT FRONT",
+      "to": "czapka - przód"
+    },
+    {
+      "pattern": "HEAD LEFT",
+      "to": "główka"
+    },
+    {
+      "pattern": "HEAD RIGHT",
+      "to": "główka"
+    },
+    {
+      "pattern": "HEAD RIGHT HANDED",
+      "to": "główka"
+    },
+    {
+      "pattern": "HEART",
+      "to": "serce"
+    },
+    {
+      "pattern": "HOLDER",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "HOOD",
+      "to": "kaptur"
+    },
+    {
+      "pattern": "HOODIE",
+      "to": "bluza"
+    },
+    {
+      "pattern": "HOURGLASS",
+      "to": "klepsydra"
+    },
+    {
+      "pattern": "IDENTIFIER",
+      "to": "identyfikator"
+    },
+    {
+      "pattern": "IN LINE OF CLIP",
+      "to": "korpus - pod klipem"
+    },
+    {
+      "pattern": "IN LINE WITH CLIP",
+      "to": "korpus - pod klipem"
+    },
+    {
+      "pattern": "INCH SIDE",
+      "to": "strona z calami"
+    },
+    {
+      "pattern": "INFUSER",
+      "to": "zaparzacz"
+    },
+    {
+      "pattern": "INK BOX",
+      "to": "tusz"
+    },
+    {
+      "pattern": "INLAY",
+      "to": "wkładka"
+    },
+    {
+      "pattern": "INLAY FRONT",
+      "to": "wkładka - przód"
+    },
+    {
+      "pattern": "INSIDE",
+      "to": "wewnątrz"
+    },
+    {
+      "pattern": "INSIDE COVER",
+      "to": "okładka - wewnątrz"
+    },
+    {
+      "pattern": "INSIDE OF LID",
+      "to": "pokrywka - wewnątrz"
+    },
+    {
+      "pattern": "INSIDE PIECE 1",
+      "to": "część wewnętrzna"
+    },
+    {
+      "pattern": "INSIDE PIECE 2",
+      "to": "część wewnętrzna"
+    },
+    {
+      "pattern": "INSIDE POCKET 1",
+      "to": "kieszeń wewnętrzna"
+    },
+    {
+      "pattern": "INSIDE POCKET 2",
+      "to": "kieszeń wewnętrzna"
+    },
+    {
+      "pattern": "INSIDE TOP LEFT",
+      "to": "wewnątrz"
+    },
+    {
+      "pattern": "KEY RING",
+      "to": "brelok"
+    },
+    {
+      "pattern": "KEYRING",
+      "to": "brelok"
+    },
+    {
+      "pattern": "KEYRING STRAP",
+      "to": "brelok - pasek"
+    },
+    {
+      "pattern": "KITE",
+      "to": "latawiec"
+    },
+    {
+      "pattern": "KNIFE",
+      "to": "nóż"
+    },
+    {
+      "pattern": "LABEL",
+      "to": "etykieta"
+    },
+    {
+      "pattern": "LAMP",
+      "to": "lampa"
+    },
+    {
+      "pattern": "LAMP SIDE",
+      "to": "lampa"
+    },
+    {
+      "pattern": "LEAF SIDE",
+      "to": "liść"
+    },
+    {
+      "pattern": "LEATHER PART",
+      "to": "skórzana część"
+    },
+    {
+      "pattern": "LEFT",
+      "to": "bok"
+    },
+    {
+      "pattern": "LEFT EAR",
+      "to": "nausznik"
+    },
+    {
+      "pattern": "LEFT HANDED UPPER",
+      "to": "bok - na górze"
+    },
+    {
+      "pattern": "LEFT LEG",
+      "to": "nogawka"
+    },
+    {
+      "pattern": "LEFT OF CLIP",
+      "to": "korpus - pod klipem"
+    },
+    {
+      "pattern": "LEFT OF SOLAR CEL",
+      "to": "obok panelu słonecznego"
+    },
+    {
+      "pattern": "LEVEL",
+      "to": "poziomica"
+    },
+    {
+      "pattern": "LID",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LID BOTTOM",
+      "to": "pokrywka - spód"
+    },
+    {
+      "pattern": "LID CENTER",
+      "to": "pokrywka - środek"
+    },
+    {
+      "pattern": "LID FRONT",
+      "to": "pokrywka - przód"
+    },
+    {
+      "pattern": "LID HANDLE",
+      "to": "pokrywka - uchwyt"
+    },
+    {
+      "pattern": "LID INSIDE",
+      "to": "pokrywka - wewnątrz"
+    },
+    {
+      "pattern": "LID LABEL",
+      "to": "pokrywka - etykieta"
+    },
+    {
+      "pattern": "LID LEFT",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LID OF BAG",
+      "to": "torba - klapa"
+    },
+    {
+      "pattern": "LID PAD",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LID RIGHT",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LID SIDE",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LID SIDE 1 LABEL",
+      "to": "pokrywka - etykieta"
+    },
+    {
+      "pattern": "LID TOP",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LID TOP PAD",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LIDTOP",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "LOWER EMBROIDERY",
+      "to": "na dole"
+    },
+    {
+      "pattern": "LOWER LEFT",
+      "to": "na dole"
+    },
+    {
+      "pattern": "LOWER MIDDLE",
+      "to": "na dole - środek"
+    },
+    {
+      "pattern": "LOWER RIGHT",
+      "to": "na dole"
+    },
+    {
+      "pattern": "LOWER RIGHT POCKET",
+      "to": "dolna kieszeń"
+    },
+    {
+      "pattern": "LUNCHBOX LID",
+      "to": "lunchbox - pokrywka"
+    },
+    {
+      "pattern": "LUNCHBOX SIDE",
+      "to": "lunchbox"
+    },
+    {
+      "pattern": "MAP",
+      "to": "mapa"
+    },
+    {
+      "pattern": "MARKER",
+      "to": "marker"
+    },
+    {
+      "pattern": "MASK",
+      "to": "maska"
+    },
+    {
+      "pattern": "MAT",
+      "to": "mata"
+    },
+    {
+      "pattern": "MAT CORNER",
+      "to": "mata - narożnik"
+    },
+    {
+      "pattern": "MEASURING CUP TOP",
+      "to": "miarka"
+    },
+    {
+      "pattern": "METAL CAP BACK",
+      "to": "metalowa nakrętka"
+    },
+    {
+      "pattern": "METAL CAP FRONT",
+      "to": "metalowa nakrętka - przód"
+    },
+    {
+      "pattern": "METAL PLATE",
+      "to": "metalowa płytka"
+    },
+    {
+      "pattern": "MICROPHONE",
+      "to": "mikrofon"
+    },
+    {
+      "pattern": "MIDDLE EMBROIDERY",
+      "to": "środek"
+    },
+    {
+      "pattern": "MIDDLE POCKET",
+      "to": "środkowa kieszeń"
+    },
+    {
+      "pattern": "MIRROR",
+      "to": "lusterko"
+    },
+    {
+      "pattern": "MIRROR BOTTOM",
+      "to": "lusterko - na dole"
+    },
+    {
+      "pattern": "MITTEN",
+      "to": "rękawiczka"
+    },
+    {
+      "pattern": "MOUSE",
+      "to": "mysz"
+    },
+    {
+      "pattern": "MOUSE PAD",
+      "to": "podkładka pod mysz"
+    },
+    {
+      "pattern": "MOUSEPAD",
+      "to": "podkładka pod mysz"
+    },
+    {
+      "pattern": "MUG",
+      "to": "kubek"
+    },
+    {
+      "pattern": "MUG 1 360",
+      "to": "kubek - na okrągło"
+    },
+    {
+      "pattern": "MUG 1 RIGHT HANDED",
+      "to": "kubek"
+    },
+    {
+      "pattern": "MUG 1 ROUNSCREEN",
+      "to": "na okrągło"
+    },
+    {
+      "pattern": "MUG 360",
+      "to": "kubek - na okrągło"
+    },
+    {
+      "pattern": "MUG GRIP",
+      "to": "uchwyt"
+    },
+    {
+      "pattern": "MUG LEFT HANDED",
+      "to": "kubek"
+    },
+    {
+      "pattern": "MUG RIGHT HANDED",
+      "to": "kubek"
+    },
+    {
+      "pattern": "MULTITOOL",
+      "to": "narzędzie wielofunkcyjne"
+    },
+    {
+      "pattern": "NEXT TO CLIP",
+      "to": "korpus - pod klipem"
+    },
+    {
+      "pattern": "NEXT TO THE CLIP",
+      "to": "korpus - pod klipem"
+    },
+    {
+      "pattern": "NOTEBOOK",
+      "to": "notatnik"
+    },
+    {
+      "pattern": "NOTEBOOK BACK",
+      "to": "notatnik - tył"
+    },
+    {
+      "pattern": "NOTEBOOK BAMBOO PART",
+      "to": "notatnik - bambusowa część"
+    },
+    {
+      "pattern": "NOTEBOOK FRONT",
+      "to": "notatnik - przód"
+    },
+    {
+      "pattern": "NOTEBOOK PLATE",
+      "to": "notatnik - płytka"
+    },
+    {
+      "pattern": "ON GLASS",
+      "to": "na szkle"
+    },
+    {
+      "pattern": "OPENER",
+      "to": "otwieracz"
+    },
+    {
+      "pattern": "OPPOSITE CLIP",
+      "to": "korpus - naprzeciw klipu"
+    },
+    {
+      "pattern": "OPPOSITE CLIP PENCIL",
+      "to": "ołówek - naprzeciw klipu"
+    },
+    {
+      "pattern": "OPPOSITE OF CLIP PEN",
+      "to": "długopis - naprzeciw klipu"
+    },
+    {
+      "pattern": "OPPOSITE OF HANDLE",
+      "to": "naprzeciw ucha"
+    },
+    {
+      "pattern": "OPPOSITE OF THE CLIP",
+      "to": "korpus - naprzeciw klipu"
+    },
+    {
+      "pattern": "OPPOSITE THE CLIP",
+      "to": "korpus - naprzeciw klipu"
+    },
+    {
+      "pattern": "ORGANIZER",
+      "to": "organizer"
+    },
+    {
+      "pattern": "OUTSIDE PIECE 1",
+      "to": "część zewnętrzna"
+    },
+    {
+      "pattern": "OUTSIDE PIECE 2",
+      "to": "część zewnętrzna"
+    },
+    {
+      "pattern": "PAD",
+      "to": "podkładka"
+    },
+    {
+      "pattern": "PANEL",
+      "to": "panel"
+    },
+    {
+      "pattern": "PAPER ENVELOPE",
+      "to": "koperta"
+    },
+    {
+      "pattern": "PAPER INSERT",
+      "to": "wkładka"
+    },
+    {
+      "pattern": "PART 1",
+      "to": "część"
+    },
+    {
+      "pattern": "PART 2",
+      "to": "część"
+    },
+    {
+      "pattern": "PART 3",
+      "to": "część"
+    },
+    {
+      "pattern": "PART 4",
+      "to": "część"
+    },
+    {
+      "pattern": "PATCH",
+      "to": "naszywka"
+    },
+    {
+      "pattern": "PD",
+      "to": "tampodruk"
+    },
+    {
+      "pattern": "PEN",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN 1 BARREL RH",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN 1 CLIP RH",
+      "to": "długopis - klip"
+    },
+    {
+      "pattern": "PEN 1 LEFT HANDED",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN 1 RIGHT HANDED",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN 1 ROUNDSCREEN",
+      "to": "długopis - na okrągło"
+    },
+    {
+      "pattern": "PEN 2 BARREL RH",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN 2 CLIP RH",
+      "to": "długopis - klip"
+    },
+    {
+      "pattern": "PEN 2 LEFT HANDED",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN 2 RIGHT HANDED",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN 2 ROUNDSCREEN",
+      "to": "długopis - na okrągło"
+    },
+    {
+      "pattern": "PEN BARREL LH",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN BARREL RH",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN BARREL RIGHT",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN METAL PART",
+      "to": "długopis - metalowa część"
+    },
+    {
+      "pattern": "PEN NEXT CLIP",
+      "to": "korpus - pod klipem"
+    },
+    {
+      "pattern": "PEN NEXT TO CLIP",
+      "to": "długopis - pod klipem"
+    },
+    {
+      "pattern": "PEN OPPOSITE CLIP",
+      "to": "długopis - naprzeciw klipu"
+    },
+    {
+      "pattern": "PEN RIGHT BARREL",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN RIGHT HANDED",
+      "to": "długopis"
+    },
+    {
+      "pattern": "PEN ROUNDSCREEN",
+      "to": "długopis - na okrągło"
+    },
+    {
+      "pattern": "PENCIL",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "PENCIL CASE",
+      "to": "piórnik"
+    },
+    {
+      "pattern": "PENCIL RIGHT BARREL",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "PIECE",
+      "to": "część"
+    },
+    {
+      "pattern": "PILLOW",
+      "to": "poduszka"
+    },
+    {
+      "pattern": "PILLOW POCKET",
+      "to": "poduszka - kieszeń"
+    },
+    {
+      "pattern": "PLANK",
+      "to": "deska"
+    },
+    {
+      "pattern": "PLATE",
+      "to": "płytka"
+    },
+    {
+      "pattern": "PLATE 1",
+      "to": "talerz"
+    },
+    {
+      "pattern": "PLATE 2",
+      "to": "talerz"
+    },
+    {
+      "pattern": "PLATE CENTER",
+      "to": "płytka - środek"
+    },
+    {
+      "pattern": "PLUG",
+      "to": "wtyczka"
+    },
+    {
+      "pattern": "PLUG SIDE",
+      "to": "wtyczka"
+    },
+    {
+      "pattern": "POCKET",
+      "to": "kieszeń"
+    },
+    {
+      "pattern": "POCKET OUTSIDE LOWER",
+      "to": "kieszeń zewnętrzna - na dole"
+    },
+    {
+      "pattern": "POCKET OUTSIDE UPPER",
+      "to": "kieszeń zewnętrzna - na górze"
+    },
+    {
+      "pattern": "POLE SIDE",
+      "to": "kij"
+    },
+    {
+      "pattern": "POT 1",
+      "to": "doniczka"
+    },
+    {
+      "pattern": "POT 2",
+      "to": "doniczka"
+    },
+    {
+      "pattern": "POT 3",
+      "to": "doniczka"
+    },
+    {
+      "pattern": "POT LASER",
+      "to": "doniczka"
+    },
+    {
+      "pattern": "POT PAD",
+      "to": "doniczka"
+    },
+    {
+      "pattern": "POT SIDE",
+      "to": "doniczka"
+    },
+    {
+      "pattern": "POT TC",
+      "to": "doniczka"
+    },
+    {
+      "pattern": "POTHOLDER",
+      "to": "łapka kuchenna"
+    },
+    {
+      "pattern": "POUCH",
+      "to": "worek"
+    },
+    {
+      "pattern": "POUCH BACK",
+      "to": "worek - tył"
+    },
+    {
+      "pattern": "POUCH EMBROIDERY",
+      "to": "worek"
+    },
+    {
+      "pattern": "POUCH FRONT",
+      "to": "worek - przód"
+    },
+    {
+      "pattern": "POUCH INSIDE",
+      "to": "worek - wewnątrz"
+    },
+    {
+      "pattern": "POUCH OUTSIDE",
+      "to": "worek - na zewnątrz"
+    },
+    {
+      "pattern": "POWERBANK",
+      "to": "powerbank"
+    },
+    {
+      "pattern": "PUZZLE",
+      "to": "puzzle"
+    },
+    {
+      "pattern": "RACK SIDE",
+      "to": "stojak"
+    },
+    {
+      "pattern": "RACKET 1",
+      "to": "rakietka"
+    },
+    {
+      "pattern": "RACKET 1 HANDLE",
+      "to": "rakietka - uchwyt"
+    },
+    {
+      "pattern": "RACKET 2",
+      "to": "rakietka"
+    },
+    {
+      "pattern": "RACKET 2 HANDLE",
+      "to": "rakietka - uchwyt"
+    },
+    {
+      "pattern": "RADIO",
+      "to": "radio"
+    },
+    {
+      "pattern": "RAKE",
+      "to": "grabie"
+    },
+    {
+      "pattern": "RANDOM GREEN PATCH",
+      "to": "dowolny zielony panel"
+    },
+    {
+      "pattern": "RED LIGHT",
+      "to": "światło"
+    },
+    {
+      "pattern": "RED STICK",
+      "to": "patyczek"
+    },
+    {
+      "pattern": "REFLECTIVE PART",
+      "to": "część odblaskowa"
+    },
+    {
+      "pattern": "REMOTE TOP",
+      "to": "pilot"
+    },
+    {
+      "pattern": "RIBBON",
+      "to": "wstążka"
+    },
+    {
+      "pattern": "RIGHT",
+      "to": "bok"
+    },
+    {
+      "pattern": "RIGHT CHEST",
+      "to": "na piersi"
+    },
+    {
+      "pattern": "RIGHT EAR",
+      "to": "nausznik"
+    },
+    {
+      "pattern": "RIGHT GLOVE",
+      "to": "rękawiczka"
+    },
+    {
+      "pattern": "RIGHT HANDED",
+      "to": "bok"
+    },
+    {
+      "pattern": "RIGHT LEG",
+      "to": "nogawka"
+    },
+    {
+      "pattern": "RIGHT OF CLIP",
+      "to": "korpus - pod klipem"
+    },
+    {
+      "pattern": "RIGHT OF SOLAR CEL",
+      "to": "obok panelu słonecznego"
+    },
+    {
+      "pattern": "ROLLER LEFT HANDED",
+      "to": "pióro kulkowe"
+    },
+    {
+      "pattern": "ROLLER NEXT TO CLIP",
+      "to": "pióro kulkowe - pod klipem"
+    },
+    {
+      "pattern": "ROLLER RIGHT HANDED",
+      "to": "pióro kulkowe"
+    },
+    {
+      "pattern": "ROOF",
+      "to": "dach"
+    },
+    {
+      "pattern": "ROOF SIDE",
+      "to": "dach"
+    },
+    {
+      "pattern": "ROUND DL",
+      "to": "na okrągło"
+    },
+    {
+      "pattern": "ROUND SCREEN",
+      "to": "na okrągło"
+    },
+    {
+      "pattern": "ROUNDCREEN PEN",
+      "to": "długopis - na okrągło"
+    },
+    {
+      "pattern": "ROUNDCREEN PENCIL",
+      "to": "ołówek - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN",
+      "to": "na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN BOX",
+      "to": "pudełko - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN CANDLE",
+      "to": "świeca - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN DIFFUSER",
+      "to": "dyfuzor - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN PEN",
+      "to": "długopis - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN PENCIL",
+      "to": "ołówek - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN RIBBON",
+      "to": "wstążka - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN SALT",
+      "to": "solniczka - na okrągło"
+    },
+    {
+      "pattern": "ROUNDSCREEN SLEEVE",
+      "to": "rękaw - na okrągło"
+    },
+    {
+      "pattern": "RULER",
+      "to": "linijka"
+    },
+    {
+      "pattern": "RULLER",
+      "to": "linijka"
+    },
+    {
+      "pattern": "SCARF",
+      "to": "szalik"
+    },
+    {
+      "pattern": "SCRAPER",
+      "to": "skrobaczka"
+    },
+    {
+      "pattern": "SCREEN BLOCKER",
+      "to": "zasłona kamery"
+    },
+    {
+      "pattern": "SCREWDRIVER",
+      "to": "śrubokręt"
+    },
+    {
+      "pattern": "SEAT",
+      "to": "siedzisko"
+    },
+    {
+      "pattern": "SEAT EMBROIDERY",
+      "to": "siedzisko"
+    },
+    {
+      "pattern": "SEG",
+      "to": "segment"
+    },
+    {
+      "pattern": "SEGMENT",
+      "to": "segment"
+    },
+    {
+      "pattern": "SEGMENT1",
+      "to": "segment"
+    },
+    {
+      "pattern": "SEGMENT2",
+      "to": "segment"
+    },
+    {
+      "pattern": "SEGMENT3",
+      "to": "segment"
+    },
+    {
+      "pattern": "SEGMENT4",
+      "to": "segment"
+    },
+    {
+      "pattern": "SHAKER",
+      "to": "shaker"
+    },
+    {
+      "pattern": "SHARPENER",
+      "to": "temperówka"
+    },
+    {
+      "pattern": "SHOULDER STRAP",
+      "to": "pasek na ramię"
+    },
+    {
+      "pattern": "SHOVEL BOTTOM",
+      "to": "łopatka - spód"
+    },
+    {
+      "pattern": "SHOVEL TOP",
+      "to": "łopatka"
+    },
+    {
+      "pattern": "SIDE",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 1 CENTER",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 1 EMBROIDERY",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 1 HEAD",
+      "to": "bandana - głowa"
+    },
+    {
+      "pattern": "SIDE 1 METAL",
+      "to": "metalowa część"
+    },
+    {
+      "pattern": "SIDE 1 NECK",
+      "to": "bandana - szyja"
+    },
+    {
+      "pattern": "SIDE 1 PART 1",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 1 PART 2",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 1 SUBLIMATION",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 1 UPPER",
+      "to": "bok - na górze"
+    },
+    {
+      "pattern": "SIDE 2 EMBROIDERY",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 2 HEAD",
+      "to": "bandana - głowa"
+    },
+    {
+      "pattern": "SIDE 2 NECK",
+      "to": "bandana - szyja"
+    },
+    {
+      "pattern": "SIDE 2 PART 1",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 2 PART 2",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE 2 UPPER",
+      "to": "bok - na górze"
+    },
+    {
+      "pattern": "SIDE 4 UPPER",
+      "to": "bok - na górze"
+    },
+    {
+      "pattern": "SIDE BOTTOM",
+      "to": "bok - na dole"
+    },
+    {
+      "pattern": "SIDE POCKET",
+      "to": "kieszeń boczna"
+    },
+    {
+      "pattern": "SIDE SUBLIMATION",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE1",
+      "to": "bok"
+    },
+    {
+      "pattern": "SIDE2",
+      "to": "bok"
+    },
+    {
+      "pattern": "SINGLE RANDOM PATCH",
+      "to": "dowolny panel"
+    },
+    {
+      "pattern": "SLATE",
+      "to": "deska"
+    },
+    {
+      "pattern": "SLEEPING BAG",
+      "to": "śpiwór"
+    },
+    {
+      "pattern": "SLEEVE",
+      "to": "rękaw"
+    },
+    {
+      "pattern": "SLIPPER",
+      "to": "kapeć"
+    },
+    {
+      "pattern": "SLIPPERS",
+      "to": "kapeć"
+    },
+    {
+      "pattern": "SMALL BAG",
+      "to": "torebka"
+    },
+    {
+      "pattern": "SNOWFLAKE",
+      "to": "śnieżynka"
+    },
+    {
+      "pattern": "SOCK",
+      "to": "skarpeta"
+    },
+    {
+      "pattern": "SOCK EMBROIDERY",
+      "to": "skarpeta"
+    },
+    {
+      "pattern": "SPADE",
+      "to": "łopatka"
+    },
+    {
+      "pattern": "SPATULA",
+      "to": "łopatka"
+    },
+    {
+      "pattern": "SPOON",
+      "to": "łyżka"
+    },
+    {
+      "pattern": "SPOON FRONT",
+      "to": "łyżka"
+    },
+    {
+      "pattern": "SPOON HANDLE",
+      "to": "łyżka - uchwyt"
+    },
+    {
+      "pattern": "SQUEEZER HANDLE",
+      "to": "wyciskacz - uchwyt"
+    },
+    {
+      "pattern": "STAMP",
+      "to": "stempel"
+    },
+    {
+      "pattern": "STAND",
+      "to": "podstawka"
+    },
+    {
+      "pattern": "STAND FRONT",
+      "to": "podstawka - przód"
+    },
+    {
+      "pattern": "STAND UPPER",
+      "to": "podstawka - na górze"
+    },
+    {
+      "pattern": "STAR",
+      "to": "gwiazda"
+    },
+    {
+      "pattern": "STEEL PLATE",
+      "to": "metalowa płytka"
+    },
+    {
+      "pattern": "STICKER ON BOX",
+      "to": "pudełko - naklejka"
+    },
+    {
+      "pattern": "STOPPER",
+      "to": "korek"
+    },
+    {
+      "pattern": "STRAP",
+      "to": "pasek"
+    },
+    {
+      "pattern": "STRAP MAGNET",
+      "to": "magnes"
+    },
+    {
+      "pattern": "STRAP RIGHT",
+      "to": "pasek"
+    },
+    {
+      "pattern": "STRAP(S) FRONT",
+      "to": "pasek - przód"
+    },
+    {
+      "pattern": "STRAW",
+      "to": "słomka"
+    },
+    {
+      "pattern": "STRIP",
+      "to": "pasek"
+    },
+    {
+      "pattern": "STRIP EMBROIDERY",
+      "to": "pasek"
+    },
+    {
+      "pattern": "STRIP RIGHT",
+      "to": "pasek"
+    },
+    {
+      "pattern": "STRIPE",
+      "to": "pasek"
+    },
+    {
+      "pattern": "SUBLIMATION",
+      "to": "sublimacja"
+    },
+    {
+      "pattern": "SUBLIMATION 360",
+      "to": "na okrągło"
+    },
+    {
+      "pattern": "T-SHIRT",
+      "to": "koszulka"
+    },
+    {
+      "pattern": "T-SHIRT BACK",
+      "to": "koszulka - tył"
+    },
+    {
+      "pattern": "TABLE TOP",
+      "to": "blat"
+    },
+    {
+      "pattern": "TAG",
+      "to": "zawieszka"
+    },
+    {
+      "pattern": "TEA POT",
+      "to": "dzbanek"
+    },
+    {
+      "pattern": "TOKEN",
+      "to": "żeton"
+    },
+    {
+      "pattern": "TONG",
+      "to": "szczypce"
+    },
+    {
+      "pattern": "TOOL 1",
+      "to": "narzędzie"
+    },
+    {
+      "pattern": "TOOL 2",
+      "to": "narzędzie"
+    },
+    {
+      "pattern": "TOOL SIDE 1",
+      "to": "narzędzie"
+    },
+    {
+      "pattern": "TOOTHBRUSH",
+      "to": "szczoteczka"
+    },
+    {
+      "pattern": "TOP",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "TOP BLACK PART",
+      "to": "wierzch - czarna część"
+    },
+    {
+      "pattern": "TOP BOX",
+      "to": "pudełko - wierzch"
+    },
+    {
+      "pattern": "TOP BOX PAD",
+      "to": "pudełko - wierzch"
+    },
+    {
+      "pattern": "TOP DOMING",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "TOP EMBROIDERY",
+      "to": "na górze"
+    },
+    {
+      "pattern": "TOP LEFT",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "TOP LID",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "TOP OF LID",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "TOP OF PANTS",
+      "to": "spodnie"
+    },
+    {
+      "pattern": "TOP PAD",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "TOP POCKET",
+      "to": "górna kieszeń"
+    },
+    {
+      "pattern": "TOP RIGHT",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "TOP SIDE",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "TOP UPPER",
+      "to": "wierzch - na górze"
+    },
+    {
+      "pattern": "TORCH",
+      "to": "latarka"
+    },
+    {
+      "pattern": "TORCH FRONT",
+      "to": "latarka"
+    },
+    {
+      "pattern": "TORSS0",
+      "to": "korpus"
+    },
+    {
+      "pattern": "TOWEL BACK",
+      "to": "ręcznik - tył"
+    },
+    {
+      "pattern": "TOWEL BACK CENTER E",
+      "to": "ręcznik - tył"
+    },
+    {
+      "pattern": "TOWEL CENTER",
+      "to": "ręcznik"
+    },
+    {
+      "pattern": "TOWEL CORNER",
+      "to": "ręcznik - narożnik"
+    },
+    {
+      "pattern": "TOWEL E",
+      "to": "ręcznik"
+    },
+    {
+      "pattern": "TOWEL FRONT",
+      "to": "ręcznik - przód"
+    },
+    {
+      "pattern": "TOWEL FRONT CENTER E",
+      "to": "ręcznik - przód"
+    },
+    {
+      "pattern": "TOWEL STRIPE",
+      "to": "ręcznik - pasek"
+    },
+    {
+      "pattern": "TRAIN",
+      "to": "pociąg"
+    },
+    {
+      "pattern": "TRAY",
+      "to": "taca"
+    },
+    {
+      "pattern": "TREE",
+      "to": "choinka"
+    },
+    {
+      "pattern": "TREE SIDE",
+      "to": "choinka"
+    },
+    {
+      "pattern": "TSHIRT",
+      "to": "koszulka"
+    },
+    {
+      "pattern": "TSHIRT BACK",
+      "to": "koszulka - tył"
+    },
+    {
+      "pattern": "TUB SIDE",
+      "to": "pojemnik"
+    },
+    {
+      "pattern": "TUBE",
+      "to": "tuba"
+    },
+    {
+      "pattern": "TUBE  PART 2",
+      "to": "tuba"
+    },
+    {
+      "pattern": "TUBE PART 1",
+      "to": "tuba"
+    },
+    {
+      "pattern": "UMBRELLA HANDLE",
+      "to": "parasol - uchwyt"
+    },
+    {
+      "pattern": "UNDER CARD",
+      "to": "pod kartą"
+    },
+    {
+      "pattern": "UNDER SCREEN",
+      "to": "pod wyświetlaczem"
+    },
+    {
+      "pattern": "UPPER",
+      "to": "na górze"
+    },
+    {
+      "pattern": "UPPER BACK",
+      "to": "tył - na górze"
+    },
+    {
+      "pattern": "UPPER FRONT",
+      "to": "przód - na górze"
+    },
+    {
+      "pattern": "UPPER RIGHT",
+      "to": "na górze"
+    },
+    {
+      "pattern": "USB",
+      "to": "pamięć USB"
+    },
+    {
+      "pattern": "WALLET FRONT",
+      "to": "portfel"
+    },
+    {
+      "pattern": "WARMER",
+      "to": "podgrzewacz"
+    },
+    {
+      "pattern": "WHEEL SIDE 1",
+      "to": "koło"
+    },
+    {
+      "pattern": "WHISK",
+      "to": "trzepaczka"
+    },
+    {
+      "pattern": "WHITE DL",
+      "to": "biała część"
+    },
+    {
+      "pattern": "WHITE LIGHT",
+      "to": "światło"
+    },
+    {
+      "pattern": "WHITE PART",
+      "to": "biała część"
+    },
+    {
+      "pattern": "WHITE SEGMENT",
+      "to": "biały segment"
+    },
+    {
+      "pattern": "WING",
+      "to": "skrzydło"
+    },
+    {
+      "pattern": "WRIST SUPPORT",
+      "to": "podkładka pod nadgarstek"
+    }
+  ],
+  "categories": [],
+  "labelings": [
+    {
+      "code": "DI",
+      "type": "ignore",
+      "data": null
+    },
+    {
+      "code": "DL",
+      "type": "ignore",
+      "data": null
+    },
+    {
+      "code": "E",
+      "type": "ignore",
+      "data": null
+    },
+    {
+      "code": "T1",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 2,
+          "code": "T1/A 0-50"
+        },
+        {
+          "type": "gt",
+          "threshold": 5000,
+          "company": 2,
+          "code": "T1/B 50-150"
+        },
+        {
+          "type": "gt",
+          "threshold": 15000,
+          "company": 2,
+          "code": "T1/C 150-300"
+        },
+        {
+          "type": "gt",
+          "threshold": 30000,
+          "company": 2,
+          "code": "T1/D 300-999"
+        }
+      ]
+    },
+    {
+      "code": "TDT",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 2,
+          "code": "TDT/A 0-50"
+        },
+        {
+          "type": "gt",
+          "threshold": 5000,
+          "company": 2,
+          "code": "TDT/B 50-150"
+        },
+        {
+          "type": "gt",
+          "threshold": 15000,
+          "company": 2,
+          "code": "TDT/C 150-300"
+        },
+        {
+          "type": "gt",
+          "threshold": 30000,
+          "company": 2,
+          "code": "TDT/D 300-999"
+        }
+      ]
+    },
+    {
+      "code": "TR",
+      "type": "ignore",
+      "data": null
+    },
+    {
+      "code": "TT",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 2,
+          "code": "TT/1 - 0-150"
+        },
+        {
+          "type": "gt",
+          "threshold": 15000,
+          "company": 2,
+          "code": "TT/2 - 150-150-999"
+        }
+      ]
+    }
+  ],
+  "removeLabelings": [
+    {
+      "code": "P1",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "RT1"
+      }
+    },
+    {
+      "code": "P2",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "RT1"
+      }
+    }
+  ]
+}

@@ -8,18 +8,16 @@
   import HeadIcon from '@c/table/HeadIcon.svelte';
   import Panel from '../mappings/Panel.svelte';
   import Grid from '@c/table/Grid.svelte';
-  import { countHits, matchRule, placeCounts, translatePlace } from '../places.js';
+  import { countHits, matchRule, normal, placeCounts, placeWins, translatePlace, uselessRules } from '../places.js';
 
   export let apiCompany;
   export let apiItems = null; // the api snapshot
 
-  const SHOWN_RULES = 24; // the rest behind "Pokaż wszystkie"
-  const SHOWN_PLACES = 40;
+  const SHOWN_PLACES = 40; // the rest behind "Pokaż wszystkie" (the rules are always all shown)
 
   let rulesOriginal = [];
   let rules = [];
   let query = '';
-  let allRules = false;
   let allPlaces = false; // every place the api has, or the most frequent ones
 
   $: unsaved = diffSync(rules, rulesOriginal).changed;
@@ -36,7 +34,7 @@
   function load(places) {
     // the rules translating the most places first; the order doesn't change what they do
     const loaded = (apiCompany.api_places_mappings ?? []).map(({ pattern, to }) => ({ _uid: uid(10), pattern, to }));
-    const hits = countHits(loaded, places);
+    const hits = countHits(placeWins(loaded, places));
     loaded.sort((a, b) => (hits.get(b) ?? 0) - (hits.get(a) ?? 0));
     rulesOriginal = loaded;
     rules = deep.copy(loaded);
@@ -44,14 +42,15 @@
 
   $: results = places.map(({ place, count }) => {
     const rule = matchRule(rules, place);
-    return { place, count, rule, translated: translatePlace(rules, place) };
+    return { place, count, rule, translated: rule ? normal(rule.to) : place.trim() };
   });
-  $: hits = countHits(rules, places);
+  $: wins = placeWins(rules, places);
+  $: hits = countHits(wins);
+  $: useless = uselessRules(rules, wins);
   $: untranslated = results.filter((r) => !r.rule);
   $: patterns = rules.map((r) => r.pattern?.trim().toLowerCase()).filter(Boolean);
   $: repeated = [...new Set(patterns.filter((p, i) => patterns.indexOf(p) !== i))];
 
-  $: shownRules = allRules ? rules : rules.slice(0, SHOWN_RULES);
   $: shownPlaces = allPlaces ? results : results.slice(0, SHOWN_PLACES);
 
   $: q = query?.trim().toLowerCase();
@@ -120,16 +119,16 @@
       <div class="chips">
         {#each shownPlaces as { place, count, rule } (place)}
           {@const exact = patterns.includes(place.toLowerCase())}
-          <Button small disabled={exact} tone={!rule && !exact ? 'warning' : null} on:click={() => add(place)}>
+          <Button size="sm" disabled={exact} tone={!rule && !exact ? 'warning' : null} on:click={() => add(place)}>
             {place} <span class="count">({count})</span>
           </Button>
         {/each}
       </div>
     {/if}
     <div class="tools">
-      <Button small icon="add" on:click={() => add()}>Reguła</Button>
+      <Button size="sm" icon="add" on:click={() => add()}>Reguła</Button>
       {#if results.length > SHOWN_PLACES}
-        <Button small dashed on:click={() => (allPlaces = !allPlaces)}>
+        <Button size="sm" dashed on:click={() => (allPlaces = !allPlaces)}>
           {allPlaces ? 'Zwiń' : `Pokaż wszystkie (${results.length})`}
         </Button>
       {/if}
@@ -151,10 +150,17 @@
         <span />
         <span>U nas</span>
       </svelte:fragment>
-      {#each shownRules as rule (rule._uid)}
+      {#each rules as rule (rule._uid)}
         {@const count = hits.get(rule) ?? 0}
         <div class="row">
-          <Button small dangerous icon="delete" on:click={() => remove(rule._uid)} />
+          {#if useless.has(rule)}
+            {@const instead = useless.get(rule)}
+            <small class="useless">
+              Zbędna reguła: {#if instead?.length}reguła „{instead[0].pattern}” → „{instead[0].to}” osiąga to samo.{:else if instead}bez
+                niej te miejsca zostaną takie same.{:else}bez niej te miejsca przetłumaczą się tak samo.{/if}
+            </small>
+          {/if}
+          <Button size="sm" dangerous icon="delete" on:click={() => remove(rule._uid)} />
           <Input size="small" bind:value={rule.pattern} placeholder="z API" />
           <span class="hits" class:zero={!count} title="Dopasowania">{count}</span>
           <Arrow />
@@ -162,14 +168,6 @@
         </div>
       {/each}
     </Grid>
-    <!-- on a row of its own, not to be missed -->
-    {#if rules.length > SHOWN_RULES}
-      <div class="tools">
-        <Button small dashed on:click={() => (allRules = !allRules)}>
-          {allRules ? 'Zwiń' : `Pokaż wszystkie reguły (${rules.length})`}
-        </Button>
-      </div>
-    {/if}
   </svelte:fragment>
 
   <svelte:fragment slot="end">
@@ -207,6 +205,11 @@
   }
   .hits.zero {
     color: var(--red-500);
+  }
+  /* over its rule, the whole row (as the labelings' mappings) */
+  .useless {
+    grid-column: 1 / -1;
+    color: var(--orange-700);
   }
 
   .preview {

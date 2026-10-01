@@ -35,7 +35,7 @@
   {#each { length: level } as _}<span class="guide" />{/each}
   <span class="button" title="{depth} {name}">
     <Button
-      small
+      size="sm"
       start
       width="100%"
       ghost={!active}
@@ -98,11 +98,11 @@
     min-width: 0;
   }
   /* a long name wraps: the button grows with it, the arrow and the number stay on its first line */
-  .button :global(button.small) {
+  .button :global(button.sm) {
     height: auto;
     min-height: var(--height);
   }
-  .button :global(button.small .content.small) {
+  .button :global(button.sm .content.sm) {
     align-items: flex-start;
     gap: var(--gap);
     padding: calc((var(--height) - var(--line)) / 2) var(--pad);
@@ -111,11 +111,11 @@
     font-size: var(--font);
     text-align: left;
   }
-  .row.leaf .button :global(button.small .content.small) {
+  .row.leaf .button :global(button.sm .content.sm) {
     padding-left: calc(var(--pad-start) + var(--arrow-in));
   }
   /* its size, not 58% of a height that now grows (Icon sets it inline, hence !important) */
-  .button :global(button.small .content.small > svg) {
+  .button :global(button.sm .content.sm > svg) {
     flex: none;
     margin-top: calc((var(--line) - var(--icon)) / 2);
     width: var(--icon) !important;

@@ -60,7 +60,7 @@ export function merge(company, dbItems, apiItems, { sort, query = null }) {
     const api = scanProduct(db, scan);
     const storage = db.storage.map((s) => ({ ...s, _db: true, _api: !!scanVariant(s, scan) }));
     for (const s of db.storage) if (s.api_color_code) ours.add(s.api_color_code);
-    const item = { ...db, _db: true, _api: !!api, storage };
+    const item = { ...db, _db: true, _api: !!api, _scan: api, storage }; // (_scan: the scan's product, see health.js)
     mergedItems.push(item);
     if (api && !following.has(api)) following.set(api, item);
   }
@@ -70,7 +70,8 @@ export function merge(company, dbItems, apiItems, { sort, query = null }) {
     const fresh = api.storage.filter((s) => !ours.has(s.api_color_code)).map((s) => ({ ...s, _db: false, _api: true }));
     const item = following.get(api);
     if (item) item.storage.push(...fresh);
-    else if (fresh.length || !api.storage.length) mergedItems.push({ ...api, _db: false, _api: true, storage: fresh });
+    else if (fresh.length || !api.storage.length)
+      mergedItems.push({ ...api, _db: false, _api: true, _scan: api, storage: fresh });
   }
 
   // a product's uid is its code, told apart by its first variant when the code repeats; given in the order they

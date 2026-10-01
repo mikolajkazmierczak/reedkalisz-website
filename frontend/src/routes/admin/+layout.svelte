@@ -86,14 +86,17 @@
   }
 
   .content {
-    /* the header is fixed above it (4rem); under it, a gap like between the boxes (the menu's first button starts
-       there too, see Nav) */
-    padding: calc(var(--header-height) + 1rem) 1.5rem 1.5rem calc(var(--nav-width) + 1.5rem);
+    /* the header is fixed above it (4rem), the first box right under it (the menu's first button starts there too,
+       see Nav) */
+    padding: var(--header-height) 1.5rem 1.5rem calc(var(--nav-width) + 1.5rem);
   }
   /* a phone: no menu beside it (it's over the page when opened, see Nav), room under it for the menu's button */
   @media (max-width: 50rem) {
     .content {
-      padding: calc(var(--header-height) + 0.75rem) 0.75rem 5rem;
+      padding: var(--header-height) 0.75rem 5rem;
+    }
+    .content :global(.ui-fill) {
+      height: auto;
     }
   }
 </style>

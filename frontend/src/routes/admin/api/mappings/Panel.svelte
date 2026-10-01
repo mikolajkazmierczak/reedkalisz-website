@@ -43,10 +43,11 @@
   h3 {
     margin: 0;
   }
+  /* the summary in the middle of the title's height (the categories' counts are two lines) */
   .head {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     gap: 0.25rem 0.5rem;
   }
   .head > :global(small::before) {

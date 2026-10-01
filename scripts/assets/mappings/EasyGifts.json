@@ -1,0 +1,1537 @@
+{
+  "places": [
+    {
+      "pattern": "Biały młynek",
+      "to": "biały młynek"
+    },
+    {
+      "pattern": "bok",
+      "to": "bok"
+    },
+    {
+      "pattern": "Brelok",
+      "to": "brelok"
+    },
+    {
+      "pattern": "Butelka",
+      "to": "butelka"
+    },
+    {
+      "pattern": "Czarny młynek",
+      "to": "czarny młynek"
+    },
+    {
+      "pattern": "Deska",
+      "to": "deska"
+    },
+    {
+      "pattern": "Długopis",
+      "to": "długopis"
+    },
+    {
+      "pattern": "Długopis, klips",
+      "to": "długopis - klip"
+    },
+    {
+      "pattern": "dookoła",
+      "to": "na okrągło"
+    },
+    {
+      "pattern": "Dół",
+      "to": "na dole"
+    },
+    {
+      "pattern": "element",
+      "to": "element"
+    },
+    {
+      "pattern": "Etui",
+      "to": "etui"
+    },
+    {
+      "pattern": "Etui góra",
+      "to": "etui - wierzch"
+    },
+    {
+      "pattern": "Etui, góra",
+      "to": "etui - wierzch"
+    },
+    {
+      "pattern": "Góra",
+      "to": "wierzch"
+    },
+    {
+      "pattern": "Góra zakrętka",
+      "to": "nakrętka"
+    },
+    {
+      "pattern": "Gwiazda",
+      "to": "gwiazda"
+    },
+    {
+      "pattern": "Klips",
+      "to": "klip"
+    },
+    {
+      "pattern": "Klosz",
+      "to": "klosz"
+    },
+    {
+      "pattern": "Koc",
+      "to": "koc"
+    },
+    {
+      "pattern": "Korpus",
+      "to": "korpus"
+    },
+    {
+      "pattern": "Kula",
+      "to": "kula"
+    },
+    {
+      "pattern": "Latarka",
+      "to": "latarka"
+    },
+    {
+      "pattern": "Lewa strona",
+      "to": "bok"
+    },
+    {
+      "pattern": "Lunch box",
+      "to": "lunch box"
+    },
+    {
+      "pattern": "Łyżka",
+      "to": "łyżka"
+    },
+    {
+      "pattern": "Metalowy element",
+      "to": "metalowy element"
+    },
+    {
+      "pattern": "Multinarzędzie",
+      "to": "multinarzędzie"
+    },
+    {
+      "pattern": "Naklejka na wiaderku",
+      "to": "naklejka na wiaderku"
+    },
+    {
+      "pattern": "Nakrętka",
+      "to": "nakrętka"
+    },
+    {
+      "pattern": "Narożnik",
+      "to": "narożnik"
+    },
+    {
+      "pattern": "Nausznik",
+      "to": "nausznik"
+    },
+    {
+      "pattern": "Notatnik",
+      "to": "notatnik"
+    },
+    {
+      "pattern": "Nożyczki ostrze",
+      "to": "nożyczki - ostrze"
+    },
+    {
+      "pattern": "Nóż",
+      "to": "nóż"
+    },
+    {
+      "pattern": "Obudowa",
+      "to": "obudowa"
+    },
+    {
+      "pattern": "Okienko",
+      "to": "okienko"
+    },
+    {
+      "pattern": "Ołówek",
+      "to": "ołówek"
+    },
+    {
+      "pattern": "Opakowanie",
+      "to": "opakowanie"
+    },
+    {
+      "pattern": "Opakowanie, przód",
+      "to": "opakowanie - przód"
+    },
+    {
+      "pattern": "Opakowanie, tył",
+      "to": "opakowanie - tył"
+    },
+    {
+      "pattern": "Oparcie, tył",
+      "to": "oparcie"
+    },
+    {
+      "pattern": "Opaska",
+      "to": "opaska"
+    },
+    {
+      "pattern": "Ostrze",
+      "to": "ostrze"
+    },
+    {
+      "pattern": "Otwieracz",
+      "to": "otwieracz"
+    },
+    {
+      "pattern": "Paletka",
+      "to": "paletka"
+    },
+    {
+      "pattern": "Panel",
+      "to": "panel"
+    },
+    {
+      "pattern": "Panel biały",
+      "to": "biały panel"
+    },
+    {
+      "pattern": "Panel kolorowy",
+      "to": "kolorowy panel"
+    },
+    {
+      "pattern": "Papierowa zawieszka",
+      "to": "papierowa zawieszka"
+    },
+    {
+      "pattern": "Piersiówka",
+      "to": "piersiówka"
+    },
+    {
+      "pattern": "Piłka",
+      "to": "piłka"
+    },
+    {
+      "pattern": "Pióro",
+      "to": "pióro"
+    },
+    {
+      "pattern": "Pióro kulkowe",
+      "to": "pióro kulkowe"
+    },
+    {
+      "pattern": "Pióro wieczne",
+      "to": "pióro wieczne"
+    },
+    {
+      "pattern": "Pióro, klips",
+      "to": "pióro - klip"
+    },
+    {
+      "pattern": "Plakietka",
+      "to": "plakietka"
+    },
+    {
+      "pattern": "Pod okienkiem",
+      "to": "pod okienkiem"
+    },
+    {
+      "pattern": "Podstawa",
+      "to": "podstawa"
+    },
+    {
+      "pattern": "Poduszka",
+      "to": "poduszka"
+    },
+    {
+      "pattern": "Pokrowiec",
+      "to": "pokrowiec"
+    },
+    {
+      "pattern": "Pokrowiec plastikowy",
+      "to": "pokrowiec plastikowy"
+    },
+    {
+      "pattern": "Pokrywka",
+      "to": "pokrywka"
+    },
+    {
+      "pattern": "Power bank",
+      "to": "power bank"
+    },
+    {
+      "pattern": "Prawa strona",
+      "to": "bok"
+    },
+    {
+      "pattern": "Przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "Przód, środek",
+      "to": "przód - środek"
+    },
+    {
+      "pattern": "Przykrywka",
+      "to": "przykrywka"
+    },
+    {
+      "pattern": "Pudełko",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "Puzzle i dół",
+      "to": "puzzle"
+    },
+    {
+      "pattern": "Rączka",
+      "to": "rączka"
+    },
+    {
+      "pattern": "Ręcznik, dół",
+      "to": "ręcznik"
+    },
+    {
+      "pattern": "Rękawiczka",
+      "to": "rękawiczka"
+    },
+    {
+      "pattern": "Rękojeść",
+      "to": "rękojeść"
+    },
+    {
+      "pattern": "Scyzoryk",
+      "to": "scyzoryk"
+    },
+    {
+      "pattern": "Shaker",
+      "to": "shaker"
+    },
+    {
+      "pattern": "Skarpeta",
+      "to": "skarpeta"
+    },
+    {
+      "pattern": "Smycz",
+      "to": "smycz"
+    },
+    {
+      "pattern": "Spód",
+      "to": "spód"
+    },
+    {
+      "pattern": "Szelki",
+      "to": "szelki"
+    },
+    {
+      "pattern": "Środek",
+      "to": "środek"
+    },
+    {
+      "pattern": "Taśma",
+      "to": "taśma"
+    },
+    {
+      "pattern": "Termos",
+      "to": "termos"
+    },
+    {
+      "pattern": "Torba, przód",
+      "to": "torba - przód"
+    },
+    {
+      "pattern": "Tył",
+      "to": "tył"
+    },
+    {
+      "pattern": "Tył, dół",
+      "to": "tył - na dole"
+    },
+    {
+      "pattern": "Tył, góra",
+      "to": "tył - na górze"
+    },
+    {
+      "pattern": "Tył, środek",
+      "to": "tył - środek"
+    },
+    {
+      "pattern": "U góry, na wieczku",
+      "to": "wieczko"
+    },
+    {
+      "pattern": "Widelec",
+      "to": "widelec"
+    },
+    {
+      "pattern": "Wieczko",
+      "to": "wieczko"
+    },
+    {
+      "pattern": "Wizytownik",
+      "to": "wizytownik"
+    },
+    {
+      "pattern": "Worek, przód",
+      "to": "worek - przód"
+    },
+    {
+      "pattern": "Worek, tył",
+      "to": "worek - tył"
+    },
+    {
+      "pattern": "Wtyczka",
+      "to": "wtyczka"
+    },
+    {
+      "pattern": "Wtyczka samochodowa",
+      "to": "wtyczka samochodowa"
+    },
+    {
+      "pattern": "Wtyczka zasilająca",
+      "to": "wtyczka zasilająca"
+    },
+    {
+      "pattern": "Zawieszka",
+      "to": "zawieszka"
+    }
+  ],
+  "categories": [
+    {
+      "path": [
+        "Artykuły biurowe",
+        "Akcesoria biurowe"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Artykuły biurowe",
+        "Etui na karty i wizytówki"
+      ],
+      "categories": [
+        96
+      ]
+    },
+    {
+      "path": [
+        "Artykuły biurowe",
+        "Karteczki do markowania"
+      ],
+      "categories": [
+        274
+      ]
+    },
+    {
+      "path": [
+        "Artykuły biurowe",
+        "Notatniki i notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "Artykuły biurowe",
+        "Stojaki biurkowe"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "Artykuły biurowe",
+        "Teczki i foldery"
+      ],
+      "categories": [
+        100
+      ]
+    },
+    {
+      "path": [
+        "Bluetooth"
+      ],
+      "categories": [
+        201
+      ]
+    },
+    {
+      "path": [
+        "Branża budowlana"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża edukacyjna i szkolnictwo"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża finansowa i ubezpieczeniowa"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża gastronomiczna i HoReCa"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża kosmetyczna i beauty"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża medyczna i służba zdrowia"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża motoryzacyjna"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża technologiczna i IT"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Branża turystyczna"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Dla dzieci"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Dla kobiet"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Dla mężczyzn"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Drobiazgi"
+      ],
+      "categories": [
+        92
+      ]
+    },
+    {
+      "path": [
+        "Drobiazgi",
+        "Antystresy"
+      ],
+      "categories": [
+        63
+      ]
+    },
+    {
+      "path": [
+        "Drobiazgi",
+        "Breloki"
+      ],
+      "categories": [
+        91
+      ]
+    },
+    {
+      "path": [
+        "Drobiazgi",
+        "Gry i zabawy"
+      ],
+      "categories": [
+        93
+      ]
+    },
+    {
+      "path": [
+        "Drobiazgi",
+        "Opakowania"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Drobiazgi",
+        "Smycze, opaski na rękę"
+      ],
+      "categories": [
+        6
+      ]
+    },
+    {
+      "path": [
+        "Drobiazgi",
+        "Zapalniczki"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Długopisy ekologiczne"
+      ],
+      "categories": [
+        81
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Długopisy metalowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Długopisy nietypowe"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Długopisy plastikowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Kredki, kredy, zakreślacze"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Ołówki"
+      ],
+      "categories": [
+        82
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Pióra wieczne i kulkowe"
+      ],
+      "categories": [
+        239
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Soft touch"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Touch pen"
+      ],
+      "categories": [
+        97
+      ]
+    },
+    {
+      "path": [
+        "Długopisy i artykuły piśmienne",
+        "Zestawy piśmienne"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "Ekologiczne"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Elektronika"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Akcesoria do komputerów"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Akcesoria do telefonów"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Dyski"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Głośniki"
+      ],
+      "categories": [
+        201
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Kable"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Power banki"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Słuchawki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Zegary i zegarki"
+      ],
+      "categories": [
+        142
+      ]
+    },
+    {
+      "path": [
+        "Elektronika",
+        "Ładowarki"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Eventy"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Instytucje publiczne"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Akcesoria barowe"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Akcesoria kuchenne"
+      ],
+      "categories": [
+        122
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Butelki i bidony"
+      ],
+      "categories": [
+        5
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Inne"
+      ],
+      "categories": [
+        4
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Kubki"
+      ],
+      "categories": [
+        123
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Kubki i butelki termiczne"
+      ],
+      "categories": [
+        25
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Piersiówki"
+      ],
+      "categories": [
+        124
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Pojemniki na żywność"
+      ],
+      "categories": [
+        134
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Termosy"
+      ],
+      "categories": [
+        27
+      ]
+    },
+    {
+      "path": [
+        "Jedzenie i picie",
+        "Wyposażenie wnętrz"
+      ],
+      "categories": [
+        117
+      ]
+    },
+    {
+      "path": [
+        "Latarki i narzędzia"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "Latarki i narzędzia",
+        "Akcesoria samochodowe"
+      ],
+      "categories": [
+        94
+      ]
+    },
+    {
+      "path": [
+        "Latarki i narzędzia",
+        "Latarki i lampki"
+      ],
+      "categories": [
+        62
+      ]
+    },
+    {
+      "path": [
+        "Latarki i narzędzia",
+        "Miarki i taśmy miernicze"
+      ],
+      "categories": [
+        90
+      ]
+    },
+    {
+      "path": [
+        "Latarki i narzędzia",
+        "Narzędzia"
+      ],
+      "categories": [
+        75
+      ]
+    },
+    {
+      "path": [
+        "Latarki i narzędzia",
+        "Noże i scyzoryki"
+      ],
+      "categories": [
+        141,
+        75
+      ]
+    },
+    {
+      "path": [
+        "MoLu"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "MoLu",
+        "Biurowe i piśmienne"
+      ],
+      "categories": [
+        32
+      ]
+    },
+    {
+      "path": [
+        "MoLu",
+        "Elektroniczne"
+      ],
+      "categories": [
+        89
+      ]
+    },
+    {
+      "path": [
+        "MoLu",
+        "Picie i jedzenie"
+      ],
+      "categories": [
+        4
+      ]
+    },
+    {
+      "path": [
+        "MoLu",
+        "Podróżne"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "Na plażę"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Na prezent"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Nietypowe"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Odblaskowe"
+      ],
+      "categories": [
+        72
+      ]
+    },
+    {
+      "path": [
+        "Pamięci USB"
+      ],
+      "categories": [
+        86
+      ]
+    },
+    {
+      "path": [
+        "Parasole i płaszcze"
+      ],
+      "categories": [
+        77
+      ]
+    },
+    {
+      "path": [
+        "Parasole i płaszcze",
+        "Płaszcze przeciwdeszczowe"
+      ],
+      "categories": [
+        206
+      ]
+    },
+    {
+      "path": [
+        "Pierre Cardin"
+      ],
+      "categories": [
+        254
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Akcesoria kosmetyczne"
+      ],
+      "categories": [
+        118
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Akcesoria plażowe"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Akcesoria podróżne"
+      ],
+      "categories": [
+        112
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Akcesoria rowerowe"
+      ],
+      "categories": [
+        61
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Akcesoria sportowe"
+      ],
+      "categories": [
+        78
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Czapki z daszkiem"
+      ],
+      "categories": [
+        135
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Grill i piknik"
+      ],
+      "categories": [
+        121
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Higiena i dezynfekcja"
+      ],
+      "categories": [
+        219
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Koce i maty"
+      ],
+      "categories": [
+        121
+      ]
+    },
+    {
+      "path": [
+        "Podróże i rekreacja",
+        "Okulary przeciwsłoneczne"
+      ],
+      "categories": [
+        95
+      ]
+    },
+    {
+      "path": [
+        "Rivacase"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "Silicon Power"
+      ],
+      "categories": [
+        86
+      ]
+    },
+    {
+      "path": [
+        "Silicon Power",
+        "Dyski"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Silicon Power",
+        "Inne"
+      ],
+      "categories": [
+        69
+      ]
+    },
+    {
+      "path": [
+        "Silicon Power",
+        "Power Banki"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "Targi i konferencje"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki"
+      ],
+      "categories": [
+        30
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Plecaki"
+      ],
+      "categories": [
+        23
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby bawełniane"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby i koszyki na zakupy"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby i plecaki na laptopy"
+      ],
+      "categories": [
+        23,
+        130
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby non-woven"
+      ],
+      "categories": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby sportowe"
+      ],
+      "categories": [
+        9
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby termiczne"
+      ],
+      "categories": [
+        128
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Worki"
+      ],
+      "categories": [
+        85
+      ]
+    },
+    {
+      "path": [
+        "Victorinox"
+      ],
+      "categories": [
+        236
+      ]
+    },
+    {
+      "path": [
+        "Wenger",
+        "Plecaki"
+      ],
+      "categories": [
+        23,
+        130
+      ]
+    },
+    {
+      "path": [
+        "Wenger",
+        "Torby na laptopy i tablety"
+      ],
+      "categories": [
+        130
+      ]
+    },
+    {
+      "path": [
+        "Wenger",
+        "Walizki i torby podróżne"
+      ],
+      "categories": [
+        30,
+        112
+      ]
+    },
+    {
+      "path": [
+        "XMAS"
+      ],
+      "categories": [
+        139
+      ]
+    }
+  ],
+  "labelings": [
+    {
+      "code": "C1A",
+      "type": "direct",
+      "data": {
+        "company": 8,
+        "code": "A"
+      }
+    },
+    {
+      "code": "C1D",
+      "type": "direct",
+      "data": {
+        "company": 8,
+        "code": "D"
+      }
+    },
+    {
+      "code": "HF",
+      "type": "direct",
+      "data": {
+        "company": 5,
+        "code": "HF"
+      }
+    },
+    {
+      "code": "L0",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "L1",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "L2",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "L3",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L3"
+        },
+        {
+          "type": "gt",
+          "threshold": 500,
+          "company": 4,
+          "code": "L4"
+        },
+        {
+          "type": "gt",
+          "threshold": 1000,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 3000,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    },
+    {
+      "code": "L4",
+      "type": "area",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L5"
+        },
+        {
+          "type": "gt",
+          "threshold": 1500,
+          "company": 4,
+          "code": "L6"
+        }
+      ]
+    }
+  ],
+  "replaceCategories": [
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby i plecaki na laptopy"
+      ],
+      "from": [
+        23
+      ],
+      "to": [
+        23,
+        130
+      ]
+    },
+    {
+      "path": [
+        "Wenger",
+        "Plecaki"
+      ],
+      "from": [
+        23
+      ],
+      "to": [
+        23,
+        130
+      ]
+    },
+    {
+      "path": [
+        "Wenger",
+        "Walizki i torby podróżne"
+      ],
+      "from": [
+        30
+      ],
+      "to": [
+        30,
+        112
+      ]
+    },
+    {
+      "path": [
+        "Latarki i narzędzia",
+        "Noże i scyzoryki"
+      ],
+      "from": [
+        141
+      ],
+      "to": [
+        141,
+        75
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby bawełniane"
+      ],
+      "from": [
+        30
+      ],
+      "to": [
+        29
+      ]
+    },
+    {
+      "path": [
+        "Torby, worki, plecaki",
+        "Torby non-woven"
+      ],
+      "from": [
+        30
+      ],
+      "to": [
+        29
+      ]
+    }
+  ]
+}

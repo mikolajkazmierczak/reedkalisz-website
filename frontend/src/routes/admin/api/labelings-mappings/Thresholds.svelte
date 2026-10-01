@@ -37,11 +37,11 @@
   </div>
   <div class="c-arrow"><Arrow /></div>
   <Target {apiCompany} bind:company={t.company} bind:code={t.code} />
-  <div class="c-remove"><Button small dangerous square icon="delete" on:click={() => remove(t._uid)} /></div>
+  <div class="c-remove"><Button size="sm" dangerous square icon="delete" on:click={() => remove(t._uid)} /></div>
 {/each}
 
 <div class="c-add">
-  <Button small dashed icon="add" on:click={add}>Próg</Button>
+  <Button size="sm" dashed icon="add" on:click={add}>Próg</Button>
 </div>
 
 <style>

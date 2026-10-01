@@ -5,6 +5,10 @@ import { treeGetItem } from '%/utils';
 const smallestCellWidth = 2.25;
 export const hierarchyCellWidth = smallestCellWidth * 0.8;
 const checkboxCellWidth = 1.4; // the flag columns: narrow, there are many of them
+// a product's code, in the products' list and the API's alike: about 1.5 times an average one (a longer one is cut,
+// whole on hover). Measured 2026-10-01 on the 4,745 shown products, the 5% shortest and longest left out:
+// 5.4 characters, 47.2px in the API's monospace (46.5px in the list's font); settled by eye (5.1rem - 15%, + 10%)
+export const productCodeWidth = '4.8rem';
 // the "add a subcategory" column: its grey cell, over the row's padding and the gap after it (see TableRow), is a
 // little wider than the row is tall (a small button, 1.5rem, and the row's padding above and below), the button in
 // its middle

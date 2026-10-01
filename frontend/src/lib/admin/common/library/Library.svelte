@@ -212,7 +212,7 @@
     </div>
     <div class="right">
       {#if !picker}
-        <Button small dangerous icon="delete" on:click={() => (showUnused = true)}>Posprzątaj</Button>
+        <Button size="sm" dangerous icon="delete" on:click={() => (showUnused = true)}>Posprzątaj</Button>
       {/if}
       <Search {searchParams} bind:query />
     </div>
@@ -237,7 +237,7 @@
           {#if pages(section) > 1}
             <div class="pager">
               <Button
-                small
+                size="sm"
                 square
                 icon="chevron_left"
                 title="Poprzednia strona"
@@ -245,7 +245,7 @@
                 on:click={() => readSection(i, section.page - 1)} />
               <small>{section.page} / {pages(section)}</small>
               <Button
-                small
+                size="sm"
                 square
                 icon="chevron_right"
                 title="Następna strona"

@@ -33,7 +33,7 @@ export function chooseThreshold(value, thresholds) {
   return chosen;
 }
 
-function resolveMapping(selectedCompany, mappings, apiCode, apiItem, area, warn) {
+export function resolveMapping(selectedCompany, mappings, apiCode, apiItem, area, warn) {
   // Find the labeling to import for the given api code: either through a rule, or - if there is no
   // rule for the code - through our own labeling of that company with the very same code.
   const mapping = mappings.find((m) => m.code === apiCode);

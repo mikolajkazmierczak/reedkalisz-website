@@ -4,15 +4,12 @@ export const search = [
   'date_created',
   'user_updated',
   'date_updated',
-  'from_contact',
-  'from_product',
+  'product',
   'read',
-  'spam_chance',
   'name',
   'phone',
   'email',
   'content',
-  'file',
 ];
 export const show = [...search];
 
@@ -25,15 +22,12 @@ export const defaults = () => ({
   date_created: null,
   user_updated: null,
   date_updated: null,
-  from_contact: false,
-  from_product: false,
+  product: null, // asked about on its page; none: from the Kontakt page, or written here
   read: true, // written in the panel: nothing new to read
-  spam_chance: 0,
   name: '',
   phone: '',
   email: '',
   content: '',
-  file: null,
 });
 
 export default { search, show, read, edit, defaults };

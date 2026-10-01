@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 //
 // Starts the "something to look at" markers in the menu from a clean slate.
+// ONE-OFF, applied on prod 2026-09-28: it reads questions' from_product / from_contact, which
+// migrate-schema-2.mjs --cleanup removes - after that it can't run (and needn't).
 //
 //   node scripts/migrate-unread.mjs           # dry run: prints what would change
 //   node scripts/migrate-unread.mjs --apply   # makes the changes

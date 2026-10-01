@@ -898,6 +898,7 @@
           await api.files.updateOne(selectedCompany.api_snapshot, formData);
         } else {
           const { id } = await api.files.createOne(formData);
+          await api.files.updateOne(id, { tags: ['hidden'] }); // out of the library, as the avatars
           companyUpdates.api_snapshot = id;
         }
         heimdall.emit('directus_files', companyUpdates?.api_snapshot || selectedCompany.api_snapshot);
@@ -940,110 +941,118 @@
   <title>Admin | API | REED Kalisz</title>
 </svelte:head>
 
-{#if supportedCompanies && selectedCompany}
-  <CompanyBar
-    companies={supportedCompanies}
-    selected={selectedCompany}
-    disabled={fetching}
-    busy={scanning}
-    on:change={handleCompanyChange}>
-    <!-- only what's always there, so the companies next to it never move -->
-    <Button slot="before" disabled={fetching || !dbItems} icon="cloud" on:click={fetchApi}>Skanuj</Button>
+<!-- the page doesn't scroll, the list does (see .ui-fill) -->
+<div class="ui-fill">
+  {#if supportedCompanies && selectedCompany}
+    <CompanyBar
+      companies={supportedCompanies}
+      selected={selectedCompany}
+      disabled={fetching}
+      busy={scanning}
+      on:change={handleCompanyChange}>
+      <!-- only what's always there, so the companies next to it never move -->
+      <Button slot="before" disabled={fetching || !dbItems} icon="cloud" on:click={fetchApi}>Skanuj</Button>
 
-    <!-- labels on one line, values on the next, each on a shared baseline -->
-    <div class="stats">
-      {#if selectedCompany.api_discount !== null}
-        <label class="ui-stat-label" for="discount">Rabat</label>
-        <span class="ui-stat-value discount">
-          <Input
-            id="discount"
-            size="compact"
-            type="number"
-            min={0}
-            max={100}
-            value={discount}
-            invalid={discountInvalid}
-            disabled={fetching}
-            on:input={(e) => discountTyped(e.detail.e)}
-            on:blur={discountLeft} />&nbsp;%
-        </span>
-      {/if}
-      <span class="ui-stat-label">Ostatni skan</span>
-      <span class="ui-stat-value">{lastScan}</span>
-    </div>
-
-    <small slot="busy">
-      <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
-    </small>
-  </CompanyBar>
-{/if}
-
-<div class="content">
-  {#if fetching}
-    {#if fetchingPhase === 0}
-      <p class="aligned"><Loader dark /> Pobieranie danych</p>
-    {:else if fetchingPhase === 1}
-      <p class="aligned"><Loader dark /> Pobieranie zewnętrznych danych (1/3)</p>
-      <small class="indent">Pobierana jest duża ilość danych, może to zająć kilka minut.</small>
-    {:else if fetchingPhase === 2}
-      <p class="aligned"><Loader dark /> Aktualizacja cen, stanów magazynowych, znakowań i kategorii (2/3)</p>
-    {:else if fetchingPhase === 3}
-      <p class="aligned"><Loader dark /> Aktualizacja cenników (3/3)</p>
-    {/if}
-
-    {#if statusLog}
-      <small class="indent">{statusLog}</small>
-    {/if}
-  {/if}
-
-  {#if !fetching && mergedItems && selectedCompany && $colors}
-    {@const pagedItems = mergedItems.slice((page - 1) * limit, page * limit)}
-
-    <!-- the sorting (and adding what's picked) in a bar of its own, like the companies above -->
-    <Bar>
-      {#if selectedCount.all}
-        <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
-          {uploading ? 'Dodawanie...' : 'Dodaj'}
-        </Button>
-        <!-- what's picked, a number and its label on each line (the labels like the last scan's in the bar above) -->
-        <div class="ui-counts">
-          <span class="ui-stat-value">{selectedCount.items}</span>
-          <span class="ui-stat-label">Produkty</span>
-          <span class="ui-stat-value">{selectedCount.storages}</span>
-          <span class="ui-stat-label">Warianty</span>
-        </div>
-        <span class="ui-divider" />
-      {/if}
-      <div class="sorting">
-        <Input size="small" type="checkbox" bind:value={sort.notInApiFirst}>Najpierw wycofane</Input>
-        <Input size="small" type="checkbox" bind:value={sort.dbFirst}>Najpierw zaimportowane</Input>
-      </div>
-      <!-- what acts on the list, at the other end -->
-      <div class="list-actions">
-        {#if retiredCount}
-          <!-- deletes the retired products and variants (the confirmation says how many) -->
-          <Button
-            small
-            dangerous
-            disabled={deletingRetired}
-            icon="delete"
-            on:click={() => deleteRetired().catch(writeFailed)}>
-            {deletingRetired ? 'Usuwanie...' : 'Posprzątaj'}
-          </Button>
+      <!-- labels on one line, values on the next, each on a shared baseline -->
+      <div class="stats">
+        {#if selectedCompany.api_discount !== null}
+          <label class="ui-stat-label" for="discount">Rabat</label>
+          <span class="ui-stat-value discount">
+            <Input
+              id="discount"
+              size="compact"
+              type="number"
+              min={0}
+              max={100}
+              value={discount}
+              invalid={discountInvalid}
+              disabled={fetching}
+              on:input={(e) => discountTyped(e.detail.e)}
+              on:blur={discountLeft} />&nbsp;%
+          </span>
         {/if}
-        <Search {searchParams} {query} />
+        <span class="ui-stat-label">Ostatni skan</span>
+        <span class="ui-stat-value">{lastScan}</span>
       </div>
-    </Bar>
 
-    <div class="products">
-      {#if pagedItems.length === 0}
-        <p>Brak wyników</p>
-      {:else}
-        <Items items={pagedItems} company={selectedCompany} total={mergedItems.length} bind:sort />
-      {/if}
-    </div>
-    <Pagination {searchParams} {limit} {page} count={mergedItems.length} />
+      <small slot="busy">
+        <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
+      </small>
+    </CompanyBar>
   {/if}
+
+  <div class="content ui-fill-col">
+    {#if fetching}
+      {#if fetchingPhase === 0}
+        <p class="aligned"><Loader dark /> Pobieranie danych</p>
+      {:else if fetchingPhase === 1}
+        <p class="aligned"><Loader dark /> Pobieranie zewnętrznych danych (1/3)</p>
+        <small class="indent">Pobierana jest duża ilość danych, może to zająć kilka minut.</small>
+      {:else if fetchingPhase === 2}
+        <p class="aligned"><Loader dark /> Aktualizacja cen, stanów magazynowych, znakowań i kategorii (2/3)</p>
+      {:else if fetchingPhase === 3}
+        <p class="aligned"><Loader dark /> Aktualizacja cenników (3/3)</p>
+      {/if}
+
+      {#if statusLog}
+        <small class="indent">{statusLog}</small>
+      {/if}
+    {/if}
+
+    {#if !fetching && mergedItems && selectedCompany && $colors}
+      {@const pagedItems = mergedItems.slice((page - 1) * limit, page * limit)}
+
+      <!-- the sorting (and adding what's picked) in a bar of its own, like the companies above -->
+      <Bar>
+        {#if selectedCount.all}
+          <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
+            {uploading ? 'Importowanie...' : 'Importuj'}
+          </Button>
+          <!-- what's picked, a number and its label on each line (the labels like the last scan's in the bar above) -->
+          <div class="ui-counts">
+            <span class="ui-stat-value">{selectedCount.items}</span>
+            <span class="ui-stat-label">Produkty</span>
+            <span class="ui-stat-value">{selectedCount.storages}</span>
+            <span class="ui-stat-label">Warianty</span>
+          </div>
+          <span class="ui-divider" />
+        {/if}
+        <div class="sorting">
+          <Input size="small" type="checkbox" bind:value={sort.notInApiFirst}>Najpierw wycofane</Input>
+          <Input size="small" type="checkbox" bind:value={sort.dbFirst}>Najpierw zaimportowane</Input>
+        </div>
+        <!-- what acts on the list, at the other end -->
+        <div class="list-actions">
+          {#if retiredCount}
+            <!-- deletes the retired products and variants (the confirmation says how many) -->
+            <Button
+              size="sm"
+              dangerous
+              disabled={deletingRetired}
+              icon="delete"
+              on:click={() => deleteRetired().catch(writeFailed)}>
+              {deletingRetired ? 'Usuwanie...' : 'Posprzątaj'}
+            </Button>
+          {/if}
+          <Search {searchParams} {query} />
+        </div>
+      </Bar>
+
+      <div class="products ui-fill-col">
+        {#if pagedItems.length === 0}
+          <p>Brak wyników</p>
+        {:else}
+          <Items
+            items={pagedItems}
+            company={selectedCompany}
+            {apiItems}
+            bind:sort
+            scrollKey={[page, limit, query, selectedCompany.id]} />
+        {/if}
+      </div>
+      <Pagination {searchParams} {limit} {page} count={mergedItems.length} />
+    {/if}
+  </div>
 </div>
 
 {#if !fetching && newImages.length}
@@ -1106,9 +1115,6 @@
   }
   .warning {
     color: var(--red-500);
-  }
-  .products {
-    margin-bottom: 1rem;
   }
   /* at the other end of the bar */
   .list-actions {

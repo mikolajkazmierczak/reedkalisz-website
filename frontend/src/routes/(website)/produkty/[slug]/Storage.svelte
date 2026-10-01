@@ -18,9 +18,9 @@
     <div class="swatch">
       <Color first={color_first} second={color_second} {amount} {available} size="1.5rem" />
     </div>
-    <h3>
+    <h3 class:plain={!firstLine}>
       <small class="code">{api_color_code || code}</small>
-      <span class="color">{firstLine ?? ''}</span>
+      {#if firstLine}<span class="color">{firstLine}</span>{/if}
       {#if secondLine}<span class="color">{' '}{secondLine}</span>{/if}
     </h3>
   </div>
@@ -72,6 +72,11 @@
   }
   .code {
     font-size: 0.6875rem;
+  }
+  /* no colour to name: the code alone, level with the swatch (the lines under it stay, so "Dostępność" lines up) */
+  .plain .code {
+    grid-row: 1 / span 2;
+    align-self: center;
   }
   .color {
     font-weight: 700;

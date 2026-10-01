@@ -7,9 +7,9 @@ import { recalculateProducts } from '@/calculations';
 import { companies } from '@/globals';
 import { usedFiles } from '@/files';
 
-// A copy of a product: everything it has (variants, gallery, labelings, categories, prices), under the next free
-// "(n)" of its code and name - "Latarka" becomes "Latarka (2)", a copy of that "Latarka (3)". The copy is hidden
-// until an admin shows it, and uses the very same image files (deleting one product keeps what the other uses).
+// A copy of a product: everything it has (variants, gallery, attachments, labelings, categories, prices), under the
+// next free "(n)" of its code and name - "Latarka" becomes "Latarka (2)", a copy of that "Latarka (3)". The copy is
+// hidden until an admin shows it, and uses the very same image files (deleting one product keeps what the other uses).
 // It is REED's: a supplier's feed doesn't have its code, so the scanner would take it for a retired product.
 
 const own = ['id', 'user_created', 'date_created', 'user_updated', 'date_updated'];

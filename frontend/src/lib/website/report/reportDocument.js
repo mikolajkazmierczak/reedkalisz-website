@@ -2,6 +2,7 @@ import { marked } from 'marked';
 import qrEnc from 'pdfmake/js/qrEnc.js';
 import { makeTree, treeGetItemsFromPath } from '%/utils';
 import { parseAmount, AMOUNT, NONE } from '$/storage';
+import { NEUTRAL_QUARTERS, NO_COLOR_LINE, WOOD_RINGS } from '$/colors';
 import { parseColor, plural } from '#/utils';
 import { business, SITE } from '#/seo';
 import { deepestCategory } from '#/products/product';
@@ -119,7 +120,9 @@ export function reportImages(product) {
 // --- small drawings (svg: pdfmake draws it as vectors) ------------------------------------------------------------
 
 // A colour dot, as the website's Color: a flat fill, two colours split on the diagonal (the second one below it),
-// multicolour's four quarters, a see-through tint over a checkerboard; a ring of a darker shade over it.
+// multicolour's four quarters (neutral's too, in its pastels), wood's end-grain rings, a see-through tint over a
+// checkerboard; a ring of a darker shade over it.
+let clips = 0; // the clip paths' ids (a page has many swatches)
 function swatch(first, second, x, y, d) {
   const { bg, fg, multicolor } = parseColor(first, second);
   const r = d / 2;
@@ -133,6 +136,19 @@ function swatch(first, second, x, y, d) {
     return `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 0 1 ${x2},${y2} Z" fill="${fill}" fill-opacity="${opacity}"/>`;
   };
   const disc = (color) => {
+    if (color.neutral) return NEUTRAL_QUARTERS.map((fill, i) => slice(-45 + i * 90, 45 + i * 90, fill)).join('');
+    if (color.wood) {
+      // the rings round the middle (the website's are off centre: a clip the card's svg can't be sure of)
+      return (
+        `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${WOOD_RINGS.light}"/>` +
+        [0.72, 0.42, 0.14]
+          .map(
+            (f) =>
+              `<circle cx="${cx}" cy="${cy}" r="${r * f}" fill="none" stroke="${WOOD_RINGS.dark}" stroke-width="${r * 0.12}"/>`,
+          )
+          .join('')
+      );
+    }
     if (color.transparent) {
       const tint = color.color || '#ffffff';
       return (
@@ -151,11 +167,21 @@ function swatch(first, second, x, y, d) {
       .join('');
   } else if (bg) {
     paint = disc(bg);
-    // the second colour: the half below the rising diagonal
-    if (fg) paint += slice(-45, 135, fg.color || '#ffffff', fg.transparent ? 0.45 : 1);
+    // the second colour - its whole disc, wood and neutral too - in the half below the rising diagonal
+    if (fg) {
+      const id = `half${clips++}`;
+      const [x1, y1] = at(-45);
+      const [x2, y2] = at(135);
+      paint +=
+        `<clipPath id="${id}"><path d="M${x1},${y1} A${r},${r} 0 0 1 ${x2},${y2} Z"/></clipPath>` +
+        `<g clip-path="url(#${id})">${disc(fg)}</g>`;
+    }
   } else {
-    // no colour: a blank dot
-    paint = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${c.paper2}"/>`;
+    // no colour: white, crossed out from edge to edge, as on the website
+    const [[x1, y1], [x2, y2], [x3, y3], [x4, y4]] = [45, 225, 135, 315].map(at);
+    paint =
+      `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffffff"/>` +
+      `<path d="M${x1},${y1} L${x2},${y2} M${x3},${y3} L${x4},${y4}" stroke="${NO_COLOR_LINE}" stroke-width="0.6"/>`;
   }
   return (
     paint +
@@ -781,7 +807,7 @@ export function reportDocument(product, { categories, images = {}, logo, date = 
   } else if (note && product.description) {
     content.push({ stack: [hairline([0, 4, 0, 10]), note], margin: [0, 8, 0, 0] });
   }
-  if (d.variants.length) content.push(section('Kolory i dostępność', variants(product, d, images)));
+  if (d.variants.length) content.push(section('Warianty i dostępność', variants(product, d, images)));
 
   const { address } = business;
   const site = SITE.replace(/^https?:\/\//, '');

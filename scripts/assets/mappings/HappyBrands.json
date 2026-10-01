@@ -1,0 +1,322 @@
+{
+  "places": [
+    {
+      "pattern": "Główka",
+      "to": "główka"
+    },
+    {
+      "pattern": "Klips",
+      "to": "klip"
+    },
+    {
+      "pattern": "Korpus",
+      "to": "korpus"
+    },
+    {
+      "pattern": "Okładka przednia",
+      "to": "okładka - przód"
+    },
+    {
+      "pattern": "Okładka tylna",
+      "to": "okładka - tył"
+    },
+    {
+      "pattern": "Pełna obwoluta",
+      "to": "pełna obwoluta"
+    },
+    {
+      "pattern": "Przód",
+      "to": "przód"
+    },
+    {
+      "pattern": "Pudełko",
+      "to": "pudełko"
+    },
+    {
+      "pattern": "Tubka rotująca",
+      "to": "tubka rotująca"
+    },
+    {
+      "pattern": "Tył",
+      "to": "tył"
+    }
+  ],
+  "categories": [
+    {
+      "path": [
+        "Nowości"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "antybakteryjne"
+      ],
+      "categories": []
+    },
+    {
+      "path": [
+        "długopisy metalowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "długopisy reklamowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "długopisy reklamowe",
+        "ekologiczne"
+      ],
+      "categories": [
+        81
+      ]
+    },
+    {
+      "path": [
+        "długopisy reklamowe",
+        "standardowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "etui"
+      ],
+      "categories": [
+        280
+      ]
+    },
+    {
+      "path": [
+        "notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "plecaki premium"
+      ],
+      "categories": [
+        23
+      ]
+    },
+    {
+      "path": [
+        "powerbanki"
+      ],
+      "categories": [
+        87
+      ]
+    },
+    {
+      "path": [
+        "wyprzedaż",
+        "Deal Zone"
+      ],
+      "categories": [
+        133
+      ]
+    },
+    {
+      "path": [
+        "wyprzedaż",
+        "Długopisy metalowe"
+      ],
+      "categories": [
+        2
+      ]
+    },
+    {
+      "path": [
+        "wyprzedaż",
+        "Długopisy plastikowe"
+      ],
+      "categories": [
+        3
+      ]
+    },
+    {
+      "path": [
+        "wyprzedaż",
+        "Notesy"
+      ],
+      "categories": [
+        76
+      ]
+    },
+    {
+      "path": [
+        "zestawy"
+      ],
+      "categories": [
+        32
+      ]
+    }
+  ],
+  "labelings": [
+    {
+      "code": "Grawer laserowy",
+      "type": "price",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L1"
+        },
+        {
+          "type": "gt",
+          "threshold": 3,
+          "company": 4,
+          "code": "L2"
+        },
+        {
+          "type": "gt",
+          "threshold": 5,
+          "company": 4,
+          "code": "L3"
+        }
+      ]
+    },
+    {
+      "code": "Grawer laserowy \"Mirror\"",
+      "type": "price",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L1"
+        },
+        {
+          "type": "gt",
+          "threshold": 3,
+          "company": 4,
+          "code": "L2"
+        },
+        {
+          "type": "gt",
+          "threshold": 5,
+          "company": 4,
+          "code": "L3"
+        }
+      ]
+    },
+    {
+      "code": "Grawer laserowy \"Mirror\" 180°",
+      "type": "price",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L1"
+        },
+        {
+          "type": "gt",
+          "threshold": 3,
+          "company": 4,
+          "code": "L2"
+        },
+        {
+          "type": "gt",
+          "threshold": 5,
+          "company": 4,
+          "code": "L3"
+        }
+      ]
+    },
+    {
+      "code": "Grawer laserowy \"Mirror\" 300°",
+      "type": "price",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L1"
+        },
+        {
+          "type": "gt",
+          "threshold": 3,
+          "company": 4,
+          "code": "L2"
+        },
+        {
+          "type": "gt",
+          "threshold": 5,
+          "company": 4,
+          "code": "L3"
+        }
+      ]
+    },
+    {
+      "code": "Grawer laserowy 180°",
+      "type": "price",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L1"
+        },
+        {
+          "type": "gt",
+          "threshold": 3,
+          "company": 4,
+          "code": "L2"
+        },
+        {
+          "type": "gt",
+          "threshold": 5,
+          "company": 4,
+          "code": "L3"
+        }
+      ]
+    },
+    {
+      "code": "Grawer laserowy 300°",
+      "type": "price",
+      "data": [
+        {
+          "type": "gte",
+          "threshold": 0,
+          "company": 4,
+          "code": "L1"
+        },
+        {
+          "type": "gt",
+          "threshold": 3,
+          "company": 4,
+          "code": "L2"
+        },
+        {
+          "type": "gt",
+          "threshold": 5,
+          "company": 4,
+          "code": "L3"
+        }
+      ]
+    },
+    {
+      "code": "Tampodruk",
+      "type": "direct",
+      "data": {
+        "company": 4,
+        "code": "RT"
+      }
+    }
+  ]
+}

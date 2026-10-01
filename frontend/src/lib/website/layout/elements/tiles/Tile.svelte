@@ -348,7 +348,7 @@
     text-decoration: none;
   }
   /* see Tiles */
-  @media (min-width: 118rem) {
+  @media (min-width: 100.5rem) {
     .tile {
       border-radius: 4rem;
       corner-shape: squircle;
@@ -404,7 +404,7 @@
     min-height: 100%;
   }
 
-  @media (min-width: 118rem) {
+  @media (min-width: 100.5rem) {
     .content {
       padding-inline: var(--reach);
     }

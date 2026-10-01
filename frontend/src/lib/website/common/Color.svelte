@@ -1,9 +1,9 @@
 <script>
   import ProductColorTooltip from '#/products/ProductColorTooltip.svelte';
   import { parseColor } from '#/utils';
-  import { swatch } from '$/colors';
+  import { swatch, NO_COLOR } from '$/colors';
 
-  export let first = null; // { name, color, multicolor, transparent }
+  export let first = null; // { name, color, multicolor, transparent, wood, neutral }
   export let second = null;
 
   export let amount = null;
@@ -28,7 +28,8 @@
     {#if bg}<div class="color bg" style:background={swatch(bg)} />{/if}
     {#if fg}<div class="color fg" style:background={swatch(fg)} />{/if}
   {:else}
-    <div class="color none">?</div>
+    <!-- none: a white dot crossed out (see $/colors) -->
+    <div class="color" style:background={NO_COLOR} />
   {/if}
 </div>
 
@@ -73,8 +74,5 @@
     height: 100%;
     transform: translateY(-50%) rotate(45deg);
     transform-origin: center left;
-  }
-  .none {
-    opacity: 0.5;
   }
 </style>

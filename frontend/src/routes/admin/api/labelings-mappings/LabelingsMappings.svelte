@@ -141,7 +141,7 @@
       <small><b>Znakowania</b> · <span class="muted">Kliknij, by dodać regułę</span></small>
       <div class="chips">
         {#each apiCodeStates as { code, mapped, lost }}
-          <Button small disabled={mapped} tone={lost ? 'danger' : null} on:click={() => add(code)}>{code}</Button>
+          <Button size="sm" disabled={mapped} tone={lost ? 'danger' : null} on:click={() => add(code)}>{code}</Button>
         {/each}
       </div>
     </div>

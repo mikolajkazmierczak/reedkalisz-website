@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { marked } from 'marked';
 
-  import { treeGetItemsFromPath } from '%/utils';
+  import { treeGetItemsFromPath, filetypeToReadable, bytesToReadable } from '%/utils';
   import { me } from '$/auth';
   import { baseUrl } from '$/api';
   import { parseAmount, NONE } from '$/storage';
@@ -49,7 +49,18 @@
     labelings,
     storage,
     gallery,
+    attachments,
   } = data.product);
+
+  // the files to download with it (an admin sees the product's disabled ones too: leave them out)
+  $: files = (attachments ?? []).filter((a) => a.enabled && a.file).map(({ file }) => file);
+  // PDF, DOCX, ZIP: from its name (a document's mime type is a sentence), else from the type when that's short
+  function fileKind(name, type) {
+    const extension = /\.([a-z0-9]{1,5})$/i.exec(name ?? '')?.[1];
+    if (extension) return extension.toUpperCase();
+    const readable = type ? filetypeToReadable(type) : null;
+    return readable?.length <= 5 ? readable : null;
+  }
 
   $: mainGalleryImgs = getMainGalleryImgs(gallery, storage);
   $: showCustomPrices = custom_prices && custom_prices.some((p) => p.enabled);
@@ -309,6 +320,23 @@
                   </dl>
                 {/if}
 
+                {#if files.length}
+                  <ul class="buy__files" aria-label="Załączniki">
+                    {#each files as { id, title, filename_download, type, filesize }}
+                      <li>
+                        <a class="buy__file" href="{baseUrl}/assets/{id}?download" download={filename_download}>
+                          <Icon name="document" color="currentColor" strokeWidth={0.5} width="1rem" height="1rem" />
+                          <span class="buy__file-name">{title || filename_download}</span>
+                          <span class="buy__file-meta tnum">
+                            {[fileKind(filename_download, type), filesize && bytesToReadable(filesize)]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </span>
+                        </a>
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
                 <button class="btn buy__card" disabled={carding} aria-busy={carding} on:click={downloadCard}>
                   {#if carding}
                     <span class="buy__card-spin" aria-hidden="true"></span>
@@ -327,7 +355,7 @@
                   <span class="buy__ask-word">Zapytanie</span> o <strong>{name}</strong>
                   <span class="code">{code}</span>
                 </h2>
-                <QuestionForm {code} />
+                <QuestionForm product={data.product.id} />
               </div>
             </div>
           </div>
@@ -335,7 +363,7 @@
 
         {#if enabledStorage.length}
           <section class="sec product__variants">
-            <h2 class="sec__title">Kolory i dostępność</h2>
+            <h2 class="sec__title">Warianty i dostępność</h2>
             <div class="storages">
               {#each enabledStorage as s}
                 <Storage {code} storage={s} />
@@ -622,6 +650,45 @@
     to {
       transform: rotate(360deg);
     }
+  }
+  /* the files that go with it: links over the card's button, their type and size after them */
+  .buy__files {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    margin-top: var(--sp-4);
+    padding: 0;
+    list-style: none;
+  }
+  .buy__file {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    font-size: var(--fs-sm);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .buy__file :global(svg) {
+    flex: none;
+    align-self: center;
+    color: var(--text-subtle);
+  }
+  .buy__file-name {
+    text-decoration: underline;
+    text-decoration-color: var(--ink-300);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color var(--dur-fast) var(--ease);
+  }
+  .buy__file:hover .buy__file-name {
+    text-decoration-color: currentColor;
+  }
+  .buy__file:hover :global(svg) {
+    color: var(--red);
+  }
+  .buy__file-meta {
+    flex: none;
+    font-size: var(--fs-xs);
+    color: var(--text-subtle);
   }
   .buy__card-error {
     margin-top: var(--sp-2);

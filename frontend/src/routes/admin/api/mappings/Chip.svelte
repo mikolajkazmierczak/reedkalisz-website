@@ -15,7 +15,7 @@
 <span class="chip" class:inherited class:blocked class:missing class:removable {title}>
   <span class="text"><slot /></span>
   {#if removable}
-    <Button small ghost icon="close" borderRadius="0" title="Usuń" on:click={() => dispatch('remove')} />
+    <Button size="sm" ghost icon="close" borderRadius="0" title="Usuń" on:click={() => dispatch('remove')} />
   {/if}
 </span>
 
@@ -51,12 +51,14 @@
     border-color: var(--edge);
     color: var(--grey-500);
   }
+  /* "ignoruj" isn't one of ours: grey ground, no edge (an inherited one keeps its dashed edge) */
   .blocked {
-    font-style: italic;
+    border-color: transparent;
     color: var(--grey-500);
+    background-color: var(--grey-100);
   }
-  .blocked .text {
-    padding-right: 0.15em; /* the slant of the last letter, not cut off with a long name's end */
+  .blocked.inherited {
+    border-color: var(--edge);
   }
   .missing {
     border-color: var(--red-500);

@@ -4,11 +4,14 @@
 
   // An icon in a table head, for a column of buttons (deleting, the tree), with what the column is for.
   export let icon;
-  export let label;
+  export let label; // (a line break: "\n")
 </script>
 
 <span class="head-icon">
-  <Tooltip><small>{label}</small></Tooltip>
+  <Tooltip
+    ><small
+      >{#each label.split('\n') as line, i}{#if i}<br />{/if}{line}{/each}</small
+    ></Tooltip>
   <Icon name={icon} height="1.125rem" color="currentColor" />
 </span>
 

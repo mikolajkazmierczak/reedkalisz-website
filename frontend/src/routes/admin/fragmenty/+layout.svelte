@@ -38,7 +38,7 @@
 </script>
 
 {#if items}
-  <div class="wrapper">
+  <div class="wrapper ui-fill">
     <div class="actions ui-bar">
       <div />
       <Search {searchParams} {query} />
@@ -57,15 +57,10 @@
         values: [$.name, { user: $.user_updated, datetime: $.date_updated }],
       })}
       {searchParams}
+      scrollKey={[query]}
       {sort}
       {limit}
       {page} />
   </div>
 {/if}
 <slot />
-
-<style>
-  .wrapper {
-    overflow-x: auto;
-  }
-</style>

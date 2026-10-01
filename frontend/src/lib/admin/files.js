@@ -1,10 +1,11 @@
 import api from '$/api';
 
-// every file a product uses: variant images and the gallery
+// every file a product uses: variant images, the gallery and the attachments
 export function usedFiles(product) {
   const files = new Set();
   for (const s of product.storage ?? []) for (const img of s.img ?? []) if (img.img) files.add(img.img);
   for (const img of product.gallery ?? []) if (img.img) files.add(img.img);
+  for (const a of product.attachments ?? []) if (a.file) files.add(a.file);
   return files;
 }
 
@@ -133,7 +134,7 @@ export async function describeReferences(refs) {
     href: `/admin/produkty/${p.slug}`,
   });
 
-  const [products, variants, gallery, categories, pages] = await Promise.all([
+  const [products, variants, gallery, attachments, categories, pages] = await Promise.all([
     ids('products').length && readByIds('products', ids('products'), ['id', 'name', 'code', 'slug']),
     ids('products_storage_image').length &&
       readByIds('products_storage_image', ids('products_storage_image'), [
@@ -145,6 +146,13 @@ export async function describeReferences(refs) {
       ]),
     ids('products_image').length &&
       readByIds('products_image', ids('products_image'), ['id', 'product.name', 'product.code', 'product.slug']),
+    ids('products_attachment').length &&
+      readByIds('products_attachment', ids('products_attachment'), [
+        'id',
+        'product.name',
+        'product.code',
+        'product.slug',
+      ]),
     ids('categories').length && readByIds('categories', ids('categories'), ['id', 'name', 'slug']),
     ids('pages').length && readByIds('pages', ids('pages'), ['id', 'name', 'slug']),
   ]);
@@ -158,6 +166,8 @@ export async function describeReferences(refs) {
       described.push(product(p, code ? `wariant ${code}` : 'wariant'));
     } else if (collection === 'products_image' && find(gallery)?.product) {
       described.push(product(find(gallery).product, 'galeria'));
+    } else if (collection === 'products_attachment' && find(attachments)?.product) {
+      described.push(product(find(attachments).product, 'załącznik'));
     } else if (collection === 'categories' && find(categories)) {
       described.push({ text: `Kategoria ${find(categories).name}`, href: `/admin/kategorie/${find(categories).slug}` });
     } else if (collection === 'pages' && find(pages)) {

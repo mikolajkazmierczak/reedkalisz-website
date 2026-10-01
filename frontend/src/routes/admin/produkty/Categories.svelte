@@ -77,9 +77,13 @@
 
 <style>
   /* the two buttons spaced as a bar's (its 2rem buttons have 0.6875rem above and below, border included), then the tree */
+  /* no taller than the page (see .ui-fill): the tree scrolls, the buttons stay */
   sidebar {
     display: flex;
     flex-direction: column;
+    align-self: start;
+    max-height: 100%;
+    min-height: 0;
     padding: 0.5rem;
     padding-top: 0.625rem;
     width: 20rem; /* always: a long name wraps (the gadgets' second level fits in one line, with room to spare) */
@@ -87,6 +91,15 @@
     corner-shape: squircle;
     border: var(--border-light);
     background-color: var(--light);
+  }
+  sidebar > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .tree {
+    overflow-y: auto;
+    min-height: 0;
   }
   /* products without a category: the button's outline is orange, solid, whatever its state (hovered, pressed, picked) */
   .warn :global(button),

@@ -41,19 +41,22 @@
   <title>Admin | Kalkulacje | Znakowania | REED Kalisz</title>
 </svelte:head>
 
-{#if pages}
-  <div class="actions ui-bar">
-    <div class="left">
-      <div class="pages">
-        <Filters filters={pages} selected={selectedCompany} on:change={handlePageChange} />
+<!-- the page doesn't scroll, the table does (see .ui-fill) -->
+<div class="ui-fill">
+  {#if pages}
+    <div class="actions ui-bar">
+      <div class="left">
+        <div class="pages">
+          <Filters filters={pages} selected={selectedCompany} on:change={handlePageChange} />
+        </div>
       </div>
     </div>
-  </div>
-{/if}
+  {/if}
 
-{#if $companies && selectedCompany}
-  <Company bind:unsaved company={selectedCompany} />
-{/if}
+  {#if $companies && selectedCompany}
+    <Company bind:unsaved company={selectedCompany} />
+  {/if}
+</div>
 
 <style>
   /* the small buttons sit 0.75rem from the top and bottom of the bar (it's as tall as a big one): as far on the left */

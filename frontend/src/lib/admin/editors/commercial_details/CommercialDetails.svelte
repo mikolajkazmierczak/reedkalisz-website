@@ -27,7 +27,7 @@
   read();
 
   $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    $unsaved = changed;
+    unsaved.set(changed);
   });
 </script>
 

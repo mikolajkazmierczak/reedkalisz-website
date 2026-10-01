@@ -15,7 +15,7 @@
 </script>
 
 <div class="wrapper">
-  <Button small outline selected={active} on:click={() => !active && dispatch('change', { value })}
+  <Button size="sm" outline selected={active} on:click={() => !active && dispatch('change', { value })}
     >{#if image}<img class="image" src={image} alt="" />{/if}{label}</Button>
 </div>
 

@@ -75,9 +75,9 @@
     aspect-ratio: var(--tile-cols) / var(--tile-rows);
     width: 100%;
   }
-  /* Flush below 118rem (see the page's blocks); above, apart and squircled, reaching past the column by --reach while
+  /* Flush below 100.5rem (see the page's blocks); above, apart and squircled, reaching past the column by --reach while
      the text stays in it (see Tile) */
-  @media (min-width: 118rem) {
+  @media (min-width: 100.5rem) {
     .tiles:not(.editing) {
       gap: var(--sp-5);
     }

@@ -72,7 +72,7 @@
 
 <tr class:remove={item._remove}>
   <td class="col-sticky col-remove">
-    <span class="cell-button"><Button small dangerous icon="delete" title="Usuń" on:click={tryRemove} /></span>
+    <span class="cell-button"><Button size="sm" dangerous icon="delete" title="Usuń" on:click={tryRemove} /></span>
   </td>
   <td class="input type col-sticky col-index heavy-border">
     <Input

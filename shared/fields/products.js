@@ -111,6 +111,10 @@ export const edit = [
   'gallery.enabled',
   'gallery.main',
   'gallery.img',
+  'attachments.id',
+  'attachments.index',
+  'attachments.enabled',
+  'attachments.file',
 ];
 
 export const calculate = [
@@ -198,6 +202,7 @@ export const defaults = () => ({
   product_minimum: 0,
   storage: [],
   gallery: [],
+  attachments: [],
 });
 
 export default { search, show, read, edit, defaults };
