@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
-import { addCategories, mergePositions, printPosition } from '../common.js';
+import { addCategories, mergePositions, printPosition, uniqueMaterials } from '../common.js';
 
 function parseStorage(item) {
   const { imgs, amount, id, colors } = item;
@@ -87,7 +87,8 @@ function parse(products, stocks, categories) {
       name: $.nazwa,
       desc: $.opis,
       size: $.wymiary,
-      materials: [$.material_wykonania, $.material_dodatkowy].filter(Boolean),
+      // the additional ones are a list of their own: 'PP, stal nierdzewna 18/0'
+      materials: uniqueMaterials([$.material_wykonania, $.material_dodatkowy].flatMap((m) => (m ?? '').split(','))),
       colors: [$.kolor_podstawowy, $.kolor_dodatkowy].filter(Boolean),
       // tag-like categories (e.g. "Gadżety do 20 zł") are not in the tree, they stay flat
       // (without the tree none are given: flat subcategory names would match no mapping and drop the mapped ones)

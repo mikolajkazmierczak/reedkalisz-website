@@ -215,7 +215,6 @@
   .preview {
     gap: 0.25rem;
   }
-  /* as NewImages' head */
   .preview-head {
     display: flex;
     align-items: baseline;

@@ -1,17 +1,26 @@
 <script>
   import { globals, colors, companies } from '@/globals';
   import { isApiCompany } from '@/sync';
-  import { moveItem } from '%/utils';
-  import { parseAmount, AMOUNT } from '$/storage';
-  import Tooltip from '$c/Tooltip.svelte';
+  import { parseAmount, AMOUNT, NONE } from '$/storage';
+  import { createEventDispatcher } from 'svelte';
+  import { sortable, moveTo } from '@/sortable';
+  import { beside } from '@/beside';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
+  import DragHandle from '@c/DragHandle.svelte';
+  import MoveTo from '@c/MoveTo.svelte';
   import Picker from '@c/library/Picker.svelte';
   import { swatch } from '$/colors';
 
+  // The variants, in the order of their codes (set on saving, see order.js), each with its photos: dragged into place
+  // by their handles, or moved to the gallery or another variant (`targets`): `on:move` { from, index, to }. Every
+  // enabled variant's photos show in the product's gallery on the site too, after its own.
   export let product;
   export let fileContext = null; // { used, history } file ids, for the picker
   export let scanner = { variant: () => false }; // what the API scanner overwrites (see scannerFields)
+  export let targets = [];
+  export let covers = []; // (see ProductFiles)
+  const dispatch = createEventDispatcher();
 
   $: globals.update(colors);
   $: apiProduct = isApiCompany($companies?.find((c) => c.id === product.company));
@@ -38,14 +47,10 @@
     product.storage.splice(i, 1);
     product = product;
   }
-  function moveStorage(i, d) {
-    product.storage = moveItem(product.storage, i, d);
-  }
-
   // in the order shown (`index`: they're read back sorted by it, a photo without one first)
   function pushStorageImg(i) {
     const img = product.storage[i].img;
-    img.push({ img: null, enabled: true, show_in_gallery: true, index: img.length });
+    img.push({ img: null, enabled: true, index: img.length });
     product = product;
   }
   function removeStorageImg(i, j) {
@@ -53,8 +58,10 @@
     product.storage[i].img.forEach((img, k) => (img.index = k));
     product = product;
   }
-  function moveStorageImg(i, j, d) {
-    product.storage[i].img = moveItem(product.storage[i].img, j, d);
+  function sortStorageImg(i, from, to) {
+    const img = product.storage[i].img;
+    if (to < 0 || to >= img.length) return false;
+    product.storage[i].img = moveTo(img, from, to);
   }
 </script>
 
@@ -71,12 +78,6 @@
               <Input type="checkbox" bind:value={storage.available}>Dostępny</Input>
             </div>
             <div>
-              {#if !i == 0}
-                <Button size="sm" icon="arrow_left" on:click={() => moveStorage(i, -1)} square />
-              {/if}
-              {#if i < product.storage.length - 1}
-                <Button size="sm" icon="arrow_right" on:click={() => moveStorage(i, 1)} square />
-              {/if}
               <Button size="sm" icon="delete" on:click={() => removeStorage(i)} dangerous />
             </div>
           </div>
@@ -89,7 +90,8 @@
                 bind:value={storage.amount}
                 api={scanner.variant(storage)}
                 disabled={scanner.variant(storage)}>
-                Ilość{#if state.state !== AMOUNT}<small>{state.label}</small>{/if}
+                <!-- (the site's "Chwilowy brak" doesn't fit beside the label: "Brak" here) -->
+                Ilość{#if state.state !== AMOUNT}<small>{state.state === NONE ? 'BRAK' : state.label}</small>{/if}
               </Input>
             </div>
             <Input bind:value={storage.api_color_code}>
@@ -105,64 +107,60 @@
             {/each}
           </div>
 
-          <div class="imgs-wrapper">
-            <h3 class="ui-h3">Zdjęcia</h3>
-            <div class="imgs">
-              {#each storage.img as img, j (img)}
-                <div class="img">
-                  <div class="img-actions img-actions--top">
-                    <span class="order">
-                      {#if j > 0}
-                        <Button size="sm" icon="arrow_left" on:click={() => moveStorageImg(i, j, -1)} square />
-                      {/if}
-                      {#if j < storage.img.length - 1}
-                        <Button size="sm" icon="arrow_right" on:click={() => moveStorageImg(i, j, 1)} square />
-                      {/if}
-                    </span>
+          <div class="imgs" use:sortable={{ sort: (from, to) => sortStorageImg(i, from, to) }}>
+            {#each storage.img as img, j (img)}
+              <div
+                class="img"
+                class:ui-cover={img === covers[0]}
+                class:ui-cover--hover={img === covers[1]}
+                data-sortable>
+                <div class="img-actions">
+                  <DragHandle disabled={storage.img.length < 2} on:step={(e) => sortStorageImg(i, j, j + e.detail)} />
+                  <div>
+                    {#if img.img}
+                      <MoveTo
+                        {targets}
+                        here={i}
+                        on:move={(e) => dispatch('move', { from: i, index: j, to: e.detail })} />
+                    {/if}
                     <Button size="sm" icon="delete" on:click={() => removeStorageImg(i, j)} square dangerous />
                   </div>
-                  <Picker bind:selected={img.img} {fileContext} />
-                  <div class="img-actions img-actions--bottom">
-                    <span class="tip">
-                      <Input type="checkbox" bind:value={img.show_in_gallery}>Galeria</Input>
-                      <Tooltip><small>Dołącza zdjęcie na końcu głównej galerii</small></Tooltip>
-                    </span>
-                  </div>
                 </div>
-              {/each}
-              <Button icon="add" on:click={() => pushStorageImg(i)}>Dodaj</Button>
-            </div>
+                <Picker bind:selected={img.img} {fileContext} />
+              </div>
+            {/each}
+            <span class="ui-add" use:beside>
+              <!-- a variant without photos: what it adds, there being no heading; with some: quieter, dashed -->
+              <Button icon="add" dashed={storage.img.length > 0} on:click={() => pushStorageImg(i)}>
+                {storage.img.length ? 'Dodaj' : 'Zdjęcie'}
+              </Button>
+            </span>
           </div>
         </div>
       {/each}
 
-      <div class="ui-section__col">
-        <Button icon="add" on:click={pushStorage}>Dodaj</Button>
-      </div>
+      <span class="ui-add" use:beside><Button icon="add" on:click={pushStorage}>Dodaj</Button></span>
     </div>
   </section>
 {/if}
 
 <style>
-  .imgs-wrapper {
-    border-top: var(--border-light);
-    padding-top: 1rem;
-  }
   .imgs {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
-    gap: 1rem;
+    gap: 0.75rem;
+    border-top: var(--border-light);
     padding-top: 1rem;
   }
   /* framed as the variant's box */
   .img {
-    padding: 0.25rem;
-    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    border-radius: var(--box-radius);
     corner-shape: squircle;
     border: var(--border-light);
   }
 
-  /* (not halves: on a phone the buttons go under the toggles) */
+  /* (not halves: on a phone the delete button goes under the toggles) */
   .storage-actions {
     display: flex;
     flex-wrap: wrap;
@@ -171,8 +169,6 @@
   }
   .storage-actions > div:last-child {
     display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
   }
   .toggles {
     display: flex;
@@ -191,23 +187,12 @@
   .img-actions {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    --label-size: 0.75rem; /* the small checkbox's name, to fit a narrow tile */
-  }
-  .img-actions--top {
     justify-content: space-between;
+    gap: 0.3rem;
     padding-bottom: 0.25rem;
   }
-  .img-actions--bottom {
-    padding-top: 0.25rem;
-  }
-  .order {
+  .img-actions div {
     display: flex;
     gap: 0.3rem;
-  }
-
-  /* the whole checkbox shows what it does */
-  .tip {
-    display: flex;
   }
 </style>

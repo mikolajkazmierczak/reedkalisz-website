@@ -1,5 +1,5 @@
 <script>
-  /** @type {'new'|'sale'|'bestseller'|'soon'|'out'} */
+  /** @type {'new'|'sale'|'bestseller'|'soon'|'out'|'none'} */
   export let tone = 'new';
   export let label;
 </script>
@@ -29,20 +29,24 @@
     color: #fff;
   }
   .badge--sale {
-    background-color: var(--orange);
+    background-color: var(--red);
     color: #fff;
   }
   .badge--bestseller {
-    background-color: var(--navy);
+    background-color: var(--green);
     color: #fff;
   }
   .badge--soon {
-    background-color: #fff;
-    color: var(--ink);
-    border-color: var(--ink);
+    background-color: var(--blue-light);
+    color: var(--navy);
   }
   .badge--out {
     background-color: var(--ink-600);
     color: #fff;
+  }
+  /* out of stock for now: a quiet grey */
+  .badge--none {
+    background-color: var(--paper-3);
+    color: var(--ink-600);
   }
 </style>

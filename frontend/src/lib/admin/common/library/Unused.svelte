@@ -20,7 +20,7 @@
 
   let unused = null;
   let kept = new Set();
-  // the images a page at a time (others are few), the list back at its top on another page
+  // the images a page at a time (others are few), the list back at its top on another page (`list`: what scrolls)
   let limit = 100;
   let page = 1;
   let list;
@@ -78,89 +78,71 @@
   }
 </script>
 
-<Modal type="fill" dotted on:close={() => !deleting && dispatch('close')}>
-  <!-- the bar scrolls away with the files -->
-  <div class="list" bind:this={list}>
-    <div class="head ui-bar">
-      {#if !unused}
-        <p class="aligned"><Loader dark /> Szukam plików, których nic nie używa...</p>
-      {:else}
-        <div class="buttons">
-          <Button icon="close" disabled={!!deleting} on:click={() => dispatch('close')}>Anuluj</Button>
-          {#if unused.length}
-            <Button dangerous icon="delete" disabled={!!deleting || !marked.length} on:click={remove}>
-              {deleting ? `Usuwanie ${deleting}...` : 'Usuń'}
-            </Button>
-          {/if}
-        </div>
+<Modal type="fill" dotted closeText={null} bind:scroller={list} on:close={() => !deleting && dispatch('close')}>
+  <svelte:fragment slot="bar">
+    {#if !unused}
+      <p class="aligned"><Loader dark /> Szukam plików, których nic nie używa...</p>
+    {:else}
+      <div class="buttons">
+        <Button icon="close" secondary edge disabled={!!deleting} on:click={() => dispatch('close')}>Anuluj</Button>
         {#if unused.length}
-          <div class="ui-counts">
-            <span class="ui-stat-value">{marked.length}</span>
-            <span class="ui-stat-label">Do usunięcia</span>
-          </div>
-          <span class="ui-divider" />
+          <Button dangerous icon="delete" disabled={!!deleting || !marked.length} on:click={remove}>
+            {deleting ? `Usuwanie ${deleting}...` : 'Usuń'}
+          </Button>
         {/if}
-        <h3>
-          Nieużywane pliki
-          <small class="muted">
-            · {unused.length
-              ? `${plural(unused.length, 'plik', 'pliki', 'plików')}, ${bytesToReadable(sizeOf(unused))}`
-              : 'wszystkie pliki są gdzieś używane'}
-          </small>
-        </h3>
-      {/if}
-    </div>
-    {#if unused?.length}
-      {#if others.length}
-        <h4>Inne pliki ({others.length})</h4>
-        <div class="ui-tiles">
-          {#each others as file (file.id)}
-            <File
-              {...fileProps(file)}
-              marked={!kept.has(file.id)}
-              remove="Usuń"
-              backing="var(--grey-100)"
-              on:click={() => toggle(file.id)} />
-          {/each}
+      </div>
+      {#if unused.length}
+        <div class="ui-counts">
+          <span class="ui-stat-value">{marked.length}</span>
+          <span class="ui-stat-label">Do usunięcia</span>
         </div>
+        <span class="ui-divider" />
       {/if}
-      {#if images.length}
-        <h4>Zdjęcia ({images.length})</h4>
-        <div class="ui-tiles">
-          {#each images.slice((page - 1) * limit, page * limit) as file (file.id)}
-            <File
-              {...fileProps(file)}
-              marked={!kept.has(file.id)}
-              remove="Usuń"
-              backing="var(--grey-100)"
-              on:click={() => toggle(file.id)} />
-          {/each}
-        </div>
-        <Pagination bind:limit bind:page count={images.length} />
-      {/if}
+      <h3>
+        Nieużywane pliki
+        <small class="muted">
+          · {unused.length
+            ? `${plural(unused.length, 'plik', 'pliki', 'plików')}, ${bytesToReadable(sizeOf(unused))}`
+            : 'wszystkie pliki są gdzieś używane'}
+        </small>
+      </h3>
     {/if}
-  </div>
+  </svelte:fragment>
+  {#if unused?.length}
+    {#if others.length}
+      <h4>Inne pliki ({others.length})</h4>
+      <div class="ui-tiles">
+        {#each others as file (file.id)}
+          <File
+            {...fileProps(file)}
+            marked={!kept.has(file.id)}
+            remove="Usuń"
+            backing="var(--grey-100)"
+            on:click={() => toggle(file.id)} />
+        {/each}
+      </div>
+    {/if}
+    {#if images.length}
+      <h4>Zdjęcia ({images.length})</h4>
+      <div class="ui-tiles">
+        {#each images.slice((page - 1) * limit, page * limit) as file (file.id)}
+          <File
+            {...fileProps(file)}
+            marked={!kept.has(file.id)}
+            remove="Usuń"
+            backing="var(--grey-100)"
+            on:click={() => toggle(file.id)} />
+        {/each}
+      </div>
+      <Pagination bind:limit bind:page count={images.length} />
+    {/if}
+  {/if}
 </Modal>
 
 <style>
-  /* a bar as the pages' (ui-bar): from the left, wrapping when there's no room */
-  .head {
-    flex: none;
-    justify-content: flex-start;
-    gap: 0.5rem 1rem;
-    margin: 0 0 0.5rem;
-  }
   .buttons {
     display: flex;
     gap: 0.5rem;
-  }
-  .list {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
   }
   h3,
   h4,
@@ -175,7 +157,7 @@
   h4 {
     font-size: 1.15rem;
   }
-  h4:not(:nth-child(2)) {
+  h4:not(:first-child) {
     margin-top: 0.75rem;
   }
   .aligned {

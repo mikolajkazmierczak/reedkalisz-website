@@ -11,7 +11,7 @@
   // The admin's select: a button showing the chosen option and, under it, the options in a white box, a search field
   // over them (always: open, type, Enter). Like the browser's own: a click beside the box only closes it, the arrows
   // move, Enter picks, Escape closes; typing on the closed button opens it, searching.
-  //   options: [{ id, text, disabled, color, special, depth, code, swatch, image, note, noteImage, chosen }]
+  //   options: [{ id, text, disabled, color, special, depth, code, swatch, image, icon, note, noteImage, chosen }]
   //     color   - the option's background (e.g. a status)
   //     special - a choice beside the list ("Wszystkie", "Brak"): a button over it, as the products' "Wszystkie"
   //               and "Bez kategorii", never searched away
@@ -20,6 +20,7 @@
   //     swatch  - a colour (a css background, see $/colors swatch): a pill of it before its name; `true` for a colour
   //               without one yet: the website's "no colour" (a white dot crossed out) in its place
   //     image   - a picture's url (a company's favicon) before its name
+  //     icon    - an icon's name, in a swatch's place (the gallery among the variants)
   //     note    - more about it, on a line of its own under its name in the list, smaller (searched too)
   //     noteImage - a picture's url before the note (a company's favicon)
   //     chosen  - already had (e.g. the product's categories, a select adding another): marked as the one chosen,
@@ -75,6 +76,8 @@
   $: showsLabel = !!emptyLabel && (multiple ? !value.length : value == null || value === '');
   $: countWord = pluralWord(count, 'Wybrany', 'Wybrane', 'Wybranych');
   $: listed = options.filter((o) => !o.special);
+  // a swatch or picture before some of the names: the others' names start where theirs do (an empty one in its place)
+  $: lead = listed.some((o) => o.swatch || o.icon) ? 'swatch' : listed.some((o) => o.image) ? 'image' : null;
 
   let query = '';
   const fold = (text) =>
@@ -375,6 +378,8 @@
                   class="swatch"
                   style:background={option.swatch === true ? NO_COLOR : option.swatch} />{/if}
               {#if option.image}<img class="image" src={option.image} alt="" />{/if}
+              {#if option.icon}<span class="swatch glyph"><Icon fill name={option.icon} dark /></span>{/if}
+              {#if lead && !option.swatch && !option.image && !option.icon}<span class="{lead} blank" />{/if}
               {#if option.code}<CategoryCode code={option.code} />{/if}
               <span class="name" class:coded={option.code}>
                 {option.text}
@@ -528,6 +533,18 @@
   /* a swatch a little further from the name than a picture: it's bigger to the eye */
   .label .swatch {
     margin-right: 0.25em;
+  }
+  .label .blank {
+    visibility: hidden;
+  }
+  /* an icon in a swatch's place, without its ring: bigger than a swatch (its lines are thin), over the edges of the
+     swatch's room so the name starts where the others' do */
+  .label .glyph {
+    display: grid;
+    width: 1.5em;
+    height: 1.5em;
+    margin: -0.25em 0 -0.25em -0.25em;
+    box-shadow: none;
   }
 
   /* a filter's name while none are chosen: a field's label, a little bigger (it's in the field) */

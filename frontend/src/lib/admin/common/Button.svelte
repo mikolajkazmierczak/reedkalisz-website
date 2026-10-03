@@ -13,7 +13,8 @@
   export let outline = false; // a light pill with a faint border, e.g. a choice between companies
   export let selected = false; // the chosen one of a few (purplish), e.g. the company picked
   export let edge = false; // a light one on a grey or dotted page: a ring a shade darker than its fill
-  // a state in colour: 'info' (light blue), 'selected' (purplish), 'success' (green), 'warning' (orange), 'danger' (red)
+  // a state in colour: 'info' (light blue), 'selected' (purplish), 'success' (green), 'warning' (orange), 'danger' (red),
+  // 'new' (purple), 'split' (orange and purple, halved corner to corner: a warning and something new at once)
   export let tone = null;
   export let square = false;
   // 'sm' (1.5rem, in tables and next to small fields), 'md' (2rem, the default), 'lg' (as tall as what's in it, at
@@ -54,6 +55,8 @@
   class:tone-success={shade === 'success'}
   class:tone-warning={shade === 'warning'}
   class:tone-danger={shade === 'danger'}
+  class:tone-new={shade === 'new'}
+  class:tone-split={shade === 'split'}
   class:dark
   class:square={squared}
   class:sm={size === 'sm'}
@@ -163,6 +166,21 @@
     --bg-hover: var(--red-200);
     --bg-active: var(--red-300);
   }
+  .tone-new {
+    --bg: var(--purple-100);
+    --bg-hover: var(--purple-200);
+    --bg-active: var(--purple-300);
+  }
+  /* orange above the line from the bottom left corner to the top right one, purple under it */
+  .tone-split {
+    background-image: linear-gradient(to bottom right, var(--orange-100) 50%, var(--purple-100) 50%);
+  }
+  .tone-split:hover {
+    background-image: linear-gradient(to bottom right, var(--orange-200) 50%, var(--purple-200) 50%);
+  }
+  .tone-split:active {
+    background-image: linear-gradient(to bottom right, var(--orange-300) 50%, var(--purple-300) 50%);
+  }
 
   .content {
     position: relative;
@@ -216,6 +234,7 @@
   [disabled]:active {
     cursor: not-allowed;
     background-color: var(--grey-100);
+    background-image: none;
   }
   [disabled] .content {
     color: var(--grey-500);

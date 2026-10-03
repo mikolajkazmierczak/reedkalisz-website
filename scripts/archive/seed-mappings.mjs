@@ -2,14 +2,14 @@
 //
 // Adds the proposed API mappings (places, categories, labelings) to the supplier companies.
 //
-//   node scripts/seed-mappings.mjs                  # dry run: prints what would be added
-//   node scripts/seed-mappings.mjs --apply          # adds them
-//   node scripts/seed-mappings.mjs MidOcean AXPOL   # only these companies (with or without --apply)
+//   node scripts/archive/seed-mappings.mjs                  # dry run: prints what would be added
+//   node scripts/archive/seed-mappings.mjs --apply          # adds them
+//   node scripts/archive/seed-mappings.mjs MidOcean AXPOL   # only these companies (with or without --apply)
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env),
 // never the database file, so Directus validates and logs it like an edit in the admin panel.
 //
-// The proposals are in scripts/assets/mappings/<Company>.json, in the columns' own formats:
+// The proposals are in scripts/archive/assets/mappings/<Company>.json, in the columns' own formats:
 //   { "places": [{ pattern, to }], "categories": [{ path, categories }], "labelings": [{ code, type, data }],
 //     "removeLabelings": [{ code, type, data }], "replaceCategories": [{ path, from, to }] }
 // They were worked out from what the admins did by hand before the scanner did it.
@@ -33,8 +33,8 @@ import { fileURLToPath } from 'url';
 
 const apply = process.argv.includes('--apply');
 const only = process.argv.slice(2).filter((a) => !a.startsWith('--'));
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const assets = path.join(root, 'scripts/assets/mappings');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const assets = path.join(root, 'scripts/archive/assets/mappings');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

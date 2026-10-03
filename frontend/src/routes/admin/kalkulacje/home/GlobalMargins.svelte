@@ -87,7 +87,7 @@
 
 {#if unsaved}
   <div class="ui-pair edit" transition:slide={{ duration: 200 }}>
-    <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
+    <Button icon="close" secondary edge on:click={cancel}>Anuluj</Button>
     <Button icon="ok" on:click={save}>
       {#if saving}Zapisuję...{:else}Zapisz{/if}
     </Button>

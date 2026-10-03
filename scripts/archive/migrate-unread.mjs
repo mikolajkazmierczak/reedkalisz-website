@@ -4,8 +4,8 @@
 // ONE-OFF, applied on prod 2026-09-28: it reads questions' from_product / from_contact, which
 // migrate-schema-2.mjs --cleanup removes - after that it can't run (and needn't).
 //
-//   node scripts/migrate-unread.mjs           # dry run: prints what would change
-//   node scripts/migrate-unread.mjs --apply   # makes the changes
+//   node scripts/archive/migrate-unread.mjs           # dry run: prints what would change
+//   node scripts/archive/migrate-unread.mjs --apply   # makes the changes
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env),
 // never the database file, so Directus validates and logs it like an edit in the admin panel.
@@ -27,7 +27,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const apply = process.argv.includes('--apply');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

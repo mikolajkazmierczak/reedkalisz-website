@@ -114,7 +114,7 @@
 <style>
   div {
     pointer-events: none;
-    z-index: 2000; /* above everything: popups and the login (1000), errors (1003) */
+    z-index: 2000; /* above everything: popups and the login (1000-1001), errors (1002), dialogs (1500) */
     position: fixed;
     top: 0;
     left: 0;

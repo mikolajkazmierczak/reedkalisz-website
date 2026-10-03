@@ -41,7 +41,9 @@
   --orange-500: #e8871e;
   --orange-700: #b26a00;
 
-  --purple-100: #e9d8ff; /* the API's "Hmm" */
+  --purple-100: #e9d8ff; /* the API's "Hmm", new variants in the API */
+  --purple-200: #dcc2ff;
+  --purple-300: #cfadff;
   --purple-700: #6604c2; /* transport (T, TP) in the labelings, as in the pricing infographic */
 
   --yellow-100: #ffec99; /* the API's "Do edycji" */
@@ -77,7 +79,6 @@
   --border-ink: solid 1px rgb(27 47 78 / 0.55); /* navy seen through, darkening with the box it's on: a table's lines,
   a preview's edge */
   --border-heavy: solid 0.1875rem var(--black-10);
-  --outline-dashed: dashed 2px var(--navy-700);
   --shadow: #43475545 0 0 0.25em, #5a7dbc0d 0 0.25em 1em;
 }
 
@@ -134,6 +135,41 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+/* a product's photo the site's tiles show (gallery or variant, see Product): the picture in a blue line, the one under
+   the pointer in a dashed one */
+.ui-cover {
+  outline: solid 2px var(--blue-500);
+  outline-offset: -1px;
+}
+.ui-cover--hover {
+  outline: dashed 2px var(--blue-500);
+  outline-offset: -1px;
+}
+/* "+ Dodaj" at the end of a grid of boxes (a product's photos, files, variants): as wide as its cell on a row of its
+   own; on a row with a box before it (`ui-add--side`, see beside.js) turned on its side, reading downwards, as long as
+   what's on it, at the top of its cell */
+.ui-add {
+  display: flex;
+  flex-direction: column;
+}
+.ui-add.ui-add--side {
+  flex-direction: row;
+  align-items: flex-start;
+}
+span.ui-add.ui-add--side > button {
+  width: 2rem !important; /* (over the Button's own width) */
+  height: auto;
+  writing-mode: vertical-rl;
+}
+/* (over the Button's own: Svelte doubles its classes) */
+span.ui-add.ui-add--side.ui-add > button > div {
+  padding: 1rem 0; /* as a button lying down has at its ends */
+}
+/* its "+" as big as on a button lying down (Button sizes it by its height) */
+span.ui-add.ui-add--side > button svg {
+  width: 1.16rem !important;
+  height: 1.16rem !important;
 }
 
 .ui-pair {
@@ -423,4 +459,15 @@ body {
 .ui-thumbed > .float {
   flex: 1;
   min-width: 0;
+}
+
+/* a tile being dragged into place (see sortable.js): its place faded under it, its copy under the pointer over
+   everything */
+.sortable-ghost {
+  opacity: 0.35;
+}
+.sortable-fallback {
+  z-index: 3000 !important;
+  opacity: 0.9 !important;
+  box-shadow: 0 0.25rem 1rem rgb(17 17 16 / 0.18);
 }

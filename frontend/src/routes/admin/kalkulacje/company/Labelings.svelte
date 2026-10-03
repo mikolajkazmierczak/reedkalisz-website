@@ -173,9 +173,10 @@
             </th>
           {/each}
 
-          <th style:width="5.625rem" class="add-amount">
+          <!-- as wide as the deleting column -->
+          <th style:width="2.25rem" class="add-amount">
             <span class="head-icon"
-              ><Button size="sm" icon="add" title="Dodaj nakład" on:click={addAmount}>Dodaj</Button></span>
+              ><Button size="sm" dashed icon="add" title="Dodaj nakład" on:click={addAmount} /></span>
           </th>
           <!-- no width: the rest of the box, so the lines of the rows go all the way (nothing when it scrolls) -->
           <th class="filler" />
@@ -200,7 +201,7 @@
     {#if !saving}<span class="divider" />{/if}
     <div class="save">
       {#if !saving}
-        <Button icon="close" dangerous on:click={cancel}>Anuluj</Button>
+        <Button icon="close" secondary edge on:click={cancel}>Anuluj</Button>
       {/if}
       <Button icon="ok" on:click={trySave}>
         {#if saving}Zapisuję...{:else}Zapisz{/if}

@@ -3,8 +3,8 @@
 // A variant's code becomes its whole code: 'R123.10' instead of '10' next to the product's 'R123' (see
 // frontend/src/routes/admin/api/match.js). Run right after deploying the heimdall that sends whole codes.
 //
-//   node scripts/migrate-variant-codes.mjs           # dry run: prints what would change
-//   node scripts/migrate-variant-codes.mjs --apply   # makes the changes
+//   node scripts/archive/migrate-variant-codes.mjs           # dry run: prints what would change
+//   node scripts/archive/migrate-variant-codes.mjs --apply   # makes the changes
 //
 // For the suppliers the whole codes come from the supplier itself: every supplier is scanned (heimdall's adapters, the
 // same as the "Skanuj" button, nothing is written by that), and each of their variants' old code is worked out the
@@ -21,7 +21,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const apply = process.argv.includes('--apply');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

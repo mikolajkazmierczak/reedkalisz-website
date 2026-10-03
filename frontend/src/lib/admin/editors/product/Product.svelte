@@ -1,4 +1,5 @@
 <script>
+  import { tick } from 'svelte';
   import { marked } from 'marked';
 
   import api from '$/api';
@@ -10,7 +11,7 @@
 
   import { unsaved } from '@/stores';
   import { tell } from '@/dialog';
-  import { globals, companies, categories, commercialDetails } from '@/globals';
+  import { globals, companies, categories, commercialDetails, colors, labelings } from '@/globals';
   import Editor from '@/editors/Editor.svelte';
   import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
@@ -36,6 +37,8 @@
   import Select from '@c/Select.svelte';
   import { goto } from '$app/navigation';
   import { duplicateProduct } from './duplicate.js';
+  import { dropEmpty, imageTargets, moveImage, orderVariants, sortLabelings, sortVariants } from './order.js';
+  import { productImageRows } from '#/products/images';
   import Loader from '$c/Loader.svelte';
   import Icon from '$c/Icon.svelte';
 
@@ -70,6 +73,10 @@
       item.price_max_sale = minMaxPrices.maxSale;
       // only the most specific categories, in the order of the tree
       item.categories = keepSpecific(item.categories);
+      // no tiles without a file, the variants and labelings put in order (not by hand, see order.js)
+      item = dropEmpty(item);
+      item.storage = sortVariants(item.storage);
+      item.labelings = sortLabelings(item.labelings, $labelings, item.company);
       // remember every file the product ever used (the library shows where a file was used)
       item.images_history = [...new Set([...(item.images_history ?? []), ...usedFiles(item)])];
       // save
@@ -86,6 +93,7 @@
     await globals.update(companies);
     await globals.update(commercialDetails);
     await globals.update(categories);
+    await globals.update(labelings);
 
     if (slug == '+') {
       item = defaults();
@@ -97,6 +105,11 @@
     } else {
       const filter = { slug: { _eq: slug } };
       item = (await api.items('products').readByQuery({ fields, filter })).data[0];
+      // shown in their order (see order.js) from the start - one saved before it had it is saved in it next time
+      if (item) {
+        item.storage = sortVariants(item.storage);
+        item.labelings = sortLabelings(item.labelings, $labelings, item.company);
+      }
     }
     itemOriginal = item ? deep.copy(item) : null;
   }
@@ -190,6 +203,13 @@
     }
   }
 
+  // an image moved between the gallery and the variants
+  $: targets = item && imageTargets(item, $colors);
+  const move = ({ detail: { from, index, to } }) => (item = moveImage(item, from, index, to));
+
+  // the photos the site's tiles show: the picture, the one under the pointer (the variants as saving orders them)
+  $: covers = item ? productImageRows({ ...item, storage: orderVariants(item.storage) }).slice(0, 2) : [];
+
   // for the image picker: the product's files now, and before
   $: fileContext = item && {
     used: [...usedFiles(item)],
@@ -214,11 +234,17 @@
     });
 
   $: correctSlug = item && !['+', ''].includes(item.slug);
-  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
-    // (set, not `$unsaved =`: that would make the store an input of this statement, and two editors open at once
-    // - the one being left and the next - would set it back and forth forever)
-    unsaved.set(!errors.materials && correctSlug && item.company != null && changed);
-  });
+  // looked at once the update is through: the parts below work some of it out in the same update (a labeling switched
+  // on gets its prices switched on), and a look before that saw changes that weren't there (switched off and on again)
+  $: checkUnsaved(item, itemOriginal, errors.materials, correctSlug);
+  let checking = 0;
+  async function checkUnsaved(item, itemOriginal, materialsError, correctSlug) {
+    const run = ++checking;
+    await tick();
+    const { changed } = await diff(item, itemOriginal, { editorPreset: true });
+    if (run !== checking) return; // a newer look is on its way
+    unsaved.set(!materialsError && correctSlug && item.company != null && changed);
+  }
 </script>
 
 <Editor
@@ -425,8 +451,15 @@
     </section>
 
     <ProductPricing bind:product={item} productOriginal={itemOriginal} {scanner} bind:saleTooHigh />
-    <ProductFiles title="Galeria" main bind:items={item.gallery} {fileContext} />
-    <ProductStorage bind:product={item} {fileContext} {scanner} />
+    <ProductFiles
+      title="Galeria"
+      main
+      {covers}
+      bind:items={item.gallery}
+      {fileContext}
+      targets={item.storage.length ? targets : null}
+      on:move={move} />
+    <ProductStorage bind:product={item} {fileContext} {scanner} {targets} {covers} on:move={move} />
     <ProductFiles title="Załączniki" key="file" bind:items={item.attachments} {fileContext} />
   {/if}
 </Editor>

@@ -2,8 +2,8 @@
 //
 // NOWOŚCI, BESTSELLERY and PROMOCJE stop being categories: the website makes them from the product flags.
 //
-//   node scripts/migrate-sections.mjs           # dry run: prints what would change
-//   node scripts/migrate-sections.mjs --apply   # makes the changes
+//   node scripts/archive/migrate-sections.mjs           # dry run: prints what would change
+//   node scripts/archive/migrate-sections.mjs --apply   # makes the changes
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env),
 // never the database file, so Directus validates and logs it like an edit in the admin panel.
@@ -21,10 +21,10 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { recalculateStale } from './recalculate.mjs';
+import { recalculateStale } from '../recalculate.mjs';
 
 const apply = process.argv.includes('--apply');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

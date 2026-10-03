@@ -1,5 +1,6 @@
 <script>
   import Color from '#c/Color.svelte';
+  import { allOut } from '$/storage';
   import Badges from '#c/badges/Badges.svelte';
   import { productImages } from '#/products/images';
 
@@ -70,6 +71,7 @@
       amount,
       available,
     }));
+  $: noneNow = !out_of_stock && allOut(colors);
   $: shownColors = colors.slice(0, 6);
   $: extraColors = colors.length - shownColors.length;
 
@@ -89,6 +91,7 @@
   }}
   class="tile"
   class:is-out={out_of_stock}
+  class:is-none={noneNow}
   class:t-sale={sale}
   class:t-new={isNew}
   class:t-best={bestseller}
@@ -126,7 +129,7 @@
         {/key}
       {/if}
 
-      <Badges {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} />
+      <Badges {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} {noneNow} />
     </div>
 
     <div class="tile__body">
@@ -189,16 +192,16 @@
       background-color var(--dur-fast) var(--ease);
   }
   .tile.t-soon {
-    --edge: var(--ink-400);
+    --edge: var(--blue);
   }
   .tile.t-best {
-    --edge: var(--navy);
+    --edge: var(--green);
   }
   .tile.t-new {
     --edge: var(--purple);
   }
   .tile.t-sale {
-    --edge: var(--orange);
+    --edge: var(--red);
   }
   /* Hover thickens via an outer ring, so the contents don't shift. */
   .tile:hover {
@@ -207,6 +210,13 @@
   }
   .tile.is-out {
     background-color: var(--paper-2);
+  }
+  /* out of stock for now (Chwilowy brak): a little faded, whole again under the pointer */
+  .tile.is-none {
+    opacity: 0.8;
+  }
+  .tile.is-none:hover {
+    opacity: 1;
   }
 
   .tile__link {
@@ -284,13 +294,12 @@
   .tile__body {
     padding: var(--sp-3) var(--sp-3) var(--sp-2);
   }
-  /* Two lines reserved so grid rows line up. */
+  /* At most two lines; a one-line name has its code right under it (the foot keeps the rows' bottoms level). */
   .tile__name {
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.25;
     letter-spacing: -0.015em;
-    min-height: calc(2 * 1.25em);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -344,7 +353,9 @@
     min-height: 2.25rem;
     gap: 0.3em;
   }
+  /* up into the room under the price's digits (its line is taller than they are) */
   .tile__with {
+    margin-top: -0.3rem;
     min-height: 1lh;
     color: var(--ink-500);
     font-size: 0.6875rem;

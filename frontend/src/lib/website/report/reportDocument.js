@@ -1,7 +1,7 @@
 import { marked } from 'marked';
 import qrEnc from 'pdfmake/js/qrEnc.js';
 import { makeTree, treeGetItemsFromPath } from '%/utils';
-import { parseAmount, AMOUNT, NONE } from '$/storage';
+import { allOut, parseAmount, AMOUNT, NONE } from '$/storage';
 import { NEUTRAL_QUARTERS, NO_COLOR_LINE, WOOD_RINGS } from '$/colors';
 import { parseColor, plural } from '#/utils';
 import { business, SITE } from '#/seo';
@@ -17,6 +17,7 @@ const c = {
   ink500: '#55524d',
   ink400: '#78746d',
   paper2: '#f4f3f0',
+  paper3: '#e9e7e2',
   border: '#dededd',
   red: '#bf0417',
   redDeep: '#8c020f',
@@ -26,6 +27,7 @@ const c = {
   orange: '#c2560b',
   orangeLight: '#ffa45e',
   green: '#166534',
+  blueLight: '#d9e7fb',
 };
 
 // static instances of Bricolage Grotesque (static/fonts/pdf): a PDF can't be trusted with a variable font's axes
@@ -71,15 +73,16 @@ function derive(product, categories) {
   const variants = storage.filter((s) => s.enabled);
   const shown = (imgs) => (imgs ?? []).filter((i) => i?.img && i.enabled !== false);
 
-  // as the page's gallery (the gallery, then the enabled variants' photos meant for it), a variant's first one only:
+  // as the page's gallery (the gallery, then the enabled variants' photos), a variant's first one only:
   // the four that fit shouldn't be one colour from a few sides
-  const gallery = shown([
-    ...(product.gallery ?? []),
-    ...variants.map((s) => shown(s.img.filter((i) => i.show_in_gallery))[0]),
-  ]);
+  const gallery = shown([...(product.gallery ?? []), ...variants.map((s) => shown(s.img)[0])]);
 
-  const customPrices = (product.custom_prices ?? []).some((p) => p.enabled);
-  const labelings = (product.labelings ?? []).filter((l) => l.enabled && l.prices.some((p) => p.enabled));
+  // as the page's: a price list with a price in it (one switched on with nothing in it is as one switched off)
+  const hasPrice = (prices) => (prices ?? []).some((p) => p.enabled && p.price);
+  const customPrices = hasPrice(product.custom_prices) || hasPrice(product.custom_prices_sale);
+  const labelings = (product.labelings ?? []).filter(
+    (l) => l.enabled && (hasPrice(l.prices) || hasPrice(l.prices_sale)),
+  );
   // the lowest price, and whether it includes marking (labeling prices always do, custom ones when flagged)
   const from = [
     ...[...(product.custom_prices ?? []), ...(product.custom_prices_sale ?? [])].map((p) => [
@@ -354,14 +357,14 @@ function section(text, blocks, { margin = [0, 22, 0, 0], id } = {}) {
   return { stack: [{ stack: head, unbreakable: true }, ...rest], margin };
 }
 
-function pill(text, color, fill, border = fill) {
+function pill(text, color, fill) {
   return {
     table: { body: [[{ text: text.toUpperCase(), color, fillColor: fill }]] },
     layout: {
       hLineWidth: () => 0.75,
       vLineWidth: () => 0.75,
-      hLineColor: () => border,
-      vLineColor: () => border,
+      hLineColor: () => fill,
+      vLineColor: () => fill,
       paddingLeft: () => 4,
       paddingRight: () => 4,
       paddingTop: () => 1.5,
@@ -374,14 +377,15 @@ function pill(text, color, fill, border = fill) {
   };
 }
 
-function badges(product) {
+function badges(product, d) {
   // the page's Badges, in its order and colours
   const list = [
-    product.out_of_stock && pill('Brak', '#ffffff', c.ink600),
-    product.sale && pill('Promocja', '#ffffff', c.orange),
+    product.out_of_stock && pill('Koniec nakładu', '#ffffff', c.ink600),
+    !product.out_of_stock && allOut(d.variants) && pill('Chwilowy brak', c.ink600, c.paper3),
+    product.sale && pill('Promocja', '#ffffff', c.red),
     product.new && pill('Nowość', '#ffffff', c.purple),
-    product.bestseller && pill('Bestseller', '#ffffff', c.navy),
-    product.coming_soon && pill('Wkrótce', c.ink, '#ffffff', c.ink),
+    product.bestseller && pill('Bestseller', '#ffffff', c.green),
+    product.coming_soon && pill('Wkrótce', c.navy, c.blueLight),
   ].filter(Boolean);
   return list.length ? { columns: list, columnGap: 3, margin: [0, 0, 0, 8] } : null;
 }
@@ -462,7 +466,7 @@ function summary(product, d) {
 
   const n = d.variants.length;
   return [
-    badges(product),
+    badges(product, d),
     { text: product.name.replace(/[ \t\r\n]+/g, ' '), style: 'h1' },
     { text: product.code, style: 'code', margin: [0, 5, 0, 0] },
     d.from && {
@@ -480,17 +484,26 @@ function summary(product, d) {
       ],
       margin: [0, 10, 0, 0],
     },
+    // no price: as the page's, the way to ask for one (its form, on the page)
+    !d.from && {
+      text: 'Zapytaj o cenę',
+      link: `${d.url}#zapytaj`,
+      font: 'BricolageDisplay',
+      color: c.ink,
+      fontSize: 16,
+      characterSpacing: -0.3,
+      margin: [0, 10, 0, 0],
+    },
     // as the page's: a link to the Cennik
-    d.from &&
-      (d.customPrices || d.labelings.length) && {
-        text: 'Pełny cennik według nakładu ↓',
-        linkToDestination: 'cennik',
-        color: c.ink500,
-        font: 'BricolageSemi',
-        fontSize: 7.5,
-        decoration: 'underline',
-        margin: [0, 2, 0, 0],
-      },
+    d.from && {
+      text: 'Pełny cennik według nakładu ↓',
+      linkToDestination: 'cennik',
+      color: c.ink500,
+      font: 'BricolageSemi',
+      fontSize: 7.5,
+      decoration: 'underline',
+      margin: [0, 2, 0, 0],
+    },
     n && {
       columns: [
         colorsRow(d.variants, 180),

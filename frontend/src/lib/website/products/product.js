@@ -82,7 +82,6 @@ const fields = [
 
   'storage.img.enabled',
   'storage.img.img',
-  'storage.img.show_in_gallery',
 ];
 
 /** The deepest enabled category the product is in: its breadcrumbs end there, "Podobne produkty" come from it. */

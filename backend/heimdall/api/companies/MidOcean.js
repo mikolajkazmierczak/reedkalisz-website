@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
-import { addCategories } from '../common.js';
+import { addCategories, uniqueMaterials } from '../common.js';
 
 function parseCode(code) {
   // formats: 'XXXXXX', 'XXXXXX-XX', 'XXXXXX-XX-XX', ...?
@@ -103,7 +103,7 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
       size_x: parseSize($.length, $.length_unit),
       size_y: parseSize($.width, $.width_unit),
       size_z: parseSize($.height, $.height_unit),
-      materials: [$.material],
+      materials: uniqueMaterials([$.material]),
       price,
       handling_cost,
       gallery: [], // TODO: $.digital_assets.filter(a => a.type === 'image').map(a => a.url)

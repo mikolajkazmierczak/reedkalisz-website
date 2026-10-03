@@ -2,7 +2,7 @@
   import { tick } from 'svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import Popup from '@c/Popup.svelte';
+  import Modal from '@c/Modal.svelte';
   import { reindex } from './utils';
 
   export let items;
@@ -57,18 +57,19 @@
   }
 </script>
 
-<Popup title="Zaznaczyć do usunięcia?" maxWidth={'18.75rem'} bind:opened={removing} on:close={removeCancel}>
-  <small>
-    Przy zapisywaniu znakowanie zostanie usunięte w produktach, które z niego korzystają. Możesz też wybrać zamiennik.
-  </small>
+{#if removing}
+  <Modal title="Zaznaczyć do usunięcia?" maxWidth="24rem" on:close={removeCancel}>
+    <small>
+      Przy zapisywaniu znakowanie zostanie usunięte w produktach, które z niego korzystają. Możesz też wybrać zamiennik.
+    </small>
 
-  <Input type="select" bind:value={swapID} options={swapOptions}>Zamiennik</Input>
-
-  <div class="ui-pair popup-actions">
-    <Button on:click={removeCancel}>Anuluj</Button>
-    <Button on:click={remove} dangerous>Usuń</Button>
-  </div>
-</Popup>
+    <Input type="select" bind:value={swapID} options={swapOptions}>Zamiennik</Input>
+    <div class="ui-pair">
+      <Button icon="close" secondary edge on:click={removeCancel}>Anuluj</Button>
+      <Button dangerous on:click={remove}>Usuń</Button>
+    </div>
+  </Modal>
+{/if}
 
 <tr class:remove={item._remove}>
   <td class="col-sticky col-remove">

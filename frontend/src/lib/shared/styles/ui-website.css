@@ -27,7 +27,8 @@
 
   --green: #166534;
 
-  --blue: #4f86d9; /* the photo picked in the lightbox */
+  --blue: #4f86d9; /* the photo picked in the lightbox; the edge of a product coming soon */
+  --blue-light: #d9e7fb; /* the "Wkrótce" badge */
 
   --bg: var(--paper);
   --surface: #ffffff;

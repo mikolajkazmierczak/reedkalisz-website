@@ -51,8 +51,7 @@
     display: inline-flex;
     align-items: center;
     border-radius: 100rem;
-    padding: 0.15em 0.3em;
-    padding-right: 0.5em;
+    padding: 3px 0.5em 3px 3px; /* the avatar close to the pill's round end */
     width: auto;
     background-color: var(--black-10);
     font-size: 0.9em;
@@ -71,12 +70,20 @@
     margin-right: 0;
   }
   .img {
+    position: relative;
     overflow: hidden;
-    margin-right: 0.25em;
+    margin-right: 0.3em;
     border-radius: 50%;
-    border: 1px solid var(--black-50);
-    height: 1em;
-    width: 1em;
+    height: 1.3em;
+    width: 1.3em;
+  }
+  /* ringed over the picture, as the colour swatches are (a darker shade of whatever is at its edge) */
+  .img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--black-20);
   }
   .img img {
     display: block;

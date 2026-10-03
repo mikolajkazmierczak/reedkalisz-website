@@ -29,16 +29,13 @@
 
 <script>
   import { createEventDispatcher } from 'svelte';
-  import Button from '@c/Button.svelte';
   import Modal from '@c/Modal.svelte';
-  import { scrolled } from '@/scrolled';
   import { changelog, version } from './changelog.js';
 
   // Every version, newest first; the ones out since the changelog was last seen here with their titles in orange
   // (`seen`: that version, see Nav). Closing it counts as seen.
   export let seen = readSeen();
   const dispatch = createEventDispatcher();
-  let scroller; // what scrolls: the bar over it frosts as the versions go under it, as the pages' bars do
 
   const isNew = (v) => !!seen && compare(v, seen) > 0;
 
@@ -48,61 +45,32 @@
   }
 </script>
 
-<!-- (the box without its padding: the versions scroll under the bar, edge to edge) -->
-<Modal
-  maxWidth="40rem"
-  on:close={close}
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="changelog-title"
-  style="padding: 0; gap: 0; overflow: hidden">
-  <div class="scroll" bind:this={scroller}>
-    <div class="head ui-topbar" use:scrolled={scroller}>
-      <h3 id="changelog-title">Historia zmian</h3>
-      <Button icon="close" size="sm" secondary on:click={close}>Zamknij</Button>
-    </div>
-    <div class="list">
-      {#each changelog as { version: v, date: d, title, synopsis, changes }}
-        <section>
-          <h4 class:new={isNew(v)}>
-            {isNew(v) ? 'NOWE ZMIANY · ' : ''}v{v} <span class="date">· {date(d)}</span>
-          </h4>
-          <p><b>{title}</b>: {synopsis}</p>
-          <ul>
-            {#each changes as change}
-              <li>
-                {#if typeof change === 'string'}{change}{:else}{#if change.big}<b>{change.label}</b
-                    >{:else}{change.label}{/if}: {change.text}{/if}
-              </li>
-            {/each}
-          </ul>
-        </section>
-      {/each}
-    </div>
+<Modal title="Historia zmian" maxWidth="40rem" on:close={close}>
+  <div class="list">
+    {#each changelog as { version: v, date: d, title, synopsis, changes }}
+      <section>
+        <h4 class:new={isNew(v)}>
+          {isNew(v) ? 'NOWE ZMIANY · ' : ''}v{v} <span class="date">· {date(d)}</span>
+        </h4>
+        <p><b>{title}</b>: {synopsis}</p>
+        <ul>
+          {#each changes as change}
+            <li>
+              {#if typeof change === 'string'}{change}{:else}{#if change.big}<b>{change.label}</b
+                  >{:else}{change.label}{/if}: {change.text}{/if}
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/each}
   </div>
 </Modal>
 
 <style>
-  .scroll {
-    overflow-y: auto;
-    min-height: 0;
-  }
-  /* the title stays over the versions: as much above as under it */
-  .head {
-    z-index: 1;
-    position: sticky;
-    top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 1.5rem;
-  }
   .list {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    padding: 0.25rem 1.5rem 1.25rem;
   }
   section {
     display: flex;

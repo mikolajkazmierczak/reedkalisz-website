@@ -6,7 +6,7 @@
 //   node scripts/recalculate.mjs --apply   # writes them
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env). Also the
-// last step of `migrate-sections.mjs`.
+// last step of `archive/migrate-sections.mjs`.
 
 import fs from 'fs';
 import path from 'path';

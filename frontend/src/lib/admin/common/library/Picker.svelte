@@ -1,13 +1,11 @@
 <script>
-  import { fade, fly } from 'svelte/transition';
-
   import api from '$/api';
   import { read as fields } from '%/fields/directus_files';
 
   import Button from '@c/Button.svelte';
   import File, { fileProps } from '@c/library/File.svelte';
   import Library from '@c/library/Library.svelte';
-  import { portal } from '@/portal';
+  import Modal from '@c/Modal.svelte';
 
   let opened;
 
@@ -41,46 +39,15 @@
 <File {...fileData} marked={false} {backing} on:click={() => (opened = true)} />
 
 {#if opened}
-  <div class="bg" use:portal transition:fade={{ duration: 200 }} />
-  <div class="wrapper" role="presentation" use:portal on:click|self={close}>
-    <div class="library" transition:fly={{ y: -50, duration: 200 }}>
-      <Library picker {fileContext} bind:selected on:select={handleSelect}>
-        <svelte:fragment slot="actions">
-          <Button icon="close" on:click={close}>Anuluj</Button>
-          {#if selected}
-            <Button icon="delete" dangerous on:click={() => (selected = null)}>Wyczyść</Button>
-          {/if}
-        </svelte:fragment>
-      </Library>
-    </div>
-  </div>
+  <!-- the library's own bar on top, not the frosted one -->
+  <Modal type="fill" dotted closeText={null} on:close={close}>
+    <Library picker {fileContext} bind:selected on:select={handleSelect}>
+      <svelte:fragment slot="actions">
+        <Button icon="close" secondary edge on:click={close}>Anuluj</Button>
+        {#if selected}
+          <Button icon="delete" dangerous on:click={() => (selected = null)}>Wyczyść</Button>
+        {/if}
+      </svelte:fragment>
+    </Library>
+  </Modal>
 {/if}
-
-<style>
-  .bg,
-  .wrapper {
-    z-index: 100;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 1rem;
-    width: 100%;
-    height: 100%;
-  }
-  .bg {
-    background-color: var(--black-50);
-  }
-  .wrapper {
-    overflow-y: auto;
-    border-radius: 1rem;
-  }
-  .library {
-    border-radius: 1rem;
-    corner-shape: squircle;
-    padding: 1rem;
-    width: 100%;
-    background-color: var(--grey-100);
-    background-image: url('/imgs/dot_grid.png');
-    background-size: 10rem;
-  }
-</style>

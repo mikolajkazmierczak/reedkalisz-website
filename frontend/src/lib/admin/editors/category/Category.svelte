@@ -17,7 +17,7 @@
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Picker from '@c/library/Picker.svelte';
-  import Popup from '@c/Popup.svelte';
+  import Modal from '@c/Modal.svelte';
 
   const searchParams = SearchParams.read();
 
@@ -109,24 +109,26 @@
   });
 </script>
 
-<Popup title="Na pewno?" maxWidth={'18.75rem'} bind:opened={deletingOpen} on:close={removeClose}>
-  <small>Kategoria zostanie usunięta z powiązanych produktów.</small>
-  <Input
-    type="select"
-    bind:value={deletingSwapId}
-    options={[
-      { id: null, text: 'Brak zamiennika', special: true },
-      ...categoryOptions(categoryLabels($categories)).filter((o) => o.id !== item?.id),
-    ]}>
-    Możesz wybrać zamiennik
-  </Input>
-  <div class="ui-pair popup-actions">
-    <Button on:click={removeClose}>Anuluj</Button>
-    <Button on:click={remove} dangerous>
-      {#if deleting}Usuwanie...{:else}Usuń{/if}
-    </Button>
-  </div>
-</Popup>
+{#if deletingOpen}
+  <Modal title="Na pewno?" maxWidth="24rem" on:close={removeClose}>
+    <small>Kategoria zostanie usunięta z powiązanych produktów.</small>
+    <Input
+      type="select"
+      bind:value={deletingSwapId}
+      options={[
+        { id: null, text: 'Brak zamiennika', special: true },
+        ...categoryOptions(categoryLabels($categories)).filter((o) => o.id !== item?.id),
+      ]}>
+      Możesz wybrać zamiennik
+    </Input>
+    <div class="ui-pair">
+      <Button icon="close" secondary edge on:click={removeClose}>Anuluj</Button>
+      <Button dangerous on:click={remove}>
+        {#if deleting}Usuwanie...{:else}Usuń{/if}
+      </Button>
+    </div>
+  </Modal>
+{/if}
 
 <Editor
   root="/admin/kategorie"

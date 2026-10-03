@@ -9,7 +9,7 @@
   import { recalculateProducts } from '@/calculations';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import Popup from '@c/Popup.svelte';
+  import Modal from '@c/Modal.svelte';
 
   // `default` property is handled separately
   const fieldsToIgnore = ['default', 'user_created', 'date_created', 'user_updated', 'date_updated'];
@@ -151,7 +151,7 @@
 
   {#if unsaved && correct}
     <div class="save-actions" transition:slide={{ duration: 200 }}>
-      <Button size="sm" icon="close" dangerous on:click={cancel}>Anuluj</Button>
+      <Button size="sm" icon="close" secondary edge on:click={cancel}>Anuluj</Button>
       <Button size="sm" icon="ok" on:click={save}>
         {#if saving}Zapisuję...{:else}Zapisz{/if}
       </Button>
@@ -159,31 +159,25 @@
   {/if}
 </div>
 
-<Popup
-  title="Jesteś pewny, że chcesz usunąć ten widok?"
-  maxWidth={'18.75rem'}
-  bind:opened={deleting}
-  on:close={removeFinish}>
-  <small>Produkty, które korzystają z tego widoku potrzebują zamiennika.</small>
-  <Input
-    type="select"
-    bind:value={swapID}
-    options={items
-      .filter(({ id }) => id !== '+' && id !== item.id)
-      .map((i) => ({ id: i.id, text: `${i.default ? '(Domyślny) ' : ''}${i.name}`, note: i.amounts.join(', ') }))}>
-    Widok zastępczy
-  </Input>
-  <div class="ui-pair popup-actions">
-    <Button on:click={removeFinish}>Anuluj</Button>
-    <Button on:click={remove} dangerous>
-      {#if deletingSaving}
-        Usuwanie...
-      {:else}
-        Usuń
-      {/if}
-    </Button>
-  </div>
-</Popup>
+{#if deleting}
+  <Modal title="Jesteś pewny, że chcesz usunąć ten widok?" maxWidth="24rem" on:close={removeFinish}>
+    <small>Produkty, które korzystają z tego widoku potrzebują zamiennika.</small>
+    <Input
+      type="select"
+      bind:value={swapID}
+      options={items
+        .filter(({ id }) => id !== '+' && id !== item.id)
+        .map((i) => ({ id: i.id, text: `${i.default ? '(Domyślny) ' : ''}${i.name}`, note: i.amounts.join(', ') }))}>
+      Widok zastępczy
+    </Input>
+    <div class="ui-pair">
+      <Button icon="close" secondary edge on:click={removeFinish}>Anuluj</Button>
+      <Button dangerous on:click={remove}>
+        {#if deletingSaving}Usuwanie...{:else}Usuń{/if}
+      </Button>
+    </div>
+  </Modal>
+{/if}
 
 <style>
   .view {
@@ -210,8 +204,5 @@
     grid-template-columns: 1fr 1fr;
     gap: 0.25rem;
     margin-top: 0.25rem;
-  }
-  .popup-actions {
-    margin-top: 1rem;
   }
 </style>

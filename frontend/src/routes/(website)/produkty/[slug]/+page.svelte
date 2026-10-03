@@ -5,7 +5,7 @@
   import { treeGetItemsFromPath, filetypeToReadable, bytesToReadable } from '%/utils';
   import { me } from '$/auth';
   import { baseUrl } from '$/api';
-  import { parseAmount, NONE } from '$/storage';
+  import { allOut } from '$/storage';
   import Color from '#c/Color.svelte';
   import SideRail from '#/shell/SideRail.svelte';
   import Badges from '#c/badges/Badges.svelte';
@@ -63,11 +63,13 @@
   }
 
   $: mainGalleryImgs = getMainGalleryImgs(gallery, storage);
-  $: showCustomPrices = custom_prices && custom_prices.some((p) => p.enabled);
-  $: showLabelingsPrices = labelings && labelings.some((l) => l.enabled && l.prices.some((p) => p.enabled));
+  // a price list shows when it has a price: one switched on with nothing in it is as one switched off
+  const hasPrice = (prices) => (prices ?? []).some((p) => p.enabled && p.price);
+  $: showCustomPrices = hasPrice(custom_prices) || hasPrice(custom_prices_sale);
+  $: pricedLabelings = (labelings ?? []).filter((l) => l.enabled && (hasPrice(l.prices) || hasPrice(l.prices_sale)));
   // the paragraph (net or gross, what's binding) is about the prices: over them, under the description without them
   $: post = commercial_details?.content ?? null;
-  $: pricesShown = showCustomPrices || showLabelingsPrices;
+  $: pricesShown = showCustomPrices || pricedLabelings.length > 0;
   $: size = [size_x, size_y, size_z].filter((s) => s).join(' x ') + 'mm';
 
   $: enabledStorage = storage?.filter((s) => s.enabled) ?? [];
@@ -86,7 +88,7 @@
     .sort(([a], [b]) => a.price - b.price);
   $: priceFrom = allPrices[0]?.[0].price ?? null;
   $: priceFromWithLabeling = allPrices[0]?.[1] ?? false;
-  $: inStock = enabledStorage.some((s) => parseAmount({ available: s.available, amount: s.amount }).state !== NONE);
+  $: noneNow = !out_of_stock && allOut(enabledStorage); // Chwilowy brak
 
   // made in this browser; report.js (and pdfmake) load on the first click
   let carding = false;
@@ -129,7 +131,7 @@
       if (!s.enabled) continue;
       const variant = { code: s.api_color_code || code, first: s.color_first, second: s.color_second };
       for (const img of s.img) {
-        if (img.show_in_gallery && img.img) imgs.push({ ...img, variant }); // the lightbox names its variant
+        if (img.img) imgs.push({ ...img, variant }); // the lightbox names its variant
       }
     }
     return imgs;
@@ -238,31 +240,29 @@
                     </div>
                   {/if}
 
-                  {#if showLabelingsPrices}
-                    {#each labelings.filter((l) => l.enabled) as labeling}
-                      {@const { code, type, name, company } = labeling.labeling}
-                      <div class="pricing">
-                        <div class="pricing__head">
-                          <h3 class="pricing__title">
-                            <span>{name}</span>
-                            <span class="pricing__meta">
-                              {#if code}<span class="code">{code}</span>{/if}
-                              {#if type}<span class="pricing__type">{type}</span>{/if}
-                              {#if $me && company?.name}<span class="company">({company.name})</span>{/if}
-                            </span>
-                          </h3>
-                          <IncludesLabeling />
-                        </div>
-                        <Prices
-                          showIncludes={false}
-                          field={[labeling.labeling_field_x, labeling.labeling_field_y]}
-                          place={labeling.labeling_place}
-                          prices={labeling.prices}
-                          pricesSale={labeling.prices_sale}
-                          pricesWithLabeling />
+                  {#each pricedLabelings as labeling}
+                    {@const { code, type, name, company } = labeling.labeling}
+                    <div class="pricing">
+                      <div class="pricing__head">
+                        <h3 class="pricing__title">
+                          <span>{name}</span>
+                          <span class="pricing__meta">
+                            {#if code}<span class="code">{code}</span>{/if}
+                            {#if type}<span class="pricing__type">{type}</span>{/if}
+                            {#if $me && company?.name}<span class="company">({company.name})</span>{/if}
+                          </span>
+                        </h3>
+                        <IncludesLabeling />
                       </div>
-                    {/each}
-                  {/if}
+                      <Prices
+                        showIncludes={false}
+                        field={[labeling.labeling_field_x, labeling.labeling_field_y]}
+                        place={labeling.labeling_place}
+                        prices={labeling.prices}
+                        pricesSale={labeling.prices_sale}
+                        pricesWithLabeling />
+                    </div>
+                  {/each}
                 </div>
               </section>
             {/if}
@@ -271,7 +271,7 @@
           <div class="product__buy">
             <div class="buy">
               <div class="buy__summary">
-                <Badges inline {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} />
+                <Badges inline {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} {noneNow} />
 
                 <h1 class="buy__title">{name}</h1>
                 <p class="code buy__code">
@@ -286,9 +286,10 @@
                     <span class="buy__unit">/ szt</span>
                     {#if priceFromWithLabeling}<span class="buy__with">ze znakowaniem</span>{/if}
                   </p>
-                  {#if pricesShown}
-                    <a class="buy__tocennik" href="#cennik" on:click={glide}>Pełny cennik według nakładu ↓</a>
-                  {/if}
+                  <a class="buy__tocennik" href="#cennik" on:click={glide}>Pełny cennik według nakładu ↓</a>
+                {:else}
+                  <!-- no price to show: where it'd be, the way to ask for one (as the lists' tiles say) -->
+                  <a class="buy__price buy__price--ask" href="#zapytaj" on:click={glide}>Zapytaj o cenę ↓</a>
                 {/if}
 
                 {#if summaryColors.length}
@@ -563,6 +564,15 @@
     font-weight: 800;
     letter-spacing: -0.035em;
   }
+  .buy__price--ask {
+    color: var(--ink);
+    font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .buy__price--ask:hover {
+    color: var(--red);
+  }
   .buy__tocennik {
     margin-top: calc(var(--sp-2) * -1);
     color: var(--ink-500);
@@ -711,6 +721,7 @@
     font-size: var(--fs-h2);
   }
 
+  /* each card takes three rows (its name, its availability, its photos - see Storage), so a row of cards lines up */
   .storages {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.375rem), 1fr));

@@ -13,7 +13,7 @@
   $: secondLine = color_first && color_second ? `/\u00a0${color_second.name}` : null;
 </script>
 
-<div class="storage">
+<div class="storage" class:none={state.state === NONE}>
   <div class="badge">
     <div class="swatch">
       <Color first={color_first} second={color_second} {amount} {available} size="1.5rem" />
@@ -30,7 +30,7 @@
     {#if state.state === AMOUNT}
       {state.label}
     {:else}
-      <b><small class:empty={state.state === NONE}>{state.label}</small></b>
+      <b class="state">{state.label}</b>
     {/if}
   </div>
 
@@ -42,22 +42,38 @@
 </div>
 
 <style>
+  /* the name, the availability and the photos on the rows of the cards' grid (+page's .storages): a row of cards has
+     its "Dostępność" level, whatever names the cards have (a colour, two, a code over two lines) */
   .storage {
     position: relative;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0;
     border: 1px solid var(--border);
     background-color: var(--surface);
   }
+  /* out of stock for now (CHWILOWY BRAK): its swatch and photos faded, its text as clear as any card's (fading the
+     whole card would take its grey state below a readable contrast); whole again under the pointer */
+  .storage.none .swatch,
+  .storage.none :global(.gallery) {
+    opacity: 0.55;
+    transition: opacity var(--dur-fast) var(--ease);
+  }
+  .storage.none:hover .swatch,
+  .storage.none:hover :global(.gallery) {
+    opacity: 1;
+  }
 
-  /* Code and two colour lines on every card, so "Dostępność" lines up; the swatch centres on the first two. */
+  /* The code and the colour's line(s): a second one only when there's a second colour ("/ Biały"); the swatch centres
+     on the first two. The row is as tall as the tallest name of the cards beside it (see .storage). */
   .badge {
     --line: calc(var(--fs-xs) * 1.25);
     display: grid;
     grid-template-columns: 1.5rem minmax(0, 1fr);
-    grid-template-rows: auto minmax(var(--line), auto) minmax(var(--line), auto);
+    grid-template-rows: auto minmax(var(--line), auto) auto;
     column-gap: var(--sp-2);
-    padding: var(--sp-2) var(--sp-3);
+    padding: var(--sp-2) var(--sp-3) var(--sp-1);
   }
   .swatch {
     grid-row: 1 / span 2;
@@ -73,7 +89,7 @@
   .code {
     font-size: 0.6875rem;
   }
-  /* no colour to name: the code alone, level with the swatch (the lines under it stay, so "Dostępność" lines up) */
+  /* no colour to name: the code alone, level with the swatch */
   .plain .code {
     grid-row: 1 / span 2;
     align-self: center;
@@ -83,25 +99,37 @@
     line-height: 1.25;
   }
 
+  /* the state on the same line when there's room; under it, right below, when the card's too narrow */
   .amount {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: var(--sp-2);
+    gap: 0 0.3em;
+    line-height: 1.25;
+    align-self: start;
     padding: 0 var(--sp-3) var(--sp-2);
     font-size: var(--fs-xs);
     font-variant-numeric: tabular-nums;
   }
+  /* a number's line in every card (an empty piece as big as one), so "Dostępność" sits as low beside a state as
+     beside a number, the row's labels level */
+  .amount::before {
+    content: '\200b';
+    margin-right: -0.3em;
+  }
   .amount > small {
     color: var(--ink-400);
   }
-  .amount b {
+  /* as small as the label, in one piece, its capitals a little closer (still clear) so "CHWILOWY BRAK" fits beside the
+     label more often */
+  .state {
+    font-size: 0.8333em;
     font-weight: 700;
-  }
-  .amount b small {
+    letter-spacing: -0.03em;
+    white-space: nowrap;
     color: var(--green);
   }
-  .amount b small.empty {
+  .storage.none .state {
     color: var(--ink-400);
   }
 

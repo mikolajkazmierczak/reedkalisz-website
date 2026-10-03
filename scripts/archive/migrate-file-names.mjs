@@ -4,8 +4,8 @@
 // '<product code> / <variant code> / #<n>' - the n-th image of that variant (see frontend/src/routes/admin/api/images.js).
 // Needs the `company` field on files first (see the instructions).
 //
-//   node scripts/migrate-file-names.mjs           # dry run: prints what would change
-//   node scripts/migrate-file-names.mjs --apply   # makes the changes
+//   node scripts/archive/migrate-file-names.mjs           # dry run: prints what would change
+//   node scripts/archive/migrate-file-names.mjs --apply   # makes the changes
 //
 // - a variant image of a supplier's product: that product's company, and named after where it is now (a file in
 //   several variants after the first of them)
@@ -13,7 +13,7 @@
 //   named by hand
 // - a company's last scan (its snapshot): that company
 // - an image no product has: its company and name read from its importer name - 'MidOcean/MO6934/85 0' (an old
-//   variant code, completed the way scripts/migrate-variant-codes.mjs does) or 'PAR R73341.02 0'
+//   variant code, completed the way scripts/archive/migrate-variant-codes.mjs does) or 'PAR R73341.02 0'
 // - everything else (catalogues, price lists, hand uploads) stays as it is, without a company
 //
 // A file that already has what it should is left alone, so running it again changes nothing. Renaming a file puts
@@ -26,7 +26,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const apply = process.argv.includes('--apply');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

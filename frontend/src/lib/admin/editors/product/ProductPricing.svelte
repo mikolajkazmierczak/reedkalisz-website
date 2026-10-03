@@ -1,5 +1,5 @@
 <script>
-  import { deep, moveItem } from '%/utils';
+  import { deep } from '%/utils';
   import { recalculateLabelings, toggleCustomPrices } from '%/calculations';
   import { repairPrices, cleanupPrices } from '%/calculationsPrices';
   import Input from '@c/Input.svelte';
@@ -11,7 +11,8 @@
   import ProductPricingTable from './ProductPricingTable.svelte';
   import ProductPricingMargins from './ProductPricingMargins.svelte';
   import LabelingField from './LabelingField.svelte';
-  import { syncsLabelings, isManagedLabeling } from '@/sync';
+  import { syncsLabelings, mappedLabelings, isManagedLabeling } from '@/sync';
+  import { tell } from '@/dialog';
 
   export let product;
   export let productOriginal;
@@ -37,9 +38,47 @@
     return product.labelings.filter((l) => sameField(l, labeling)).length > 1;
   }
 
+  $: $labelings?.sort((a, b) => {
+    // labelings are sorted by the user with the exception of the company
+    const companyName = (x) => $companies.find((c) => c.id == x.company)?.name ?? '-';
+    return companyName(a).localeCompare(companyName(b));
+  });
+  // the labelings a product can have: its company's and REED's (any, without a company)
+  $: company = $companies?.find((c) => c.id === product.company);
+  $: offered = ($labelings ?? []).filter((l) => !company || [company.id, 4].includes(l.company));
+  // the ones the company's labeling mappings lead to: the scanner adds and removes them (see sync.js), they can't be
+  // picked here
+  $: labelingsSynced = scanner.labelings && syncsLabelings(company);
+  $: scannerTargets = labelingsSynced ? mappedLabelings(company) : new Set();
+  const byScanner = (l, targets) => !!l && targets.has(`${l.company}|${l.code}`);
+  // another of the product's rows with that labeling on the same field: picking it would be a duplicate
+  const taken = (row, id, rows) => rows.some((o) => o !== row && sameField(o, { ...row, labeling: id }));
+  // a row's choice: its own one, and the others not the scanner's nor taken
+  function labelingOptions(row, rows, offered, targets) {
+    return offered.map((l) => {
+      const { name: cname } = $companies.find((c) => c.id == l.company);
+      const note =
+        l.id === row.labeling
+          ? undefined
+          : byScanner(l, targets)
+            ? 'Dodaje je skaner API'
+            : taken(row, l.id, rows)
+              ? 'Już jest w produkcie'
+              : undefined;
+      return { id: l.id, text: labelingText(l, cname), image: companyIcon(cname), disabled: !!note, note };
+    });
+  }
+
   function pushLabeling() {
     if ($labelings.length == 0) throw new Error('Brak znakowań w bazie danych');
-    const labeling = defaultLabeling($labelings, product.company, { withCode: false }) ?? $labelings[0];
+    // the company's default, else the first in the list - not one of the scanner's, nor one the product has already
+    // (on no field: as the new one)
+    const fresh = { labeling_field_x: null, labeling_field_y: null };
+    const preferred = defaultLabeling($labelings, product.company, { withCode: false });
+    const labeling = [preferred, ...offered].find(
+      (l) => l && !byScanner(l, scannerTargets) && !taken(fresh, l.id, product.labelings),
+    );
+    if (!labeling) return tell('Wszystkie znakowania, które można dodać, są już w tym produkcie.');
     product.labelings.push({
       index: product.labelings.length,
       enabled: true,
@@ -55,9 +94,6 @@
   function removeLabeling(i) {
     product.labelings.splice(i, 1);
     product.labelings = product.labelings;
-  }
-  function moveLabeling(i, d) {
-    product.labelings = moveItem(product.labelings, i, d);
   }
 
   read();
@@ -81,11 +117,6 @@
         productLabelingsReusable,
       );
   }
-  $: $labelings?.sort((a, b) => {
-    // labelings are sorted by the user with the exception of the company
-    const company = (x) => $companies.find((c) => c.id == x.company)?.name ?? '-';
-    return company(a).localeCompare(company(b));
-  });
   $: productLabelingsReusable = productOriginal.labelings.map(({ id, prices, prices_sale }) => {
     const pricesIDs = prices.map((p) => p.id);
     const pricesSaleIDs = prices_sale.map((p) => p.id);
@@ -135,8 +166,6 @@
 </script>
 
 {#if product && $labelings && $priceViews && $globalMargins}
-  {@const company = $companies.find((c) => c.id === product.company)}
-  {@const labelingsSynced = scanner.labelings && syncsLabelings(company)}
   <section class="ui-section">
     <h2 class="ui-h2">Cennik</h2>
     <div class="ui-section__row">
@@ -256,7 +285,7 @@
               {#each product.labelings as labeling, i (labeling)}
                 {@const chosenLabeling = $labelings.find((l) => l.id == labeling.labeling)}
                 {@const duplicateLabeling = checkDuplicateLabeling(labeling)}
-                {@const managed = labelingsSynced && isManagedLabeling(labeling, $labelings, company)}
+                {@const managed = isManagedLabeling(labeling, $labelings, company, scannerTargets)}
                 <div
                   class="ui-box ui-box--element"
                   class:ui-box--uneditable={!labeling.enabled}
@@ -266,19 +295,10 @@
                       <Input type="checkbox" bind:value={labeling.enabled}>Włączone</Input>
                     </div>
                     <div>
-                      {#if !i == 0}
-                        <Button size="sm" icon="arrow_left" on:click={() => moveLabeling(i, -1)} square />
-                      {/if}
-                      {#if i < product.labelings.length - 1}
-                        <Button size="sm" icon="arrow_right" on:click={() => moveLabeling(i, 1)} square />
-                      {/if}
                       <Button size="sm" icon="delete" on:click={() => removeLabeling(i)} disabled={managed} dangerous />
                     </div>
                   </div>
 
-                  {#if duplicateLabeling}
-                    <h4 class="ui-h4" style:color="var(--red-400)">DUPLIKAT</h4>
-                  {/if}
                   <Input
                     type="select"
                     label="Znakowanie"
@@ -286,15 +306,7 @@
                     api={managed}
                     apiText="Prowadzi do niego mapowanie znakowań. Skaner API ustawia znakowanie, pole i miejsce, dodaje je i usuwa."
                     disabled={managed}
-                    options={$labelings
-                      .filter(({ company: cid }) => {
-                        if (!company) return true; // all labelings
-                        return [company.id, 4].includes(cid); // also include REED labelings
-                      })
-                      .map((l) => {
-                        const { name: cname } = $companies.find((c) => c.id == l.company);
-                        return { id: l.id, text: labelingText(l, cname), image: companyIcon(cname) };
-                      })} />
+                    options={labelingOptions(labeling, product.labelings, offered, scannerTargets)} />
 
                   {#if company?.api_handling_costs && product.handling_cost}
                     <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
@@ -362,7 +374,6 @@
   .actions div {
     display: flex;
     justify-content: flex-end;
-    gap: 0.5rem;
   }
   .actions .enabled {
     justify-content: flex-start;

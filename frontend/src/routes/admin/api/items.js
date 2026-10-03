@@ -1,5 +1,6 @@
 import { getUid } from '%/uid';
 import { indexScan, scanProduct, scanVariant } from '@/match';
+import { natural } from '%/order';
 
 function queryItems(items, query = null) {
   // query items name, code, storage color names and storage color code
@@ -16,11 +17,14 @@ function queryItems(items, query = null) {
   });
 }
 
-function sortItems(items, sort) {
-  // by: 'name' (then the code) or 'code' (then the name), `desc` the other way round; dbFirst: ours first;
-  // notInApiFirst: products or variants the api no longer has first
+function sortItems(items, sort, complications) {
+  // by: 'name' (then the code) or 'code' (then the name), `desc` the other way round; then, each over the ones
+  // before (the list's buttons from the right): dbFirst: ours first; complicationsFirst: the ones that will be missing
+  // something (the Komplikacje column: `complications(item)` -> 'red' | 'orange' | null) first, red before orange;
+  // newFirst: ours with variants we don't have yet first; notInApiFirst: products or variants the api no longer has
+  // first
 
-  const compare = (a, b) => (typeof a === 'string' ? a.localeCompare(b) : 0);
+  const compare = (a, b) => (typeof a === 'string' ? natural(a, b) : 0);
   const way = sort.desc ? -1 : 1;
   sort.by === 'code'
     ? items.sort((a, b) => way * (compare(a.code ?? '', b.code ?? '') || compare(a.name, b.name)))
@@ -35,20 +39,31 @@ function sortItems(items, sort) {
     });
   }
 
+  if (sort.complicationsFirst && complications) {
+    const rank = { red: 0, orange: 1 };
+    const levels = new Map(items.map((item) => [item, rank[complications(item)] ?? 2]));
+    items.sort((a, b) => levels.get(a) - levels.get(b));
+  }
+
+  // ours with new variants (the scan's ones we don't have, see merge)
+  const fresh = (item) => item._db && item.storage.some((s) => !s._db);
+  if (sort.newFirst) items.sort((a, b) => fresh(b) - fresh(a));
+
   if (sort.notInApiFirst) {
-    // bubble items that are not in the api, or that have storage that is not in the api
-    const removed = (item) => !item._api || item.storage.some((s) => !s._api);
-    items.sort((a, b) => {
-      if (removed(a) && !removed(b)) return -1;
-      if (!removed(a) && removed(b)) return 1;
-      return 0;
-    });
+    // bubble what the api no longer has: whole products first (none of their variants there), then the ones with
+    // some variants gone, then the ones with some gone and some new (as the list's cloud: red, orange, orange-purple)
+    const retired = (item) => {
+      if (!item._api || item.storage.every((s) => !s._api)) return 0;
+      if (!item.storage.some((s) => !s._api)) return 3;
+      return fresh(item) ? 2 : 1;
+    };
+    items.sort((a, b) => retired(a) - retired(b));
   }
 
   return items;
 }
 
-export function merge(company, dbItems, apiItems, { sort, query = null }) {
+export function merge(company, dbItems, apiItems, { sort, query = null, complications = null }) {
   if (!company || !dbItems || !apiItems) return;
   const scan = indexScan(apiItems);
   const mergedItems = [];
@@ -85,16 +100,19 @@ export function merge(company, dbItems, apiItems, { sort, query = null }) {
   };
   for (const item of mergedItems) item._uid = uid(item);
 
-  sortItems(mergedItems, sort);
+  sortItems(mergedItems, sort, complications);
   const queriedItems = queryItems(mergedItems, query);
   return queriedItems.map((item, i) => ({
     ...item,
     _index: i,
-    storage: item.storage.map((s, j) => ({
-      ...s,
-      _uid: getUid(company.name, item, s),
-      _index: j,
-    })),
+    // the variants by their codes too
+    storage: [...item.storage]
+      .sort((a, b) => natural(a.api_color_code, b.api_color_code))
+      .map((s, j) => ({
+        ...s,
+        _uid: getUid(company.name, item, s),
+        _index: j,
+      })),
   }));
 }
 

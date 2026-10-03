@@ -105,7 +105,6 @@ export const edit = [
   'storage.img.index',
   'storage.img.enabled',
   'storage.img.img',
-  'storage.img.show_in_gallery',
   'gallery.id',
   'gallery.index',
   'gallery.enabled',

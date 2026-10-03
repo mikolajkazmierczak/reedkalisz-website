@@ -3,8 +3,8 @@
 // New pictures for "Reklama zewnętrzna" (drawn like the website's category icons, scripts/assets/reklama-zewnetrzna/),
 // and a Roll-up product there.
 //
-//   node scripts/migrate-outdoor.mjs           # dry run: prints what would change
-//   node scripts/migrate-outdoor.mjs --apply   # makes the changes
+//   node scripts/archive/migrate-outdoor.mjs           # dry run: prints what would change
+//   node scripts/archive/migrate-outdoor.mjs --apply   # makes the changes
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env),
 // never the database file, so Directus validates and logs it like an edit in the admin panel.
@@ -18,10 +18,10 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { slugify } from '../shared/utils.js';
+import { slugify } from '../../shared/utils.js';
 
 const apply = process.argv.includes('--apply');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')
@@ -41,7 +41,7 @@ async function call(method, url, body) {
   return res.status === 204 ? null : (await res.json()).data;
 }
 
-const DIR = path.join(root, 'scripts/assets/reklama-zewnetrzna');
+const DIR = path.join(root, 'scripts/archive/assets/reklama-zewnetrzna');
 const CATEGORY = 'Reklama zewnętrzna';
 const DRAWINGS = { BJ: 'BJ.svg', BJT: 'BJT.svg', BD: 'BD.svg', T: 'T.svg', RU: 'ROLLUP.svg' };
 const ROLLUP = { code: 'RU', name: 'Roll-up' };

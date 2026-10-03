@@ -26,7 +26,7 @@
   <slot name="after" />
   {#if unsaved}
     <div class="ui-pair actions">
-      <Button icon="close" dangerous on:click={() => dispatch('cancel')}>Anuluj</Button>
+      <Button icon="close" secondary edge on:click={() => dispatch('cancel')}>Anuluj</Button>
       <Button icon="ok" on:click={() => dispatch('save')}>Zapisz</Button>
     </div>
   {/if}

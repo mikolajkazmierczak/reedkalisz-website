@@ -60,6 +60,14 @@ export function mergePositions(positions) {
   return [...merged.values()];
 }
 
+// each material once (PAR: 'PP polipropylen, PP polipropylen'), trimmed, none empty
+export function uniqueMaterials(materials) {
+  const seen = new Set();
+  return (materials ?? [])
+    .map((m) => String(m ?? '').trim())
+    .filter((m) => m && !seen.has(m.toLowerCase()) && seen.add(m.toLowerCase()));
+}
+
 function parseMain($) {
   const { _incompatible, _labelings, _categories } = $;
   const { name, code, slug, seo_title, seo_description, description } = $;
@@ -77,7 +85,7 @@ function parseMain($) {
     size_x,
     size_y,
     size_z,
-    materials,
+    materials: uniqueMaterials(materials),
     price,
     handling_cost,
     gallery: gallery || [],

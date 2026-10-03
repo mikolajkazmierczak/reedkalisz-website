@@ -1,11 +1,16 @@
 import { baseUrl } from '$/api';
 
 /** A product's card images, in order: its gallery, then each enabled variant's pictures. */
-export function productImages({ gallery, storage }) {
+export function productImages(product) {
+  return productImageRows(product).map(({ img }) => `${baseUrl}/assets/${img}?key=medium`);
+}
+
+/** The rows they're in: the first the card's picture, the second the one under the pointer (marked in the editor). */
+export function productImageRows({ gallery, storage }) {
   return [
     ...gallery.filter((g) => g.enabled && g.img),
     ...storage.filter((s) => s.enabled).flatMap((s) => s.img.filter((i) => i.enabled && i.img)),
-  ].map(({ img }) => `${baseUrl}/assets/${img}?key=medium`);
+  ];
 }
 
 /** Warms the browser cache with each product's first image, so swapping them in doesn't flash. */

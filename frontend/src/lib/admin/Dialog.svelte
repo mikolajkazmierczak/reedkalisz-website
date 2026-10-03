@@ -8,6 +8,9 @@
   // safe one when the other can't be undone - and Escape answers no. Like the browser's own dialogs, Tab stays on
   // the answers, and the focus goes back where it was after the last one.
   $: dialog = $dialogs[0];
+  // what the box shows: the last one while it fades out, too (its text read after it's gone broke the page)
+  let shown = null;
+  $: if (dialog) shown = dialog;
 
   let panel;
   let opener = null; // focused before the first dialog
@@ -49,34 +52,38 @@
 <svelte:window on:keydown|capture={keydown} />
 
 {#if dialog}
-  <!-- layer 1500: over popups, the login and errors (1000-1003), under tooltips (2000) -->
+  <!-- layer 1500: over popups, the login and errors (1000-1002), under tooltips (2000) -->
   <Modal
     layer={1500}
     maxWidth="28rem"
-    danger={dialog.danger}
+    closeText={null}
+    tone={shown.danger ? 'danger' : null}
     role="alertdialog"
-    aria-modal="true"
-    aria-labelledby={dialog.title ? 'dialog-title' : undefined}
+    aria-labelledby={shown.title ? 'dialog-title' : undefined}
     aria-describedby="dialog-message"
     bind:panel>
     <div class="text">
-      {#if dialog.title}<h3 id="dialog-title">{dialog.title}</h3>{/if}
-      <p id="dialog-message">{dialog.message}</p>
+      {#if shown.title}<h3 id="dialog-title">{shown.title}</h3>{/if}
+      <p id="dialog-message">{shown.message}</p>
     </div>
-    <div class="actions">
-      {#if dialog.cancel}
-        <span class="answer"><Button secondary on:click={() => answer(false)}>{dialog.cancel}</Button></span>
+    <svelte:fragment slot="actions">
+      {#if shown.cancel}
+        <span class="answer">
+          <Button icon={shown.cancel === 'Anuluj' ? 'close' : null} secondary edge on:click={() => answer(false)}>
+            {shown.cancel}
+          </Button>
+        </span>
       {/if}
       <span class="answer">
         <!-- the bin for deleting only, not for every danger (leaving, undoing, a failure) -->
         <Button
-          dangerous={dialog.danger}
-          icon={dialog.danger && dialog.ok.startsWith('Usuń') ? 'delete' : 'ok'}
+          dangerous={shown.danger}
+          icon={shown.danger && shown.ok.startsWith('Usuń') ? 'delete' : 'ok'}
           on:click={() => answer(true)}>
-          {dialog.ok}
+          {shown.ok}
         </Button>
       </span>
-    </div>
+    </svelte:fragment>
   </Modal>
 {/if}
 
@@ -93,12 +100,5 @@
     margin: 0;
     white-space: pre-line; /* the messages break their lines with \n */
     overflow-wrap: anywhere; /* long lists of codes and urls */
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
   }
 </style>

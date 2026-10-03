@@ -224,7 +224,7 @@
 
   {#if marked && !picker}
     <div class="buttons" transition:slide>
-      <Button on:click={unmark}>Anuluj</Button>
+      <Button icon="close" secondary edge on:click={unmark}>Anuluj</Button>
       <Button on:click={handleDelete} dangerous>Usuń</Button>
     </div>
   {/if}

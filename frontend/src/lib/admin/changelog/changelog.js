@@ -5,6 +5,46 @@
 // a change is its text, or { label, text, big }: a short name before it ("Historia zmian: ..."), bold when `big`
 export const changelog = [
   {
+    version: '1.25.0',
+    date: '2026-10-03',
+    title: 'Zdjęcia, API i strona produktu',
+    synopsis: 'przeciąganie zdjęć, przegląd zdjęć z API i nowe znaczniki na stronie.',
+    changes: [
+      {
+        label: 'Przeciąganie',
+        text: 'zdjęcia i załączniki przestawia się, przeciągając je za uchwyt w rogu; Esc anuluje.',
+        big: true,
+      },
+      'Przycisk ze strzałką w rogu zdjęcia przenosi je między galerią a wariantami.',
+      {
+        label: 'Kolejność',
+        text: 'warianty i znakowania układają się same przy zapisie, więc strzałek już nie ma.',
+        big: true,
+      },
+      'Niebieska ramka oznacza zdjęcie z kafelka na stronie, a przerywana zdjęcie po najechaniu.',
+      'W wyborze znakowania nieaktywne są te dodawane przez skaner i te, które produkt już ma.',
+      {
+        label: 'Przegląd zdjęć z API',
+        text: 'nowe zdjęcia widać obok obecnych, w kolejności dostawcy i ze znakiem NOWE.',
+        big: true,
+      },
+      'Import produktów pyta o zgodę dopiero po przejrzeniu zdjęć i ma Anuluj zamiast „Później”.',
+      {
+        label: 'API',
+        text: 'przyciski nad listą przenoszą na górę wycofane, nowe warianty, komplikacje lub zaimportowane.',
+      },
+      'Fioletowa chmurka oznacza nowe warianty u dostawcy, a kolumna Stan nazywa się teraz Komplikacje.',
+      { label: 'Poprawka', text: 'wyłączenie i ponowne włączenie znakowania nie wymaga już zapisu produktu.' },
+      { label: 'Poprawka', text: 'materiały z PAR i MidOcean nie powtarzają się po następnym skanie.' },
+      { label: 'Strona', text: 'produkt bez cen pokazuje „Zapytaj o cenę”, także na karcie PDF.', big: true },
+      'Znaczniki mają nowe kolory, „Brak” to „Koniec nakładu”, a produkt bez towaru dostaje „Chwilowy brak”.',
+      {
+        label: 'Drobne zmiany',
+        text: 'puste kafelki znikają przy zapisie, cenniki mieszczą się w wierszu, okna wyglądają jednakowo, a zdjęcie usunięte u dostawcy znika z całego produktu. Zdjęcia wariantów są zawsze w galerii strony (pole „Galeria” zniknęło), która pokazuje dwa rzędy miniatur, a resztę pod „+N”.',
+      },
+    ],
+  },
+  {
     version: '1.24.1',
     date: '2026-10-02',
     title: 'Poprawki',

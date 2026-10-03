@@ -4,10 +4,10 @@
 // product, product attachments, two more special colours and a "mini" thumbnail. Then (after the deploy and
 // migrate-questions.mjs) the old question fields removed.
 //
-//   node scripts/migrate-schema-2.mjs                     # dry run: prints what would change
-//   node scripts/migrate-schema-2.mjs --apply             # makes the changes: BEFORE the deploy
-//   node scripts/migrate-schema-2.mjs --cleanup           # dry run of the removals
-//   node scripts/migrate-schema-2.mjs --cleanup --apply   # removes them: AFTER the deploy and migrate-questions.mjs
+//   node scripts/archive/migrate-schema-2.mjs                     # dry run: prints what would change
+//   node scripts/archive/migrate-schema-2.mjs --apply             # makes the changes: BEFORE the deploy
+//   node scripts/archive/migrate-schema-2.mjs --cleanup           # dry run of the removals
+//   node scripts/archive/migrate-schema-2.mjs --cleanup --apply   # removes them: AFTER the deploy and migrate-questions.mjs
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env): the same
 // requests the admin panel sends from Settings > Data Model, so Directus writes its own `directus_fields` /
@@ -31,7 +31,7 @@ import { fileURLToPath } from 'url';
 
 const apply = process.argv.includes('--apply');
 const cleanup = process.argv.includes('--cleanup');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

@@ -1,8 +1,8 @@
 // The paragraphs (commercial_details) lose their leading "---": the product page, the PDF card and the admin's preview
 // draw their own line, so it would show twice.
 //
-//   node scripts/migrate-paragraphs.mjs           # dry run: prints what would change
-//   node scripts/migrate-paragraphs.mjs --apply   # makes the changes
+//   node scripts/archive/migrate-paragraphs.mjs           # dry run: prints what would change
+//   node scripts/archive/migrate-paragraphs.mjs --apply   # makes the changes
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env), never the
 // database file. Run it right after the new website is deployed (the old one still needs the line in the content).
@@ -12,7 +12,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const apply = process.argv.includes('--apply');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

@@ -2,8 +2,8 @@
 //
 // Links every question asked on a product's page to its product, instead of its code on top of the message.
 //
-//   node scripts/migrate-questions.mjs           # dry run: prints what would change
-//   node scripts/migrate-questions.mjs --apply   # makes the changes
+//   node scripts/archive/migrate-questions.mjs           # dry run: prints what would change
+//   node scripts/archive/migrate-questions.mjs --apply   # makes the changes
 //
 // Everything goes through the Directus API (heimdall's API + DIRECTUS_TOKEN from backend/heimdall/.env),
 // never the database file, so Directus validates and logs it like an edit in the admin panel.
@@ -21,7 +21,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const apply = process.argv.includes('--apply');
-const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const env = Object.fromEntries(
   fs
     .readFileSync(path.join(root, 'backend/heimdall/.env'), 'utf8')

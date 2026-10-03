@@ -35,6 +35,18 @@
     opener?.focus?.({ preventScroll: true });
   }
   $: photos = variant ? shown.map((i) => ({ ...i, variant })) : shown;
+
+  // The main gallery's thumbnails in two rows at most: the second's last place then says how many more there are,
+  // and opens the lightbox at the first of them (as many columns as fit, worked out from the page)
+  let columns = Infinity;
+  function measure(node) {
+    const count = () => (columns = getComputedStyle(node).gridTemplateColumns.split(' ').length);
+    const resized = new ResizeObserver(count);
+    resized.observe(node);
+    return { destroy: () => resized.disconnect() };
+  }
+  $: fit = small || shown.length <= columns * 2 ? shown.length : columns * 2 - 1;
+  $: more = shown.length - fit;
 </script>
 
 {#if shown.length}
@@ -58,8 +70,8 @@
     {/if}
 
     {#if showPicker}
-      <div class="picker" class:small>
-        {#each shown as { img }, i}
+      <div class="picker" class:small use:measure>
+        {#each shown.slice(0, fit) as { img }, i}
           <button
             class="picker__button"
             type="button"
@@ -69,6 +81,16 @@
             <img src="{baseUrl}/assets/{img}" alt="" loading="lazy" decoding="async" draggable="false" />
           </button>
         {/each}
+        {#if more}
+          <button
+            class="picker__button picker__more"
+            type="button"
+            aria-label="Pokaż pozostałe zdjęcia ({more})"
+            on:mouseenter={() => (index = fit)}
+            on:click={() => openLightbox(fit)}>
+            <span class="count tnum" class:long={more > 99}><span class="plus">+</span>{more}</span>
+          </button>
+        {/if}
       </div>
     {/if}
   </div>
@@ -123,7 +145,7 @@
   }
   /* Instant 2× zoom on hover (a tween jitters); pointer devices only. */
   @media (hover: hover) {
-    .picker__button:hover {
+    .picker__button:not(.picker__more):hover {
       z-index: 2;
       transform: scale(2);
       border-color: var(--ink);
@@ -135,6 +157,34 @@
     height: 100%;
     object-fit: contain;
     mix-blend-mode: multiply;
+  }
+  /* just the count, big, thin and faint (not zoomed on hover); its ink in the middle, not its line box */
+  .picker__more {
+    display: grid;
+    place-items: center;
+    container-type: inline-size;
+    color: var(--ink-300);
+    cursor: pointer;
+  }
+  .picker__more:hover {
+    color: var(--ink-500);
+  }
+  .count {
+    display: flex;
+    align-items: center;
+    font-size: 41cqw;
+    font-weight: 300; /* (the lightest the site's variable font has) */
+    line-height: 1;
+    letter-spacing: -0.04em;
+    transform: translateX(-0.03em); /* a little left: the thin plus weighs less than the digits */
+  }
+  .count.long {
+    font-size: 31cqw;
+  }
+  /* level with the digits' middle (it sits on the lower case's) */
+  .plus {
+    margin-right: 0.12em;
+    transform: translateY(-0.03em);
   }
 
   @media (min-width: 56.25rem) {

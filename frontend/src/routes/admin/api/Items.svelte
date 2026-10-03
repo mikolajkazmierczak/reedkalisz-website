@@ -27,14 +27,14 @@
   export let sort; // { by: 'name' | 'code', desc, ... } (see items.js), set by the head's buttons
   export let scrollKey = null; // the page, search, company: another one scrolls the list back up (see Grid)
 
-  // as a Table's: up, down, then back to by name
+  // as a Table's: up, down, then back to by code (the list's own order)
   function sortBy(by) {
     if (sort.by !== by) sort = { ...sort, by, desc: false };
     else if (!sort.desc) sort = { ...sort, desc: true };
-    else sort = { ...sort, by: 'name', desc: false };
+    else sort = { ...sort, by: 'code', desc: false };
   }
 
-  // what a product will be missing (the "Stan" column, see health.js): once per list, not per row update, and only
+  // what a product will be missing (the "Komplikacje" column, see health.js): once per list, not per row update, and only
   // once our labelings and categories are there (without them every product would look like missing everything)
   globals.update(labelings);
   globals.update(categories);
@@ -192,7 +192,7 @@
     <HeadIcon icon="hierarchy" label="Warianty" />
     <HeadIcon icon="add" label="Importuj / Otwórz zaimportowany" />
     <HeadIcon icon="eye" label="Widoczność" />
-    <HeadIcon icon="heart_pulse" label="Stan" />
+    <HeadIcon icon="heart_pulse" label="Komplikacje" />
     {#each [{ by: 'code', label: 'Kod' }, { by: 'name', label: 'Nazwa' }] as { by, label }}
       <span class="sortable">
         <span>{label}</span>
@@ -204,6 +204,16 @@
   {#each items as item}
     {@const itemNotAllInApi = item.storage.some((s) => !s._api)}
     {@const itemNotInApi = item.storage.every((s) => !s._api) || !item._api}
+    {@const itemHasNew = item._db && item.storage.some((s) => !s._db)}
+    {@const [cloudTone, cloudTitle] = itemNotInApi
+      ? ['danger', 'Wycofany']
+      : itemNotAllInApi && itemHasNew
+        ? ['split', 'Wycofane i nowe kolory']
+        : itemNotAllInApi
+          ? ['warning', 'Wycofane kolory']
+          : itemHasNew
+            ? ['new', 'Nowe kolory']
+            : ['success', 'Dostępny']}
     {@const itemSelected = $selected.has(item._uid)}
     {@const itemExpanded = expanded.has(item._uid)}
     {@const itemCompatible = !item?._incompatible}
@@ -231,8 +241,8 @@
       <Button
         size="sm"
         icon={itemNotInApi ? 'cloud_off' : 'cloud'}
-        tone={itemNotInApi ? 'danger' : itemNotAllInApi ? 'warning' : 'success'}
-        title={itemNotInApi ? 'Wycofany' : itemNotAllInApi ? 'Wycofane kolory' : 'Dostępny'}
+        tone={cloudTone}
+        title={cloudTitle}
         on:click={() => openApi(item.code, item.name)} />
       <span class="expand">
         {#if item.storage.length}

@@ -5,6 +5,7 @@
   import { SearchParams, searchparams } from '$/searchparams';
   import { parseDatetime } from '%/datetime';
   import { defaults } from '%/fields/products';
+  import { sortLabelings, sortVariants } from '%/order';
   import { getUid } from '%/uid';
   import { capitalize } from '%/utils';
   import { recalculateProducts, recalculateProductsGenerator } from '@/calculations';
@@ -14,10 +15,30 @@
   import { dequal } from 'dequal';
   import { planCategories, resolveCategories } from '../categories.js';
   import { merge, retiredOf } from '../items.js';
+  import { complicationsOf } from '../health.js';
   import { indexScan, scanProduct, scanVariant } from '@/match';
   import { detailsFields, planDetails } from '@/details';
   import { removeUnusedFiles, usedFiles } from '@/files';
-  import { appending, arrangeGallery, imageTitle, importSource, planImages, seedImages } from '../images.js';
+  import {
+    arrangeGallery,
+    basename,
+    changedMeanwhile,
+    downloadImages,
+    inPlace,
+    keptRows,
+    numberGallery,
+    numberRows,
+    planImages,
+    readFiles,
+    renameFiles,
+    renamesOf,
+    reviewGroups,
+    reviewPlaces,
+    seedImages,
+    stem,
+    writeGallery,
+    writeVariantImages,
+  } from '../images.js';
   import { createLabelings, planLabelings } from '../labelings.js';
   import { clearSelected, countSelected, selected } from '../selected.js';
   import { findColorId, round } from '../utils.js';
@@ -82,6 +103,7 @@
   let fetching = false;
   let fetchingPhase = 1;
   let uploading = false;
+  let preparing = false;
 
   // loading the products is just `fetching`, a scan (phases 1-3) writes to the database
   $: scanning = fetching && fetchingPhase > 0;
@@ -91,16 +113,19 @@
   });
 
   let statusLog = null;
-  let newImages = []; // found by the last scan, waiting for approval: [{ product, known, candidates }]
+  let newImages = []; // found by the last scan, waiting for approval: [{ product, href, known, places }]
   let addingImages = false;
-  let importImages = null; // the images of the products about to be imported, to look through first: { groups, decide }
+  // the images of the products about to be imported, to look through first: { groups, decide, cancel }
+  let importImages = null;
   let deletingRetired = false;
 
   let dbItems;
   let apiItems;
   let sort = {
-    by: 'name',
+    by: 'code',
     desc: false,
+    newFirst: true,
+    complicationsFirst: false,
     dbFirst: false,
     notInApiFirst: true,
   };
@@ -110,7 +135,12 @@
     lastCompany = selectedCompany.id;
     fetchItems();
   }
-  $: mergedItems = merge(selectedCompany, dbItems, apiItems, { sort, query });
+  // what a product will be missing, for the Komplikacje sort (worked out only while it's on: see health.js)
+  $: complications =
+    sort.complicationsFirst && $labelings && categoriesIndex && selectedCompany
+      ? complicationsOf(selectedCompany, apiItems, $labelings, categoriesIndex)
+      : null;
+  $: mergedItems = merge(selectedCompany, dbItems, apiItems, { sort, query, complications });
 
   $: lastScan = parseDatetime(selectedCompany?.api_last_scan).str() ?? 'Nie skanowano';
   $: selectedCount = $selected && countSelected(mergedItems); // { items: 1, storages: 2, all: 3 }
@@ -155,11 +185,12 @@
     });
   }
 
-  function planImport(item, picked, scan) {
-    // what importing a product takes: its picked variants, and the images they'll download - not the ones refused
-    // before, nor the ones it has already (another variant of it shows them, `files`: source -> file id); a new
-    // product's gallery too (an imported one's comes with the scan, see planImages)
-    // -> { selectedStorages, inDb, known, files, sources: Map(source -> { title, storages }), gallery: [source] }
+  function planImport(item, picked, scan, library) {
+    // what importing a product takes: its picked variants, and where their images go (see reviewPlaces) - the new ones
+    // to download, not the ones refused before, nor the ones it has already (another variant of it shows them, `files`:
+    // source -> file id; one from before they were tracked by its name, see reviewPlaces - `library`: the library's
+    // data of its files); a new product's gallery too (an imported one's comes with the scan, see planImages)
+    // -> { selectedStorages, inDb, known, review (see reviewPlaces), elsewhere (the files of its other variants) }
     const selectedStorages = item.storage.filter((s) => picked.has(s._uid));
     const inDb = { ...item, storage: item.storage.filter((s) => s._db) }; // the listing mixes in the api's variants
     // images already there count as known, so the next scan doesn't offer them again
@@ -168,106 +199,98 @@
     const files = new Map(
       Object.entries(known).flatMap(([source, { file }]) => (used.has(file) ? [[source, file]] : [])),
     );
-    const sources = new Map();
-    for (const storage of selectedStorages) {
-      [...new Set(storage.img)]
-        .filter((source) => !known[source]?.rejected)
-        .forEach((source, index) => {
-          if (files.has(source)) return;
-          if (!sources.has(source)) sources.set(source, { title: imageTitle(item, storage, index), storages: [] });
-          sources.get(source).storages.push(storage);
-        });
+    const byName = new Map([...used].map((file) => [stem(library.get(file)?.filename_download), file]));
+    for (const [source, entry] of Object.entries(known)) {
+      const file = !entry.file && !entry.rejected && byName.get(stem(basename(source)));
+      if (file) files.set(source, file);
     }
-    // (the gallery's first, as the site shows it)
-    const gallery = item._db ? [] : [...new Set(item.gallery ?? [])].filter((source) => source && !sources.has(source));
-    const all = new Map(
-      gallery.map((source, index) => [source, { title: imageTitle(item, null, index), storages: [] }]),
-    );
-    for (const [source, entry] of sources) all.set(source, entry);
-    return { selectedStorages, inDb, known, files, sources: all, gallery };
+    const fresh = new Map();
+    for (const storage of selectedStorages) {
+      for (const source of new Set(storage.img)) {
+        if (source && !known[source]?.rejected && !files.has(source))
+          fresh.set(source, [...(fresh.get(source) ?? []), storage]);
+      }
+    }
+    if (!item._db) for (const source of item.gallery ?? []) if (source && !fresh.has(source)) fresh.set(source, []);
+    // one a variant there shows too, not offered there yet (the scan's waiting for an admin, or "Później"): there too -
+    // known once imported, it would never be offered there
+    const shares = inDb.storage.filter((storage) => {
+      const shows = new Set(scanVariant(storage, scan)?.img ?? []);
+      const shared = [...fresh.keys()].filter((source) => shows.has(source) && !(source in known));
+      for (const source of shared) fresh.get(source).push(storage);
+      return shared.length;
+    });
+    const apiGallery = item._db ? (scanProduct(inDb, scan)?.gallery ?? []) : (item.gallery ?? []);
+    const review = {
+      variants: [...selectedStorages, ...shares],
+      // a new variant's: the files it shares with the ones there
+      rows: (storage) =>
+        !storage
+          ? item._db
+            ? [...(item.gallery ?? [])].sort(inPlace)
+            : []
+          : storage._db
+            ? [...(storage.img ?? [])].sort(inPlace)
+            : [...new Set(storage.img)]
+                .filter((source) => files.has(source))
+                .map((source) => ({ img: files.get(source) })),
+      order: (storage) => (!storage ? apiGallery : storage._db ? (scanVariant(storage, scan)?.img ?? []) : storage.img),
+      fresh,
+    };
+    const others = inDb.storage.filter((storage) => !shares.includes(storage));
+    const elsewhere = new Set(others.flatMap((s) => (s.img ?? []).map((i) => i.img)));
+    return { selectedStorages, inDb, known, review, elsewhere };
   }
 
-  function reviewImages(plans) {
-    // the images about to be downloaded, looked through by an admin first (see NewImages) -> Map(item uid ->
-    // Map(source -> 'rejected' | 'later')), none when there's nothing to look at
-    const groups = [...plans]
-      .filter(([, plan]) => plan.sources.size)
-      .map(([item, plan]) => ({
-        product: item,
-        href: item._db ? `/admin/produkty/${item.slug}` : null,
-        candidates: [...plan.sources].map(([source, { title, storages }]) => ({ source, title, storages })),
-      }));
-    if (!groups.length) return new Map();
+  // the products of `plans` with new images, as NewImages takes them
+  const importGroups = (plans, library) =>
+    reviewGroups(
+      [...plans]
+        .filter(([, plan]) => plan.review.fresh.size)
+        .map(([item, plan]) => ({
+          product: plan.inDb,
+          href: item._db ? `/admin/produkty/${item.slug}` : null,
+          known: plan.known,
+          review: plan.review,
+          elsewhere: plan.elsewhere,
+        })),
+      library,
+    );
+
+  function reviewImages(groups, question) {
+    // the images about to be downloaded, looked through by an admin first (see NewImages, `groups`): taken off, put in
+    // order, moved to the gallery or another of the variants imported; then the import is asked about (`question`) -
+    // nothing is written before that, so Anuluj (or leaving the page) imports nothing
+    // -> Map(item uid -> it as looked through, see NewImages), empty when there were no images to look at; null: not
+    // imported
+    const asked = () => ask(question, { ok: 'Importuj' });
+    if (!groups.length) return asked().then((yes) => (yes ? new Map() : null));
     return new Promise((resolve) => {
+      let asking = false; // (a second click while the question is up)
       importImages = {
         groups,
-        decide: (decided) => {
+        cancel: () => {
           importImages = null;
-          resolve(
-            new Map(
-              groups.map((group, i) => [
-                group.product._uid,
-                new Map(
-                  group.candidates.map((c, j) => [
-                    c.source,
-                    !decided ? 'later' : decided[i].candidates[j].rejected ? 'rejected' : null,
-                  ]),
-                ),
-              ]),
-            ),
-          );
+          resolve(null);
+        },
+        decide: async (decided) => {
+          if (asking) return;
+          asking = true;
+          const yes = await asked();
+          asking = false;
+          if (!yes) return; // back to the images
+          importImages = null;
+          resolve(new Map(groups.map((group, i) => [group.product._uid, decided[i]])));
         },
       };
     });
   }
 
-  async function uploadImages(storage, plan, decisions, failed) {
-    // import the variant's images, remembering which file each api image became (see images.js); one the product's
-    // other variants show too is imported once (`files`: source -> file id, or its promise), one an admin rejected is
-    // left out for good, one left for later isn't known yet - the next scan offers it
-    const { known, files } = plan;
-    const sources = [...new Set(storage.img)].filter((source) => !known[source]?.rejected);
-    const imgs = [];
-    for (const source of sources) {
-      const decision = decisions?.get(source);
-      if (decision === 'rejected') known[source] = { rejected: true };
-      if (decision) continue;
-      // named after the place it takes (the one shown in the review, unless some before it were left out)
-      if (!files.has(source))
-        files.set(source, importSource(source, imageTitle(plan.inDb, storage, imgs.length), selectedCompany.id));
-      const file = await files.get(source);
-      if (!file) {
-        failed.push(source);
-        continue;
-      }
-      imgs.push({ index: imgs.length, img: file, enabled: true, show_in_gallery: true });
-      known[source] = { file };
-    }
-    return imgs;
-  }
-
-  async function uploadGallery(item, plan, decisions, failed) {
-    // a new product's own images (see uploadImages), the first one its main
-    const rows = [];
-    for (const source of plan.gallery) {
-      const decision = decisions?.get(source);
-      if (decision === 'rejected') plan.known[source] = { rejected: true };
-      if (decision) continue;
-      const file = await importSource(source, imageTitle(item, null, rows.length), selectedCompany.id);
-      if (!file) {
-        failed.push(source);
-        continue;
-      }
-      rows.push({ index: rows.length, img: file, enabled: true, main: !rows.length });
-      plan.known[source] = { file, gallery: true };
-    }
-    return rows;
-  }
-
   const codeTaken = 'ten kod ma już inny produkt';
 
-  async function uploadItem(item, plan, decisions, newIds, failedImages) {
+  async function uploadItem(item, plan, reviewed, newIds, failedImages) {
     const { selectedStorages, inDb, known } = plan;
+    const places = reviewed?.places ?? reviewPlaces({ ...plan.review, known }); // (not looked through: no new images)
 
     if (!item._db && item.code) {
       // a code is unique across all the suppliers: one another product has would fail the import, but only once its
@@ -277,9 +300,15 @@
       if (data.length) throw new Error(codeTaken);
     }
 
-    for (const storage of selectedStorages) {
-      // first upload all imgs in storage
-      storage.img = await uploadImages(storage, plan, decisions, failedImages);
+    const files = await downloadImages(places, known, selectedCompany.id, failedImages);
+    if (reviewed) await renameFiles(renamesOf(reviewed, files));
+    // the variants as they're saved (copies: the listing's stay as the api has them, for another try)
+    const variants = [];
+    for (const original of selectedStorages) {
+      const place = places.find((p) => p.storage === original);
+      const storage = { ...original };
+      variants.push(storage);
+      storage.img = numberRows(keptRows(place, files)).map(({ img, index }) => ({ index, img, enabled: true }));
 
       // then assign existing colors or upload new ones
       const tryGetColor = async (name, hex) => {
@@ -306,14 +335,23 @@
       storage.enabled = true; // shown as soon as its product is
     }
 
-    const gallery = item._db ? [] : await uploadGallery(item, plan, decisions, failedImages);
-    const imported = [...new Set([...selectedStorages.flatMap((s) => s.img), ...gallery].map((i) => i.img))];
+    const gallery = numberGallery(keptRows(places[0], files));
+    const imported = [
+      ...new Set([...[...variants.flatMap((s) => s.img), ...gallery].map((i) => i.img), ...files.values()]),
+    ];
 
     // lastly upload item
     if (item._db) {
-      const storage = [...item.storage.filter((s) => s._db), ...selectedStorages];
-      const storageReindexed = storage.map((s, i) => ({ ...s, index: i }));
+      // in the order of their codes, as the product editor saves them (see order.js); the ones there without their
+      // images (written on their own, below)
+      const there = item.storage.filter((s) => s._db).map(({ img, ...s }) => s);
+      const storageReindexed = sortVariants([...there, ...variants]);
       const history = [...new Set([...(item.images_history ?? usedFiles(inDb)), ...imported])];
+      // the rows first: an image marked imported (api_images) without one would be taken as removed by hand - the
+      // gallery's, and those of the variants there that show a new one too (see planImport)
+      if (places[0].shown) await writeGallery(item.id, gallery);
+      for (const place of places.filter((p) => p.shown && p.storage?._db))
+        await writeVariantImages(place.storage.id, numberRows(keptRows(place, files)));
       await api.items('products').updateOne(item.id, {
         storage: storageReindexed,
         api_images: known,
@@ -323,7 +361,7 @@
     } else {
       const priceView = $priceViews.find((p) => p.default);
       const prices = priceView.amounts.map((amount) => ({ enabled: false, amount, price: null }));
-      const storage = selectedStorages.map((s, i) => ({ ...s, index: i }));
+      const storage = sortVariants(variants);
       const categoryIds = resolveCategories(selectedCompany.api_categories_mappings, item._categories, categoriesIndex);
       const newItem = {
         ...defaults(),
@@ -338,8 +376,10 @@
         global_full_margin: selectedCompany.id === 2, // MidOcean exception
         global_product_margin: selectedCompany.id !== 2, // MidOcean exception
         storage,
-        gallery,
-        labelings: item._labelings ? createLabelings(selectedCompany, item) : [],
+        gallery: gallery.map(({ img, index, main }) => ({ img, index, main, enabled: true })),
+        labelings: item._labelings
+          ? sortLabelings(createLabelings(selectedCompany, item), $labelings, selectedCompany.id)
+          : [],
         categories: sortCategoryRows(
           categoryIds.map((category) => ({ category })),
           categoriesIndex.order,
@@ -359,22 +399,31 @@
   async function upload() {
     // items are uploaded synchronously because they might share colors
     const { items, storages } = selectedCount;
-    if (uploading || !(await ask(`Zaimportować ${items} produktów (${storages} wariantów)?`, { ok: 'Importuj' })))
-      return;
-    uploading = true;
+    if (uploading || importImages || preparing) return;
     const picked = new Set($selected); // what was picked when it started, whatever clears it meanwhile
+    // note: if a storage is selected, the item is too; which storages are is checked later based on the item
+    const pickedItems = [...picked].map((uid) => mergedItems.find((i) => i._uid === uid)).filter(Boolean);
+    const scan = indexScan(apiItems);
+    let plans, groups;
+    preparing = true; // (reading what the products have: a second click meanwhile starts nothing)
+    try {
+      const library = await readFiles(pickedItems.flatMap((item) => [...usedFiles(item)]));
+      plans = new Map(pickedItems.map((item) => [item, planImport(item, picked, scan, library)]));
+      groups = await importGroups(plans, library);
+    } finally {
+      preparing = false;
+    }
+    // its images looked through first, the question after them: only its answer writes anything
+    const reviewed = await reviewImages(groups, `Zaimportować ${items} produktów (${storages} wariantów)?`);
+    if (!reviewed) return;
+    uploading = true;
     const newIds = { products: [], colors: [] };
     const failedItems = [];
     const failedImages = [];
     try {
-      // note: if a storage is selected, the item is too; which storages are is checked later based on the item
-      const pickedItems = [...picked].map((uid) => mergedItems.find((i) => i._uid === uid)).filter(Boolean);
-      const scan = indexScan(apiItems);
-      const plans = new Map(pickedItems.map((item) => [item, planImport(item, picked, scan)]));
-      const decisions = await reviewImages(plans);
       for (const item of pickedItems) {
         try {
-          await uploadItem(item, plans.get(item), decisions.get(item._uid), newIds, failedImages);
+          await uploadItem(item, plans.get(item), reviewed.get(item._uid), newIds, failedImages);
         } catch (e) {
           console.log(`failed to import item (${item._uid}): ${e}`);
           failedItems.push(e.message === codeTaken ? `${item._uid} (${codeTaken})` : item._uid);
@@ -517,16 +566,18 @@
         }
         if (images.candidates.length) {
           const known = images.known ?? dbItem.api_images;
-          const place = appending(); // how they'll be named, if all are added (see addNewImages)
-          const gallery = { img: product.gallery }; // (its places, as a variant's)
-          const candidates = images.candidates.map((c) => ({
-            ...c,
-            // a place in each variant it goes to, or in the gallery - the api's first there leads it (see addNewImages)
-            ...(c.storages.length
-              ? { title: imageTitle(dbItem, c.storages[0], c.storages.map(place)[0]) }
-              : { title: imageTitle(dbItem, null, place(gallery)), lead: c.source === apiItem.gallery?.[0] }),
-          }));
-          newImages.push({ product, href: `/admin/produkty/${dbItem.slug}`, known, candidates });
+          const removed = new Set(images.remove);
+          // where they go is worked out once the scan is written (see updateDb)
+          const review = {
+            variants: dbItem.storage,
+            rows: (storage) =>
+              (storage ? (storage.img ?? []).filter((i) => !removed.has(i.id)) : [...(product.gallery ?? [])]).sort(
+                inPlace,
+              ),
+            order: (storage) => (storage ? scanVariant(storage, scan)?.img : apiItem?.gallery) ?? [],
+            fresh: new Map(images.candidates.map((c) => [c.source, c.storages])),
+          };
+          newImages.push({ product, href: `/admin/produkty/${dbItem.slug}`, known, review });
         }
 
         for (const dbStorage of dbItem.storage) {
@@ -655,6 +706,8 @@
       tell('Baza danych nie została zmodyfikowana.', { title: 'Nie zapisano skanowania' });
       return;
     }
+    // (a failed read only puts them off: unknown still, the next scan offers them again)
+    if (newImages.length) newImages = await reviewGroups(newImages).catch((e) => (console.warn(e), []));
     const { changedPrice, changedLabelings, all } = updatedItemsIds;
     const recalculate = new Set([...changedPrice, ...changedLabelings, ...(await unpricedProducts())]);
     await updatePricelists([...recalculate]);
@@ -664,66 +717,28 @@
   }
 
   async function addNewImages(e) {
-    // import the approved images into their variants (or the gallery), remember the refused ones
+    // the approved images downloaded into their places (see NewImages), the refused remembered
     addingImages = true;
     const failed = [];
+    const changed = []; // saved meanwhile: left for the next scan
     const ids = [];
-    for (const { product, known: before, candidates } of e.detail) {
+    for (const group of e.detail) {
+      const { product, known: before, places } = group;
+      if (await changedMeanwhile(product, places)) {
+        changed.push(product.code);
+        continue;
+      }
       const known = structuredClone(before ?? {});
       const history = new Set(product.images_history ?? usedFiles(product));
-      const nextIndex = new Map(); // storage id -> index for the next image
-      const next = (storage) => {
-        const index = nextIndex.get(storage.id) ?? Math.max(-1, ...storage.img.map((i) => i.index ?? -1)) + 1;
-        nextIndex.set(storage.id, index + 1);
-        return index;
-      };
-      const place = appending();
-      const gallery = { img: product.gallery ?? [] }; // its places, as a variant's
-      const added = []; // to the gallery: { img, lead }
-      for (const { storages, source, rejected, lead } of candidates) {
-        if (rejected) {
-          known[source] = { rejected: true };
-          continue;
-        }
-        const title = storages.length
-          ? imageTitle(product, storages[0], storages.map(place)[0]) // a place in each variant it goes to
-          : imageTitle(product, null, place(gallery));
-        const file = await importSource(source, title, selectedCompany.id);
-        if (!file) {
-          failed.push(source); // stays unknown, so the next scan offers it again
-          continue;
-        }
-        // one file, in every variant that shows it
-        if (storages.length)
-          await api.items('products_storage_image').createMany(
-            storages.map((storage) => ({
-              products_storage: storage.id,
-              img: file,
-              index: next(storage),
-              enabled: true,
-              show_in_gallery: true,
-            })),
-          );
-        else added.push({ img: file, lead });
-        known[source] = storages.length ? { file } : { file, gallery: true };
-        history.add(file);
-      }
-      if (added.length) {
-        // the api's first leads the gallery, the rest go after the ones there
-        const rows = arrangeGallery(
-          product.gallery ?? [],
-          added.filter((a) => a.lead),
-          added.filter((a) => !a.lead),
-        );
-        await api
-          .items('products_image')
-          .createMany(
-            rows
-              .filter((r) => r.id == null)
-              .map(({ img, index, main }) => ({ product: product.id, img, index, main, enabled: true })),
-          );
-        const changed = rows.filter((r) => r.changed).map(({ id, index, main }) => ({ id, index, main }));
-        if (changed.length) await api.items('products_image').updateBatch(changed);
+      const files = await downloadImages(places, known, selectedCompany.id, failed);
+      for (const file of files.values()) history.add(file);
+      await renameFiles(renamesOf(group, files));
+      // the places shown saved as looked through, the rows first: an image marked imported (api_images) without one
+      // would be taken as removed by hand
+      for (const place of places.filter((p) => p.shown)) {
+        const rows = keptRows(place, files);
+        if (place.storage) await writeVariantImages(place.storage.id, numberRows(rows));
+        else await writeGallery(product.id, numberGallery(rows));
       }
       await api.items('products').updateOne(product.id, { api_images: known, images_history: [...history] });
       ids.push(product.id);
@@ -732,6 +747,10 @@
     addingImages = false;
     heimdall.emit('products', ids);
     if (failed.length) tell(`Nie pobrano:\n${failed.join('\n')}`, { title: 'Niektóre zdjęcia się nie zaimportowały' });
+    if (changed.length)
+      tell(`Ktoś je w międzyczasie zapisał. Ich nowe zdjęcia zaproponuje kolejny skan:\n${changed.join(', ')}`, {
+        title: 'Pominięte produkty',
+      });
   }
 
   function writeFailed(e) {
@@ -1017,9 +1036,19 @@
           </div>
           <span class="ui-divider" />
         {/if}
+        <!-- what goes to the top (each one's over the ones right of it) -->
         <div class="sorting">
-          <Input size="small" type="checkbox" bind:value={sort.notInApiFirst}>Najpierw wycofane</Input>
-          <Input size="small" type="checkbox" bind:value={sort.dbFirst}>Najpierw zaimportowane</Input>
+          {#each [['notInApiFirst', 'Wycofane'], ['newFirst', 'Nowe warianty'], ['complicationsFirst', 'Komplikacje'], ['dbFirst', 'Zaimportowane']] as [key, label]}
+            <Button
+              size="sm"
+              icon="arrow_up"
+              outline={!sort[key]}
+              selected={sort[key]}
+              title="Najpierw: {label.toLowerCase()}"
+              on:click={() => (sort[key] = !sort[key])}>
+              {label}
+            </Button>
+          {/each}
         </div>
         <!-- what acts on the list, at the other end -->
         <div class="list-actions">
@@ -1066,9 +1095,12 @@
 {#if importImages}
   <NewImages
     title="Zdjęcia importowanych produktów"
+    confirmText="Importuj"
+    cancelable
+    later={false}
     groups={importImages.groups}
     on:confirm={(e) => importImages.decide(e.detail)}
-    on:later={() => importImages.decide(null)} />
+    on:cancel={() => importImages.cancel()} />
 {/if}
 
 <style>
@@ -1123,15 +1155,10 @@
     gap: 0.5rem;
     margin-left: auto;
   }
-  /* like the flags next to the products, each option in one piece */
   .sorting {
-    padding-left: 0.25rem;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem 1rem;
-  }
-  .sorting :global(label) {
-    white-space: nowrap;
+    gap: 0.25rem 0.5rem;
   }
 </style>
