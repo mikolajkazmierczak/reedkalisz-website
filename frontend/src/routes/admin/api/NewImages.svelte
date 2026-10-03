@@ -185,6 +185,8 @@
   {#each work as group (key(group))}
     {@const places = targets(group)}
     {@const list = entries(group)}
+    <!-- NOWE tells the new from the ones there: none when all shown are new (a product being imported, mostly) -->
+    {@const mixed = list.some(({ tile }) => !tile.fresh)}
     <div class="product">
       <div class="heading">
         <!-- an imported one opens in a new tab, as the API list's (its cube) -->
@@ -196,7 +198,11 @@
             title="Otwórz zaimportowany produkt"
             on:click={() => window.open(group.href, '_blank', 'noreferrer')} />
         {/if}
-        <h3 class="ui-h3">{group.product.code} {group.product.name}</h3>
+        <h3 class="ui-h3">
+          {group.product.name}
+          <span class="code">{group.product.code}</span>
+          {#if mixed}<span class="known">Niektóre ze zdjęć były już w naszej bazie</span>{/if}
+        </h3>
       </div>
       <div class="ui-tiles" inert={busy} use:sortable={{ sort: (from, to) => sort(group, from, to) }} use:dividers>
         {#each list as { place, p, tile }, j (`${p}|${tile.key}`)}
@@ -207,8 +213,14 @@
                 ? { src: tile.source, filename_download: basename(tile.source) }
                 : fileProps(group.files?.get(tile.file) ?? { id: tile.file })}
               title={titleOf(names, group, tile)}
-              note={tile.fresh ? shownIn(group, tile.source) : tile.source ? null : 'Spoza API: nazwa zostaje'}
-              flag={tile.fresh ? 'NOWE' : null}
+              note={tile.fresh
+                ? shownIn(group, tile.source)
+                : !tile.source
+                  ? 'Spoza API: nazwa zostaje'
+                  : group.elsewhere?.has(tile.file)
+                    ? 'Też gdzie indziej: nazwa zostaje'
+                    : null}
+              flag={tile.fresh && mixed ? 'NOWE' : null}
               marked={tile.fresh && rejected.has(id(group, tile.source))}
               remove="Odrzuć"
               clickable={tile.fresh}
@@ -224,15 +236,15 @@
                   Galeria
                 {/if}
               </svelte:fragment>
+              <svelte:fragment slot="left">
+                <DragHandle disabled={place.tiles.length < 2} on:step={(e) => sort(group, j, j + e.detail)} />
+              </svelte:fragment>
+              <svelte:fragment slot="right">
+                {#if tile.fresh && places.length > 1}
+                  <MoveTo targets={places} here={p} on:move={(e) => move(group, p, tile, e.detail)} />
+                {/if}
+              </svelte:fragment>
             </File>
-            <span class="corner left">
-              <DragHandle disabled={place.tiles.length < 2} on:step={(e) => sort(group, j, j + e.detail)} />
-            </span>
-            {#if tile.fresh && places.length > 1}
-              <span class="corner right">
-                <MoveTo targets={places} here={p} on:move={(e) => move(group, p, tile, e.detail)} />
-              </span>
-            {/if}
           </div>
         {/each}
       </div>
@@ -280,53 +292,45 @@
     gap: 0.5rem;
     margin-bottom: 0.75rem;
   }
+  /* after the code, as faint as the bar's hint, after a dot */
+  .known {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--grey-500);
+  }
+  .known::before {
+    content: '·';
+    margin: 0 0.4em 0 0.15em;
+  }
+  /* after the name, as a field's label (.ui-label), bigger */
+  .code {
+    margin-left: 0.15em;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-label);
+  }
 
-  /* the handle and the move button over the tile's top corners (the tile's own parts take no clicks, see File) */
   .tile {
     position: relative;
-    container-type: inline-size; /* its photo is as tall as it is wide (the divider's height, below) */
   }
-  /* between two places' images: a line in the middle of the gap beside the photos (see dividers), taking no room (not
-     beside the dragged one's copy) */
+  /* between two places' images: a line in the middle of the gap (see dividers), from where the photo's squircled corner
+     turns straight to the bottom of the subtitle's letters, taking no room (not beside the dragged one's copy) */
   .tile:global([data-place-start]:not([data-row-start]):not(.sortable-fallback))::before {
     content: '';
     position: absolute;
-    top: 0.75rem;
-    height: calc(100cqw - 1.5rem); /* beside the photo, a little short of its edges */
+    top: calc(var(--box-radius) / 3);
+    bottom: 0.25rem;
     left: -0.5rem; /* half the tiles' gap (ui-tiles) */
-    width: 2px;
+    width: 3px;
     transform: translateX(-50%);
     border-radius: 2px;
-    background-color: var(--blue-500);
+    background-color: var(--blue-700);
   }
   @media (max-width: 50rem) {
     .tile:global([data-place-start]:not([data-row-start]):not(.sortable-fallback))::before {
       left: -0.25rem;
-    }
-  }
-  .corner {
-    z-index: 1;
-    position: absolute;
-    top: 0.6rem;
-    display: flex;
-    opacity: 0;
-    transition: opacity 100ms;
-  }
-  .corner.left {
-    left: 0.6rem;
-  }
-  .corner.right {
-    right: 0.6rem;
-  }
-  /* shown with the tile's hover (and while used); always on a touch screen, which has none */
-  .tile:hover .corner,
-  .corner:focus-within,
-  .corner:has([aria-expanded='true']) {
-    opacity: 1;
-  }
-  @media (hover: none) {
-    .corner {
-      opacity: 1;
     }
   }
 </style>

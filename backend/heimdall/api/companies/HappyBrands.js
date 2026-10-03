@@ -2,7 +2,7 @@ import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
 import { mergePositions, parseItems, printPosition } from '../common.js';
-import { xmlToJson } from '../utils.js';
+import { TIMEOUT, timeout, xmlToJson } from '../utils.js';
 import { parsePrice } from './EasyGifts.js';
 
 // One xml of everything (Lecce Pen, b1pen, thINKme, Enote, BAG&FLY): products with their colours, product photos
@@ -144,7 +144,9 @@ function parse(company, xml) {
 
 export class HappyBrands extends Api {
   fetch = async ({ company, env: { login, token } }) => {
-    const res = await fetch(`https://happybrands.promo/webservice/products/${login}/${token}`);
+    const res = await fetch(`https://happybrands.promo/webservice/products/${login}/${token}`, {
+      signal: timeout(TIMEOUT.feed),
+    });
     const body = await res.text();
     if (!res.ok || !body.trimStart().startsWith('<')) {
       // a refusal comes as json: { status: 21, message: 'Request made too often.' }

@@ -3,7 +3,7 @@ import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
 import { mergePositions, parseItems, printPosition } from '../common.js';
-import { parseFormData, parseSearchParams } from '../utils.js';
+import { parseFormData, parseSearchParams, TIMEOUT, timedOut, timeout } from '../utils.js';
 import { parsePrice, parseSize } from './EasyGifts.js';
 
 function parseColor(color) {
@@ -114,96 +114,190 @@ function parse(company, products, printing = null) {
   );
 }
 
-async function fetchApi(method, { jwt = null, searchparams = null, formdata = null } = {}) {
-  // Call the api, while possibly attaching searchparams and/or formdata.
-  const params = searchparams ? parseSearchParams(searchparams) : '';
+// the fields of a product row `parse` reads (keep the two in step): the other ~50, mostly the same texts in three more
+// languages, are dropped as each page comes, not held for all 10k rows until the last one
+const FIELDS = [
+  ...['productId', 'CodeERP', 'TitlePL', 'DescriptionPL', 'Dimensions', 'MaterialPL', 'ColorPL', 'Foto'],
+  ...['NetPricePLN', 'Sale', 'HandlingCost', 'InStock', 'onOrder', 'nextDelivery', 'MainCategoryPL', 'SubCategoryPL'],
+];
+const pickFields = (row) => Object.fromEntries(FIELDS.map((field) => [field, row[field]]));
 
-  const fakeBrowserAgent =
-    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0. 2272.118 Safari/537.36';
-  const options = {
-    method,
-    headers: {
-      Accept: '*/*', // for some reason, the api works with this and not 'Content-Type'
-      'User-Agent': fakeBrowserAgent,
-    },
+const fakeBrowserAgent =
+  'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0. 2272.118 Safari/537.36';
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Runs tasks at most `max` at a time, in the order they came. `max` may be lowered on the way (the running ones finish).
+function pool(max) {
+  let active = 0;
+  const waiting = [];
+  const run = async (task) => {
+    if (active < run.max && !waiting.length) active++;
+    else await new Promise((resolve) => waiting.push(resolve));
+    try {
+      return await task();
+    } finally {
+      if (active > run.max || !waiting.length) active--;
+      else waiting.shift()();
+    }
   };
-  if (jwt) options.headers.Authorization = `Bearer ${jwt}`;
-  if (formdata) options.body = parseFormData(formdata);
-
-  const res = await fetch(`https://axpol.com/api/b2b-api/${params}`, options);
-  return await res.json();
+  run.max = max;
+  return run;
 }
 
+// a 429's Retry-After (seconds, or a date) in ms
+const retryAfter = (header) =>
+  header ? Number(header) * 1000 || Math.max(0, Date.parse(header) - Date.now()) || 0 : 0;
+
+// Calls the api through the scan's pool, `seconds` at most a try (the body's reading included). Network errors,
+// timeouts, 5xx, 429 and AXPOL's own `success: 0` get three tries, ~2 then ~4 s apart (jittered) or as long as a 429's
+// Retry-After asks (up to 30 s); any other 4xx is final. A retry sends the rest of the scan one request at a time: AXPOL
+// may say three are too many with a 503 or a timeout as well as a 429. A scan called off (`run.closed`) asks for
+// nothing more, so a quick re-scan doesn't run beside the old one's leftovers.
+async function fetchApi(
+  run,
+  method,
+  { jwt = null, searchparams = null, formdata = null, seconds = TIMEOUT.call } = {},
+) {
+  const params = searchparams ? parseSearchParams(searchparams) : '';
+  const name = searchparams?.method ?? formdata?.method;
+  const attempt = async () => {
+    const options = {
+      method,
+      headers: {
+        Accept: '*/*', // for some reason, the api works with this and not 'Content-Type'
+        'User-Agent': fakeBrowserAgent,
+      },
+      signal: timeout(seconds),
+    };
+    if (jwt) options.headers.Authorization = `Bearer ${jwt}`;
+    if (formdata) options.body = parseFormData(formdata);
+
+    const res = await fetch(`https://axpol.com/api/b2b-api/${params}`, options);
+    if (!res.ok) {
+      await res.arrayBuffer().catch(() => {}); // (an unread body holds the connection)
+      const error = new Error(`${res.status} ${res.statusText}`);
+      throw Object.assign(error, { status: res.status, retryAfter: retryAfter(res.headers.get('retry-after')) });
+    }
+    const body = await res.json();
+    if (!Number(body?.success)) throw new Error(body?.message || 'success: 0');
+    return body;
+  };
+
+  return await run(async () => {
+    for (let tries = 1; ; tries++) {
+      if (run.closed) throw new Error(`${name}: called off`);
+      try {
+        return await attempt();
+      } catch (e) {
+        const { status } = e;
+        // (node-fetch's message holds the url, the api key in its query; the reason reaches the admin, in Polish)
+        const reason = timedOut(e)
+          ? `brak odpowiedzi w ciągu ${seconds} s`
+          : String(e?.message ?? e).replace(/\?\S*/, '');
+        if (tries === 3 || (status >= 400 && status < 500 && status !== 429)) {
+          throw new Error(`${name}: ${reason}${tries > 1 ? ` (${tries} próby)` : ''}`, { cause: e });
+        }
+        run.max = 1;
+        const wait = Math.max(2 ** tries * 1000 * (0.75 + Math.random() / 2), Math.min(e.retryAfter ?? 0, 30_000));
+        console.log(`   - ${name} failed (${reason}), again in ${(wait / 1000).toFixed(1)} s`);
+        await sleep(wait);
+      }
+    }
+  });
+}
+
+// `session`: { run, key, uid, jwt, date }
 const endpoints = {
   // these methods are based on the Postman collection
-  customerLogin: async (key, username, password) => {
+  customerLogin: async (run, key, username, password) => {
     // returns { success: 0/1, data: { uid: '123', jwt: '123' } }
     const params = { 'params[username]': username, 'params[password]': password };
-    return await fetchApi('POST', { formdata: { method: 'Customer.Login', key, ...params } });
+    return await fetchApi(run, 'POST', { formdata: { method: 'Customer.Login', key, ...params } });
   },
-  productCount: async (key, uid, jwt, date) => {
+  productCount: async ({ run, key, uid, jwt, date }) => {
     // returns { succes: 0/1, data: { count: '123' } }
     const params = { 'params[date]': date };
-    return await fetchApi('GET', { jwt, searchparams: { method: 'Product.Count', key, uid, ...params } });
+    return await fetchApi(run, 'GET', { jwt, searchparams: { method: 'Product.Count', key, uid, ...params } });
   },
-  productList: async (key, uid, jwt, date, limit, offset) => {
+  productList: async ({ run, key, uid, jwt, date }, limit, offset) => {
     // returns { success: 0/1, data: { 'id1': {}, 'id2': {}, ... } }
     const params = { 'params[date]': date, 'params[limit]': limit, 'params[offset]': offset };
-    return await fetchApi('GET', { jwt, searchparams: { method: 'Product.List', key, uid, ...params } });
+    const searchparams = { method: 'Product.List', key, uid, ...params };
+    return await fetchApi(run, 'GET', { jwt, searchparams, seconds: TIMEOUT.page });
   },
-  printingCount: async (key, uid, jwt, date) => {
+  printingCount: async ({ run, key, uid, jwt, date }) => {
     // returns { succes: 0/1, data: { count: '123' } }
     const params = { 'params[date]': date };
-    return await fetchApi('GET', { jwt, searchparams: { method: 'Printing.Count', key, uid, ...params } });
+    return await fetchApi(run, 'GET', { jwt, searchparams: { method: 'Printing.Count', key, uid, ...params } });
   },
-  printingList: async (key, uid, jwt, date, limit, offset) => {
+  printingList: async ({ run, key, uid, jwt, date }, limit, offset) => {
     // returns { success: 0/1, data: { 'id1': { productId, CodeERP, Print: [...] }, ... } }
     const params = { 'params[date]': date, 'params[limit]': limit, 'params[offset]': offset };
-    return await fetchApi('GET', { jwt, searchparams: { method: 'Printing.List', key, uid, ...params } });
+    const searchparams = { method: 'Printing.List', key, uid, ...params };
+    return await fetchApi(run, 'GET', { jwt, searchparams, seconds: TIMEOUT.page });
   },
 };
 
-// every row of a paged list, 1000 at a time
-// a page that doesn't come fails the list: a lost page of print data would read as products without labelings
-async function fetchAllRows(count, list) {
+// every row of a paged list, 1000 at a time, three pages asked for at once (the pool decides when they go), in order;
+// `keep` trims a row as its page comes. A page that doesn't come fails the list (a lost page of print data would read
+// as products without labelings).
+async function fetchAllRows(label, count, list, keep = (row) => row) {
   const limit = 1000;
-  const rows = [];
-  for (let offset = 0; offset < count; offset += limit) {
-    console.log(`   - fetching: ${offset}-${offset + limit}/${count}`);
-    const page = await list(limit, offset);
-    if (!page?.data) throw new Error(`page ${offset} not fetched`);
-    rows.push(...Object.values(page.data));
-  }
-  return rows;
+  const pages = [];
+  let next = 0;
+  let failed = false;
+  const worker = async () => {
+    while (!failed && next * limit < count) {
+      const offset = next++ * limit;
+      console.log(`   - fetching ${label}: ${offset}-${offset + limit}/${count}`);
+      try {
+        const page = await list(limit, offset);
+        if (!page?.data) throw new Error(`${label} page ${offset} not fetched`);
+        pages[offset / limit] = Object.values(page.data).map(keep);
+      } catch (e) {
+        failed = true;
+        throw e;
+      }
+    }
+  };
+  await Promise.all([worker(), worker(), worker()]);
+  return pages.flat();
 }
 
 export class AXPOL extends Api {
   fetch = async ({ company, env: { username, password, key } }) => {
     const date = '2000-01-01 00:00:00'; // arbitrary date far enough in the past for all requests
+    const run = pool(3); // for the products and the print data together
 
     // Login to the api and get the uid and jwt.
-    const { uid, jwt } = (await endpoints.customerLogin(key, username, password)).data;
+    const { uid, jwt } = (await endpoints.customerLogin(run, key, username, password)).data;
+    const session = { run, key, uid, jwt, date };
 
-    // Get the product count.
-    const { count } = (await endpoints.productCount(key, uid, jwt, date)).data;
-    console.log(`   - count: ${count}`);
+    // the products and the print data side by side
+    const products = async () => {
+      const { count } = (await endpoints.productCount(session)).data;
+      console.log(`   - count: ${count}`);
+      const list = (limit, offset) => endpoints.productList(session, limit, offset);
+      return await fetchAllRows('products', count, list, pickFields);
+    };
+    // print data is not essential: without it the products just have no labelings (called off when the products fail)
+    const printing = async () => {
+      try {
+        const count = Number((await endpoints.printingCount(session)).data.count);
+        const list = (limit, offset) => endpoints.printingList(session, limit, offset);
+        return await fetchAllRows('printing', count, list);
+      } catch (e) {
+        console.log(`   - printing not fetched: ${e}`);
+        return null;
+      }
+    };
 
-    const products = await fetchAllRows(count, (limit, offset) =>
-      endpoints.productList(key, uid, jwt, date, limit, offset),
-    );
-
-    // print data is not essential: without it the products just have no labelings
-    let printing = null;
-    try {
-      const printCount = Number((await endpoints.printingCount(key, uid, jwt, date)).data.count);
-      printing = await fetchAllRows(printCount, (limit, offset) =>
-        endpoints.printingList(key, uid, jwt, date, limit, offset),
-      );
-    } catch (e) {
-      console.log(`   - printing not fetched: ${e}`);
-    }
-
-    const items = parse(company, products, printing);
+    const fetched = products().catch((e) => {
+      run.closed = true;
+      throw e;
+    });
+    const items = parse(company, ...(await Promise.all([fetched, printing()])));
     return { items, lastScan: getISODate() };
   };
 }

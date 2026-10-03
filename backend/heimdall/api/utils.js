@@ -74,22 +74,33 @@ export function parseFormData(data) {
   return formData;
 }
 
+// How long one request to a supplier may take, in seconds, its body included (one that stops answering would hold the
+// scan forever): a whole catalogue in one file (MidOcean's products: 26 MB) the most, a page or a login far less.
+export const TIMEOUT = { feed: 180, page: 60, call: 30 };
+export const timeout = (seconds) => AbortSignal.timeout(seconds * 1000);
+// a request stopped by its time limit (the built-in fetch throws a TimeoutError, node-fetch an AbortError)
+export const timedOut = (err) => err?.name === 'TimeoutError' || err?.name === 'AbortError';
+
 export async function fetchSimpleApi({ company, routes, optional = [], url, parse }) {
   // `optional` routes are not essential (e.g. print data): one that fails reaches `parse` as null
   const isXml = url('test').includes('xml'); // a bit crude, but does the job
   const read = (res) => (isXml ? res.text() : res.json());
-  const data = await Promise.all(routes.map(async (route) => read(await fetch(url(route)))));
-  const extra = await Promise.all(
-    optional.map(async (route) => {
-      try {
-        const res = await fetch(url(route));
-        return res.ok ? await read(res) : null;
-      } catch (e) {
-        console.log(`   - ${route} not fetched: ${e}`);
-        return null;
-      }
-    }),
-  );
+  const get = (route) => fetch(url(route), { signal: timeout(TIMEOUT.feed) });
+  // all side by side: one after the other, the time limits would add up
+  const [data, extra] = await Promise.all([
+    Promise.all(routes.map(async (route) => read(await get(route)))),
+    Promise.all(
+      optional.map(async (route) => {
+        try {
+          const res = await get(route);
+          return res.ok ? await read(res) : null;
+        } catch (e) {
+          console.log(`   - ${route} not fetched: ${e}`);
+          return null;
+        }
+      }),
+    ),
+  ]);
 
   const items = parse(company, ...data, ...extra);
   return { items, lastScan: getISODate() };

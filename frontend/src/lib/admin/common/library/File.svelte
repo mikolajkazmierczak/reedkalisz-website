@@ -29,7 +29,9 @@
   import { tick } from 'svelte';
   import { baseUrl } from '$/api';
   import { companies } from '@/globals';
+  import Button from '@c/Button.svelte';
   import CompanyIcon from '@c/CompanyIcon.svelte';
+  import Lightbox from '@c/Lightbox.svelte';
   import { filetypeToReadable, bytesToReadable } from '%/utils';
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
@@ -54,6 +56,7 @@
   export let flag = null; // this ("NOWE") in a purple pill there (then the red one just its bin), and a purple ring
   export let clickable = true; // not: only looked at (a disabled button: no pointer, no focus, no hover)
   // slot "tag": what the image is for, in a pill on the bottom edge of the image
+  // slots "left", "right": small buttons over the picture's top corners, shown as its magnifier is (e.g. a drag handle)
 
   // what an image from elsewhere is, as far as it shows: its type by its name, its size once loaded
   $: srcType =
@@ -93,79 +96,115 @@
     loading = false;
     if (src) natural = [e.target.naturalWidth, e.target.naturalHeight];
   }
+
+  // the image as it is, over the page: its magnifier in the picture's corner, or a right click on the tile
+  let zoomed = false;
+  $: zoomable = isImg && !imgError;
+  function zoom(e) {
+    if (!zoomable) return;
+    e.preventDefault();
+    zoomed = true;
+  }
 </script>
 
-<div
-  class="wrapper"
-  class:marked
-  class:remove={marked && remove}
-  class:flagged={flag && !(marked && remove)}
-  class:backed={backing}
-  class:tagged={$$slots.tag}
-  style:--backing={backing}
-  class:still={!clickable}
-  role="button"
-  tabindex={clickable ? 0 : -1}
-  aria-disabled={!clickable}
-  on:click
-  on:keydown={(e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      e.currentTarget.click();
-    }
-  }}>
-  <div class="thumbnail">
-    <!-- an image on its way: a shimmering skeleton, the picture fading in over it once it's here -->
-    <div class="face" class:boilerplate={!isImg || imgError} class:skeleton={isImg && !imgError && loading}>
-      {#if isImg}
-        {#if imgError}
-          <Icon fill name="img" dark />
+<div class="file" role="presentation" on:contextmenu={zoom}>
+  <div
+    class="wrapper"
+    class:marked
+    class:remove={marked && remove}
+    class:flagged={flag && !(marked && remove)}
+    class:backed={backing}
+    class:tagged={$$slots.tag}
+    style:--backing={backing}
+    class:still={!clickable}
+    role="button"
+    tabindex={clickable ? 0 : -1}
+    aria-disabled={!clickable}
+    on:click
+    on:keydown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.currentTarget.click();
+      }
+    }}>
+    <div class="thumbnail">
+      <!-- an image on its way: a shimmering skeleton, the picture fading in over it once it's here -->
+      <div class="face" class:boilerplate={!isImg || imgError} class:skeleton={isImg && !imgError && loading}>
+        {#if isImg}
+          {#if imgError}
+            <Icon fill name="img" dark />
+          {:else}
+            <img
+              src={src ?? `${baseUrl}/assets/${id}?key=thumb#${modified_on ? modified_on : uploaded_on}`}
+              alt=""
+              loading="lazy"
+              class:shown={!loading}
+              bind:this={img}
+              on:error={() => (imgError = true)}
+              on:load={loaded} />
+          {/if}
+        {:else if id}
+          <Icon fill name="file" dark />
         {:else}
-          <img
-            src={src ?? `${baseUrl}/assets/${id}?key=thumb#${modified_on ? modified_on : uploaded_on}`}
-            alt=""
-            loading="lazy"
-            class:shown={!loading}
-            bind:this={img}
-            on:error={() => (imgError = true)}
-            on:load={loaded} />
+          <Icon fill name="edit" dark />
         {/if}
-      {:else if id}
-        <Icon fill name="file" dark />
-      {:else}
-        <Icon fill name="edit" dark />
-      {/if}
+      </div>
+      {#if $$slots.tag}<div class="edge"><span class="tag"><slot name="tag" /></span></div>{/if}
     </div>
-    {#if $$slots.tag}<div class="edge"><span class="tag"><slot name="tag" /></span></div>{/if}
-  </div>
-  {#if id || src}
-    <Tooltip>
-      <small>
-        <b>{title ?? filename_download ?? id}</b><br />{#if companyName}<CompanyIcon company={companyName} />
-          {companyName} ·
-        {/if}{meta}
-        {#if filename_download && filename_download !== title}<br />{filename_download}{/if}
-        {#if note}<br />{note}{/if}
-      </small>
-    </Tooltip>
-  {/if}
-  {#if flag || (marked && remove)}
-    <div class="pills">
-      {#if flag}<span class="pill flag">{flag}</span>{/if}
-      {#if marked && remove}
-        <span class="pill" class:bare={flag}>
-          <Icon name="delete" light height="0.8rem" />{#if !flag}{remove}{/if}
-        </span>
-      {/if}
+    {#if id || src}
+      <Tooltip>
+        <small>
+          <b>{title ?? filename_download ?? id}</b><br />{#if companyName}<CompanyIcon company={companyName} />
+            {companyName} ·
+          {/if}{meta}
+          {#if filename_download && filename_download !== title}<br />{filename_download}{/if}
+          {#if note}<br />{note}{/if}
+        </small>
+      </Tooltip>
+    {/if}
+    {#if flag || (marked && remove)}
+      <div class="pills">
+        {#if flag}<span class="pill flag">{flag}</span>{/if}
+        {#if marked && remove}
+          <span class="pill" class:bare={flag}>
+            <Icon name="delete" light height="0.8rem" />{#if !flag}{remove}{/if}
+          </span>
+        {/if}
+      </div>
+    {/if}
+    <div class="text">
+      <span class="title">{title ?? 'Wybierz'}</span>
+      <span class="meta">{meta}</span>
     </div>
-  {/if}
-  <div class="text">
-    <span class="title">{title ?? 'Wybierz'}</span>
-    <span class="meta">{meta}</span>
   </div>
+  {#if $$slots.left}<span class="corner left"><slot name="left" /></span>{/if}
+  {#if $$slots.right}<span class="corner right"><slot name="right" /></span>{/if}
+  {#if zoomable}
+    <span class="corner zoom">
+      <Button
+        size="sm"
+        dashed
+        icon="zoom_in"
+        title="Powiększ zdjęcie"
+        background="rgb(255 255 255 / 0.85)"
+        backgroundHover="var(--blue-100)"
+        on:click={zoom} />
+    </span>
+  {/if}
 </div>
 
+{#if zoomed}
+  <Lightbox src={src ?? `${baseUrl}/assets/${id}`} on:close={() => (zoomed = false)} />
+{/if}
+
 <style>
+  /* the tile and the buttons over its corners (the picture is as tall as the tile is wide): hovering one is hovering
+     the tile, as is a menu open from one */
+  .file {
+    position: relative;
+    container-type: inline-size;
+  }
+
   /* hovered or marked, the face draws in and the text rises by transforms only: resizing under the pointer made the
      hover flicker */
   .wrapper {
@@ -184,19 +223,64 @@
   .wrapper.still {
     cursor: default;
   }
-  .wrapper:not(.still):hover,
+  .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still),
   .wrapper.marked {
     --inset: 0.4rem; /* as far in as the text (see .text) */
     --shrink: 0.92; /* the face that much in (on a ~8.5rem tile: the inset) */
   }
   /* hovered: a faint shade over whatever it's on (the dots, a variant's blue), its text's backing (on the dots) the
      colour that shade makes over it */
-  .wrapper:not(.still):hover {
+  .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still) {
     background-color: rgb(0 0 0 / 0.1);
   }
-  .wrapper.backed:not(.still):hover {
+  .file:is(:hover, :has([aria-expanded='true'])) > .wrapper.backed:not(.still) {
     --face: color-mix(in srgb, var(--backing) 90%, black);
   }
+  /* the slots' buttons at the top, the magnifier at the bottom right, shown with the tile's hover (always on a touch
+     screen, which has none). They come in from the whole face's corners with the face drawn in (92% of the tile: its
+     corners 4% of the width in) */
+  .corner {
+    z-index: 1;
+    position: absolute;
+    display: flex;
+    opacity: 0;
+    transform: translate(calc(var(--x) * 4cqw), calc(var(--y) * 4cqw));
+    transition:
+      opacity 100ms,
+      transform 100ms;
+  }
+  .left {
+    --x: -1;
+    --y: -1;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+  .right {
+    --x: 1;
+    --y: -1;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  .zoom {
+    --x: 1;
+    --y: 1;
+    top: calc(100cqw - 1.5rem - 0.5rem);
+    right: 0.5rem;
+  }
+  .file:is(:hover, :has([aria-expanded='true'])) > .corner,
+  .corner:focus-within {
+    opacity: 1;
+  }
+  .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still) ~ .corner,
+  .wrapper.marked ~ .corner {
+    transform: none;
+  }
+  @media (hover: none) {
+    .corner {
+      opacity: 1;
+    }
+  }
+
   /* only the tile takes the pointer: its hover is its own box's, whatever moves in it (and the image isn't dragged off) */
   .wrapper :global(*) {
     pointer-events: none;

@@ -3,6 +3,7 @@ import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
 import { addCategories, uniqueMaterials } from '../common.js';
+import { TIMEOUT, timeout } from '../utils.js';
 
 function parseCode(code) {
   // formats: 'XXXXXX', 'XXXXXX-XX', 'XXXXXX-XX-XX', ...?
@@ -35,42 +36,52 @@ function parseColorDescription(colorDescription) {
   }
 }
 
-function parse(printpricelist, pricelist, printdata, products, stock) {
-  pricelist = pricelist.price.map((p) => ({
-    sku: p.sku,
-    price: Number(p.price.replace(',', '.')),
-  }));
-  printdata = printdata.products.map((p) => ({
-    productCode: p.master_code,
-    manipulation: p.print_manipulation,
-    positions: p.printing_positions.map((pos) => {
-      const a = pos.max_print_size_height;
-      const b = pos.max_print_size_width;
-      const areaType = pos.print_position_type;
-      // the sizes are the whole width and height, an ellipse's half-axes are half of them;
-      // a polygon counts as its bounding box
-      const area = areaType === 'Ellipse' ? Math.round((Math.PI * a * b) / 4) : a * b;
-      return {
-        techniques: pos.printing_techniques.map((t) => t.id),
-        label: pos.position_id,
-        height: a,
-        width: b,
-        area,
-      };
-    }),
-  }));
-  stock = stock.stock.map((s) => ({
-    sku: s.sku,
-    amount: Number(s.qty),
-  }));
+// each feed cut down to what `parse` reads as soon as it comes: the raw ones (the print data alone is 18 MB of JSON) are
+// then let go one by one, not all held until the last one comes
+const feeds = {
+  'printpricelist/2.0': (printpricelist) => {
+    const handlingCosts = printpricelist.print_manipulations.map((m) => ({
+      price: Number(m.price.replace(',', '.')),
+      code: m.code,
+      name: m.description,
+    }));
+    handlingCosts.sort((a, b) => a.price - b.price); // sort by price, ascending
+    return handlingCosts;
+  },
+  'pricelist/2.0': (pricelist) =>
+    pricelist.price.map((p) => ({
+      sku: p.sku,
+      price: Number(p.price.replace(',', '.')),
+    })),
+  'printdata/1.0': (printdata) =>
+    printdata.products.map((p) => ({
+      productCode: p.master_code,
+      manipulation: p.print_manipulation,
+      positions: p.printing_positions.map((pos) => {
+        const a = pos.max_print_size_height;
+        const b = pos.max_print_size_width;
+        const areaType = pos.print_position_type;
+        // the sizes are the whole width and height, an ellipse's half-axes are half of them;
+        // a polygon counts as its bounding box
+        const area = areaType === 'Ellipse' ? Math.round((Math.PI * a * b) / 4) : a * b;
+        return {
+          techniques: pos.printing_techniques.map((t) => t.id),
+          label: pos.position_id,
+          height: a,
+          width: b,
+          area,
+        };
+      }),
+    })),
+  'products/2.0': (products) => products,
+  'stock/2.0': (stock) =>
+    stock.stock.map((s) => ({
+      sku: s.sku,
+      amount: Number(s.qty),
+    })),
+};
 
-  const handlingCosts = printpricelist.print_manipulations.map((m) => ({
-    price: Number(m.price.replace(',', '.')),
-    code: m.code,
-    name: m.description,
-  }));
-  handlingCosts.sort((a, b) => a.price - b.price); // sort by price, ascending
-
+function parse(handlingCosts, pricelist, printdata, products, stock) {
   // looked up once per product / variant: a find per lookup blocks the socket server for seconds
   const priceByProduct = new Map(); // the first variant's price
   for (const p of pricelist) {
@@ -140,17 +151,15 @@ function parse(printpricelist, pricelist, printdata, products, stock) {
 
 export class MidOcean extends Api {
   fetch = async ({ env: { token } }) => {
-    const endpoints = ['printpricelist/2.0', 'pricelist/2.0', 'printdata/1.0', 'products/2.0', 'stock/2.0'];
-    const responses = await Promise.all(
-      endpoints.map((endpoint) => {
-        const url = (endpoint) => `https://api.midocean.com/gateway/${endpoint}?language=pl`;
-        const options = { headers: { 'x-Gateway-APIKey': token } };
-        return fetch(url(endpoint), options);
+    const options = { headers: { 'x-Gateway-APIKey': token }, signal: timeout(TIMEOUT.feed) };
+    const data = await Promise.all(
+      Object.entries(feeds).map(async ([endpoint, cut]) => {
+        const res = await fetch(`https://api.midocean.com/gateway/${endpoint}?language=pl`, options);
+        return cut(await res.json());
       }),
     );
-    const jsons = await Promise.all(responses.map((res) => res.json()));
 
-    const { items, handlingCosts } = parse(...jsons);
+    const { items, handlingCosts } = parse(...data);
     return { items, handlingCosts, lastScan: getISODate() };
   };
 }

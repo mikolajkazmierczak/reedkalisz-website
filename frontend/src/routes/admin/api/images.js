@@ -54,15 +54,41 @@ export async function readFiles(ids) {
   return files;
 }
 
+// the products each of these files is in (a gallery's, a variant's photo, an attachment) -> Map(id -> Set(product id))
+async function productsOf(ids) {
+  const unique = [...new Set(ids)].filter(Boolean);
+  const products = new Map();
+  const add = (file, product) => file && product && products.set(file, (products.get(file) ?? new Set()).add(product));
+  const read = (collection, fields, filter) => api.items(collection).readByQuery({ fields, filter, limit: -1 });
+  for (let i = 0; i < unique.length; i += 100) {
+    const _in = unique.slice(i, i + 100).join(','); // (as a CSV, see readFiles)
+    const [gallery, photos, attachments] = await Promise.all([
+      read('products_image', ['img', 'product'], { img: { _in } }),
+      read('products_storage_image', ['img', 'products_storage.product'], { img: { _in } }),
+      read('products_attachment', ['file', 'product'], { file: { _in } }),
+    ]);
+    for (const row of gallery.data) add(row.img, row.product);
+    for (const row of photos.data) add(row.img, row.products_storage?.product);
+    for (const row of attachments.data) add(row.file, row.product);
+  }
+  return products;
+}
+
 // What NewImages takes: products ({ product, known, review: what reviewPlaces takes but `known` and `files`, ... })
-// with their places worked out, and the library's data of their files there (`files`, read unless given)
+// with their places worked out, the library's data of their files there (`files`, read unless given), and the ones
+// another product shows too added to `elsewhere` (they keep its names: a file is renamed for all of them)
 export async function reviewGroups(groups, library = null) {
-  const files = library ?? (await readFiles(groups.flatMap((g) => [...usedFiles(g.product)])));
-  return groups.map(({ review, ...g }) => ({
-    ...g,
-    files,
-    places: reviewPlaces({ ...review, known: g.known, files }),
-  }));
+  const used = groups.map((g) => [...usedFiles(g.product)]);
+  const [files, products] = await Promise.all([library ?? readFiles(used.flat()), productsOf(used.flat())]);
+  return groups.map(({ review, ...g }, i) => {
+    const shared = used[i].filter((file) => [...(products.get(file) ?? [])].some((p) => p !== g.product.id));
+    return {
+      ...g,
+      files,
+      elsewhere: new Set([...(g.elsewhere ?? []), ...shared]),
+      places: reviewPlaces({ ...review, known: g.known, files }),
+    };
+  });
 }
 
 // Where a product's images go, as an admin looks through the new ones (see NewImages): its gallery, then each of

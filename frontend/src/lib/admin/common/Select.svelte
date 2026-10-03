@@ -11,7 +11,7 @@
   // The admin's select: a button showing the chosen option and, under it, the options in a white box, a search field
   // over them (always: open, type, Enter). Like the browser's own: a click beside the box only closes it, the arrows
   // move, Enter picks, Escape closes; typing on the closed button opens it, searching.
-  //   options: [{ id, text, disabled, color, special, depth, code, swatch, image, icon, note, noteImage, chosen }]
+  //   options: [{ id, text, disabled, color, special, depth, code, swatch, image, icon, note, noteImage, after, chosen }]
   //     color   - the option's background (e.g. a status)
   //     special - a choice beside the list ("Wszystkie", "Brak"): a button over it, as the products' "Wszystkie"
   //               and "Bez kategorii", never searched away
@@ -23,6 +23,7 @@
   //     icon    - an icon's name, in a swatch's place (the gallery among the variants)
   //     note    - more about it, on a line of its own under its name in the list, smaller (searched too)
   //     noteImage - a picture's url before the note (a company's favicon)
+  //     after   - more about it on the button, after its name, fainter (a price view's amounts)
   //     chosen  - already had (e.g. the product's categories, a select adding another): marked as the one chosen,
   //               picked again it's let go (on:unchoose)
   //   on:change - { detail: { value } }, only when picked by hand
@@ -292,6 +293,7 @@
           style:background={shownOption.swatch === true ? NO_COLOR : shownOption.swatch} />{/if}
       {#if shownOption?.code}<CategoryCode code={shownOption.code} />{/if}
       {shownOption?.text ?? placeholder ?? ''}
+      {#if shownOption?.after}<span class="after">{shownOption.after}</span>{/if}
     </span>
   {/if}
 </button>
@@ -489,6 +491,12 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+  /* as the list's note (cut with the name, see .text) */
+  .after {
+    margin-left: 0.2em;
+    font-size: 0.8em;
+    color: var(--ink-muted);
   }
   /* a colour: a circle, ringed over the colour as the website's swatches */
   .swatch {

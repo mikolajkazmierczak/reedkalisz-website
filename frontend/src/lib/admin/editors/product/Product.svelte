@@ -73,7 +73,7 @@
       item.price_max_sale = minMaxPrices.maxSale;
       // only the most specific categories, in the order of the tree
       item.categories = keepSpecific(item.categories);
-      // no tiles without a file, the variants and labelings put in order (not by hand, see order.js)
+      // no tiles without a file nor blank variants, the variants and labelings put in order (not by hand, see order.js)
       item = dropEmpty(item);
       item.storage = sortVariants(item.storage);
       item.labelings = sortLabelings(item.labelings, $labelings, item.company);

@@ -80,7 +80,7 @@
     <section class="ui-section">
       <h2 class="ui-h2">Zawartość</h2>
       <div class="ui-section__row">
-        <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
+        <div class="ui-section__col ui-box" style:grid-column={'1 / -1'}>
           <div class="ui-pair ui-texteditor">
             <div class="ui-texteditor__draft">
               <Input

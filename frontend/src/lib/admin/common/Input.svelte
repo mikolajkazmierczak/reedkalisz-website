@@ -24,7 +24,7 @@
   export let size = 'normal'; // normal (2rem), small (1.5rem, like the small Button), compact (1.2rem, a value in a bar)
   export let color = null; // a select's background, e.g. for a status
   export let api = false; // the API scanner sets it: locked, "API" in the field, why when hovered
-  export let apiText = 'Tę wartość ustawia skaner API.';
+  export let apiText = 'Tę wartość ustawia skaner API.'; // (a "\n" in it breaks the line)
   export let label = null; // a field labelled by something outside it: its name for screen readers
 
   // number
@@ -187,7 +187,7 @@
           style:border-radius={borderRadius} />
         <!-- over the field, not the items below it -->
         {#if api}
-          <span class="api"><ApiBadge /><Tooltip><small>{apiText}</small></Tooltip></span>
+          <span class="api"><ApiBadge /><Tooltip><small style:white-space="pre-line">{apiText}</small></Tooltip></span>
         {/if}
       </div>
       <div class="list-items">
@@ -240,7 +240,7 @@
   <!-- over the whole field (a disabled one gets no pointer), the badge at its right end -->
   {#if api && type != 'list'}
     <span class="api" class:select={type == 'select'} class:textarea={type == 'textarea'}>
-      <ApiBadge /><Tooltip><small>{apiText}</small></Tooltip>
+      <ApiBadge /><Tooltip><small style:white-space="pre-line">{apiText}</small></Tooltip>
     </span>
   {/if}
 </div>

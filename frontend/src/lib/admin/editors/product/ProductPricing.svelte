@@ -4,6 +4,7 @@
   import { repairPrices, cleanupPrices } from '%/calculationsPrices';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
+  import { beside } from '@/beside';
 
   import { globals, companies, globalMargins, priceViews, labelings } from '@/globals';
   import { defaultLabeling, labelingText } from '@/labelings';
@@ -99,6 +100,12 @@
   read();
 
   // PRICE VIEW
+  // its amounts under its name in the list, and after it on the field - unless its name is just them ("10, 20, 50")
+  function viewOption({ id, name, amounts }) {
+    const listed = amounts.join(', ');
+    const named = String(name).match(/\d+/g)?.join(', ') === listed;
+    return { id, text: name, note: listed, ...(!named && { after: listed }) };
+  }
   function selectDefaultPriceView() {
     product.price_view = $priceViews.find((p) => p.default).id;
   }
@@ -179,12 +186,7 @@
             {/if}
           </div>
           {#if product.show_price}
-            <Input
-              type="select"
-              bind:value={product.price_view}
-              options={$priceViews.map(({ id, name, amounts }) => ({ id, text: name, note: amounts.join(', ') }))}>
-              Widok
-            </Input>
+            <Input type="select" bind:value={product.price_view} options={$priceViews.map(viewOption)}>Widok</Input>
           {/if}
         </div>
 
@@ -243,14 +245,14 @@
               {/if}
 
               <ProductPricingMargins
-                text="na produkt"
+                text="produkt"
                 globalMargin={$globalMargins.product_margin}
                 globalMinimum={$globalMargins.product_minimum}
                 bind:globalEnabled={product.global_product_margin}
                 bind:margin={product.product_margin}
                 bind:minimum={product.product_minimum} />
               <ProductPricingMargins
-                text="na całość"
+                text="całość"
                 globalMargin={$globalMargins.full_margin}
                 globalMinimum={$globalMargins.full_minimum}
                 bind:globalEnabled={product.global_full_margin}
@@ -304,7 +306,7 @@
                     label="Znakowanie"
                     bind:value={labeling.labeling}
                     api={managed}
-                    apiText="Prowadzi do niego mapowanie znakowań. Skaner API ustawia znakowanie, pole i miejsce, dodaje je i usuwa."
+                    apiText={'Prowadzi do niego mapowanie znakowań.\nSkaner API ustawia znakowanie, pole i miejsce, dodaje je i usuwa.'}
                     disabled={managed}
                     options={labelingOptions(labeling, product.labelings, offered, scannerTargets)} />
 
@@ -319,7 +321,7 @@
                       sale={product.sale}
                       fixed />
                     <ProductPricingMargins
-                      text="na znakowanie"
+                      text="znakowanie"
                       globalMargin={chosenLabeling.margin}
                       globalMinimum={chosenLabeling.minimum}
                       bind:globalEnabled={labeling.global_margin}
@@ -335,7 +337,7 @@
                 </div>
               {/each}
 
-              <Button icon="add" on:click={pushLabeling}>Dodaj</Button>
+              <span class="ui-add" use:beside><Button icon="add" on:click={pushLabeling}>Dodaj</Button></span>
             </div>
           </div>
         </div>
@@ -369,7 +371,7 @@
   }
 
   .labelings {
-    grid-column: 2 / span 3;
+    grid-column: 2 / -1;
   }
   .actions div {
     display: flex;

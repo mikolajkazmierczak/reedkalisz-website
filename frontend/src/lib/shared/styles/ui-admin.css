@@ -125,10 +125,13 @@ body {
 
 .ui-section {
   margin-bottom: 2rem;
+  container-type: inline-size; /* (its width sizes "+ Dodaj", see .ui-add) */
 }
 .ui-section__row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(21.875rem, 100%), 1fr)); /* (a phone: one, as wide as it) */
+  /* three columns at most (a wide screen: wider ones), a phone one, as wide as it - a box across all: `1 / -1` (a span
+     past the last column adds columns, squeezing the rest) */
+  grid-template-columns: repeat(auto-fill, minmax(max(min(21.875rem, 100%), (100% - 3rem) / 3), 1fr));
   gap: 1.5rem;
 }
 .ui-section__col {
@@ -146,12 +149,14 @@ body {
   outline: dashed 2px var(--blue-500);
   outline-offset: -1px;
 }
-/* "+ Dodaj" at the end of a grid of boxes (a product's photos, files, variants): as wide as its cell on a row of its
-   own; on a row with a box before it (`ui-add--side`, see beside.js) turned on its side, reading downwards, as long as
-   what's on it, at the top of its cell */
+/* "+ Dodaj" at the end of a grid of boxes (a product's photos, files, variants, labelings): on a row of its own as wide
+   as the gallery's tile at its smallest, the same in every grid - 7.5rem, or on a phone a third of the section (see
+   ProductFiles) - and no wider than its cell; on a row with a box before it (`ui-add--side`, see beside.js) turned on
+   its side, reading downwards, as long as what's on it, at the top of its cell */
 .ui-add {
   display: flex;
   flex-direction: column;
+  width: min(7.5rem, (100cqw - 2 * 0.5625rem) / 3, 100%);
 }
 .ui-add.ui-add--side {
   flex-direction: row;

@@ -92,7 +92,7 @@
     <section class="ui-section">
       <h2 class="ui-h2">Zawartość</h2>
       <div class="ui-section__row">
-        <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
+        <div class="ui-section__col ui-box" style:grid-column={'1 / -1'}>
           <div class="ui-pair ui-texteditor">
             <div class="ui-texteditor__draft">
               <Input
@@ -114,7 +114,7 @@
     <section class="ui-section">
       <h2 class="ui-h2">Dane <small>JSON</small></h2>
       <div class="ui-section__row">
-        <div class="ui-section__col ui-box" style:grid-column={'1 / span 4'}>
+        <div class="ui-section__col ui-box" style:grid-column={'1 / -1'}>
           <div
             class="ui-pair ui-texteditor"
             style:background-color={dataParsingError ? 'var(--red-100)' : 'var(--light)'}
@@ -143,7 +143,7 @@
     font-size: 0.9rem;
   }
   .code {
-    grid-column: 1 / span 4;
+    grid-column: 1 / -1;
   }
   h2 small {
     font-size: 0.5em;

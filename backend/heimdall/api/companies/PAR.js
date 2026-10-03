@@ -3,6 +3,7 @@ import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
 import { addCategories, mergePositions, printPosition, uniqueMaterials } from '../common.js';
+import { TIMEOUT, timeout } from '../utils.js';
 
 function parseStorage(item) {
   const { imgs, amount, id, colors } = item;
@@ -119,11 +120,11 @@ function parse(products, stocks, categories) {
 export class PAR extends Api {
   fetch = async ({ env: { username, password } }) => {
     const auth = 'Basic ' + Buffer.from(`${username}:${password}`).toString('base64');
-    const options = { headers: { Authorization: auth } };
+    const get = (url) => fetch(url, { headers: { Authorization: auth }, signal: timeout(TIMEOUT.feed) });
     const [resProducts, resStocks, resCategories] = await Promise.all([
-      fetch('https://www.par.com.pl/api/products.json', options),
-      fetch('https://www.par.com.pl/api/stocks.json', options),
-      fetch('https://www.par.com.pl/api/categories.json', options),
+      get('https://www.par.com.pl/api/products.json'),
+      get('https://www.par.com.pl/api/stocks.json'),
+      get('https://www.par.com.pl/api/categories.json'),
     ]);
     const products = await resProducts.json();
     const stocks = await resStocks.json();

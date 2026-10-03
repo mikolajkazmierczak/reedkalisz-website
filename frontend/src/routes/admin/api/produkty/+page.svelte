@@ -19,6 +19,7 @@
   import { indexScan, scanProduct, scanVariant } from '@/match';
   import { detailsFields, planDetails } from '@/details';
   import { removeUnusedFiles, usedFiles } from '@/files';
+  import { packSnapshot } from '@/snapshot';
   import {
     arrangeGallery,
     basename,
@@ -459,6 +460,7 @@
       changedPrice: new Set(),
       changedStorage: new Set(),
       changedLabelings: new Set(),
+      repricedLabelings: new Set(), // the ones of changedLabelings whose prices change (see below)
       changedCategories: new Set(),
       changedDetails: new Set(),
       changedImages: new Set(),
@@ -534,6 +536,9 @@
             labelingsChanges.remove.push(...plan.remove);
             for (const { id, data } of plan.update) patch('products_labeling', id, data);
             updatedItemsIds.changedLabelings.add(dbItem.id);
+            // only a labeling added, removed or swapped changes its prices (the place and the field's size are in none)
+            if (plan.create.length || plan.remove.length || plan.update.some(({ data }) => 'labeling' in data))
+              updatedItemsIds.repricedLabelings.add(dbItem.id);
           }
         }
         if (syncCategories) {
@@ -708,8 +713,8 @@
     }
     // (a failed read only puts them off: unknown still, the next scan offers them again)
     if (newImages.length) newImages = await reviewGroups(newImages).catch((e) => (console.warn(e), []));
-    const { changedPrice, changedLabelings, all } = updatedItemsIds;
-    const recalculate = new Set([...changedPrice, ...changedLabelings, ...(await unpricedProducts())]);
+    const { changedPrice, repricedLabelings, all } = updatedItemsIds;
+    const recalculate = new Set([...changedPrice, ...repricedLabelings, ...(await unpricedProducts())]);
     await updatePricelists([...recalculate]);
 
     fetching = false; // this must be set before emitting heimdall events, or the product list won't reload
@@ -790,7 +795,9 @@
     if (fetching) return;
     fetching = true;
     fetchingPhase = 1;
-    heimdall.ask(selectedCompany);
+    // (no reply: not connected, too long, or heimdall gone meanwhile - see heimdall.js)
+    const data = await heimdall.ask(selectedCompany).catch((lost) => ({ lost }));
+    if (alive) await scanned(data); // leaving the page meanwhile calls it off
   }
 
   async function fetchDbItems() {
@@ -867,18 +874,19 @@
   globals.update(labelings);
   globals.update(categories);
 
-  // triggered by fetchApi (heimdall.ask)
-  heimdall.get(async (data) => {
-    if (!fetching || fetchingPhase !== 1) return; // not a scan this page asked for
+  // heimdall's reply to fetchApi: phase 1 ends here, written (updateDb) or not at all
+  async function scanned(data) {
     const failed = (why, title = 'Skanowanie nie powiodło się') => {
       fetching = false;
+      fetchingPhase = 0;
       tell(`${why}\nBaza danych nie została zmodyfikowana.`, { title, danger: true });
     };
+    const again = 'Spróbuj ponownie za chwilę. Jeśli to się powtarza, zgłoś to naszemu ogromnemu działowi IT.';
+    if (data?.lost) return failed(`${data.lost.message}\n${again}`);
     if (data?.notice) return failed(data.notice, 'Skanowanie niemożliwe');
     if (!data || data?.error) {
-      return failed(
-        `${data?.error ?? 'Brak odpowiedzi.'}\nSpróbuj ponownie za chwilę. Jeśli to się powtarza, zgłoś to naszemu ogromnemu działowi IT.`,
-      );
+      const why = data?.error ? `Błąd pobierania z API ${selectedCompany.name}: ${data.error}` : 'Brak odpowiedzi.';
+      return failed(`${why}\n${again}`);
     }
 
     // only apply to the company the scan was requested for
@@ -906,13 +914,24 @@
     // stopped halfway is then still compared with the one before it next time - and not at all when the admin doesn't
     // write the scan (see updatePricesAndStorages)
     const snapshotChanged = !dequal(items, apiItems);
+    // packed before anything is written: failing after the products, it would leave their pricelists unsaved, and the
+    // next scan, seeing the prices in place, would never reprice them
+    let packed = null;
+    if (snapshotChanged) {
+      try {
+        packed = await packSnapshot(items);
+      } catch (e) {
+        return failed(`Nie udało się przygotować skanu do zapisu: ${e.message}`);
+      }
+    }
     async function saveScan() {
       if (snapshotChanged) {
         const formData = new FormData();
-        const file = new Blob([JSON.stringify(items)], { type: 'application/json' });
-        const fileName = `api_snapshot_${selectedCompany.name.toLowerCase()}.json`;
+        const fileName = `api_snapshot_${selectedCompany.name.toLowerCase()}.json.gz`;
         formData.append('company', selectedCompany.id); // (Directus reads the fields before the file only)
-        formData.append('file', file, fileName);
+        // (a replaced file keeps its old name unless it's given: an old snapshot would stay ".json" with gzip inside)
+        formData.append('filename_download', fileName);
+        formData.append('file', packed, fileName);
         if (selectedCompany.api_snapshot) {
           await api.files.updateOne(selectedCompany.api_snapshot, formData);
         } else {
@@ -932,7 +951,7 @@
     const previousItems = apiItems; // the last scan, to tell names we set from ones renamed by hand
     apiItems = items;
     await updateDb(previousItems, saveScan).catch(writeFailed);
-  });
+  }
 
   // a change made elsewhere (or here: hiding a product, deleting one) reloads the list in the background,
   // the table stays where it is; kept only while its company is still picked, and done once more for a change that

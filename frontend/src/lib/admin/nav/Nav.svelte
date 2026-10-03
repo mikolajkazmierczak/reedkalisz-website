@@ -132,7 +132,7 @@
       {/each}
     </div>
     <div class="group bottom">
-      <NavButton label="Wyloguj" icon="logout" on:click={logout} />
+      <NavButton label="Wyloguj" icon="logout" center on:click={logout} />
       <div class="me">
         <img class="avatar" src="{baseUrl}/assets/{$me.avatar}" alt="" />
         <span class="name">
@@ -160,7 +160,8 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 0 0.75rem 0.75rem 0.5rem; /* a little more on the right: it looks centred */
+    --nav-skew: 0.25rem; /* a little more padding on the right: the icons on the left look centred */
+    padding: 0 calc(0.5rem + var(--nav-skew)) 0.75rem 0.5rem;
     background-color: var(--navy-700);
     --nav-button-pad: 0.7rem; /* see NavButton */
   }
@@ -186,28 +187,35 @@
     flex-direction: column;
     gap: 0.15rem;
   }
+  /* Wyloguj and the name under it on one grid, in the menu's middle (its padding evened out by the skew): the logout's
+     icon and the avatar on one axis, the word and the name starting on another (see NavButton's center) */
   .bottom {
     margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr auto auto 1fr;
+    column-gap: 0;
+    padding-left: var(--nav-skew);
+    --nav-name-gap: 0.55rem;
   }
-  /* in a band like the lit button's, flush with the menu's sides (over its padding), the version under it; the
-     avatar's middle under the buttons' icons' (1.6rem to their 1.3rem, see NavButton) */
+  /* in a band like the lit button's, flush with the menu's sides (over its padding), the version under it */
   .me {
-    display: flex;
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
     align-items: center;
-    gap: 0.5rem;
-    margin: 0.5rem -0.75rem 0 -0.5rem;
+    margin: 0.5rem -0.75rem 0;
     --pad: calc(0.5rem + var(--nav-button-pad) - (1.6rem - 1.3rem) / 2);
-    padding: var(--pad) 0.5rem var(--pad) var(--pad); /* as much above and below as on the left */
+    padding: var(--pad) 0;
     background-color: var(--navy-900);
   }
-  /* under the name, darker still, the faint version and its date: it opens the changelog */
+  /* under the name, darker still, the faint version and its date in the menu's middle: it opens the changelog */
   .version {
-    margin: -0.15rem -0.75rem -0.75rem -0.5rem; /* (right under it: over the group's gap) */
-    padding: 0.2rem 0.5rem 0.25rem var(--pad);
-    --pad: calc(0.5rem + var(--nav-button-pad) - (1.6rem - 1.3rem) / 2);
+    grid-column: 1 / -1;
+    margin: -0.15rem -0.75rem -0.75rem; /* (right under it: over the group's gap) */
+    padding: 0.2rem 0.5rem 0.25rem;
     border: none;
     cursor: pointer;
-    text-align: left;
+    text-align: center;
     font-size: 0.625rem;
     font-variant-numeric: tabular-nums;
     color: rgb(255 255 255 / 0.3);
@@ -220,7 +228,8 @@
   }
   /* beside the name's two lines, in their middle */
   .avatar {
-    flex: none;
+    grid-column: 2;
+    justify-self: center;
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 50%;
@@ -228,6 +237,8 @@
   }
   /* the name above the surname */
   .name {
+    grid-column: 3;
+    margin-left: var(--nav-name-gap);
     overflow: hidden;
     display: flex;
     flex-direction: column;

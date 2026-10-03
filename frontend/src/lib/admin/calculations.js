@@ -19,7 +19,8 @@ export async function* recalculateProductsGenerator(
   };
 
   for await (const results of recalculate(api, filter, stores, { newPriceView, swapLabelings })) {
-    if (emit) heimdall.emit('products', results.ids);
+    // (the ones whose prices came out the same weren't written: nothing to reload)
+    if (emit && results.changed.length) heimdall.emit('products', results.changed);
     yield results;
   }
 }

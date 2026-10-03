@@ -2,6 +2,7 @@ import { getISODate } from 'reedkalisz-shared/datetime.js';
 import { slugify } from 'reedkalisz-shared/utils.js';
 import { Api } from '../base.js';
 import { mergePositions, parseItems, printPosition } from '../common.js';
+import { TIMEOUT, timeout } from '../utils.js';
 import { parsePrice, parseSize } from './EasyGifts.js';
 
 function parseMaterials(materials) {
@@ -27,7 +28,8 @@ function parseMarking(markingData) {
 
 // A GET with the access token. It lasts 5 minutes: when it's refused, a new one comes from the refresh token.
 function authorized(api, tokens) {
-  const get = (url) => fetch(url, { headers: { Authorization: `Bearer ${tokens.access}` } });
+  const get = (url) =>
+    fetch(url, { headers: { Authorization: `Bearer ${tokens.access}` }, signal: timeout(TIMEOUT.page) });
   return async (url) => {
     let res = await get(url);
     if (res.status === 401 && tokens.refresh) {
@@ -35,6 +37,7 @@ function authorized(api, tokens) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: tokens.refresh }),
+        signal: timeout(TIMEOUT.call),
       });
       tokens.access = (await refreshed.json()).access;
       res = await get(url);
@@ -108,6 +111,7 @@ async function fetchTokens({ url, login, hash }) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username: login, password: hash }),
+    signal: timeout(TIMEOUT.call),
   });
   return await res.json();
 }

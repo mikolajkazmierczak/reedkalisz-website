@@ -32,8 +32,18 @@ export function moveImage(product, from, index, to) {
   return product;
 }
 
+// a variant with nothing in it: no code, colour, amount, availability or photo (its visibility alone says nothing)
+const blank = (s) =>
+  !s.img.length &&
+  !s.available &&
+  (s.amount == null || s.amount === '') &&
+  !s.api_color_code &&
+  !s.api_color_id &&
+  s.color_first == null &&
+  s.color_second == null;
+
 // Tiles left without a file (added and never picked) dropped on saving: the gallery's, the variants', the attachments';
-// the rest renumbered, the gallery's first the main one again. -> the product
+// the rest renumbered, the gallery's first the main one again. Then the variants left blank. -> the product
 export function dropEmpty(product) {
   const keep = (rows, key) => reindex(rows.filter((row) => row[key] != null));
   product.gallery = keep(product.gallery, 'img');
@@ -43,5 +53,6 @@ export function dropEmpty(product) {
   });
   product.attachments = keep(product.attachments, 'file');
   product.storage.forEach((s) => (s.img = keep(s.img, 'img')));
+  product.storage = product.storage.filter((s) => !blank(s));
   return product;
 }

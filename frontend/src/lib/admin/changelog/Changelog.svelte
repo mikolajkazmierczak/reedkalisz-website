@@ -57,7 +57,7 @@
           {#each changes as change}
             <li>
               {#if typeof change === 'string'}{change}{:else}{#if change.big}<b>{change.label}</b
-                  >{:else}{change.label}{/if}: {change.text}{/if}
+                  >{:else}{change.label}{/if}{change.label.endsWith('.') ? ' ' : ': '}{change.text}{/if}
             </li>
           {/each}
         </ul>

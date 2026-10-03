@@ -34,14 +34,25 @@ class Socket {
     this.socket.emit('changes', data);
   }
 
-  onFetch(listener) {
-    this.socket.on('fetch', listener);
-  }
-  offFetch(listener) {
-    this.socket.off('fetch', listener);
-  }
-  emitFetch(company) {
-    this.socket.emit('fetch', { company });
+  // a scan of the company's api: heimdall's reply (the scan, { error } or { notice }), or an Error when none can come -
+  // not connected, nothing within `timeout`, or the connection lost meanwhile (a reconnected one never hears of it)
+  fetch(company, timeout) {
+    return new Promise((resolve, reject) => {
+      // (an emit while disconnected is held until it reconnects, maybe never: heimdall down)
+      if (!this.socket.connected) return reject(new Error('Brak połączenia z heimdallem.'));
+      const end = () => {
+        clearTimeout(timer);
+        this.socket.off('fetch', reply);
+        this.socket.off('disconnect', lost);
+      };
+      const reply = (data) => (end(), resolve(data));
+      const fail = (message) => (end(), reject(new Error(message)));
+      const lost = () => fail('Połączenie z heimdallem zostało przerwane (mógł się zrestartować).');
+      const timer = setTimeout(() => fail(`Heimdall nie odpowiedział w ciągu ${timeout / 60000} minut.`), timeout);
+      this.socket.on('fetch', reply);
+      this.socket.on('disconnect', lost);
+      this.socket.emit('fetch', { company });
+    });
   }
 }
 
@@ -68,12 +79,10 @@ class Heimdall {
     });
   }
 
-  ask(company) {
-    this.socket.emitFetch(company);
-  }
-  get(func) {
-    this.socket.onFetch(func);
-    onDestroy(() => this.socket.offFetch(func));
+  // see Socket.fetch; the time limit is for a heimdall that's up but silent: past what heimdall gives a supplier (see
+  // its FETCH_LIMIT), so its { error } naming the supplier comes first
+  ask(company, { timeout = 10 * 60 * 1000 } = {}) {
+    return this.socket.fetch(company, timeout);
   }
 
   filter(data, ids = null) {

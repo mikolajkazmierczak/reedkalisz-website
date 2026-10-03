@@ -1,10 +1,9 @@
 <script>
   import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
   import { baseUrl } from '$/api';
   import { portal } from '@/portal';
   import Icon from '$c/Icon.svelte';
-  import Loader from '$c/Loader.svelte';
+  import Lightbox from '@c/Lightbox.svelte';
 
   // A product's picture, small and squircled (the "mini" preset: 64 x 64, cut to a square); without one, the
   // products' icon on grey. As big as `size`.
@@ -29,11 +28,10 @@
   const EDGE = 8; // px from the window's edges
   let thumb;
   let preview = null;
-  // the window listened to only while it's enlarged or open (a list has a hundred of them): a scroll moves the
-  // thumbnail away from its preview; Escape closes the lightbox only, not a modal it's in
+  // the window listened to only while it's enlarged (a list has a hundred of them): a scroll moves the thumbnail away
+  // from its preview
   const onScroll = () => leave();
-  const onKey = (e) => e.key === 'Escape' && (e.preventDefault(), close());
-  onMount(() => () => (removeEventListener('scroll', onScroll, true), removeEventListener('keydown', onKey)));
+  onMount(() => () => removeEventListener('scroll', onScroll, true));
 
   function enter() {
     if (!zoomable || !matchMedia('(hover: hover)').matches) return;
@@ -52,17 +50,10 @@
   }
 
   let open = false;
-  let loaded = false;
   function show(e) {
     e.stopPropagation();
     leave();
-    loaded = false;
     open = true;
-    addEventListener('keydown', onKey);
-  }
-  function close() {
-    open = false;
-    removeEventListener('keydown', onKey);
   }
 </script>
 
@@ -94,14 +85,7 @@
 {/if}
 
 {#if open}
-  <!-- the original, as big as it is (the window at most); a click anywhere or Escape closes it -->
-  <div class="lightbox" role="presentation" use:portal on:click={close} transition:fade={{ duration: 150 }}>
-    {#if !loaded}<span class="loader"><Loader /></span>{/if}
-    <img class:loaded src={url(null)} alt="" on:load={() => (loaded = true)} />
-    <button type="button" class="close" aria-label="Zamknij" on:click={close}>
-      <Icon fill name="close" color="var(--light)" />
-    </button>
-  </div>
+  <Lightbox src={url(null)} on:close={() => (open = false)} />
 {/if}
 
 <style>
@@ -176,53 +160,5 @@
     height: 100%;
     padding: 25%;
     background-color: var(--grey-100);
-  }
-
-  /* over everything (the editor 100, the popups 1000, the dialogs 1500), under tooltips */
-  .lightbox {
-    z-index: 1800;
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 2rem;
-    cursor: zoom-out;
-    background-color: rgb(0 0 0 / 0.75);
-  }
-  .lightbox img {
-    grid-area: 1 / 1;
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: calc(100dvh - 4rem);
-    object-fit: contain;
-    border-radius: var(--border-radius);
-    corner-shape: squircle;
-    background-color: var(--light); /* a see-through png on white, as on the website */
-    opacity: 0;
-  }
-  .lightbox img.loaded {
-    opacity: 1;
-  }
-  .loader {
-    grid-area: 1 / 1;
-    width: 2rem;
-  }
-  .close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    display: grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0.6rem;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    background-color: rgb(255 255 255 / 0.15);
-  }
-  .close:hover {
-    background-color: rgb(255 255 255 / 0.3);
   }
 </style>

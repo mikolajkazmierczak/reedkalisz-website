@@ -2,8 +2,34 @@
 // changelog opens by itself after a new one). X.Y.Z: Y - something new or noticeably different, Z - a fix, a tweak,
 // or work nobody sees. `date`: YYYY-MM-DD.
 //   { version, date, title, synopsis, changes }
-// a change is its text, or { label, text, big }: a short name before it ("Historia zmian: ..."), bold when `big`
+// a change is its text, or { label, text, big }: a short name before it ("Historia zmian: ...", no colon after a dot:
+// "P.S. ..."), bold when `big`
 export const changelog = [
+  {
+    version: '1.26.0',
+    date: '2026-10-03',
+    title: 'Szybsze skanowanie i lupa',
+    synopsis: 'krótsze skany i przeliczanie cen, podgląd zdjęć w pełnym rozmiarze, trzy kolumny w edytorze.',
+    changes: [
+      { label: 'Skanowanie', text: 'skany są kilka razy szybsze, najbardziej te duże, jak AXPOL.', big: true },
+      'Przeliczanie cen zostało usprawnione i trwa krócej.',
+      'Skan dostawcy, który przestał odpowiadać, nie wisi już bez końca: kończy się komunikatem z jego nazwą.',
+      'Drugiego skanu tej samej firmy nie da się zacząć, dopóki trwa pierwszy.',
+      { label: 'Poprawka', text: 'duże skany nie przerywają się już z braku pamięci na serwerze.' },
+      {
+        label: 'Lupa',
+        text: 'każde zdjęcie w panelu ma w rogu lupę, która otwiera je w pełnym rozmiarze; to samo robi prawy przycisk myszy.',
+        big: true,
+      },
+      'Przegląd zdjęć z API oznacza NOWE tylko przy produktach, które mają też wcześniejsze zdjęcia, a w tytule ma nazwę i kod.',
+      { label: 'Edytor', text: 'ma najwyżej trzy kolumny, a lewa kolumna cennika jest szeroka jak karta wariantu.' },
+      {
+        label: 'Drobne zmiany',
+        text: 'puste warianty znikają przy zapisie, pole Widok pokazuje obok nazwy ilości widoku, wartości marż odgórnych widać obok nich, na niebiesko, gdy są w użyciu, Wyloguj, imię i wersja są na środku menu, kafelki galerii i załączników wypełniają cały wiersz, „Dodaj” w wariantach i kalkulacjach jest wąski jak w galerii (obok karty: bokiem), uchwyt i strzałka na zdjęciach w przeglądzie pojawiają się jak lupa, linia między grupami zdjęć jest wyraźniejsza, a zdjęcie używane też w innym produkcie zachowuje swoją nazwę.',
+      },
+      { label: 'P.S.', text: 'Dziękuję za prezent!!! ❤️ Superancki jest :))', big: true },
+    ],
+  },
   {
     version: '1.25.0',
     date: '2026-10-03',

@@ -79,27 +79,10 @@
 </section>
 
 <style>
-  /* three tiles to each variant's box (the variants' grid below: its columns, its gap), lined up with them: each
-     column split in three tracks a column gap apart, a tile reaching over its neighbour's side of that gap by
-     negative margins (the first on its right, the last on its left, the one between half on each side) - all as
-     wide, `--gap` apart */
+  /* as many tiles as fit the row, filling it (three at least, on a phone); 7.5rem: also "+ Dodaj"'s (see ui-admin.css) */
   .files {
-    --col: 21.875rem; /* (as .ui-section__row's) */
-    --gap: 0.5625rem;
-    --over: calc((1.5rem - var(--gap)) * 2 / 3); /* how much wider than its track a tile is */
-    --track: minmax(calc((min(var(--col), 100%) - 3rem) / 3), 1fr);
-    display: grid;
-    grid-template-columns: repeat(auto-fill, var(--track) var(--track) var(--track));
-    gap: var(--gap) 1.5rem;
-  }
-  .files > :nth-child(3n + 1) {
-    margin-right: calc(-1 * var(--over));
-  }
-  .files > :nth-child(3n + 2) {
-    margin-inline: calc(-0.5 * var(--over));
-  }
-  .files > :nth-child(3n + 3) {
-    margin-left: calc(-1 * var(--over));
+    grid-template-columns: repeat(auto-fill, minmax(min(7.5rem, (100% - 2 * 0.5625rem) / 3), 1fr));
+    gap: 0.5625rem;
   }
   .files > .ui-box {
     gap: 0.25rem;

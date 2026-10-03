@@ -27,7 +27,11 @@ module.exports = {
       name: 'heimdall',
       cwd: at('backend/heimdall'),
       script: at('backend/heimdall/index.js'),
-      max_memory_restart: '300M',
+      // V8 sizes its young generation by the machine (128 MB on a big one): a big scan's parsing went past 400 MB.
+      // Capped, AXPOL and MidOcean scans peak ~100 MB lower, as fast.
+      node_args: '--max-semi-space-size=16',
+      // a restart mid-scan loses the scan: well above a scan's peak, with room for two at once (only for a runaway)
+      max_memory_restart: '768M',
     },
     {
       name: 'sveltekit',
