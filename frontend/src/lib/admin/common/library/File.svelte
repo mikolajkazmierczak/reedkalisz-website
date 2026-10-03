@@ -112,10 +112,10 @@
     class="wrapper"
     class:marked
     class:remove={marked && remove}
-    class:flagged={flag && !(marked && remove)}
     class:backed={backing}
     class:tagged={$$slots.tag}
     style:--backing={backing}
+    class:flagged={flag && !(marked && remove)}
     class:still={!clickable}
     role="button"
     tabindex={clickable ? 0 : -1}
@@ -224,7 +224,8 @@
     cursor: default;
   }
   .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still),
-  .wrapper.marked {
+  .wrapper.marked,
+  .wrapper.flagged {
     --inset: 0.4rem; /* as far in as the text (see .text) */
     --shrink: 0.92; /* the face that much in (on a ~8.5rem tile: the inset) */
   }
@@ -243,6 +244,7 @@
     z-index: 1;
     position: absolute;
     display: flex;
+    gap: 0.3rem;
     opacity: 0;
     transform: translate(calc(var(--x) * 4cqw), calc(var(--y) * 4cqw));
     transition:
@@ -272,7 +274,8 @@
     opacity: 1;
   }
   .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still) ~ .corner,
-  .wrapper.marked ~ .corner {
+  .wrapper.marked ~ .corner,
+  .wrapper.flagged ~ .corner {
     transform: none;
   }
   @media (hover: none) {
@@ -293,10 +296,9 @@
   .wrapper:focus {
     outline: none;
   }
-  /* flagged: round it, outside (inside, the picture would cover it) */
+  /* flagged: as a removed one (its face drawn in, see above), purple */
   .wrapper.flagged {
-    outline: solid 2px var(--purple-300);
-    outline-offset: 1px;
+    box-shadow: inset 0 0 0 2px var(--purple-300);
   }
   .wrapper:focus-visible:not(.marked) {
     box-shadow: inset 0 0 0 2px var(--navy-500);
@@ -304,8 +306,9 @@
   .wrapper.remove {
     box-shadow: inset 0 0 0 2px var(--red-500);
   }
-  /* on the middle of the top edge, together */
+  /* on the middle of the top edge, together - over the corners' buttons */
   .pills {
+    z-index: 2;
     position: absolute;
     top: 0;
     left: 50%;

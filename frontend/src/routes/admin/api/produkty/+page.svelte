@@ -24,7 +24,9 @@
     arrangeGallery,
     basename,
     changedMeanwhile,
+    deleteRows,
     downloadImages,
+    droppedOf,
     inPlace,
     keptRows,
     numberGallery,
@@ -251,6 +253,7 @@
         .map(([item, plan]) => ({
           product: plan.inDb,
           href: item._db ? `/admin/produkty/${item.slug}` : null,
+          flagNew: !!item._db, // (a new product's images are all new: no "NOWE")
           known: plan.known,
           review: plan.review,
           elsewhere: plan.elsewhere,
@@ -358,6 +361,8 @@
         api_images: known,
         images_history: history,
       });
+      // the ones removed or moved elsewhere last (see deleteRows)
+      await deleteRows(droppedOf(places, files));
       newIds.products.push(item.id);
     } else {
       const priceView = $priceViews.find((p) => p.default);
@@ -746,6 +751,7 @@
         else await writeGallery(product.id, numberGallery(rows));
       }
       await api.items('products').updateOne(product.id, { api_images: known, images_history: [...history] });
+      await deleteRows(droppedOf(places, files)); // (last, see deleteRows)
       ids.push(product.id);
     }
     newImages = [];
@@ -981,71 +987,56 @@
 
 <!-- the page doesn't scroll, the list does (see .ui-fill) -->
 <div class="ui-fill">
-  {#if supportedCompanies && selectedCompany}
-    <CompanyBar
-      companies={supportedCompanies}
-      selected={selectedCompany}
-      disabled={fetching}
-      busy={scanning}
-      on:change={handleCompanyChange}>
-      <!-- only what's always there, so the companies next to it never move -->
-      <Button slot="before" disabled={fetching || !dbItems} icon="cloud" on:click={fetchApi}>Skanuj</Button>
+  <!-- one bar, two rows: the companies and the scan, then the list's sorting -->
+  <div class="bars">
+    {#if supportedCompanies && selectedCompany}
+      <CompanyBar
+        companies={supportedCompanies}
+        selected={selectedCompany}
+        disabled={fetching}
+        busy={scanning}
+        on:change={handleCompanyChange}>
+        <!-- only what's always there, so the companies next to it never move -->
+        <span slot="before" class="lead"
+          ><Button disabled={fetching || !dbItems} icon="cloud" on:click={fetchApi}>Skanuj</Button></span>
 
-      <!-- labels on one line, values on the next, each on a shared baseline -->
-      <div class="stats">
-        {#if selectedCompany.api_discount !== null}
-          <label class="ui-stat-label" for="discount">Rabat</label>
-          <span class="ui-stat-value discount">
-            <Input
-              id="discount"
-              size="compact"
-              type="number"
-              min={0}
-              max={100}
-              value={discount}
-              invalid={discountInvalid}
-              disabled={fetching}
-              on:input={(e) => discountTyped(e.detail.e)}
-              on:blur={discountLeft} />&nbsp;%
-          </span>
-        {/if}
-        <span class="ui-stat-label">Ostatni skan</span>
-        <span class="ui-stat-value">{lastScan}</span>
-      </div>
+        <!-- labels on one line, values on the next, each on a shared baseline -->
+        <div class="stats">
+          {#if selectedCompany.api_discount !== null}
+            <label class="ui-stat-label" for="discount">Rabat</label>
+            <span class="ui-stat-value discount">
+              <Input
+                id="discount"
+                size="compact"
+                type="number"
+                min={0}
+                max={100}
+                value={discount}
+                invalid={discountInvalid}
+                disabled={fetching}
+                on:input={(e) => discountTyped(e.detail.e)}
+                on:blur={discountLeft} />&nbsp;%
+            </span>
+          {/if}
+          <span class="ui-stat-label">Ostatni skan</span>
+          <span class="ui-stat-value">{lastScan}</span>
+        </div>
 
-      <small slot="busy">
-        <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
-      </small>
-    </CompanyBar>
-  {/if}
-
-  <div class="content ui-fill-col">
-    {#if fetching}
-      {#if fetchingPhase === 0}
-        <p class="aligned"><Loader dark /> Pobieranie danych</p>
-      {:else if fetchingPhase === 1}
-        <p class="aligned"><Loader dark /> Pobieranie zewnętrznych danych (1/3)</p>
-        <small class="indent">Pobierana jest duża ilość danych, może to zająć kilka minut.</small>
-      {:else if fetchingPhase === 2}
-        <p class="aligned"><Loader dark /> Aktualizacja cen, stanów magazynowych, znakowań i kategorii (2/3)</p>
-      {:else if fetchingPhase === 3}
-        <p class="aligned"><Loader dark /> Aktualizacja cenników (3/3)</p>
-      {/if}
-
-      {#if statusLog}
-        <small class="indent">{statusLog}</small>
-      {/if}
+        <small slot="busy">
+          <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
+        </small>
+      </CompanyBar>
     {/if}
-
     {#if !fetching && mergedItems && selectedCompany && $colors}
-      {@const pagedItems = mergedItems.slice((page - 1) * limit, page * limit)}
-
-      <!-- the sorting (and adding what's picked) in a bar of its own, like the companies above -->
+      <hr class="bars-divider" />
+      <!-- the sorting (and adding what's picked) under the companies, the line between them -->
       <Bar>
         {#if selectedCount.all}
-          <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
-            {uploading ? 'Importowanie...' : 'Importuj'}
-          </Button>
+          <span class="lead">
+            <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
+              {uploading ? 'Importowanie...' : 'Importuj'}
+            </Button>
+          </span>
           <!-- what's picked, a number and its label on each line (the labels like the last scan's in the bar above) -->
           <div class="ui-counts">
             <span class="ui-stat-value">{selectedCount.items}</span>
@@ -1085,6 +1076,29 @@
           <Search {searchParams} {query} />
         </div>
       </Bar>
+    {/if}
+  </div>
+
+  <div class="content ui-fill-col">
+    {#if fetching}
+      {#if fetchingPhase === 0}
+        <p class="aligned"><Loader dark /> Pobieranie danych</p>
+      {:else if fetchingPhase === 1}
+        <p class="aligned"><Loader dark /> Pobieranie zewnętrznych danych (1/3)</p>
+        <small class="indent">Pobierana jest duża ilość danych, może to zająć kilka minut.</small>
+      {:else if fetchingPhase === 2}
+        <p class="aligned"><Loader dark /> Aktualizacja cen, stanów magazynowych, znakowań i kategorii (2/3)</p>
+      {:else if fetchingPhase === 3}
+        <p class="aligned"><Loader dark /> Aktualizacja cenników (3/3)</p>
+      {/if}
+
+      {#if statusLog}
+        <small class="indent">{statusLog}</small>
+      {/if}
+    {/if}
+
+    {#if !fetching && mergedItems && selectedCompany && $colors}
+      {@const pagedItems = mergedItems.slice((page - 1) * limit, page * limit)}
 
       <div class="products ui-fill-col">
         {#if pagedItems.length === 0}
@@ -1123,6 +1137,31 @@
 {/if}
 
 <style>
+  /* the first button of each row (Skanuj, Importuj) as wide as the other, a longer label ("Importowanie...") wider */
+  .lead {
+    display: flex;
+  }
+  .lead :global(button) {
+    min-width: 7.5rem;
+  }
+  /* the two bars as one: its frame theirs, a line between them */
+  .bars {
+    margin-bottom: 1rem;
+    border-radius: var(--box-radius);
+    corner-shape: squircle;
+    border: var(--border-light);
+    background-color: var(--light);
+  }
+  .bars > :global(.ui-bar) {
+    margin: 0;
+    border: none;
+    background: none;
+  }
+  .bars-divider {
+    margin: 0 0.5rem;
+    border: none;
+    border-top: var(--border-light);
+  }
   /* no taller than the buttons (2rem), so the bar keeps its height */
   .stats {
     display: grid;

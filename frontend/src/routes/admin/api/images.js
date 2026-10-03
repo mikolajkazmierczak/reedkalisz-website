@@ -137,8 +137,6 @@ export function placeFor(tiles, api, source) {
   return tiles.length;
 }
 
-export const hasNew = (place) => place.tiles.some((t) => t.fresh);
-
 // What the api's images of looked-through places are called (see imageTitle): the n-th of the api's in their place (an
 // admin's own not counted, nor the ones `skip(tile)` leaves out), after the first place they're in that's `shown`
 // (else their first); one the product shows elsewhere too (`elsewhere`) keeps its name
@@ -160,9 +158,10 @@ export function namesOf({ product, places, elsewhere }, skip) {
 }
 
 // the files of a looked-through product to rename, in the places shown: the ones there already, and the new ones
-// downloaded (`files`: source -> file) under another name than they now take (one before them failed)
+// downloaded (`files`: source -> file) under another name than they now take (one before them failed); the ones taken
+// off (refused, removed) not counted
 export function renamesOf(group, files) {
-  const names = namesOf(group, (t) => t.fresh && (t.rejected || !files.has(t.source)));
+  const names = namesOf(group, (t) => t.rejected || (t.fresh && !files.has(t.source)));
   const downloadedAs = new Map(
     group.places.flatMap((p) => p.tiles.filter((t) => t.fresh).map((t) => [t.source, t.title])),
   );
@@ -177,8 +176,8 @@ export function renamesOf(group, files) {
   return renames;
 }
 
-// whether the rows of the places shown changed since they were read (an admin saved the product meanwhile): they're
-// written as looked through, which would undo that
+// whether the rows of the places shown changed since they were read (`before`, see NewImages; an admin saved the
+// product meanwhile): they're written as looked through, which would undo that
 export async function changedMeanwhile(product, places) {
   const fields = ['gallery.id', 'gallery.index', 'storage.id', 'storage.img.id', 'storage.img.index'];
   const now = await api.items('products').readOne(product.id, { fields });
@@ -190,7 +189,7 @@ export async function changedMeanwhile(product, places) {
       .join();
   return places
     .filter((p) => p.shown)
-    .some((p) => key(rows(p.storage)) !== key(p.tiles.filter((t) => !t.fresh).map((t) => t.row)));
+    .some((p) => key(rows(p.storage)) !== key(p.before ?? p.tiles.filter((t) => !t.fresh).map((t) => t.row)));
 }
 
 // The new images of looked-through places downloaded, each once and as the review named it (`title`), and remembered
@@ -218,11 +217,22 @@ export async function downloadImages(places, known, company, failed) {
 }
 
 // a looked-through place's rows as they're saved: the ones kept, in their order (a new one as its file; without one -
-// refused, or not downloaded - left out)
+// refused, or not downloaded - left out; one there already removed, left out too)
 export const keptRows = (place, files) =>
   place.tiles
-    .filter((t) => !t.fresh || (!t.rejected && files.has(t.source)))
+    .filter((t) => !t.rejected && (!t.fresh || files.has(t.source)))
     .map((t) => (t.fresh ? { img: files.get(t.source) } : t.row));
+// the rows of the places shown that were there before (`before`, see NewImages) and aren't kept - removed, or moved to
+// another place -> { gallery, variants: [row id] }
+export function droppedOf(places, files) {
+  const dropped = { gallery: [], variants: [] };
+  for (const place of places.filter((p) => p.shown)) {
+    const kept = new Set(keptRows(place, files).map((r) => r.id));
+    const ids = (place.before ?? []).filter((r) => r.id != null && !kept.has(r.id)).map((r) => r.id);
+    dropped[place.storage ? 'variants' : 'gallery'].push(...ids);
+  }
+  return dropped;
+}
 
 // Rows numbered in their order (a gallery's first one its main) -> `changed` on those of the db to update
 export const numberRows = (rows) =>
@@ -256,6 +266,13 @@ export async function writeVariantImages(storage, rows) {
   if (created.length) await api.items('products_storage_image').createMany(created);
   const changed = rows.filter((r) => r.changed).map(({ id, index }) => ({ id, index }));
   if (changed.length) await api.items('products_storage_image').updateBatch(changed);
+}
+
+// the rows taken out of looked-through places (see droppedOf) deleted: last, once every place's rows are written, so
+// one failing halfway can't lose an image moved from one place to another (the files stay in the library either way)
+export async function deleteRows({ gallery = [], variants = [] }) {
+  if (gallery.length) await api.items('products_image').deleteMany(gallery);
+  if (variants.length) await api.items('products_storage_image').deleteMany(variants);
 }
 
 // files renamed (see renamesOf)

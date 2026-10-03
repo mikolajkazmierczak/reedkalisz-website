@@ -6,6 +6,26 @@
 // "P.S. ..."), bold when `big`
 export const changelog = [
   {
+    version: '1.27.0',
+    date: '2026-10-03',
+    title: 'Przegląd zdjęć jako edytor',
+    synopsis: 'w przeglądzie zdjęć z API można zarządzać wszystkimi zdjęciami produktu.',
+    changes: [
+      {
+        label: 'Przegląd zdjęć z API',
+        text: 'pokazuje wszystkie zdjęcia produktu, a nie tylko warianty z nowymi.',
+        big: true,
+      },
+      'Zdjęcia, które już były, można usuwać i przenosić między galerią a wariantami, tak jak nowe.',
+      'Obok strzałki w rogu zdjęcia jest kosz, a po kliknięciu przycisk cofnięcia; kliknięcie samego zdjęcia działa tak samo.',
+      'Po skanie każde nowe zdjęcie ma znak NOWE i fioletową ramkę; przy imporcie tylko u produktów, które już są w bazie.',
+      {
+        label: 'Drobne zmiany',
+        text: 'licznik zdjęć do usunięcia na pasku przeglądu, nazwa i kod produktu na szarym tle, dwa paski w API › Produkty połączone w jeden, a Skanuj i Importuj są równej szerokości.',
+      },
+    ],
+  },
+  {
     version: '1.26.0',
     date: '2026-10-03',
     title: 'Szybsze skanowanie i lupa',
