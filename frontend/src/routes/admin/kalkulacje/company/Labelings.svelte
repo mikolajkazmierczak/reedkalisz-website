@@ -160,82 +160,84 @@
 </script>
 
 {#if items.length}
-  <div class="wrapper ui-fill-scroll ui-snap">
-    <table class="ui-table" use:gridKeys>
-      <thead>
-        <tr>
-          <th style:width="2.25rem" class="col-sticky col-remove">
-            <span class="head-icon"><Tooltip>Usuwanie</Tooltip><Icon width={15} name="delete" /></span>
-          </th>
-          <th style:width="3.75rem" class="col-sticky col-index heavy-border">
-            <span class="head-icon">
-              <Tooltip>Kolejność (pierwsze jest domyślne dla producenta)</Tooltip>
-              <Icon width={15} name="arrow_down" />
-            </span>
-          </th>
-
-          <th style:width="8.75rem">Nazwa</th>
-          <th style:width="6.25rem" class="col-sticky col-code">Kod</th>
-          <th style:width="6.25rem" class="heavy-border">Typ</th>
-
-          <th style:width="3.75rem">
-            <span class="head-icon"><Tooltip>Marża</Tooltip><b style:color="var(--green-700)">M</b></span>
-          </th>
-          <th style:width="3.75rem">
-            <span class="head-icon"><Tooltip>Minimum</Tooltip><b style:color="var(--green-700)">MIN</b></span>
-          </th>
-          <th style:width="3.75rem">
-            <span class="head-icon"><Tooltip>Przygotowalnia</Tooltip><b style:color="var(--blue-700)">P</b></span>
-          </th>
-          <th style:width="3.75rem">
-            <span class="head-icon"><Tooltip>Cena transportu</Tooltip><b style:color="var(--purple-700)">T</b></span>
-          </th>
-          <th style:width="4.375rem" class="heavy-border">
-            <span class="head-icon"
-              ><Tooltip>Próg dla uwzględnienia transportu</Tooltip><b style:color="var(--purple-700)">TP</b></span>
-          </th>
-
-          {#each items[0].prices as p, i (p._uid)}
-            {@const isLumpsum = p.amount == 1}
-
-            <th style:width="5rem" class="amount" class:amount--lumpsum={isLumpsum} class:changed={amountChanged(i)}>
-              <div class="amount-actions">
-                <Button icon="delete" on:click={() => removeAmount(i)} square dangerous />
-              </div>
-
-              {#if isLumpsum}
-                <div class="lumpsum">
-                  <small>Ryczałt</small>
-                </div>
-              {/if}
-
-              <Input
-                type="number"
-                borderless
-                min={0}
-                step={1}
-                value={p.amount}
-                on:input={(e) => handleAmountInput(e, i)} />
+  <div class="slot ui-fill-scroll ui-snap">
+    <div class="wrapper">
+      <table class="ui-table" use:gridKeys>
+        <thead>
+          <tr>
+            <th style:width="2.25rem" class="col-sticky col-remove">
+              <span class="head-icon"><Tooltip>Usuwanie</Tooltip><Icon width={15} name="delete" /></span>
             </th>
+            <th style:width="3.75rem" class="col-sticky col-index heavy-border">
+              <span class="head-icon">
+                <Tooltip>Kolejność (pierwsze jest domyślne dla producenta)</Tooltip>
+                <Icon width={15} name="arrow_down" />
+              </span>
+            </th>
+
+            <th style:width="8.75rem">Nazwa</th>
+            <th style:width="6.25rem" class="col-sticky col-code">Kod</th>
+            <th style:width="6.25rem" class="heavy-border">Typ</th>
+
+            <th style:width="3.75rem">
+              <span class="head-icon"><Tooltip>Marża</Tooltip><b style:color="var(--green-700)">M</b></span>
+            </th>
+            <th style:width="3.75rem">
+              <span class="head-icon"><Tooltip>Minimum</Tooltip><b style:color="var(--green-700)">MIN</b></span>
+            </th>
+            <th style:width="3.75rem">
+              <span class="head-icon"><Tooltip>Przygotowalnia</Tooltip><b style:color="var(--blue-700)">P</b></span>
+            </th>
+            <th style:width="3.75rem">
+              <span class="head-icon"><Tooltip>Cena transportu</Tooltip><b style:color="var(--purple-700)">T</b></span>
+            </th>
+            <th style:width="4.375rem" class="heavy-border">
+              <span class="head-icon"
+                ><Tooltip>Próg dla uwzględnienia transportu</Tooltip><b style:color="var(--purple-700)">TP</b></span>
+            </th>
+
+            {#each items[0].prices as p, i (p._uid)}
+              {@const isLumpsum = p.amount == 1}
+
+              <th style:width="5rem" class="amount" class:amount--lumpsum={isLumpsum} class:changed={amountChanged(i)}>
+                <div class="amount-actions">
+                  <Button icon="delete" on:click={() => removeAmount(i)} square dangerous />
+                </div>
+
+                {#if isLumpsum}
+                  <div class="lumpsum">
+                    <small>Ryczałt</small>
+                  </div>
+                {/if}
+
+                <Input
+                  type="number"
+                  borderless
+                  min={0}
+                  step={1}
+                  value={p.amount}
+                  on:input={(e) => handleAmountInput(e, i)} />
+              </th>
+            {/each}
+
+            <!-- as wide as the deleting column -->
+            <!-- (the right arrow past a row's last field lands on its button, see gridKeys) -->
+            <th style:width="2.25rem" class="add-amount" data-grid-end>
+              <span class="head-icon"
+                ><Button size="sm" dashed icon="add" title="Dodaj nakład" on:click={addAmount} /></span>
+            </th>
+            <!-- no width: the rest of the box, so the lines of the rows go all the way (nothing when it scrolls) -->
+            <th class="filler" />
+          </tr>
+        </thead>
+
+        <tbody>
+          {#each items as item, i (item._uid)}
+            <Labeling bind:items bind:item original={itemsOriginal.find((o) => o._uid === item._uid)} index={i} />
           {/each}
-
-          <!-- as wide as the deleting column -->
-          <!-- (the right arrow past a row's last field lands on its button, see gridKeys) -->
-          <th style:width="2.25rem" class="add-amount" data-grid-end>
-            <span class="head-icon"
-              ><Button size="sm" dashed icon="add" title="Dodaj nakład" on:click={addAmount} /></span>
-          </th>
-          <!-- no width: the rest of the box, so the lines of the rows go all the way (nothing when it scrolls) -->
-          <th class="filler" />
-        </tr>
-      </thead>
-
-      <tbody>
-        {#each items as item, i (item._uid)}
-          <Labeling bind:items bind:item original={itemsOriginal.find((o) => o._uid === item._uid)} index={i} />
-        {/each}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
   </div>
 {/if}
 
@@ -283,12 +285,20 @@
 </div>
 
 <style>
-  /* scrolls both ways: the page gives it what's left (see .ui-fill), its head and first columns stay (a field reached
-     by the keys not under them: scroll-padding) - on the mat as a box is (.ui-snap) */
-  .wrapper {
-    overflow: auto;
+  /* the table's place on the mat: what the page gives it (see .ui-fill), whole half cells (.ui-snap) - a short table
+     ends at its last row, the rest of its place left bare under it */
+  .slot {
+    display: flex;
+    flex-direction: column;
     max-width: 100%;
     margin-bottom: var(--page-pad);
+  }
+  /* scrolls both ways once the table outgrows its place; its head and first columns stay (a field reached by the keys
+     not under them: scroll-padding) */
+  .wrapper {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: auto;
     scroll-padding: 2.5rem 0 0 12.25rem;
     border-radius: var(--box-radius);
     corner-shape: squircle;

@@ -462,11 +462,16 @@
     font-size: 0.85rem;
   }
 
-  /* in a table's cell (the calculations): square, the cell draws the lines - whatever its size */
+  /* in a table's cell (the calculations, a price table): square, the cell draws the lines - whatever its size; its halo
+     in focus inside it, thinner and faintly blue, where the cells around don't cover it */
   .wrapper input.borderless,
   .wrapper textarea.borderless {
     border: none;
     border-radius: 0;
+  }
+  .wrapper input.borderless:focus,
+  .wrapper textarea.borderless:focus {
+    box-shadow: inset 0 0 0 2px var(--blue-300);
   }
 
   /* the field's last line (a label may be above it), the badge at its right end, before a select's arrow */

@@ -6,6 +6,19 @@
 // "P.S. ..."), bold when `big`
 export const changelog = [
   {
+    version: '1.28.1',
+    date: '2026-10-04',
+    title: 'Poprawki w kalkulacjach',
+    synopsis: 'dół tabeli znakowań i ramka zaznaczonej komórki.',
+    changes: [
+      {
+        label: 'Poprawka',
+        text: 'krótka tabela znakowań kończy się na ostatnim wierszu, bez szarego paska pod spodem.',
+      },
+      'Zaznaczona komórka w tabelach ma cienką, jasnoniebieską ramkę widoczną ze wszystkich stron.',
+    ],
+  },
+  {
     version: '1.28.0',
     date: '2026-10-04',
     title: 'Nowy wygląd panelu',
