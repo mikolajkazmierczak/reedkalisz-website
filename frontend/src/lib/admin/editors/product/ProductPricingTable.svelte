@@ -108,13 +108,14 @@
 {/if}
 
 <style>
-  /* typed by hand: half into the box's padding, as ui-box--optional (a labeling's calculated ones stay in line) */
+  /* typed by hand: a quarter cell into the box's padding, as ui-box--optional (a labeling's calculated ones stay in
+     line) */
   .manual {
-    margin-inline: -0.5rem;
-    width: calc(100% + 1rem);
+    margin-inline: calc(-1 * var(--quarter));
+    width: calc(100% + 2 * var(--quarter));
   }
   .fit:first-child .manual {
-    margin-top: -0.5rem;
+    margin-top: calc(-1 * var(--quarter));
   }
   .fit {
     min-width: 0;
@@ -158,19 +159,20 @@
     white-space: nowrap;
     text-align: right;
   }
-  /* calculated: nothing to type, so lower rows than a table of fields, the numbers a little smaller */
+  /* calculated: nothing to type, so lower rows than a table of fields - a cell, with its rule - the numbers a little
+     smaller */
   .calculated th,
   .calculated td {
-    height: 1.625rem;
+    height: calc(var(--cell) - 1px);
   }
   .calculated td {
     font-size: 0.875rem;
   }
   /* calculated: nothing to type, but not greyed out either - white, as the fields of the table typed by hand */
   .calculated .fixed {
-    background-color: var(--light);
+    background-color: var(--paper-field);
   }
-  /* the sale's: as the box of the sale's price (ui-box--optional) */
+  /* the sale's head and prices */
   .sale,
   .calculated .fixed.sale {
     background-color: var(--blue-100);

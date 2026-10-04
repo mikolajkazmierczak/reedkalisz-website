@@ -4,9 +4,8 @@
   import { unsavedMapping } from '../company.js';
 
   // The frame of every mapping: a box with a title (and `summary` beside it, its parts parted by dots) and the hints
-  // (the slot), under it its table and the rest
-  // (`after`, on the page as the API products' table), save / cancel once something changed, and what goes under
-  // those (`end`).
+  // (the slot), under it its table and the rest (`after`, on the page as the API products' table), and save / cancel
+  // once something changed.
   const dispatch = createEventDispatcher();
 
   export let title;
@@ -30,25 +29,37 @@
       <Button icon="ok" on:click={() => dispatch('save')}>Zapisz</Button>
     </div>
   {/if}
-  <slot name="end" />
 </div>
 
 <style>
   .panel {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--page-pad); /* half a cell of the mat, as a page's boxes */
     margin-bottom: 2rem;
+  }
+  /* a bar under the companies' (see .ui-bar): its title part two cells of the mat on every tab (its slot, border,
+     padding, the title's row), whole half cells in all (see onGrid), what's in it from its top - the title in the same
+     place on every tab, what rounding adds to its height left under it */
+  .panel > .ui-box {
+    justify-content: flex-start;
+    padding: var(--bar-pad) var(--box-pad);
   }
   h3 {
     margin: 0;
   }
-  /* the summary in the middle of the title's height (the categories' counts are two lines) */
+  /* the title and its summary in the middle of a row as tall on every tab (with the padding: two cells), so the
+     summary's lines - the categories' counts are two, set close to fit - don't move the title */
   .head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    align-content: center;
     gap: 0.25rem 0.5rem;
+    min-height: var(--control); /* (with the box's padding and border, two cells less the 1px it sits inside) */
+  }
+  .head > :global(small) {
+    line-height: 0.8125rem;
   }
   .head > :global(small::before) {
     content: '·';

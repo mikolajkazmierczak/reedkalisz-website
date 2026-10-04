@@ -1,4 +1,4 @@
-import api from '$/api';
+import api from '$lib/server/api';
 import { cached, SERVER_MAX_AGE } from '$lib/server/cache';
 import { flaggedFields, flaggedFilter, withSections } from '#/sections';
 

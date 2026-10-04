@@ -79,14 +79,15 @@
 
 {#if company}
   <CompanyBar companies={supported} selected={company} on:change={(e) => pickCompany(e.detail.id)}>
-    <Button
-      slot="before"
-      icon="cloud"
-      disabled={$unsavedMapping}
-      title={$unsavedMapping ? 'Najpierw zapisz albo anuluj zmiany' : null}
-      on:click={scan}>
-      Skanuj
-    </Button>
+    <span slot="before" class="ui-lead">
+      <Button
+        icon="cloud"
+        disabled={$unsavedMapping}
+        title={$unsavedMapping ? 'Najpierw zapisz albo anuluj zmiany' : null}
+        on:click={scan}>
+        Skanuj
+      </Button>
+    </span>
     {#if search}<Search bind:query />{/if}
   </CompanyBar>
   {#if loading}

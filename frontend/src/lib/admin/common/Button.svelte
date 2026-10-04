@@ -4,21 +4,21 @@
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 
-  // Every variant is a background, and the ones on hover and when pressed (no animation, it just changes).
+  // Every variant is a background, and the ones on hover and when pressed (a quick fade between them).
   // `background`, `backgroundHover`, `backgroundActive` override them.
   export let secondary = false; // light, dark text
   export let dangerous = false; // dark, red on hover
   export let dashed = false; // a quiet "add something" button: dashed outline, no fill
   export let ghost = false; // just the icon or label, e.g. inside a chip or a table cell
   export let outline = false; // a light pill with a faint border, e.g. a choice between companies
-  export let selected = false; // the chosen one of a few (purplish), e.g. the company picked
-  export let edge = false; // a light one on a grey or dotted page: a ring a shade darker than its fill
-  // a state in colour: 'info' (light blue), 'selected' (purplish), 'success' (green), 'warning' (orange), 'danger' (red),
+  export let selected = false; // the chosen one of a few (navy-100, the selected blue), e.g. the company picked
+  export let edge = false; // a light one on the board or a ply (a box, a popup): a ring a shade darker than its fill
+  // a state in colour: 'info' (light blue), 'selected' (navy-100), 'success' (green), 'warning' (orange), 'danger' (red),
   // 'new' (purple), 'split' (orange and purple, halved corner to corner: a warning and something new at once)
   export let tone = null;
   export let square = false;
-  // 'sm' (1.5rem, in tables and next to small fields), 'md' (2rem, the default), 'lg' (as tall as what's in it, at
-  // least 3.5rem: e.g. a product with its picture, name and code); more as they're needed
+  // 'sm' (1.5rem, in tables and next to small fields), 'md' (a cell and a quarter, --control: the default), 'lg' (as
+  // tall as what's in it, at least 3.5rem: e.g. a product with its picture, name and code); more as they're needed
   export let size = 'md';
 
   export let background = null;
@@ -82,17 +82,22 @@
 <style>
   button {
     --bg: var(--navy-700);
-    --bg-hover: var(--navy-500);
+    --bg-hover: var(--navy-600);
     --bg-active: var(--navy-900);
     cursor: pointer;
     overflow: hidden;
     position: relative;
     border: none;
     padding: 0;
-    height: 2rem;
+    height: var(--control);
     border-radius: var(--button-radius);
-    corner-shape: squircle; /* rounder than the fields; the top bars' (BarButton) stay sharp */
+    corner-shape: squircle;
     background-color: var(--bg);
+    transition: background-color 120ms;
+  }
+  button:focus-visible {
+    outline: solid 2px var(--navy-700);
+    outline-offset: 2px;
   }
   button:hover {
     background-color: var(--bg-hover);
@@ -110,7 +115,6 @@
   }
 
   .dangerous {
-    --bg: var(--navy-900);
     --bg-hover: var(--red-400);
     --bg-active: var(--red-500);
   }
@@ -136,7 +140,7 @@
     box-shadow: inset 0 0 0 1px var(--edge);
   }
   .outline {
-    --bg: var(--light);
+    --bg: var(--paper-field);
     --bg-hover: var(--blue-100);
     --bg-active: var(--navy-100);
     box-shadow: 0 0 0 1px var(--black-10) inset;
@@ -192,6 +196,7 @@
     height: 100%;
     color: var(--light);
     font-size: 0.95rem;
+    font-weight: 500;
   }
   .dark .content {
     color: var(--text);

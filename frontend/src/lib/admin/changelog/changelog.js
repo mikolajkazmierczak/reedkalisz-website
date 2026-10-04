@@ -6,6 +6,49 @@
 // "P.S. ..."), bold when `big`
 export const changelog = [
   {
+    version: '1.28.0',
+    date: '2026-10-04',
+    title: 'Nowy wygląd panelu',
+    synopsis: 'panel jest teraz w kratkę, a strona główna ładuje się szybciej.',
+    changes: [
+      {
+        label: 'Nowy wygląd',
+        text: 'panel wygląda jak formularz na macie do cięcia, a wszystko leży równo na jej kratce.',
+        big: true,
+      },
+      'To nie tylko wygląd: układ jest gęstszy, więc gęstość informacji jest większa.',
+      'Listy pokazują domyślnie 50 pozycji na stronę.',
+      {
+        label: 'Kalkulacje',
+        text: 'po tabeli znakowań chodzi się strzałkami jak w Excelu; Enter edytuje, Esc cofa zmianę.',
+        big: true,
+      },
+      'Zmienione komórki są żółte, a pod tabelą widać, które znakowania się zmieniły.',
+      'W wyborze pliku „Wyczyść” zmienia się w „Przywróć”, a wyczyszczony kafelek ma przerywaną ramkę.',
+      'W API › Produkty można zmienić firmę, zanim skończy się pobieranie danych.',
+      'Notatki w produkcie wypełniają kolumnę i są żółte, gdy coś zawierają.',
+      {
+        label: 'Poprawka',
+        text: 'kategorię dodaną ręcznie można usunąć przed zapisem, nawet gdy jest w mapowaniu API.',
+      },
+      { label: 'Poprawka', text: 'przełączniki znakowań i wariantów oraz pola wyboru już nie migają.' },
+      {
+        label: 'Strona',
+        text: 'wiele różnych optymalizacji, dzięki czemu strona główna ładuje się szybciej.',
+        big: true,
+      },
+      {
+        label: 'Uwaga',
+        text: 'zmiany na stronie głównej, w Kontakcie, politykach, kategoriach i stopce klienci mogą zobaczyć do 5 minut później – wejścia na stronę są zapisywane w pamięci podręcznej, żeby przyspieszyć wczytywanie.',
+      },
+      'Wizyty z przeglądarek, w których admin logował się do panelu, nie liczą się już do statystyk strony.',
+      {
+        label: 'Drobne zmiany',
+        text: '„Anuluj” w wyborze pliku to „Wróć”, znaczki skanera w opcjach są mniejsze i po prawej, przycisk produktu w przeglądzie zdjęć jest w etykiecie, test miejsc w API stoi obok tabeli, powtórzone znakowanie ma czerwoną ramkę, logo w menu ma proste rogi, maszyna na stronie głównej rzuca cień, a przyciski admina na stronie są na wierzchu.',
+      },
+    ],
+  },
+  {
     version: '1.27.0',
     date: '2026-10-03',
     title: 'Przegląd zdjęć jako edytor',

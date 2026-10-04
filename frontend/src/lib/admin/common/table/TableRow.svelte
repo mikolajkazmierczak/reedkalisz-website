@@ -226,8 +226,8 @@
     aspect-ratio: 1 / 1;
   }
 
-  /* the tree's columns are grey like the head, the whole height of the row; the bar starts further right the deeper
-     the item is, so its level shows as grey to its left */
+  /* the tree's columns are grey, the whole height of the row; the bar starts further right the deeper the item is, so
+     its level shows as grey to its left */
   .tree-cell {
     align-self: stretch;
     display: flex;
@@ -256,7 +256,7 @@
     padding-right: 0.2rem;
     border-radius: var(--border-radius) 0 0 var(--border-radius);
     corner-shape: squircle;
-    background-color: var(--light);
+    background-color: var(--paper);
   }
   /* the arrow in the middle of its level's part of the column */
   /* (it gives way at the deepest level: the bar is a level wide there, and has no arrow) */

@@ -83,7 +83,8 @@ if [[ "$CADDY" == "1" ]]; then
 fi
 
 step "Reloading sveltekit"
-pm2 startOrReload ecosystem.config.cjs --only sveltekit
+# --update-env: ecosystem.config.cjs's env (API_INTERNAL_URL) reaches a running app too, not only a new one
+pm2 startOrReload ecosystem.config.cjs --only sveltekit --update-env
 wait_http "$SVELTEKIT_URL" || fail "sveltekit did not answer at $SVELTEKIT_URL (pm2 logs sveltekit)"
 success "sveltekit reloaded and answering"
 
@@ -109,7 +110,7 @@ if git rev-parse -q --verify "origin/$BETA_BRANCH" >/dev/null; then
     (cd "$BETA_DIR/frontend" && npm ci)
   fi
   (cd "$BETA_DIR/frontend" && PUBLIC_BASE_URL="$BETA_ORIGIN" PUBLIC_API_URL="$API_ORIGIN/api" PUBLIC_HEIMDALL_URL="$API_ORIGIN" npm run build)
-  pm2 startOrReload ecosystem.config.cjs --only sveltekit-beta
+  pm2 startOrReload ecosystem.config.cjs --only sveltekit-beta --update-env
   wait_http "$SVELTEKIT_BETA_URL" || fail "sveltekit-beta did not answer at $SVELTEKIT_BETA_URL (pm2 logs sveltekit-beta)"
   success "beta at $(git -C "$BETA_DIR" rev-parse --short HEAD), reloaded and answering"
 else

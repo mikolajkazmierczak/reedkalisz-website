@@ -7,8 +7,8 @@
   import { createEventDispatcher } from 'svelte';
   import Icon from '$c/Icon.svelte';
 
-  // A button of the top bars (the page header and the editor's): square corners, a black outline,
-  // filled black when `active` (e.g. the current tab). A link with `href`.
+  // A button of the top bars (the page header and the editor's): slightly squircled corners, a navy outline,
+  // filled navy when `active` (e.g. the current tab). A link with `href`.
   const dispatch = createEventDispatcher();
 
   export let href = null;
@@ -22,7 +22,6 @@
   export let title = null;
 
   $: hover = hoverColor ?? (dangerous ? 'var(--red-100)' : active ? 'var(--navy-500)' : 'var(--blue-100)');
-  // (a background on hover, no animation)
   $: iconColor = dangerous ? 'var(--red-500)' : active ? 'var(--light)' : 'var(--text)';
 </script>
 
@@ -62,25 +61,28 @@
     justify-content: center;
     align-items: center;
     gap: 0.25rem;
-    border: solid 2px var(--text);
-    border-radius: 0;
+    border: solid 1.5px var(--navy-700);
+    border-radius: var(--border-radius);
+    corner-shape: squircle;
     padding: 0 1rem;
-    height: 2rem;
+    height: var(--bar-button); /* see ui-admin.css */
     font-size: 0.95rem;
     text-decoration: none;
     white-space: nowrap;
     color: var(--text);
-    background-color: transparent;
+    background-color: rgb(from var(--paper) r g b / 0.6); /* the paper, the board showing faintly through */
+    transition: background-color 120ms;
   }
-  .bar-button:hover {
+  .bar-button:not(.disabled):hover {
     background-color: var(--hover);
+  }
+  .bar-button:focus-visible {
+    outline: solid 2px var(--navy-700);
+    outline-offset: 2px;
   }
   .disabled {
     cursor: not-allowed;
     opacity: 0.5;
-  }
-  .disabled:hover {
-    background-color: transparent;
   }
   .square {
     padding: 0;
@@ -88,17 +90,17 @@
   }
   .active {
     color: var(--light);
-    background-color: var(--text);
+    background-color: var(--navy-700);
   }
   /* the page you're on: nothing to click */
   a.active {
     cursor: default;
     pointer-events: none;
   }
-  /* right around the border, as thick */
+  /* a ring just outside the border */
   .warn {
     outline: solid 2px var(--orange-500);
-    outline-offset: 0;
+    outline-offset: 1px;
   }
   .dangerous {
     border-color: var(--red-500);

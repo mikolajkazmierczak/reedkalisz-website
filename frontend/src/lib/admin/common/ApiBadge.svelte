@@ -8,6 +8,9 @@
   export let text = null;
   export let edited = false;
   export let restore = null;
+  export let small = false; // in a list (a select's options)
+
+  $: iconSize = small ? '0.85rem' : '1.1rem';
 </script>
 
 {#if edited}
@@ -23,15 +26,15 @@
     {/if}
   </button>
 {:else}
-  <span class="api-badge" aria-label={text ?? 'API'}>
-    <Icon name="api" width="1.1rem" height="1.1rem" color="var(--blue-700)" />
+  <span class="api-badge" class:small aria-label={text ?? 'API'}>
+    <Icon name="api" width={iconSize} height={iconSize} color="var(--blue-700)" />
     {#if text}<Tooltip><small>{text}</small></Tooltip>{/if}
   </span>
 {/if}
 
 <style>
-  /* ringed as the colour swatches (see Select), the robot blue as the category codes; clear, only what's under it
-     blurred */
+  /* ringed as the colour swatches (see Select), the robot blue as the category codes; clear (a field keeps its value
+     clear of it, see Input) */
   .api-badge {
     cursor: help;
     display: inline-grid;
@@ -41,8 +44,10 @@
     height: 1.4rem;
     border-radius: 50%;
     box-shadow: inset 0 0 0 1px var(--black-20);
-    -webkit-backdrop-filter: blur(0.25rem);
-    backdrop-filter: blur(0.25rem);
+  }
+  .small {
+    width: 1.1rem;
+    height: 1.1rem;
   }
   .edited {
     cursor: pointer;

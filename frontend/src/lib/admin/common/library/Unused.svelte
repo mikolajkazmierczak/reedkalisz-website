@@ -78,7 +78,7 @@
   }
 </script>
 
-<Modal type="fill" dotted closeText={null} bind:scroller={list} on:close={() => !deleting && dispatch('close')}>
+<Modal type="fill" mat closeText={null} bind:scroller={list} on:close={() => !deleting && dispatch('close')}>
   <svelte:fragment slot="bar">
     {#if !unused}
       <p class="aligned"><Loader dark /> Szukam plików, których nic nie używa...</p>
@@ -110,31 +110,35 @@
   </svelte:fragment>
   {#if unused?.length}
     {#if others.length}
-      <h4>Inne pliki ({others.length})</h4>
-      <div class="ui-tiles">
-        {#each others as file (file.id)}
-          <File
-            {...fileProps(file)}
-            marked={!kept.has(file.id)}
-            remove="Usuń"
-            backing="var(--grey-100)"
-            on:click={() => toggle(file.id)} />
-        {/each}
-      </div>
+      <section>
+        <h4 class="ui-h2"><span>Inne pliki <small>({others.length})</small></span></h4>
+        <div class="ui-tiles ui-snap">
+          {#each others as file (file.id)}
+            <File
+              {...fileProps(file)}
+              marked={!kept.has(file.id)}
+              remove="Usuń"
+              backing="var(--board)"
+              on:click={() => toggle(file.id)} />
+          {/each}
+        </div>
+      </section>
     {/if}
     {#if images.length}
-      <h4>Zdjęcia ({images.length})</h4>
-      <div class="ui-tiles">
-        {#each images.slice((page - 1) * limit, page * limit) as file (file.id)}
-          <File
-            {...fileProps(file)}
-            marked={!kept.has(file.id)}
-            remove="Usuń"
-            backing="var(--grey-100)"
-            on:click={() => toggle(file.id)} />
-        {/each}
-      </div>
-      <Pagination bind:limit bind:page count={images.length} />
+      <section>
+        <h4 class="ui-h2"><span>Zdjęcia <small>({images.length})</small></span></h4>
+        <div class="ui-tiles ui-snap">
+          {#each images.slice((page - 1) * limit, page * limit) as file (file.id)}
+            <File
+              {...fileProps(file)}
+              marked={!kept.has(file.id)}
+              remove="Usuń"
+              backing="var(--board)"
+              on:click={() => toggle(file.id)} />
+          {/each}
+        </div>
+        <Pagination bind:limit bind:page count={images.length} />
+      </section>
     {/if}
   {/if}
 </Modal>
@@ -145,7 +149,6 @@
     gap: 0.5rem;
   }
   h3,
-  h4,
   p {
     margin: 0;
   }
@@ -153,12 +156,10 @@
     font-size: 0.85rem;
     font-weight: 400;
   }
-  /* spaced as the picker's sections (see Library) */
-  h4 {
-    font-size: 1.15rem;
-  }
-  h4:not(:first-child) {
-    margin-top: 0.75rem;
+  /* each kind as the picker's groups (see Library): a paper label, its tiles under it */
+  section {
+    display: flex;
+    flex-direction: column;
   }
   .aligned {
     display: flex;

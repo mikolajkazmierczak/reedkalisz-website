@@ -16,7 +16,6 @@
   import Blames from '@/editors/Blames.svelte';
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
-  import Picker from '@c/library/Picker.svelte';
   import Modal from '@c/Modal.svelte';
 
   const searchParams = SearchParams.read();
@@ -165,17 +164,11 @@
             <Blames {item} />
           </div>
         </div>
-
-        <div class="ui-section__col">
-          <div class="img">
-            <Picker bind:selected={item.img} backing="var(--grey-100)" />
-          </div>
-        </div>
       </div>
     </section>
 
     <section class="ui-section">
-      <h2 class="ui-h2">Opis</h2>
+      <h2 class="ui-h2"><span>Opis</span></h2>
 
       <div class="ui-section__row">
         <div class="ui-section__col ui-box" style:grid-column={'1 / -1'}>
@@ -198,11 +191,3 @@
     </section>
   {/if}
 </Editor>
-
-<style>
-  .img {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(10.9375rem, 1fr));
-    gap: 1rem;
-  }
-</style>

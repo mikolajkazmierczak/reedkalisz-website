@@ -161,31 +161,64 @@
     display: flex;
     flex-direction: column;
     --nav-skew: 0.25rem; /* a little more padding on the right: the icons on the left look centred */
-    padding: 0 calc(0.5rem + var(--nav-skew)) 0.75rem 0.5rem;
-    background-color: var(--navy-700);
+    --nav-end: calc(0.5rem + var(--nav-skew)); /* its right padding: the page you're on reaches over it (NavButton) */
+    padding: 0 var(--nav-end) 0.75rem 0.5rem;
+    /* a short window: it scrolls (no bar: it would widen the menu, see width) */
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    background-color: var(--rail);
     --nav-button-pad: 0.7rem; /* see NavButton */
   }
-  /* the header's height (4rem) and its padding (0.9rem): the logo is as tall as the title's line; it starts where
-     the buttons' icons do (their padding) */
+  /* the stub's edge: a line of perforation holes, the board showing through them, where it tears off the page - fixed
+     at the menu's right edge (see width), so they stay put down its whole height while a short window's menu scrolls */
+  nav::after {
+    content: '';
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: calc(var(--nav-width) - 0.2rem - 0.25rem); /* (0.2rem in from it) */
+    bottom: 0;
+    width: 0.25rem;
+    background: radial-gradient(circle, var(--board) 0.07rem, transparent 0.09rem) center top / 0.25rem 0.5rem repeat-y;
+    opacity: 0.55;
+  }
+  /* as tall as the header, the logo level with its buttons (see Header); it starts where the menu buttons' icons do
+     (their padding) */
   .logo {
     display: flex;
     align-items: center;
     flex: none;
-    height: 4rem;
-    padding: 0.9rem var(--nav-button-pad);
+    height: var(--header-height);
+    padding: var(--mat-margin) var(--nav-button-pad) 1px; /* (on whole pixels, as the header's buttons) */
   }
   .logo img {
-    height: 100%;
+    height: var(--bar-button); /* as tall as the header's buttons */
   }
+  /* on the mat's half lines as the page is: the buttons a cell and a half tall, one under another (see NavButton), the
+     groups half a cell apart - a group of three four and a half cells, five with the gap after it */
   .groups {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: var(--half);
   }
   .group {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+  }
+  /* the groups ruled apart, as a form's sections, the rule halfway down the gap */
+  .groups > .group + .group {
+    position: relative;
+  }
+  .groups > .group + .group::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--half) / -2);
+    left: var(--nav-button-pad);
+    right: var(--nav-button-pad);
+    height: 1px;
+    background-color: var(--rail-line);
   }
   /* Wyloguj and the name under it on one grid, in the menu's middle (its padding evened out by the skew): the logout's
      icon and the avatar on one axis, the word and the name starting on another (see NavButton's center) */
@@ -196,35 +229,49 @@
     column-gap: 0;
     padding-left: var(--nav-skew);
     --nav-name-gap: 0.55rem;
+    --version: 1.125rem; /* the version's line */
   }
-  /* in a band like the lit button's, flush with the menu's sides (over its padding), the version under it */
+  /* in a darker band, flush with the menu's sides (over its padding), the version under it - the band taking up what
+     the window's height leaves over the half cells, so Wyloguj above it starts on a half line of the mat too (the
+     group from it to the menu's bottom four and a half cells and that: Wyloguj's cell and a half, the gap, the band,
+     the version) */
   .me {
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
     align-items: center;
-    margin: 0.5rem -0.75rem 0;
-    --pad: calc(0.5rem + var(--nav-button-pad) - (1.6rem - 1.3rem) / 2);
-    padding: var(--pad) 0;
-    background-color: var(--navy-900);
+    align-content: center;
+    margin: var(--quarter) -0.75rem 0;
+    height: calc(3 * var(--cell) - var(--quarter) - var(--version) + mod(100dvh, var(--half)));
+    background-color: rgb(0 0 0 / 0.2);
   }
-  /* under the name, darker still, the faint version and its date in the menu's middle: it opens the changelog */
+  /* a window too short for it all (under 658px): the band half a cell lower - Wyloguj still on a half line */
+  @media (max-height: 41.0625rem) {
+    .me {
+      height: calc(2.5 * var(--cell) - var(--quarter) - var(--version) + mod(100dvh, var(--half)));
+    }
+  }
+  /* under the name, darker still, the faint version and its date in the menu's middle: it opens the changelog - in
+     red, as a form's serial number */
   .version {
     grid-column: 1 / -1;
-    margin: -0.15rem -0.75rem -0.75rem; /* (right under it: over the group's gap) */
-    padding: 0.2rem 0.5rem 0.25rem;
+    margin: 0 -0.75rem -0.75rem; /* (over the menu's sides and bottom padding) */
+    padding: 0 0.5rem;
+    height: var(--version);
+    line-height: var(--version);
     border: none;
     cursor: pointer;
     text-align: center;
     font-size: 0.625rem;
     font-variant-numeric: tabular-nums;
-    color: rgb(255 255 255 / 0.3);
-    background-color: var(--navy-950);
+    letter-spacing: 0.02em;
+    color: rgb(243 140 151 / 0.55);
+    background-color: rgb(0 0 0 / 0.32);
     transition: color 150ms;
   }
   .version:hover,
   .version:focus-visible {
-    color: rgb(255 255 255 / 0.75);
+    color: rgb(243 140 151 / 1);
   }
   /* beside the name's two lines, in their middle */
   .avatar {
@@ -273,8 +320,8 @@
       border: none;
       border-radius: var(--box-radius);
       corner-shape: squircle;
-      background-color: var(--navy-700);
-      box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.25);
+      background-color: var(--rail);
+      box-shadow: var(--shadow-lifted);
     }
     .opener:active {
       background-color: var(--navy-900);
@@ -288,11 +335,7 @@
     }
     /* off the screen, until opened (still measured: the page doesn't start after it, see the admin layout); hidden
        once it's slid away, so its buttons aren't tabbed to or read out */
-    /* scrolled when the screen is shorter than it (a phone held sideways) */
     nav {
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior: contain;
       height: 100dvh;
       z-index: 61;
       transform: translateX(-100%);
@@ -303,12 +346,16 @@
     }
     /* stays at the top while the menu scrolls, over the buttons going under it (across the menu's padding) */
     .logo {
-      z-index: 1;
+      z-index: 2; /* (over the page you're on too, see NavButton) */
       position: sticky;
       top: 0;
       margin: 0 -0.75rem 0 -0.5rem;
+      height: 4rem; /* (its own: the phone's header is lower) */
       padding: 0.9rem calc(var(--nav-button-pad) + 0.75rem) 0.9rem calc(var(--nav-button-pad) + 0.5rem);
-      background-color: var(--navy-700);
+      background-color: var(--rail);
+    }
+    .logo img {
+      height: 100%;
     }
     nav.open {
       transform: none;

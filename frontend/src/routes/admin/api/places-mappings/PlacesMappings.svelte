@@ -139,55 +139,57 @@
     <small class="error">Powtórzone reguły: {repeated.join(', ')}. Działa tylko pierwsza.</small>
   {/if}
 
+  <!-- the test beside the rules when there's room for both, under them when not -->
   <svelte:fragment slot="after">
-    <Grid
-      columns="1.5rem minmax(8rem, 16rem) 3.5rem 1.5rem minmax(8rem, 16rem)"
-      empty={rules.length ? null : 'Brak reguł. Miejsca zaimportują się tak, jak podaje je API.'}>
-      <svelte:fragment slot="head">
-        <HeadIcon icon="delete" label="Usuwanie" />
-        <span>Miejsce (zawiera)</span>
-        <span class="hits">Dopasowania</span>
-        <span />
-        <span>U nas</span>
-      </svelte:fragment>
-      {#each rules as rule (rule._uid)}
-        {@const count = hits.get(rule) ?? 0}
-        <div class="row">
-          {#if useless.has(rule)}
-            {@const instead = useless.get(rule)}
-            <small class="useless">
-              Zbędna reguła: {#if instead?.length}reguła „{instead[0].pattern}” → „{instead[0].to}” osiąga to samo.{:else if instead}bez
-                niej te miejsca zostaną takie same.{:else}bez niej te miejsca przetłumaczą się tak samo.{/if}
-            </small>
-          {/if}
-          <Button size="sm" dangerous icon="delete" on:click={() => remove(rule._uid)} />
-          <Input size="small" bind:value={rule.pattern} placeholder="z API" />
-          <span class="hits" class:zero={!count} title="Dopasowania">{count}</span>
-          <Arrow />
-          <Input size="small" bind:value={rule.to} placeholder="tłumaczenie" />
-        </div>
-      {/each}
-    </Grid>
-  </svelte:fragment>
-
-  <svelte:fragment slot="end">
-    {#if places.length}
-      <div class="ui-box preview">
-        <div class="preview-head">
-          <h3>Przetestuj</h3>
-          <small class="muted">Wpisz miejsce, jak podałoby je API</small>
-        </div>
-        <div class="search"><Input size="small" bind:value={query} placeholder="np. FRONT" /></div>
-        {#each preview as r (r.place)}
-          <div class="preview-row">
-            <span>{r.place}</span>
-            <Arrow />
-            <span class:same={!r.rule}>{r.translated}</span>
-            <small class="muted">{r.count ?? ''}</small>
+    <div class="beside">
+      <div class="columns">
+        <Grid
+          columns="1.5rem minmax(8rem, 16rem) 3.5rem 1.5rem minmax(8rem, 16rem)"
+          empty={rules.length ? null : 'Brak reguł. Miejsca zaimportują się tak, jak podaje je API.'}>
+          <svelte:fragment slot="head">
+            <HeadIcon icon="delete" label="Usuwanie" />
+            <span>Miejsce (zawiera)</span>
+            <span class="hits">Dopasowania</span>
+            <span />
+            <span>U nas</span>
+          </svelte:fragment>
+          {#each rules as rule (rule._uid)}
+            {@const count = hits.get(rule) ?? 0}
+            <div class="row">
+              {#if useless.has(rule)}
+                {@const instead = useless.get(rule)}
+                <small class="useless">
+                  Zbędna reguła: {#if instead?.length}reguła „{instead[0].pattern}” → „{instead[0].to}” osiąga to samo.{:else if instead}bez
+                    niej te miejsca zostaną takie same.{:else}bez niej te miejsca przetłumaczą się tak samo.{/if}
+                </small>
+              {/if}
+              <Button size="sm" dangerous icon="delete" on:click={() => remove(rule._uid)} />
+              <Input size="small" bind:value={rule.pattern} placeholder="z API" />
+              <span class="hits" class:zero={!count} title="Dopasowania">{count}</span>
+              <Arrow />
+              <Input size="small" bind:value={rule.to} placeholder="tłumaczenie" />
+            </div>
+          {/each}
+        </Grid>
+        {#if places.length}
+          <div class="ui-box preview">
+            <div class="preview-head">
+              <h3>Przetestuj</h3>
+              <small class="muted">Wpisz miejsce, jak podałoby je API</small>
+            </div>
+            <div class="search"><Input size="small" bind:value={query} placeholder="np. FRONT" /></div>
+            {#each preview as r (r.place)}
+              <div class="preview-row">
+                <span>{r.place}</span>
+                <Arrow />
+                <span class:same={!r.rule}>{r.translated}</span>
+                <small class="muted">{r.count ?? ''}</small>
+              </div>
+            {/each}
           </div>
-        {/each}
+        {/if}
       </div>
-    {/if}
+    </div>
   </svelte:fragment>
 </Panel>
 
@@ -212,6 +214,22 @@
     color: var(--orange-700);
   }
 
+  /* one column, or the rules and the test side by side: the test as wide as its rows need, in whole half cells, the
+     rules the rest - so both reach the mat's frame */
+  .beside {
+    container-type: inline-size;
+  }
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--page-pad);
+  }
+  @container (min-width: 64rem) {
+    .columns {
+      grid-template-columns: minmax(0, 1fr) round(up, 31rem, var(--half));
+    }
+  }
   .preview {
     gap: 0.25rem;
   }

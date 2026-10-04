@@ -8,6 +8,7 @@
   import Button from '@c/Button.svelte';
   import Input from '@c/Input.svelte';
   import Labeling from './Labeling.svelte';
+  import { gridKeys } from './gridKeys';
   import { createNewLabeling, getChanged, save, tryCleanItems } from './utils';
   import { ask } from '@/dialog';
 
@@ -33,7 +34,57 @@
   }
 
   $: changed = getChanged(items, itemsOriginal);
+
+  // the labelings to be saved, named on as many labels as fit in two rows under the table (a new column changes every
+  // one), the rest counted on the last - and named in its tooltip, seven to a line. Worked out from the page: all of
+  // them laid out, then as many as the first two rows take, then fewer while the count doesn't fit after them
+  let list;
+  let shown = Infinity;
+  let fitting = 0;
+  const tops = () => [...new Set([...list.children].map((li) => li.offsetTop))].sort((a, b) => a - b);
+  let single = false; // all of them in one row: bigger, in the middle of the buttons' row
+  async function fit() {
+    const run = ++fitting;
+    shown = Infinity;
+    single = false;
+    await tick();
+    if (run !== fitting || !list) return;
+    const rows = tops();
+    if (rows.length === 1) {
+      single = true;
+      await tick();
+      if (run === fitting && list && tops().length > 1) single = false; // (bigger, they'd take two rows: small ones then)
+      return;
+    }
+    if (rows.length <= 2) return;
+    shown = Math.max(0, [...list.children].findIndex((li) => li.offsetTop === rows[2]) - 1);
+    await tick();
+    while (run === fitting && shown > 0 && tops().length > 2) {
+      shown--;
+      await tick();
+    }
+  }
+  // (only when what the labels say changes, not on every keystroke in a row already changed)
+  $: changedLabels = changed.map(label).join('\n');
+  $: list && changedLabels && fit();
+  const watchWidth = (node) => {
+    const resizes = new ResizeObserver(() => fit());
+    resizes.observe(node);
+    return { destroy: () => resizes.disconnect() };
+  };
+  const label = ({ code, name, type }) => code || name || type || '???';
+  const lines = (rest) => Array.from({ length: Math.ceil(rest.length / 7) }, (_, i) => rest.slice(i * 7, i * 7 + 7));
   $: unsaved = changed.length > 0;
+  // an amount changed since the last save, marked as the rows' cells are (a new column all of it, as a new row): the
+  // head's amounts are every row's, so marked against a saved row's, column by column (each row's prices have their
+  // own uids, and the first row isn't always the same one)
+  $: savedRow = items.find((item) => !item._new);
+  $: savedOriginal = savedRow && itemsOriginal.find((o) => o._uid === savedRow._uid);
+  $: amountChanged = (i) => {
+    const p = savedRow?.prices[i];
+    const saved = p && savedOriginal?.prices.find((o) => o._uid === p._uid);
+    return !saved || saved.amount !== p.amount;
+  };
 
   async function trySave() {
     if (saving) return; // prevent double click
@@ -85,10 +136,6 @@
     }
   }
 
-  function handleAmountClick(e) {
-    e.detail.e.target.select();
-  }
-
   async function handleAmountInput(e, i) {
     const input = parseInt(e.detail.e.target.value);
     const amount = isNaN(input) ? null : input < 1 ? 1 : input; // basic validation
@@ -113,8 +160,8 @@
 </script>
 
 {#if items.length}
-  <div class="wrapper ui-fill-scroll">
-    <table class="ui-table">
+  <div class="wrapper ui-fill-scroll ui-snap">
+    <table class="ui-table" use:gridKeys>
       <thead>
         <tr>
           <th style:width="2.25rem" class="col-sticky col-remove">
@@ -151,7 +198,7 @@
           {#each items[0].prices as p, i (p._uid)}
             {@const isLumpsum = p.amount == 1}
 
-            <th style:width="5rem" class="amount" class:amount--lumpsum={isLumpsum}>
+            <th style:width="5rem" class="amount" class:amount--lumpsum={isLumpsum} class:changed={amountChanged(i)}>
               <div class="amount-actions">
                 <Button icon="delete" on:click={() => removeAmount(i)} square dangerous />
               </div>
@@ -168,13 +215,13 @@
                 min={0}
                 step={1}
                 value={p.amount}
-                on:click={handleAmountClick}
                 on:input={(e) => handleAmountInput(e, i)} />
             </th>
           {/each}
 
           <!-- as wide as the deleting column -->
-          <th style:width="2.25rem" class="add-amount">
+          <!-- (the right arrow past a row's last field lands on its button, see gridKeys) -->
+          <th style:width="2.25rem" class="add-amount" data-grid-end>
             <span class="head-icon"
               ><Button size="sm" dashed icon="add" title="Dodaj nakład" on:click={addAmount} /></span>
           </th>
@@ -185,51 +232,64 @@
 
       <tbody>
         {#each items as item, i (item._uid)}
-          <Labeling bind:items bind:item index={i} />
+          <Labeling bind:items bind:item original={itemsOriginal.find((o) => o._uid === item._uid)} index={i} />
         {/each}
       </tbody>
     </table>
   </div>
 {/if}
 
-<!-- adding stays there while there are changes: several can be added before saving -->
-<div class="edit-actions">
+<!-- adding stays there while there are changes: several can be added before saving; what's to be saved after the
+     buttons, each on a small label - all of it on the page's bottom line -->
+<div class="edit-actions ui-snap">
   {#if !saving}
     <Button icon="add" on:click={addLabeling}>Dodaj</Button>
   {/if}
   {#if unsaved}
-    {#if !saving}<span class="divider" />{/if}
-    <div class="save">
-      {#if !saving}
-        <Button icon="close" secondary edge on:click={cancel}>Anuluj</Button>
+    {#if !saving}
+      <span class="ui-divider" />
+      <Button icon="close" secondary edge on:click={cancel}>Anuluj</Button>
+    {/if}
+    <Button icon="ok" on:click={trySave}>
+      {#if saving}Zapisuję...{:else}Zapisz{/if}
+    </Button>
+    <ul class="changed-list" class:single aria-label="Do zapisania" bind:this={list} use:watchWidth>
+      {#each changed.slice(0, shown) as item (item._uid)}
+        <li>{label(item)}</li>
+      {/each}
+      {#if changed.length > shown}
+        <li class="more">
+          +{changed.length - shown}
+          <Tooltip>
+            <small>
+              {#each lines(changed.slice(shown).map(label)) as line, i}{#if i}<br />{/if}{line.join(', ')}{/each}
+            </small>
+          </Tooltip>
+        </li>
       {/if}
-      <Button icon="ok" on:click={trySave}>
-        {#if saving}Zapisuję...{:else}Zapisz{/if}
-      </Button>
-    </div>
-    {#each changed as { code, name, type }}
-      <small>{code || name || type || '???'}</small>
-    {/each}
+    </ul>
   {/if}
-  {#if company?.api_handling_costs}
-    <small class="handling">Koszty manipulacyjne dodawane są automatycznie</small>
+  {#if unsaved || company?.api_handling_costs}
+    <div class="notes">
+      {#if unsaved}
+        <small><b>Zapisywanie może długo potrwać.</b></small>
+        <small>Czas zapisywania zależy od ilości powiązanych produktów.</small>
+      {/if}
+      {#if company?.api_handling_costs}
+        <small>Koszty manipulacyjne dodawane są automatycznie</small>
+      {/if}
+    </div>
   {/if}
 </div>
-{#if unsaved}
-  <div class="edit-info">
-    <small>
-      <b>Zapisywanie może (bardzo) długo potrwać.</b><br />
-      Czas zapisywania zależy od ilości powiązanych produktów.<br />
-    </small>
-  </div>
-{/if}
 
 <style>
-  /* scrolls both ways: the page gives it what's left (see .ui-fill), its head and first columns stay */
+  /* scrolls both ways: the page gives it what's left (see .ui-fill), its head and first columns stay (a field reached
+     by the keys not under them: scroll-padding) - on the mat as a box is (.ui-snap) */
   .wrapper {
     overflow: auto;
     max-width: 100%;
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--page-pad);
+    scroll-padding: 2.5rem 0 0 12.25rem;
     border-radius: var(--box-radius);
     corner-shape: squircle;
     border: var(--border-light);
@@ -266,8 +326,10 @@
     white-space: nowrap;
   }
 
+  /* an amount is typed in: white, as a row's fields (only the lump sum's label over it grey) */
   th.amount {
     padding: 0;
+    background-color: var(--paper-field);
   }
   th.amount--lumpsum {
     position: relative;
@@ -284,7 +346,8 @@
     background-color: var(--grey-100);
     transition: opacity 200ms;
   }
-  th.amount--lumpsum:hover .lumpsum {
+  th.amount--lumpsum:hover .lumpsum,
+  th.amount--lumpsum:focus-within .lumpsum {
     pointer-events: none;
     opacity: 0;
   }
@@ -292,6 +355,25 @@
   /* between the column groups, in the head and in every row (Labeling) */
   .wrapper :global(.heavy-border) {
     border-right: var(--border-heavy);
+  }
+  /* the fields take the row's colour (white, a shade darker under the pointer); the columns that stay take it too,
+     opaque, so what scrolls under them doesn't show through their lines */
+  .wrapper :global(input.borderless) {
+    background-color: transparent;
+  }
+  .wrapper :global(td.col-sticky:not(.col-remove)) {
+    background-color: inherit;
+  }
+  /* changed since the last save: faintly yellow, as a copy to be filed - over the cell's own colour, so the columns
+     that stay keep theirs opaque */
+  .wrapper :global(td.changed),
+  .wrapper :global(th.changed) {
+    --mark: linear-gradient(rgb(from var(--yellow-100) r g b / 0.5), rgb(from var(--yellow-100) r g b / 0.5));
+    background-image: var(--mark);
+  }
+  /* under the pointer a shade darker too, as the row */
+  .wrapper :global(tr:hover td.changed) {
+    background-image: linear-gradient(var(--black-6), var(--black-6)), var(--mark);
   }
   /* the columns of buttons (delete, add an amount) are grey all the way down, like the head, and so is the rest */
   .wrapper :global(.col-remove),
@@ -336,25 +418,73 @@
     display: flex;
   }
 
-  /* adding, a line, then cancelling and saving side by side (and what's changed) */
+  /* adding, a line, cancelling and saving, what's to be saved, the notes at the other end - a cell and a half on the
+     mat, all of it resting on the page's bottom line */
   .edit-actions {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .handling {
-    margin-left: auto;
-  }
-  .divider {
-    align-self: stretch;
-    border-left: var(--border-light);
-  }
-  .save {
-    display: flex;
+    align-items: flex-end;
     gap: 0.5rem;
+    height: calc(3 * var(--half) - 1px);
   }
-  .edit-info {
-    margin-top: 0.5rem;
+  .edit-actions > :global(.ui-divider) {
+    align-self: flex-end;
+  }
+  /* each labeling to be saved on a small label, yellow as its changed cells: two rows of them, from the bottom up (see
+     fit), the two and the gap between them as tall as a button beside them (16 + 3 + 16 = 35px: off the mat's steps,
+     on purpose) */
+  .changed-list {
+    position: relative; /* (the labels' offsetTop) */
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-end;
+    gap: 3px 0.25rem;
+    height: var(--control);
+    overflow: hidden;
+    margin: 0 0 0 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .changed-list li {
+    display: flex;
+    align-items: center;
+    height: 16px;
+    padding: 0 0.35rem;
+    border: var(--border-light);
+    border-radius: var(--field-radius-compact);
+    corner-shape: squircle;
+    background-color: color-mix(in srgb, var(--yellow-100) 50%, var(--paper));
+    box-shadow: var(--shadow);
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  /* one row: as tall as a small button, in the middle of the row */
+  .changed-list.single {
+    align-content: center;
+  }
+  .changed-list.single li {
+    height: 1.5rem;
+    padding: 0 0.5rem;
+    border-radius: var(--field-radius-small);
+    font-size: 0.8rem;
+  }
+  /* the count of the rest: the labels' yellow as its edge, clear inside */
+  .changed-list li.more {
+    cursor: help;
+    border-color: color-mix(in srgb, var(--yellow-100) 70%, var(--orange-300));
+    box-shadow: none;
+    background-color: transparent;
+    color: var(--text);
+  }
+  .notes {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    text-align: right;
+    line-height: 1.15;
   }
 </style>

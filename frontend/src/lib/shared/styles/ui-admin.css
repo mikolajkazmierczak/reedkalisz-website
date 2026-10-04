@@ -1,85 +1,142 @@
 :root {
   --nav-width: 9rem; /* the menu on the left, the header and the page start after it (set by the menu, see Nav) */
-  --header-height: 4rem; /* the header, fixed above the page (see Header, the admin layout); lower on a phone */
+  /* Everything is laid out on the cutting mat's squares (see Mat): sizes and gaps in quarters, mostly halves and
+     whole cells. What lies on the mat - a box, a bar, a table - fills a slot of whole half cells, sitting 1px inside
+     it (.ui-on-mat), so the mat's line before it shows and none runs under its edge. */
+  --cell: 1.75rem; /* 28px: whole pixels at every step (a quarter 7, a half 14) - lines on fractions blur */
+  --half: calc(var(--cell) / 2);
+  --quarter: calc(var(--cell) / 4);
+  --mat-margin: var(--half); /* the mat's frame from its edge */
+  /* the header, fixed above the page (see Header, the admin layout); lower on a phone - the mat's frame and two cells,
+     what's in it in their middle, the page starting on the next line */
+  --header-height: calc(var(--mat-margin) + 2 * var(--cell));
+  /* a list page: the window under the header, less the frame's margin, in whole half cells (see .ui-fill) */
+  --fill-height: round(down, 100dvh - var(--header-height) - var(--mat-margin) - 1px, var(--half));
+  /* the page beside the menu is whole half cells wide: what's left over goes past the mat's right frame - in the page,
+     the header and its bar of the mat alike (100% is the window's width, wherever it's used; see the admin layout) */
+  --leftover: mod(100% - var(--nav-width) - 2 * var(--mat-margin) - 1px, var(--half));
+  /* a sheet's with no menu beside it: a phone's page, an editor's, a modal's (100% is where it's used) */
+  --sheet-leftover: mod(100% - 2 * var(--mat-margin) - 1px, var(--half));
+  --control: calc(1.25 * var(--cell)); /* a button's, a field's height */
+  --bar-button: var(--control); /* the top bars' buttons (BarButton) */
+  --page-pad: var(--half); /* between what lies on the mat; its slots from the frame */
+  --box-pad: calc(var(--half) - 1px); /* a box's padding, less its border */
+  --bar-pad: calc((2 * var(--cell) - 3px - var(--control)) / 2); /* a bar's: two cells tall with a button in it */
+  --tile: calc(9 * var(--half)); /* a product's photo or file at its narrowest, "+ Dodaj" as wide (see .ui-add) */
+  --text: #131f33; /* the ink at full strength: a navy so dark it reads as black */
+
+  /* The admin is REED's own job ticket, a self-copying form printed in one navy ink: a pad of plies (the boxes, bars
+     and tables) on its backing board (the page), ruled in that ink, with squircle corners. */
 
   /* The admin's colours: a few families, only the shades something uses (the numbers skip the rest). A coloured
      button takes 100, 200 on hover, 300 when pressed; text and outlines take the dark ones. Nothing else: a colour
      that isn't here is one of these. */
-  --navy-50: #dee6f1; /* a box of an element (a variant, a calculation): navy-100 a quarter of the way to white */
-  --navy-100: #d3ddec; /* selected: a picked button, a row, the drop slots */
-  --navy-200: #c4d1e5;
-  --navy-300: #b5c4dc;
-  --navy-500: #526a8e; /* a button's hover */
-  --navy-700: #1b2f4e; /* buttons, the menu (the website's navy, ui-website.css) */
-  --navy-900: #0e1b2f; /* a button pressed, the page you're on in the menu */
-  --navy-950: #08111e; /* the version under the name in the menu */
+  /* the copy ply: a box of an element (a variant, a calculation) - a blue sheet, light enough that what's grey on it
+     (a handle, a photo's tile, an element switched off) reads as it does on the paper */
+  --navy-50: #eff3f9;
+  --navy-100: #d2dbe9; /* selected: a picked button, a row, the drop slots */
+  --navy-200: #c1cde0;
+  --navy-300: #afbdd6;
+  --navy-500: #526a8e; /* under the pointer or in focus: a field's edge, a checkbox, the active bar button */
+  --navy-600: #2c4268; /* a button's hover: a step lighter than the ink */
+  --navy-700: #1b2f4e; /* the ink: buttons, rules, captions (the website's navy, ui-website.css) */
+  --navy-900: #0e1b2f; /* a button pressed */
+  --navy-950: #08111e;
 
-  --grey-50: #f5f7f8; /* a row under the pointer */
-  --grey-100: #ebeef0; /* table heads, the tree's columns */
-  --grey-300: #b0bec5;
-  --grey-500: #808e95; /* muted text, dashed outlines */
+  /* the menu: the form's stub, a deeper print of the ink, torn off along a perforation (see Nav) */
+  --rail: #13213a;
+  --rail-line: rgb(255 255 255 / 0.08);
 
-  --black-6: rgba(0, 0, 0, 0.06); /* a hover wash */
-  --black-10: rgba(0, 0, 0, 0.1); /* borders, lines */
-  --black-20: rgba(0, 0, 0, 0.2); /* the backdrop of an editor */
-  --black-50: rgba(0, 0, 0, 0.5); /* the backdrop of a popup, rings */
+  /* the ground and the plies: soft, so a day of it is easy on the eyes - not white on grey */
+  --board: #dde2e9; /* the pad's backing board: the page under everything */
+  --paper: #f8f9fb; /* a ply: a box, a bar, a table, a popup */
+  --paper-field: #ffffff; /* a field written on a ply, a shade brighter than it */
+  --ply-yellow: #f5eed3; /* the yellow copy: an optional box */
+  /* the board is a cutting mat (see Mat): faint cells inside a frame that stops short of the board's edges
+     (--mat-margin) - every line of it, the frame and the ruler's ticks as one, equally faint */
+  --mat-line: rgb(27 47 78 / 0.06);
+  --ledger-rule: rgb(27 47 78 / 0.075); /* a ledger's ruling (Grid's rows, the products' category tree) */
+  --mat:
+    linear-gradient(to right, var(--mat-line) 1px, transparent 1px) 0 0 / var(--cell) var(--cell),
+    linear-gradient(to bottom, var(--mat-line) 1px, transparent 1px) 0 0 / var(--cell) var(--cell);
 
-  --blue-100: #eaf5fa; /* light blue: information, an optional box, the sale's prices, a hover */
-  --blue-200: #cee1e9;
-  --blue-300: #bcd3dd;
-  --blue-500: #6d9ad8; /* a text link under the pointer */
-  --blue-700: #3867a8;
+  --grey-50: #eef1f6; /* a row under the pointer */
+  --grey-100: #e5e9f0; /* table heads, the tree's columns, what can't be edited */
+  --grey-300: #b1bccb;
+  --grey-500: #737f91; /* muted text, dashed outlines */
 
-  --green-100: #c9eec9; /* success, done */
-  --green-200: #b6e3b6;
-  --green-300: #a3d8a3;
-  --green-700: #0a9f59;
+  /* the ink seen through (navy, not black: every line on the form is printed in it) */
+  --black-6: rgb(27 47 78 / 0.06); /* a hover wash */
+  --black-10: rgb(27 47 78 / 0.12); /* borders, lines */
+  --black-20: rgb(19 33 58 / 0.22); /* the backdrop of an editor */
+  --black-50: rgb(14 27 47 / 0.48); /* the backdrop of a popup, rings */
 
-  --orange-100: #ffdcb8; /* a warning, something to do */
-  --orange-200: #fcc995;
-  --orange-300: #f7b97a;
-  --orange-500: #e8871e;
-  --orange-700: #b26a00;
+  --blue-100: #e6eef8; /* light blue: information, the sale's prices, a hover */
+  --blue-200: #d0dff0;
+  --blue-300: #bcd0e8;
+  --blue-500: #5b88c7; /* a text link under the pointer */
+  --blue-700: #2f5d9e;
 
-  --purple-100: #e9d8ff; /* the API's "Hmm", new variants in the API */
-  --purple-200: #dcc2ff;
-  --purple-300: #cfadff;
+  --green-100: #cdeccf; /* success, done */
+  --green-200: #b8e1bb;
+  --green-300: #a3d6a7;
+  --green-700: #0a8a4e;
+
+  --orange-100: #fddcb9; /* a warning, something to do */
+  --orange-200: #fbca98;
+  --orange-300: #f6ba7c;
+  --orange-500: #e3801a;
+  --orange-700: #a85f00;
+
+  --purple-100: #e9dcfb; /* the API's "Hmm", new variants in the API */
+  --purple-200: #dcc6fa;
+  --purple-300: #ceb0f6;
   --purple-700: #6604c2; /* transport (T, TP) in the labelings, as in the pricing infographic */
 
-  --yellow-100: #ffec99; /* the API's "Do edycji" */
+  --yellow-100: #fbeca2; /* the API's "Do edycji" */
 
-  --red-50: #f7e1e3; /* the API's "Ma zamiennik": paler than "Odrzucony" */
-  --red-100: #efc2c7; /* danger, an error */
-  --red-200: #e3939b;
-  --red-300: #d7636f;
+  --red-50: #f6e2e4; /* the API's "Ma zamiennik": paler than "Odrzucony" */
+  --red-100: #efc5ca; /* danger, an error */
+  --red-200: #e3969e;
+  --red-300: #d76671;
   --red-400: #cb3343;
-  --red-500: #bf0417;
+  --red-500: #bf0417; /* REED's red: danger, and the page you're on in the menu */
 
-  /* a field's name, and what's said about it: navy seen through, so it darkens with the box it's on (white, grey,
-     the blues of a variant or an option) - contrast 9.9 / 5.2 on white, 7.6 / 4.4 on the variants' navy-100, 6.9 / 4.2 on navy-200 */
+  /* a field's name, and what's said about it: navy seen through, so it darkens with the box it's on (the paper, grey,
+     a variant's blue, an option's yellow) - contrast 9.5 / 5.1 on the paper, 9.0 / 4.9 on a variant's navy-50,
+     6.6 / 4.1 on navy-200 */
   --ink-label: rgb(27 47 78 / 0.9);
   --ink-muted: rgb(27 47 78 / 0.7);
-  /* a field's edge: black seen through, so a darker shade of whatever it's on (as the swatches' ring) */
-  --edge: rgba(0, 0, 0, 0.25);
+  /* a field's edge: the ink seen through, so a darker shade of whatever it's on (as the swatches' ring) */
+  --edge: rgb(27 47 78 / 0.26);
+  --edge-line: rgb(27 47 78 / 0.42); /* its bottom: the line it's written on */
+  --icon-ink: var(--navy-950); /* a dark icon (see Icon) */
 
   --scroll-thumb: var(--grey-300); /* see global.css */
   --scroll-track: transparent;
 
   /* corners are squircles (corner-shape, rounded where it isn't known): a squircle looks sharper than a rounded
-     corner of the same radius, so the radii are big */
-  --border-radius: 0.7rem; /* small things: a tag, a chip, a tile */
-  --box-radius: 1.1rem; /* a box, a bar, a table, a popup */
-  --field-radius: 0.7rem; /* a field (Input, Select), 2rem high */
-  --field-radius-small: 0.55rem; /* 1.5rem */
-  --field-radius-compact: 0.45rem; /* 1.2rem */
-  --button-radius: 1rem; /* a Button, rounder than a field */
-  --button-radius-small: 0.75rem;
+     corner of the same radius, so the radii are bigger than they look */
+  --border-radius: 0.6rem; /* small things: a tag, a chip, a tile */
+  --box-radius: 1rem; /* a box, a bar, a table, a popup */
+  --field-radius: 0.65rem; /* a field (Input, Select), --control high */
+  --field-radius-small: 0.5rem; /* 1.5rem */
+  --field-radius-compact: 0.4rem; /* 1.2rem */
+  --button-radius: 0.75rem; /* a Button */
+  --button-radius-small: 0.6rem;
   --border: solid 1px var(--navy-700);
   --border-light: solid 1px var(--black-10);
-  --border-ink: solid 1px rgb(27 47 78 / 0.55); /* navy seen through, darkening with the box it's on: a table's lines,
+  --border-ink: solid 1px rgb(27 47 78 / 0.5); /* navy seen through, darkening with the box it's on: a table's lines,
   a preview's edge */
   --border-heavy: solid 0.1875rem var(--black-10);
-  --shadow: #43475545 0 0 0.25em, #5a7dbc0d 0 0.25em 1em;
+  /* a ply lying on the board: its edge and a thin shadow under it, no glow */
+  --shadow: 0 1px 0 rgb(14 27 47 / 0.05), 0 1px 3px rgb(14 27 47 / 0.06);
+  /* a popup, a sheet over the page */
+  --shadow-lifted: 0 2px 6px rgb(14 27 47 / 0.08), 0 12px 32px rgb(14 27 47 / 0.16);
+  --shadow-focus: 0 0 0 3px var(--black-10); /* a field in focus (Input, Select): a halo of the ink seen through */
+  /* a line of perforation, where a bar tears off the page under it: holes in the ink seen through */
+  --perforation: radial-gradient(circle, rgb(27 47 78 / 0.32) 0.09rem, transparent 0.11rem) left bottom / 0.45rem
+    0.25rem repeat-x;
 }
 
 /* The website's font files under their own name: `swap` (the website's are `optional`; the admin stays open all
@@ -123,21 +180,48 @@ body {
   height: 100%;
 }
 
-.ui-section {
-  margin-bottom: 2rem;
-  container-type: inline-size; /* (its width sizes "+ Dodaj", see .ui-add) */
+/* what the browser draws itself, in the form's ink too */
+::selection {
+  color: var(--text);
+  background-color: var(--navy-200);
 }
+:root {
+  caret-color: var(--navy-700);
+  accent-color: var(--navy-700);
+}
+:focus-visible {
+  outline-color: var(--navy-700);
+}
+
+.ui-section {
+  margin-bottom: var(--half); /* (a section head after it is pushed further, onto a line: see onGrid) */
+  container-type: inline-size; /* (its width sizes the columns and "+ Dodaj", see .ui-add) */
+}
+/* one column, two or three as the section is wide (each at least 21.875rem: the queries below are two and three of
+   them with the gaps - a container query can't read a variable): whole half cells wide, the last taking what's left
+   of the section - itself whole half cells (see the admin layout) - so the boxes reach the mat's frame; a box across
+   all: `1 / -1` */
 .ui-section__row {
+  --w2: round(down, (100cqw - var(--page-pad)) / 2, var(--half));
+  --w3: round(down, (100cqw - 2 * var(--page-pad)) / 3, var(--half));
   display: grid;
-  /* three columns at most (a wide screen: wider ones), a phone one, as wide as it - a box across all: `1 / -1` (a span
-     past the last column adds columns, squeezing the rest) */
-  grid-template-columns: repeat(auto-fill, minmax(max(min(21.875rem, 100%), (100% - 3rem) / 3), 1fr));
-  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--page-pad);
+}
+@container (min-width: 44.625rem) {
+  .ui-section__row {
+    grid-template-columns: var(--w2) minmax(0, 1fr);
+  }
+}
+@container (min-width: 67.375rem) {
+  .ui-section__row {
+    grid-template-columns: var(--w3) var(--w3) minmax(0, 1fr);
+  }
 }
 .ui-section__col {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--page-pad);
 }
 /* a product's photo the site's tiles show (gallery or variant, see Product): the picture in a blue line, the one under
    the pointer in a dashed one */
@@ -150,20 +234,27 @@ body {
   outline-offset: -1px;
 }
 /* "+ Dodaj" at the end of a grid of boxes (a product's photos, files, variants, labelings): on a row of its own as wide
-   as the gallery's tile at its smallest, the same in every grid - 7.5rem, or on a phone a third of the section (see
+   as the gallery's tile at its smallest, the same in every grid - --tile, or on a phone a third of the section (see
    ProductFiles) - and no wider than its cell; on a row with a box before it (`ui-add--side`, see beside.js) turned on
-   its side, reading downwards, as long as what's on it, at the top of its cell */
+   its side, reading downwards, as long as what's on it, at the top of its cell. On the mat it lies as a box does: 1px
+   inside its slot, which on a row of its own is a cell and a half (the button at its top) */
 .ui-add {
   display: flex;
   flex-direction: column;
-  width: min(7.5rem, (100cqw - 2 * 0.5625rem) / 3, 100%);
+  width: min(var(--tile) - 1px, var(--w3, 100%) - 1px, 100%); /* (--w3: a third of the section's row) */
+}
+.ui-add:not(.ui-box .ui-add) {
+  margin: 1px 0 0 1px;
+}
+.ui-add:not(.ui-box .ui-add, .ui-add--side) {
+  min-height: calc(3 * var(--half) - 1px);
 }
 .ui-add.ui-add--side {
   flex-direction: row;
   align-items: flex-start;
 }
 span.ui-add.ui-add--side > button {
-  width: 2rem !important; /* (over the Button's own width) */
+  width: var(--control) !important; /* a button lying down (over the Button's own width) */
   height: auto;
   writing-mode: vertical-rl;
 }
@@ -173,8 +264,8 @@ span.ui-add.ui-add--side.ui-add > button > div {
 }
 /* its "+" as big as on a button lying down (Button sizes it by its height) */
 span.ui-add.ui-add--side > button svg {
-  width: 1.16rem !important;
-  height: 1.16rem !important;
+  width: calc(0.58 * var(--control)) !important;
+  height: calc(0.58 * var(--control)) !important;
 }
 
 .ui-pair {
@@ -192,34 +283,58 @@ span.ui-add.ui-add--side > button svg {
   flex-basis: 100%;
 }
 
+/* a section of the form (Opis, Cennik, Warianty): its name on a small paper label lying on the mat as the boxes do -
+   a cell tall, whole half cells wide (onGrid), the name in its middle - its top on a line of the mat; the mat's lines
+   do the separating */
 .ui-h2 {
-  margin-bottom: 0.5rem;
-  font-size: 1.75rem;
+  display: flex;
+  margin: calc(1px + var(--push, 0px)) 0 var(--page-pad) 1px; /* (inside its slot, see .ui-on-mat; pushed by onGrid) */
+  font-size: 1rem;
+  letter-spacing: -0.005em;
+}
+.ui-h2 > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  height: calc(var(--cell) - 1px);
+  padding: 0 var(--half);
+  white-space: nowrap;
+  border-radius: var(--border-radius);
+  corner-shape: squircle;
+  border: var(--border-light);
+  background-color: var(--paper);
+  box-shadow: var(--shadow);
 }
 
 .ui-bar {
-  /* a bar above a page's table: its parts in a row, never lower than a button */
+  /* a bar above a page's table: its parts in a row */
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  align-content: center; /* its rows together in its middle, when it's taller (whole half cells, see onGrid) */
   gap: 1rem;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  min-height: calc(2rem + 1rem + 2px); /* a button, the padding and the border (border-box) */
+  padding: var(--bar-pad) var(--box-pad); /* (what's in it as far in as a box's) */
+  margin-bottom: var(--page-pad);
+  min-height: calc(2 * var(--cell) - 1px); /* two cells, less the 1px it sits inside its slot (.ui-on-mat) */
   border-radius: var(--box-radius);
   corner-shape: squircle;
   border: var(--border-light);
-  background-color: var(--light);
+  background-color: var(--paper);
+  box-shadow: var(--shadow);
 }
 
 /* a field's name over it (Input's, or one over several fields): small, uppercase, spaced out; what's said about it
-   ("Ilość · zapytaj", "Rozmiar · mm") as big, lighter, after a dot */
+   ("Ilość · zapytaj", "Rozmiar · mm") as big, lighter, after a dot. Its row three quarters of a cell, the name over
+   the 0.25rem left under it, so with the field under it it's two cells - a box's fields keep the mat's rhythm (see
+   .ui-box) */
 .ui-label {
   display: flex;
   align-items: center;
   gap: 0.4em;
-  margin-bottom: 0.35rem;
+  min-height: calc(0.75 * var(--cell));
+  padding-bottom: 0.25rem;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -259,7 +374,7 @@ span.ui-add.ui-add--side > button svg {
   align-items: baseline;
   align-content: center;
   gap: 0.1rem 0.35rem;
-  height: 2rem;
+  height: var(--control);
   line-height: 1;
 }
 .ui-counts .ui-stat-value {
@@ -269,26 +384,48 @@ span.ui-add.ui-add--side > button svg {
 .ui-divider {
   flex: none;
   align-self: center;
+  margin-inline: 0.25rem; /* a little more room on each side of it than between the bar's parts */
   width: 1px;
-  height: 2rem;
+  height: var(--control);
   background-color: var(--black-10);
 }
 
-/* the top bars (the page's header, the editor's): the page shows through, blurred - once it's scrolled under them
-   (--scrolled, 0 to 1, see scrolled.js), the ground and the line under them coming in with it */
+/* the first button of the API bars (Skanuj beside the companies, Importuj under them): as wide on every tab and in
+   both rows, a longer label ("Importowanie...") wider */
+.ui-lead {
+  display: flex;
+}
+.ui-lead > button {
+  min-width: 7.5rem;
+}
+
+/* the top bars (the page's header, the editor's, a modal's on the mat): the board, solid while nothing is under it,
+   turning to a see-through frost as the page scrolls under (--scrolled, 0 to 1, see scrolled.js) - the mat's lines
+   on it staying as they are (see Mat) - and a line of perforation coming in under it, where it would tear off */
 .ui-topbar {
   --scrolled: 1;
-  border-bottom: solid 1px rgb(0 0 0 / calc(0.1 * var(--scrolled)));
-  background-color: rgb(235 238 240 / calc(50% * var(--scrolled))); /* grey-100, see-through */
-  -webkit-backdrop-filter: blur(calc(0.625rem * var(--scrolled)));
-  backdrop-filter: blur(calc(0.625rem * var(--scrolled)));
+  position: relative;
+  background-color: rgb(from var(--board) r g b / calc(100% - 55% * var(--scrolled)));
+  -webkit-backdrop-filter: blur(calc(0.75rem * var(--scrolled)));
+  backdrop-filter: blur(calc(0.75rem * var(--scrolled)));
+}
+.ui-topbar::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.25rem;
+  background: var(--perforation);
+  opacity: var(--scrolled);
 }
 
 /* A list page: as tall as the window under the header, it doesn't scroll - its table does (a Grid scrolls when it has
    to give way), what's above and under the table (the bar, the pagination) stays in view. Its parts in a column: the
    pagination follows the table, and stays at the bottom once the table fills the page. (A phone: the page scrolls.) */
 .ui-fill {
-  height: calc(100dvh - var(--header-height) - 1.5rem); /* the page's padding under it (see the admin layout) */
+  height: var(--fill-height);
 }
 /* a column inside it (.ui-fill-col) the same; only the table (a Grid's .table), what's marked to (.ui-fill-scroll) and
    the columns holding them give way, the rest keeps its height */
@@ -308,34 +445,47 @@ span.ui-add.ui-add--side > button svg {
   min-height: 0;
 }
 
+/* a ply: its padding and border half a cell, its parts half a cell apart, each of them whole quarters - a field and its
+   label (or a heading) two cells, a row of checkboxes one - so a box comes out whole half cells and the fields of the
+   boxes side by side line up */
 .ui-box {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--half);
   border-radius: var(--box-radius);
   corner-shape: squircle;
   border: var(--border-light);
-  padding: 1rem;
-  background-color: var(--light);
-  transition: background-color 200ms ease-in-out;
+  padding: var(--box-pad);
+  background-color: var(--paper);
+  box-shadow: var(--shadow);
+  /* switched off and on (see .ui-box--uneditable): its colour, see-through and shadow change as one */
+  transition:
+    background-color 200ms ease-in-out,
+    opacity 200ms ease-in-out,
+    box-shadow 200ms ease-in-out;
 }
+/* the copies: a box repeated for each of a kind (a variant, a calculation) on the blue ply, an optional one on the
+   yellow - one inside another lies flat on it */
 .ui-box--element {
   background-color: var(--navy-50);
 }
 .ui-box--optional {
-  background-color: var(--blue-100);
+  background-color: var(--ply-yellow);
+}
+.ui-box .ui-box {
+  box-shadow: none;
 }
 /* inside another box: reaching halfway into its padding, so the fields in it line up with the ones around it - and,
    the first or last thing in it, halfway into its top or bottom one too: as far from the box's edges as beside */
 .ui-box .ui-box--optional {
-  margin-inline: -0.5rem;
-  padding: 0.5rem;
+  margin-inline: calc(-1 * var(--quarter));
+  padding: var(--quarter);
 }
 .ui-box .ui-box--optional:first-child {
-  margin-top: -0.5rem;
+  margin-top: calc(-1 * var(--quarter));
 }
 .ui-box .ui-box--optional:last-child {
-  margin-bottom: -0.5rem;
+  margin-bottom: calc(-1 * var(--quarter));
 }
 /* a text link in a box (the website's page of it, a file, where it's used): blue, lighter
    under the pointer - all of it (every element has its own colour here, see *) */
@@ -348,20 +498,42 @@ span.ui-add.ui-add--side > button svg {
   color: var(--blue-500);
 }
 
+/* what lies on the mat sits 1px inside its slot of half cells: the mat's lines before it show, none run under its
+   edges (its height made whole half cells by onGrid, less the same 1px) */
+.ui-on-mat,
+.ui-box:not(.ui-box .ui-box),
+.ui-bar,
+.ui-snap {
+  margin-top: 1px;
+  margin-left: 1px;
+}
+/* (a box's bottom padding the pixel less, so what's in it in whole half cells makes it exactly its slot - onGrid rounds
+   up the rest; a component's own padding over it) */
+.ui-box:where(:not(.ui-box .ui-box)) {
+  padding-bottom: calc(var(--box-pad) - 1px);
+}
+
 .ui-box--uneditable {
   background-color: var(--grey-100);
 }
+/* a variant, a calculation, a photo switched off: all of it a little see-through, the mat's lines showing under its
+   grey, lying flat */
+.ui-box--element.ui-box--uneditable {
+  opacity: 0.8;
+  background-color: rgb(from var(--grey-100) r g b / 0.75);
+  box-shadow: none;
+}
 
+/* a box's heading: a big label - its row, with the box's gap under it, three quarters of a cell as a field's label is
+   (see .ui-label), so what follows keeps the mat's rhythm */
 .ui-h3 {
-  margin-bottom: -0.5rem;
-  font-size: 1.15rem;
+  margin-bottom: calc(0.75 * var(--cell) - 1.25rem - var(--half));
+  font-size: 1.1rem;
+  line-height: 1.25rem;
+  color: var(--navy-950);
 }
-.ui-h3:first-child {
-  margin-top: 0;
-}
-
-.ui-h4 {
-  margin-bottom: -1rem;
+.ui-box > .ui-h3:last-child {
+  margin-bottom: 0; /* (nothing after it in the box to take the row's last quarter: just its line) */
 }
 
 .ui-table {
@@ -385,10 +557,10 @@ span.ui-add.ui-add--side > button svg {
 }
 
 .ui-table tr {
-  background-color: var(--light);
+  background-color: var(--paper-field);
 }
 .ui-table tr:hover {
-  background-color: var(--blue-100);
+  background-color: var(--grey-50); /* (as a ledger's row, see Grid) */
 }
 .ui-table th,
 .ui-table td {
@@ -399,6 +571,7 @@ span.ui-add.ui-add--side > button svg {
   text-align: left;
 }
 .ui-table th {
+  color: var(--navy-950);
   background-color: var(--grey-100);
 }
 .ui-table .input {
@@ -410,9 +583,10 @@ span.ui-add.ui-add--side > button svg {
 
 /* file tiles (the library, its unused files, new images): a phone fits three */
 .ui-tiles {
+  --tiles-gap: var(--page-pad);
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(7.8125rem, 1fr));
-  gap: 1rem;
+  gap: var(--tiles-gap);
 }
 
 /* a squircle like the text field beside it, its edge a price table's */
@@ -423,6 +597,7 @@ span.ui-add.ui-add--side > button svg {
   border: var(--border-ink);
   border-radius: var(--field-radius);
   corner-shape: squircle;
+  background-color: var(--paper-field);
 }
 /* the text field as tall as its preview (outweighs Input's own height) */
 .ui-texteditor > .ui-texteditor__draft:has(+ .ui-texteditor__render) > .wrapper,
@@ -434,7 +609,9 @@ span.ui-add.ui-add--side > button svg {
    Header and Editor have their own. */
 @media (max-width: 50rem) {
   :root {
-    --header-height: 3.25rem;
+    --header-height: calc(var(--mat-margin) + 1.5 * var(--cell));
+    --leftover: var(--sheet-leftover); /* (no menu beside the page) */
+    --lead: round(down, var(--leftover) / 2, 1px); /* the part of it before the mat: the page in the middle */
   }
   .ui-section__row > * {
     grid-column: auto !important;
@@ -442,15 +619,12 @@ span.ui-add.ui-add--side > button svg {
   .ui-pair.ui-texteditor {
     grid-template-columns: minmax(0, 1fr);
   }
-  .ui-h2 {
-    font-size: 1.5rem;
-  }
   .ui-bar {
     gap: 0.5rem;
   }
   .ui-tiles {
+    --tiles-gap: 0.5rem;
     grid-template-columns: repeat(auto-fill, minmax(5.9375rem, 1fr));
-    gap: 0.5rem;
   }
 }
 
@@ -474,5 +648,5 @@ span.ui-add.ui-add--side > button svg {
 .sortable-fallback {
   z-index: 3000 !important;
   opacity: 0.9 !important;
-  box-shadow: 0 0.25rem 1rem rgb(17 17 16 / 0.18);
+  box-shadow: var(--shadow-lifted);
 }

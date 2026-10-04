@@ -152,15 +152,17 @@
           </div>
         </div>
         <div class="hero__plate" aria-hidden="true">
-          <img
-            class="hero__machine"
-            src="/imgs/machine-playful.webp"
-            srcset="/imgs/machine-playful-768.webp 768w, /imgs/machine-playful-1024.webp 1024w, /imgs/machine-playful.webp 1536w"
-            sizes="30rem"
-            alt=""
-            width="1536"
-            height="1024"
-            fetchpriority="high" />
+          <span class="hero__stage">
+            <img
+              class="hero__machine"
+              src="/imgs/machine-playful.webp"
+              srcset="/imgs/machine-playful-768.webp 768w, /imgs/machine-playful-1024.webp 1024w, /imgs/machine-playful.webp 1536w"
+              sizes="30rem"
+              alt=""
+              width="1536"
+              height="1024"
+              fetchpriority="high" />
+          </span>
         </div>
       </div>
     </section>
@@ -352,10 +354,24 @@
   .hero__plate {
     min-width: 0;
   }
+  /* the machine and, under it, its shadow on the navy: a soft ellipse where its feet and the boxes stand */
+  .hero__stage {
+    position: relative;
+    display: block;
+    max-width: 30rem;
+  }
+  .hero__stage::before {
+    content: '';
+    position: absolute;
+    inset: auto 2% 1% 3%;
+    height: 18%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.65), rgb(0 0 0 / 0.3) 55%, transparent);
+    filter: blur(0.375rem);
+  }
   .hero__machine {
+    position: relative; /* (over its shadow) */
     display: block;
     width: 100%;
-    max-width: 30rem;
     height: auto;
     aspect-ratio: 3 / 2;
     object-fit: contain;
@@ -626,7 +642,7 @@
       order: -1;
       margin-top: -1.25rem;
     }
-    .hero__machine {
+    .hero__stage {
       margin-inline: auto;
     }
   }
@@ -659,7 +675,7 @@
       align-self: center;
       margin-top: var(--sp-5);
     }
-    .hero__machine {
+    .hero__stage {
       max-width: none;
     }
   }
@@ -676,12 +692,27 @@
       align-self: stretch;
       margin-block: calc(var(--sp-6) * -1);
     }
-    .hero__machine {
+    .hero__stage {
       position: absolute;
       inset: 0;
       max-width: none;
+      container-type: size;
+    }
+    .hero__machine {
+      position: absolute;
+      inset: 0;
       height: 100%;
       aspect-ratio: auto;
+    }
+    /* the machine drawn in the middle of the plate (contain): its shadow under what's drawn, not under the plate */
+    .hero__stage::before {
+      --w: min(100cqw, 150cqh);
+      --h: calc(var(--w) / 1.5);
+      inset: auto;
+      left: calc(50% - var(--w) / 2 + 0.03 * var(--w));
+      bottom: calc((100cqh - var(--h)) / 2 + 0.01 * var(--h));
+      width: calc(0.95 * var(--w));
+      height: calc(0.18 * var(--h));
     }
   }
 

@@ -7,7 +7,16 @@
 
   export let items;
   export let item;
+  export let original = null; // the row as saved (none for a new one: all of it is new)
   export let index; // index in the items array, not the `index` property
+
+  // a cell changed since the last save, marked (all of a new row's, and of a new column's)
+  const differs = (value, saved) => String(value ?? '') !== String(saved ?? '');
+  $: changed = (field) => !original || differs(item[field], original[field]);
+  $: priceChanged = (p) => {
+    const saved = original?.prices.find((o) => o._uid === p._uid);
+    return !saved || differs(p.price, saved.price);
+  };
 
   let removing = false;
   let swapID = null;
@@ -19,10 +28,6 @@
       .filter((l) => l.id != null && l.id !== item.id && !l._remove)
       .map(({ id, name, code, type }) => ({ id, text: code || name || type || '???' })),
   ];
-
-  function handleIndexClick(e) {
-    e.detail.e.target.select();
-  }
 
   async function handleIndexInput(e) {
     // Validate the input (setting the index to 0 if incorrect) and fixes the new order.
@@ -75,45 +80,38 @@
   <td class="col-sticky col-remove">
     <span class="cell-button"><Button size="sm" dangerous icon="delete" title="Usuń" on:click={tryRemove} /></span>
   </td>
-  <td class="input type col-sticky col-index heavy-border">
-    <Input
-      type="number"
-      borderless
-      min={0}
-      step={1}
-      value={item.index}
-      on:click={handleIndexClick}
-      on:input={handleIndexInput} />
+  <td class="input type col-sticky col-index heavy-border" class:changed={changed('index')}>
+    <Input type="number" borderless min={0} step={1} value={item.index} on:input={handleIndexInput} />
   </td>
 
-  <td class="input type">
+  <td class="input type" class:changed={changed('name')}>
     <Input borderless bind:value={item.name} />
   </td>
-  <td class="input code col-sticky col-code">
+  <td class="input code col-sticky col-code" class:changed={changed('code')}>
     <Input borderless bind:value={item.code} />
   </td>
-  <td class="input type heavy-border">
+  <td class="input type heavy-border" class:changed={changed('type')}>
     <Input borderless bind:value={item.type} />
   </td>
 
-  <td class="input margin">
+  <td class="input margin" class:changed={changed('margin')}>
     <Input type="number" borderless min={0} step={0.01} bind:value={item.margin} />
   </td>
-  <td class="input minimum">
+  <td class="input minimum" class:changed={changed('minimum')}>
     <Input type="number" borderless min={0} step={0.01} bind:value={item.minimum} />
   </td>
-  <td class="input prepress">
+  <td class="input prepress" class:changed={changed('prepress')}>
     <Input type="number" borderless min={0} step={0.01} bind:value={item.prepress} />
   </td>
-  <td class="input transport">
+  <td class="input transport" class:changed={changed('transport')}>
     <Input type="number" borderless min={0} step={0.01} bind:value={item.transport} />
   </td>
-  <td class="input transportThreshold heavy-border">
+  <td class="input transportThreshold heavy-border" class:changed={changed('transport_threshold')}>
     <Input type="number" borderless min={0} step={0.01} bind:value={item.transport_threshold} />
   </td>
 
   {#each item.prices as p (p._uid)}
-    <td class="input prices">
+    <td class="input prices" class:changed={priceChanged(p)}>
       <Input type="number" borderless min={0} step={0.01} bind:value={p.price} />
     </td>
   {/each}

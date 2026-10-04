@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 
-import api from '$/api';
+import api from '$lib/server/api';
 import { parseSearchToParams } from '$/searchparams';
 import { makeTree } from '%/utils';
 import { fields, enabledFilter, countProducts } from '#/products/fields';

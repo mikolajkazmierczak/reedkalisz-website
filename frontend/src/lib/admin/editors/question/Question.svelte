@@ -93,7 +93,7 @@
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">
-        <div class="ui-section__col" style:grid-column={'1 / span 2'}>
+        <div class="ui-section__col">
           <div class="ui-box">
             <Input bind:value={item.name}>Imię i nazwisko</Input>
             <Input bind:value={item.email}>Email</Input>
@@ -104,7 +104,6 @@
 
         <div class="ui-section__col">
           <div class="ui-box ui-box--uneditable">
-            <h2>Zapytanie</h2>
             <Blames {item} />
             {#if item.product}
               <h3 class="ui-h3">Produkt</h3>

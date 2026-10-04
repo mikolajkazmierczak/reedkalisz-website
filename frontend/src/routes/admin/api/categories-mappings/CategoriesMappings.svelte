@@ -266,9 +266,10 @@
 <style>
   /* Lined up by what's drawn, like the categories next to the products: a name without an arrow starts where its
      siblings' ">" does, a child's ">" (or name) where its parent's name does. The line of a level runs under the middle
-     of its parent's arrow, just before the children's buttons. Bigger than a small button: it's read a lot */
+     of its parent's arrow, just before the children's buttons. Its type and arrow bigger than a small button's: it's
+     read a lot */
   .tree {
-    --height: 1.75rem;
+    --height: 1.5rem; /* a row's line (see Grid): the row a cell tall */
     --font: 0.95rem;
     --icon: 1rem;
     --gap: 0.35rem; /* between the arrow and the name */

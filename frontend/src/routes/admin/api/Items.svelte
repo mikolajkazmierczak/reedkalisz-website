@@ -70,7 +70,7 @@
     id === '_default' ? { id, text, special: true } : { id, text, color: flagColors[id] },
   );
   const flagColors = {
-    _default: 'var(--light)',
+    _default: 'var(--paper-field)',
     rejected: 'var(--red-100)',
     cut: 'var(--red-50)', // paler than rejected: it's been dealt with
     check: 'var(--purple-100)',

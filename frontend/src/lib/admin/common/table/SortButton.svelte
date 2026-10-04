@@ -28,7 +28,7 @@
     height: 1.2rem;
     padding: 0.15rem;
     border: none;
-    border-radius: 0.4rem;
+    border-radius: 0.5rem;
     corner-shape: squircle;
     color: var(--grey-500);
     background-color: transparent;

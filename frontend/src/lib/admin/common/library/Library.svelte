@@ -21,12 +21,13 @@
   const dispatch = createEventDispatcher();
 
   export let searchParams = null;
-  export let limit = 25; // default for picker
+  export let limit = 50; // (the picker's, a page's from its URL)
   export let page = 1; // default for picker
   export let query = null;
 
   export let picker = false;
   export let selected = null;
+  export let cleared = null; // the picker's file just taken off (see Picker)
   export let dropping = true; // takes files dropped anywhere on the page
   // picker in a product: { used, history } - its files now and its files before.
   // They are offered first, each file only once, every section with its own pages.
@@ -41,12 +42,7 @@
   // tagged files are hidden from the library
   const notHidden = { tags: { _null: true } };
 
-  let lastContext = null;
   async function readContext(context) {
-    // the product changes while the picker is open (e.g. when a file is picked), its files don't
-    const key = JSON.stringify(context);
-    if (key === lastContext) return;
-    lastContext = key;
     if (!context) {
       sections = null;
       excluded = [];
@@ -232,8 +228,8 @@
   {#if picker && sections}
     {#each sections as section, i}
       {#if section.ids.length}
-        <div class="section-head">
-          <h3 class="ui-h3 heading">{section.heading} <small>({section.count})</small></h3>
+        <div class="ui-h2 section-head">
+          <span role="heading" aria-level="3">{section.heading} <small>({section.count})</small></span>
           {#if pages(section) > 1}
             <div class="pager">
               <Button
@@ -254,27 +250,29 @@
             </div>
           {/if}
         </div>
-        <div class="context ui-tiles">
+        <div class="context ui-tiles ui-snap">
           {#each section.files as file (file.id)}
             <File
               {...fileProps(file)}
               marked={file.id === selected}
-              backing="var(--grey-100)"
+              cleared={file.id === cleared}
+              backing="var(--board)"
               on:click={(e) => fileClick(e, file)} />
           {/each}
         </div>
       {/if}
     {/each}
-    <h3 class="ui-h3 heading">Pozostałe pliki</h3>
+    <h3 class="ui-h2"><span>Pozostałe pliki</span></h3>
   {/if}
 
-  <div class="ui-tiles">
+  <div class="ui-tiles ui-snap">
     {#if files?.length}
       {#each files as file (file.id)}
         <File
           {...fileProps(file)}
           marked={file.marked}
-          backing="var(--grey-100)"
+          cleared={picker && file.id === cleared}
+          backing="var(--board)"
           on:click={(e) => fileClick(e, file)} />
       {/each}
     {/if}
@@ -288,20 +286,20 @@
 </div>
 
 <style>
-  .heading {
-    margin: 0 0 0.75rem;
-  }
-  .context {
-    margin-bottom: 1.5rem;
-  }
-  .section-head {
+  /* (a column, so the margins of what's in it add up, not collapse: a label pushed onto a line, see onGrid) */
+  .wrapper {
     display: flex;
+    flex-direction: column;
+  }
+  /* the picker's groups as an editor's sections: a paper label (.ui-h2) - its pages at the other end - then its tiles,
+     the next label on the next line of the mat (see onGrid) */
+  .section-head {
+    justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 0.75rem;
   }
-  .section-head .heading {
-    margin: 0;
+  .context {
+    margin-bottom: var(--page-pad);
   }
   .pager {
     display: flex;
@@ -343,7 +341,7 @@
     border: var(--border-light);
     margin-bottom: 1.5rem;
     padding: 0.5rem;
-    background-color: var(--light);
+    background-color: var(--paper);
   }
   .empty {
     text-align: center;

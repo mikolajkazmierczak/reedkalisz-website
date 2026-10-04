@@ -1,4 +1,4 @@
-import api from '$/api';
+import api from '$lib/server/api';
 import { makeTree } from '%/utils';
 import { preloadSlider } from '#/products/slider';
 import { readProduct, deepestCategory } from '#/products/product';

@@ -1,5 +1,5 @@
-// A top bar over what scrolls under it (the page's header, an editor's): clear while nothing is under it, its frosted
-// ground and its line coming in with the first `distance` px scrolled - along with the scroll, not all at once. Sets
+// A top bar over what scrolls under it (the page's header, an editor's): solid while nothing is under it, its ground
+// turning to frost and its line coming in with the first `distance` px scrolled - along with the scroll. Sets
 // `--scrolled` (0 to 1) on the bar, see .ui-topbar. `source`: the element that scrolls, or none for the page.
 export function scrolled(node, source = null) {
   const distance = 24;

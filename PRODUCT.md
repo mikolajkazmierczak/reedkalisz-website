@@ -34,7 +34,7 @@ A supporting mechanism, real but secondary as a public claim: products are impor
 - **Inquiries are the conversion.** The form takes email (required), phone, name and message (required), and prefixes the product code onto the message body. It posts to the `questions` collection; staff answer them from the admin panel, where inquiries that arrived by other channels can also be entered.
 - The homepage is **composed in the admin** from a small block vocabulary: title, tiles, category, whitespace. Contact, privacy-policy and information-obligation pages render Markdown fragments edited in the CMS. The footer is likewise three CMS fragments plus a menu.
 - Contact page embeds an OpenStreetMap view of the Kalisz premises.
-- Usage is measured with Umami analytics (script in `frontend/src/app.html`).
+- Usage is measured with Umami analytics: the script is in the website layout (`frontend/src/routes/(website)/+layout.svelte`), so only the public site on reed.kalisz.pl is counted, and a browser that has an admin logged in stops being counted (`readme` in `lib/shared/auth.js`).
 
 ## Capabilities and Constraints
 

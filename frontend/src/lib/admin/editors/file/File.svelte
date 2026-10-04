@@ -181,7 +181,7 @@
       </div>
     </section>
 
-    <div class="file">
+    <div class="file ui-snap">
       {#if isImg && imgError}
         <div class="error">Nie można wyświetlić obrazka</div>
       {:else if isImg}
@@ -215,8 +215,11 @@
     gap: 0.5rem;
   }
 
+  /* the file on the mat as a box is (whole half cells tall, see onGrid), under the section; no wider than whole half
+     cells of it */
   .file {
-    margin-top: 1.5rem;
+    margin-top: calc(var(--half) + 1px); /* (the section's margin over it, and the pixel it sits inside its slot) */
+    max-width: calc(round(down, 100%, var(--half)) - 1px);
   }
   .preview {
     display: block;

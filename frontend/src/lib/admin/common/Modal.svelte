@@ -8,7 +8,9 @@
   import { fade, fly } from 'svelte/transition';
   import { portal } from '@/portal';
   import { scrolled } from '@/scrolled';
+  import { onGrid } from '@/onGrid';
   import Button from '@c/Button.svelte';
+  import Mat from '@c/Mat.svelte';
 
   // Every box over the page, the page dimmed under it. On top a bar: the `title`, what the `bar`
   // slot adds (counts, buttons) and the close button. What's in it scrolls under the bar - the bar frosting as it goes
@@ -25,7 +27,7 @@
   export let maxWidth = '32rem';
   export let layer = 1000; // z-index: popups 1000, errors 1002, dialogs over them 1500 (see Dialog)
   export let tone = null; // 'danger': about something that can't be undone, a red top edge; 'error': a red edge all round
-  export let dotted = false; // the library's dotted grey under what's in it (files to look through, as the picker)
+  export let mat = false; // the board's cutting mat under what's in it (files to look through, as the picker)
   export let panel = null; // the box, for its owner (focus)
   export let scroller = null; // what scrolls, for its owner (back to the top)
 
@@ -35,6 +37,7 @@
   const titleId = `modal-title-${++ids}`;
 
   $: bar = !!(title || $$slots.bar || closeText);
+  const grid = (node) => (mat ? onGrid(node) : undefined); // (what's on its mat kept on the cells, see onGrid)
 
   let pressedBeside = false;
   const keydown = (e) => e.key === 'Escape' && !e.defaultPrevented && open.at(-1) === self && dispatch('close');
@@ -57,7 +60,7 @@
     class:fill={type === 'fill'}
     class:danger={tone === 'danger'}
     class:error={tone === 'error'}
-    class:dotted
+    class:on-mat={mat}
     style:max-width={type === 'fit' ? `min(${maxWidth}, 100%)` : null}
     role="dialog"
     aria-modal="true"
@@ -67,23 +70,29 @@
     in:fly={{ y: 20, duration: 200 }}
     out:fade={{ duration: 100 }}>
     <div class="scroll" bind:this={scroller}>
-      {#if bar}
-        <div class="bar ui-topbar" use:scrolled={scroller}>
-          {#if title}
-            <h3 class="title" id={titleId}>{title}</h3>
-          {/if}
-          <slot name="bar" />
-          {#if closeText}
-            <span class="close">
-              <Button icon="close" size="sm" secondary on:click={() => dispatch('close')}>
-                {closeText}
-              </Button>
-            </span>
-          {/if}
+      <div class="sheet" use:grid>
+        {#if mat}<Mat />{/if}
+        {#if bar}
+          <div class="bar ui-topbar" use:scrolled={scroller}>
+            {#if mat}<Mat bar />{/if}
+            <div class="row" class:ui-bar={mat}>
+              {#if title}
+                <h3 class="title" id={titleId}>{title}</h3>
+              {/if}
+              <slot name="bar" />
+              {#if closeText}
+                <span class="close">
+                  <Button icon="close" size="sm" secondary on:click={() => dispatch('close')}>
+                    {closeText}
+                  </Button>
+                </span>
+              {/if}
+            </div>
+          </div>
+        {/if}
+        <div class="body" class:barless={!bar}>
+          <slot />
         </div>
-      {/if}
-      <div class="body" class:barless={!bar}>
-        <slot />
       </div>
     </div>
     {#if $$slots.actions}
@@ -122,17 +131,16 @@
     border-radius: var(--box-radius);
     corner-shape: squircle;
     border: var(--border-light);
-    background-color: var(--light);
+    background-color: var(--paper);
+    box-shadow: var(--shadow-lifted);
   }
   /* as wide as the text (short lines don't stretch it), a long one wraps at the maximum */
   .panel:not(.fill) {
     width: max-content;
   }
-  .panel.dotted {
-    --pad: 1.25rem;
-    background-color: var(--grey-100);
-    background-image: url('/imgs/dot_grid.png');
-    background-size: 10rem;
+  /* the board's, with its cutting mat (see .sheet): what's in it on the mat's frame, as a page's boxes */
+  .panel.on-mat {
+    background-color: var(--board);
   }
   .panel.danger {
     border-top: solid 0.1875rem var(--red-500);
@@ -154,16 +162,32 @@
     display: flex;
     flex-direction: column;
   }
+  /* what's in it, at least as tall as the box: the mat under it scrolls with it, over the panel's ground and under
+     what's in it (its own stacking context) */
+  .sheet {
+    position: relative;
+    isolation: isolate;
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
   .bar {
     z-index: 10; /* over what scrolls under it, the tiles' pills and corner buttons too */
     position: sticky;
     top: 0;
     flex: none;
+    padding: 0.75rem var(--pad);
+  }
+  .row {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-start;
     align-items: center;
-    gap: 0.5rem 1rem;
-    padding: 0.75rem var(--pad);
+    gap: 0.5rem; /* its buttons as close as a page's (Anuluj beside Importuj), the counts after them */
+  }
+  /* frosting in the panel's own paper, not the page's board */
+  .panel:not(.on-mat) .bar {
+    background-color: rgb(from var(--paper) r g b / calc(82% * var(--scrolled)));
   }
   .title {
     margin: 0 auto 0 0; /* the rest at the right end */
@@ -182,6 +206,26 @@
   .body.barless {
     padding-top: 1.5rem;
   }
+  /* on the mat, as an editor's sheet: whole half cells wide and at least as tall as the box allows, what's left over
+     past the mat's frame (see the admin layout); what's on it in its slots from the frame - its bar a page's bar
+     (.ui-bar) on the first cells, frosted round as the page's header is, what's under it from the next half line */
+  .on-mat .sheet {
+    --leftover: var(--sheet-leftover);
+    --mat-inset: 0 var(--leftover) 0 0;
+    flex: 0 0 auto;
+    min-height: calc(round(down, 100% - 2 * var(--mat-margin) - 1px, var(--half)) + 2 * var(--mat-margin) + 1px);
+  }
+  .on-mat .bar {
+    --mat-right: var(--leftover); /* (see Mat) */
+    padding: var(--mat-margin) calc(var(--mat-margin) + 1px + var(--leftover)) 0 var(--mat-margin);
+  }
+  .on-mat .body {
+    gap: var(--page-pad);
+    padding: 0 calc(var(--mat-margin) + 1px + var(--leftover)) calc(var(--mat-margin) + 1px) var(--mat-margin);
+  }
+  .on-mat .body.barless {
+    padding-top: var(--mat-margin);
+  }
   .actions {
     flex: none;
     display: flex;
@@ -196,8 +240,7 @@
     .wrapper.fill {
       padding: 0.5rem;
     }
-    .panel,
-    .panel.dotted {
+    .panel {
       --pad: 1rem;
       max-height: calc(100dvh - 1rem);
     }

@@ -21,7 +21,8 @@
   export let invalid = false; // outlined as `error` is, what's wrong said elsewhere (a number field only)
   export let borderless = false;
   export let borderRadius = null; // a field's own (e.g. joined to a button, see Search); else a squircle by its size
-  export let size = 'normal'; // normal (2rem), small (1.5rem, like the small Button), compact (1.2rem, a value in a bar)
+  // normal (a cell and a quarter, --control), small (1.5rem, like the small Button), compact (1.2rem, a value in a bar)
+  export let size = 'normal';
   export let color = null; // a select's background, e.g. for a status
   export let api = false; // the API scanner sets it: locked, "API" in the field, why when hovered
   export let apiText = 'Tę wartość ustawia skaner API.'; // (a "\n" in it breaks the line)
@@ -43,8 +44,7 @@
   // list
   function parseList(string) {
     try {
-      // Parse comma separated list to strings and numbers array.
-      // set value in editor
+      // the typed list (none given: the value's) split on ';' into strings and numbers
       if (string === undefined) string = value === null ? '' : value.join(';');
       const array = string
         .split(';')
@@ -250,18 +250,20 @@
     position: relative;
     min-width: 0; /* in a grid's column (ui-pair) as narrow as the column: a long value is cut, not widening it */
   }
-  /* the fields are squircles (rounded, where corner-shape isn't known), smaller ones less rounded */
+  /* the fields are a form's cells: a ruled box a shade brighter than the ply, its bottom edge darker - the line it's
+     written on; squircles (rounded, where corner-shape isn't known), smaller ones less rounded */
   input,
   textarea,
   .checkbox {
     border: solid 1px var(--edge);
+    border-bottom-color: var(--edge-line);
     border-radius: var(--field-radius);
     corner-shape: squircle;
     padding: 0.25rem 0.5rem;
     width: 100%;
-    height: 2rem;
+    height: var(--control);
     font-size: 0.95rem;
-    background-color: var(--light);
+    background-color: var(--paper-field);
   }
   [disabled] {
     cursor: not-allowed;
@@ -280,7 +282,9 @@
   /* under the pointer the border darkens, as a checkbox's; in focus darker still */
   input:not([type='checkbox']),
   textarea {
-    transition: border-color 100ms;
+    transition:
+      border-color 100ms,
+      box-shadow 100ms;
   }
   input:not([type='checkbox'], [disabled]):hover,
   textarea:not([disabled]):hover {
@@ -292,6 +296,10 @@
   textarea:focus:hover {
     outline: none;
     border-color: var(--navy-700);
+    box-shadow: var(--shadow-focus);
+  }
+  input[type='checkbox']:focus {
+    box-shadow: none;
   }
   textarea {
     resize: none;
@@ -327,12 +335,12 @@
     padding: 0;
     width: 1.25rem;
     height: 1.25rem;
-    border: solid 1px var(--edge);
+    border: solid 1px var(--edge-line);
     border-radius: var(--field-radius-small);
-    background-color: var(--light);
-    transition:
-      background-color 100ms,
-      border-color 100ms;
+    background-color: var(--paper-field);
+    /* ticked or not at once: a fade, caught midway by the next click (clicking fast), reads as one toggle too many -
+       only the pointer's border eases */
+    transition: border-color 100ms;
   }
   input[type='checkbox']::after {
     content: '';
@@ -340,11 +348,7 @@
     height: 75%;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5' fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
       center / contain no-repeat;
-    transform: scale(0.4);
     opacity: 0;
-    transition:
-      transform 100ms,
-      opacity 100ms;
   }
   .checkbox:hover input[type='checkbox'] {
     border-color: var(--navy-500);
@@ -358,7 +362,6 @@
     background-color: var(--navy-500);
   }
   input[type='checkbox']:checked::after {
-    transform: none;
     opacity: 1;
   }
   input[type='checkbox']:focus-visible {
@@ -376,6 +379,10 @@
   .checkbox__label {
     user-select: none;
     margin-left: 0.75rem;
+  }
+  /* in a box a row of its own a cell tall (see .ui-box) */
+  :global(.ui-box) .checkbox {
+    min-height: var(--cell);
   }
 
   .list {
@@ -464,7 +471,7 @@
 
   /* the field's last line (a label may be above it), the badge at its right end, before a select's arrow */
   .api {
-    --field: 2rem;
+    --field: var(--control);
     z-index: 1;
     cursor: help;
     position: absolute;
@@ -487,6 +494,9 @@
   .locked input:not([type='checkbox']),
   .locked textarea {
     padding-right: 2.25rem; /* the value clear of the badge */
+  }
+  .locked :global(button.select) {
+    padding-right: 3.5rem; /* (the badge before the arrow) */
   }
   .api.select {
     padding-right: 1.8rem;

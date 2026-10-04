@@ -24,8 +24,8 @@
 <style>
   .wrapper {
     display: grid;
-    grid-template-columns: 24.5ch 1fr;
-    gap: 1rem;
+    grid-template-columns: round(up, 24.5ch, var(--half)) minmax(0, 1fr); /* (whole half cells: the views on a line) */
+    gap: var(--page-pad);
   }
 
   .margins {

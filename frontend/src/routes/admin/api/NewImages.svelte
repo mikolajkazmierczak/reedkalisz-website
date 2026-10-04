@@ -171,7 +171,7 @@
   }
 </script>
 
-<Modal type="fill" dotted closeText={null}>
+<Modal type="fill" mat closeText={null}>
   <svelte:fragment slot="bar">
     {#if cancelable}
       <Button icon="close" secondary edge disabled={busy} on:click={() => dispatch('cancel')}>Anuluj</Button>
@@ -202,22 +202,30 @@
     {@const places = targets(group)}
     {@const list = entries(group)}
     <div class="product">
-      <div class="heading">
-        <!-- an imported one opens in a new tab, as the API list's (its cube) -->
-        {#if group.href}
-          <Button
-            tone="info"
-            edge
-            icon="cube"
-            title="Otwórz zaimportowany produkt"
-            on:click={() => window.open(group.href, '_blank', 'noreferrer')} />
-        {/if}
-        <h3 class="ui-h3">
-          <span class="backed">{group.product.name}</span>
-          <span class="code backed">{group.product.code}</span>
-        </h3>
+      <div class="ui-h2 heading">
+        <span class:opens={group.href}>
+          <!-- an imported one opens in a new tab, as the API list's (its cube) -->
+          {#if group.href}
+            <Button
+              size="sm"
+              square
+              tone="info"
+              edge
+              icon="cube"
+              title="Otwórz zaimportowany produkt"
+              on:click={() => window.open(group.href, '_blank', 'noreferrer')} />
+          {/if}
+          <span class="title" role="heading" aria-level="3">
+            <span class="name">{group.product.name}</span>
+            <span class="code">{group.product.code}</span>
+          </span>
+        </span>
       </div>
-      <div class="ui-tiles" inert={busy} use:sortable={{ sort: (from, to) => sort(group, from, to) }} use:dividers>
+      <div
+        class="ui-tiles ui-snap"
+        inert={busy}
+        use:sortable={{ sort: (from, to) => sort(group, from, to) }}
+        use:dividers>
         {#each list as { place, p, tile }, j (`${p}|${tile.key}`)}
           <div class="tile" data-sortable data-group={p} data-key="{key(group)}|{p}|{tile.key}">
             <!-- a new one from its url (clicked: refused, or not), one there already from the library -->
@@ -236,7 +244,7 @@
               flag={tile.fresh && group.flagNew !== false ? 'NOWE' : null}
               marked={rejected.has(id(group, tile))}
               remove={tile.fresh ? 'Odrzuć' : 'Usuń'}
-              backing="var(--grey-100)"
+              backing="var(--board)"
               on:click={() => toggle(id(group, tile))}>
               <svelte:fragment slot="tag">
                 {#if place.storage}
@@ -310,29 +318,29 @@
     margin-left: auto;
   }
 
-  .product + .product {
-    margin-top: 0.5rem;
+  /* a product as an editor's section (as the picker's groups, see Library): its name and code on a paper label
+     (.ui-h2), its photos under it, the next label on the next line of the mat. With the button opening it in the
+     label: the label a cell and a half (still whole half cells), the button as far in from its edge as from its top
+     and bottom */
+  .heading > span {
+    min-width: 0;
   }
-  /* spaced as the picker's sections (see Library) */
-  .heading {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
+  .opens {
+    height: calc(1.5 * var(--cell) - 1px);
+    padding-left: calc((1.5 * var(--cell) - 3px - 1.5rem) / 2); /* (the label's inside, less the button, halved) */
   }
-  /* the name and its code in a row, each on a grey of its own so it reads over the dots (as a tile's name,
-     see File's backing) */
-  .heading h3 {
+  /* the name and the smaller code on one baseline */
+  .title {
     display: flex;
-    flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.25rem 0.6rem;
+    gap: 0.5em;
+    min-width: 0;
   }
-  .backed {
-    padding: 0.1rem 0.4rem;
-    border-radius: 0.45rem;
-    corner-shape: squircle;
-    background-color: var(--grey-100);
+  .name {
+    min-width: 0;
+    overflow: clip; /* (not hidden: that would make its baseline its bottom edge) */
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   /* after the name, as a field's label (.ui-label), bigger */
   .code {
@@ -353,15 +361,10 @@
     position: absolute;
     top: calc(var(--box-radius) / 3);
     bottom: 0.25rem;
-    left: -0.5rem; /* half the tiles' gap (ui-tiles) */
+    left: calc(var(--tiles-gap) / -2); /* half the tiles' gap (ui-tiles) */
     width: 3px;
     transform: translateX(-50%);
     border-radius: 2px;
     background-color: var(--blue-700);
-  }
-  @media (max-width: 50rem) {
-    .tile:global([data-place-start]:not([data-row-start]):not(.sortable-fallback))::before {
-      left: -0.25rem;
-    }
   }
 </style>

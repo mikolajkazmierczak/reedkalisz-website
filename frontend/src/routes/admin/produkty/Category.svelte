@@ -57,10 +57,10 @@
 {/if}
 
 <style>
-  /* Lined up by what's drawn, not the icon's box: the ">" starts 37.5% into it. A category without children has its
-     number where its siblings' ">" starts; a child's ">" (or number) starts where its parent's number does - so a level
-     is 62.5% of the icon and the gap deep. The line of a level runs under the middle of its parent's arrow, just
-     before the children's buttons. Bigger than a small button: it's read a lot */
+  /* Lined up by what's drawn, not the icon's box: the ">" starts 37.5% into it. A category without children leaves room
+     for an arrow, its number under its siblings'; a child's ">" starts where its parent's number does - so a level is
+     62.5% of the icon and the gap deep. The line of a level runs under the middle of its parent's arrow, just before
+     the children's buttons. Bigger than a small button: it's read a lot */
   .row {
     --height: 1.75rem; /* of a line */
     --font: 0.95rem;
@@ -96,6 +96,7 @@
     flex: 1;
     display: flex; /* the button, not a line of text: no gap under it for the letters' descent */
     min-width: 0;
+    box-shadow: inset 0 -1px 0 var(--ledger-rule); /* ruled under, as the ledger's rows (drawn in, no taller) */
   }
   /* a long name wraps: the button grows with it, the arrow and the number stay on its first line */
   .button :global(button.sm) {
@@ -112,7 +113,7 @@
     text-align: left;
   }
   .row.leaf .button :global(button.sm .content.sm) {
-    padding-left: calc(var(--pad-start) + var(--arrow-in));
+    padding-left: calc(var(--pad-start) + var(--icon) + var(--gap));
   }
   /* its size, not 58% of a height that now grows (Icon sets it inline, hence !important) */
   .button :global(button.sm .content.sm > svg) {

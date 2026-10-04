@@ -67,7 +67,7 @@
 
 {#if $colors}
   <section class="ui-section">
-    <h2 class="ui-h2">Warianty</h2>
+    <h2 class="ui-h2"><span>Warianty</span></h2>
     <div class="ui-section__row">
       {#each product.storage as storage, i (storage)}
         {@const state = parseAmount({ available: storage.available, amount: storage.amount })}
@@ -150,7 +150,7 @@
     grid-template-columns: repeat(auto-fill, minmax(6.25rem, 1fr));
     gap: 0.75rem;
     border-top: var(--border-light);
-    padding-top: 1rem;
+    padding-top: calc(var(--half) - 1px); /* (with the rule half a cell: the photos on the box's rhythm) */
   }
   /* framed as the variant's box */
   .img {
@@ -165,7 +165,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 0.5rem;
+    column-gap: 0.5rem; /* (each row a cell, see Input) */
   }
   .storage-actions > div:last-child {
     display: flex;
@@ -173,7 +173,7 @@
   .toggles {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem 1rem;
+    column-gap: 1rem; /* (each row a cell, see Input) */
   }
 
   .thirds {

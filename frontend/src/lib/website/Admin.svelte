@@ -111,7 +111,8 @@
 <style>
   .admin {
     --margin: 0.5rem;
-    z-index: 1;
+    /* over the page and what floats on it (up to the phone's "Zapytaj", 50), under the lightbox (60) and the menu (100) */
+    z-index: 55;
     position: fixed;
     bottom: var(--margin);
     left: var(--margin);

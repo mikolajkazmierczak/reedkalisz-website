@@ -1,4 +1,4 @@
-import api from '$/api';
+import api from '$lib/server/api';
 import { enabledFilter } from '#/products/fields';
 import { flaggedFields, flaggedFilter, withSections } from '#/sections';
 import { SITE } from '#/seo';

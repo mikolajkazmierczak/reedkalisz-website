@@ -47,7 +47,7 @@
 </script>
 
 <section class="ui-section">
-  <h2 class="ui-h2">{title}</h2>
+  <h2 class="ui-h2"><span>{title}</span></h2>
   <div class="files ui-section__row" use:sortable={{ sort }}>
     {#each items as item, i (item)}
       <div
@@ -79,10 +79,12 @@
 </section>
 
 <style>
-  /* as many tiles as fit the row, filling it (three at least, on a phone); 7.5rem: also "+ Dodaj"'s (see ui-admin.css) */
+  /* as many tiles as fit the row at --tile (three at least, on a phone), whole half cells wide and the last taking
+     what's left, so the row reaches the mat's frame as the section's columns do (see .ui-section__row) */
   .files {
-    grid-template-columns: repeat(auto-fill, minmax(min(7.5rem, (100% - 2 * 0.5625rem) / 3), 1fr));
-    gap: 0.5625rem;
+    --n: max(3, round(down, (100cqw + var(--page-pad)) / (var(--tile) + var(--page-pad)), 1));
+    --w: round(down, (100cqw - (var(--n) - 1) * var(--page-pad)) / var(--n), var(--half));
+    grid-template-columns: repeat(calc(var(--n) - 1), var(--w)) minmax(0, 1fr);
   }
   .files > .ui-box {
     gap: 0.25rem;

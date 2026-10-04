@@ -40,7 +40,7 @@
   .labeling-field {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--half); /* a box's (see .ui-box): each label and field two cells */
   }
   .size {
     display: flex;

@@ -42,7 +42,7 @@
   $: $categories && read();
 </script>
 
-<sidebar>
+<sidebar class="ui-snap">
   <div>
     <div class="all">
       {#each [{ id: null, name: 'Wszystkie' }, { id: -1, name: 'Bez kategorii' }] as { id, name }}
@@ -76,21 +76,23 @@
 </sidebar>
 
 <style>
-  /* the two buttons spaced as a bar's (its 2rem buttons have 0.6875rem above and below, border included), then the tree */
-  /* no taller than the page (see .ui-fill): the tree scrolls, the buttons stay */
+  /* the two buttons spaced as a bar's (.ui-bar: level with the bar's beside it), the tree 0.6875rem under them; no
+     taller than the page (see .ui-fill): the tree scrolls, the buttons stay */
   sidebar {
     display: flex;
     flex-direction: column;
     align-self: start;
-    max-height: 100%;
+    max-height: calc(100% - 1px); /* (its slot is the row, less the 1px it sits inside it) */
     min-height: 0;
-    padding: 0.5rem;
-    padding-top: 0.625rem;
-    width: 20rem; /* always: a long name wraps (the gadgets' second level fits in one line, with room to spare) */
+    padding: var(--bar-pad) var(--box-pad);
+    /* always: a long name wraps (the gadgets' second level fits in one line, with room to spare); whole half cells of
+       the mat with the gap after it (the table starting on them), less the 1px it sits inside its slot */
+    width: calc(23 * var(--half) - 1px);
     border-radius: var(--box-radius);
     corner-shape: squircle;
     border: var(--border-light);
-    background-color: var(--light);
+    background-color: var(--paper);
+    box-shadow: var(--shadow);
   }
   sidebar > div {
     display: flex;
@@ -149,7 +151,8 @@
     }
     .fold .ui-label {
       flex: none;
-      margin: 0;
+      min-height: 0;
+      padding: 0;
     }
     .picked {
       overflow: hidden;

@@ -24,6 +24,13 @@
   <meta property="og:locale" content="pl_PL" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonical} />
+
+  <!-- Umami: the website only, never the admin panel, beta or localhost (and never an admin's browser, see readme) -->
+  <script
+    defer
+    src="https://cloud.umami.is/script.js"
+    data-website-id="01971f3c-6cfe-424a-a191-f1074d749a90"
+    data-domains="reed.kalisz.pl"></script>
 </svelte:head>
 
 {#if $me}

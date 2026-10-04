@@ -7,6 +7,7 @@
   import { NO_COLOR } from '$/colors';
   import Button from '@c/Button.svelte';
   import CategoryCode from '@c/CategoryCode.svelte';
+  import ApiBadge from '@c/ApiBadge.svelte';
 
   // The admin's select: a button showing the chosen option and, under it, the options in a white box, a search field
   // over them (always: open, type, Enter). Like the browser's own: a click beside the box only closes it, the arrows
@@ -21,6 +22,7 @@
   //               without one yet: the website's "no colour" (a white dot crossed out) in its place
   //     image   - a picture's url (a company's favicon) before its name
   //     icon    - an icon's name, in a swatch's place (the gallery among the variants)
+  //     badge   - the API scanner's badge at its end, this its tooltip (a category the mappings lead to)
   //     note    - more about it, on a line of its own under its name in the list, smaller (searched too)
   //     noteImage - a picture's url before the note (a company's favicon)
   //     after   - more about it on the button, after its name, fainter (a price view's amounts)
@@ -392,6 +394,7 @@
                         alt="" />{/if}{option.note}</small
                   >{/if}
               </span>
+              {#if option.badge}<ApiBadge small text={option.badge} />{/if}
             </span>
           </div>
         {:else}
@@ -411,15 +414,18 @@
     display: flex;
     align-items: center;
     width: 100%;
-    height: 2rem;
+    height: var(--control);
     padding: 0.25rem 1.5rem 0.25rem 0.5rem;
     border: solid 1px var(--line);
+    border-bottom-color: var(--line-bottom, var(--edge-line)); /* the line it's written on, as Input's */
     border-radius: var(--field-radius);
     corner-shape: squircle;
     font-size: 0.95rem;
     text-align: left;
-    background-color: var(--light);
-    transition: border-color 100ms;
+    background-color: var(--paper-field);
+    transition:
+      border-color 100ms,
+      box-shadow 100ms;
   }
   .select::after {
     content: '';
@@ -436,11 +442,14 @@
   }
   .select:not([disabled]):hover {
     --line: var(--navy-500);
+    --line-bottom: var(--navy-500);
   }
   .select:focus-visible,
   .select:focus-visible:hover,
   .select[aria-expanded='true'] {
     --line: var(--navy-700);
+    --line-bottom: var(--navy-700);
+    box-shadow: var(--shadow-focus);
     outline: none;
   }
   .select[disabled] {
@@ -454,6 +463,7 @@
   .select.error,
   .select.error:hover {
     --line: var(--red-500);
+    --line-bottom: var(--red-500);
   }
   /* just an icon, as a table head's SortButton: navy while open */
   .select.iconic {
@@ -464,7 +474,7 @@
     height: 1.2rem;
     padding: 0.15rem;
     border: none;
-    border-radius: 0.4rem;
+    border-radius: 0.5rem;
     color: var(--grey-500);
     background-color: transparent;
   }
@@ -545,6 +555,14 @@
   .label .blank {
     visibility: hidden;
   }
+  /* the scanner's badge at the end, out of the tree's way (before the chosen one's check) */
+  .label > :global(.api-badge) {
+    align-self: center;
+    margin-left: auto;
+  }
+  .option.selected .label:has(> .api-badge)::after {
+    margin-left: 0.35em;
+  }
   /* an icon in a swatch's place, without its ring: bigger than a swatch (its lines are thin), over the edges of the
      swatch's room so the name starts where the others' do */
   .label .glyph {
@@ -616,8 +634,8 @@
     border: solid 1px var(--edge);
     border-radius: var(--box-radius);
     corner-shape: squircle;
-    background-color: var(--light);
-    box-shadow: 0 0.375rem 1.25rem var(--black-20);
+    background-color: var(--paper-field);
+    box-shadow: var(--shadow-lifted);
     overflow: hidden;
     font-size: 0.95rem;
   }
@@ -671,11 +689,11 @@
   }
   .scroll::before {
     top: 0;
-    background: linear-gradient(var(--light), transparent);
+    background: linear-gradient(var(--paper-field), transparent);
   }
   .scroll::after {
     bottom: 0;
-    background: linear-gradient(transparent, var(--light));
+    background: linear-gradient(transparent, var(--paper-field));
   }
   .scroll.fade-top::before,
   .scroll.fade-bottom::after {

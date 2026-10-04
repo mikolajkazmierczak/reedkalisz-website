@@ -3,7 +3,7 @@
   import { page as pageStore } from '$app/stores';
 
   import api from '$/api';
-  import { sliderFilter, fetchSlider } from '#/products/slider';
+  import { sliderFilter, fetchSlider, SLIDER_PRELOAD } from '#/products/slider';
   import { preloadImages } from '#/products/images';
 
   import Pagination from '#c/Pagination.svelte';
@@ -13,8 +13,23 @@
   /** Page size until the grid is measured. */
   export let limit = 4;
   export let filterIds = [];
-  /** The first page, loaded on the server (see preloadSlider), so it's in the server render. */
+  /** The first page, loaded on the server (see preloadSlider), so it's in the server render - or, arriving from another
+   *  page, a promise of it (streamed, see the homepage's load): skeleton cards in its place until it's in. */
   export let preloaded = null;
+  let first = null; // the first page, once in
+  let waiting = false;
+  $: settle(preloaded);
+  function settle(p) {
+    waiting = typeof p?.then === 'function';
+    first = waiting ? null : p;
+    if (!waiting) return;
+    p.then(
+      (page) => preloaded === p && ((first = page), (waiting = false)),
+      () => preloaded === p && (waiting = false),
+    );
+  }
+  // (the shape of a card, see ProductTile; as many as the server would have sent, the row cut as it cuts them)
+  const SKELETON = Array.from({ length: SLIDER_PRELOAD }, () => ({ _skeleton: true, gallery: [], storage: [] }));
 
   $: ({ categoriesTree, categoriesItems } = $pageStore.data);
   $: filter = slug ? sliderFilter(slug, categoriesItems, categoriesTree, filterIds) : null;
@@ -26,7 +41,7 @@
 
   /** The page on show; until one is picked (and in SSR), the preloaded first page. */
   let current = null;
-  $: shown = current ?? preloaded;
+  $: shown = current ?? first;
   let mounted = false;
 
   // Pages by filter, size and number. The current one stays up until the next is in, and once the slider is
@@ -37,16 +52,21 @@
   function load(size, page) {
     const key = JSON.stringify([filter, size, page]);
     if (!pages.has(key)) {
-      const filterKey = JSON.stringify(filter);
-      const covers = preloaded && (preloaded.products.length >= size || preloaded.products.length >= preloaded.count);
-      const request =
-        page === 1 && covers
-          ? Promise.resolve(preloaded)
-          : fetchSlider(api, filter, size, page, counts.get(filterKey) ?? preloaded?.count).then((result) => {
-              counts.set(filterKey, result.count);
-              preloadImages(result.products);
-              return result;
-            });
+      const f = filter; // (this call's: another category may be picked while the first page is on its way)
+      const filterKey = JSON.stringify(f);
+      // (the first page waited for when it's on its way, not fetched again; fetched here if it failed)
+      const request = Promise.resolve(preloaded)
+        .catch(() => null)
+        .then((first) => {
+          const covers = first && (first.products.length >= size || first.products.length >= first.count);
+          return page === 1 && covers
+            ? first
+            : fetchSlider(api, f, size, page, counts.get(filterKey) ?? first?.count).then((result) => {
+                counts.set(filterKey, result.count);
+                preloadImages(result.products);
+                return result;
+              });
+        });
       pages.set(
         key,
         request.catch((err) => (pages.delete(key), Promise.reject(err))),
@@ -116,13 +136,24 @@
 
 {#if filter}
   <div class="wrapper" class:first={page === 1} use:watch>
-    <!-- Nothing until there's a page: no empty state flashing. -->
-    {#if shown}<Products products={shown.products} />{/if}
-    <Pagination limit={pageSize} bind:page count={shown?.count ?? 0} limitLocked hideSingle noSearchParams />
+    <!-- Nothing until there's a page (no empty state flashing) - skeleton cards while it's on its way, the pages' room
+         kept under them (a slider has more than one, mostly), so nothing moves when it's in -->
+    {#if shown}
+      <Products products={shown.products} />
+      <Pagination limit={pageSize} bind:page count={shown.count} limitLocked hideSingle noSearchParams />
+    {:else if waiting}
+      <Products products={SKELETON} />
+      <div class="room" aria-hidden="true">
+        <Pagination limit={pageSize} page={1} count={2 * pageSize} limitLocked hideSingle noSearchParams />
+      </div>
+    {/if}
   </div>
 {/if}
 
 <style>
+  .room {
+    visibility: hidden;
+  }
   .wrapper {
     container: slider / inline-size;
     display: flex;

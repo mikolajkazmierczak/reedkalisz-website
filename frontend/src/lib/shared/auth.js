@@ -10,6 +10,12 @@ export async function readme() {
     const user = await api.users.me.read();
     me.set(user);
     auth.set(true);
+    // an admin's browser: Umami counts none of its visits to the website from now on, logged in or not
+    try {
+      localStorage.setItem('umami.disabled', '1');
+    } catch {
+      // storage blocked: counted, as before
+    }
     return me;
   } catch (err) {
     // DO NOT set $me to null or the user will loose all their progress

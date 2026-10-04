@@ -2,8 +2,8 @@ import { dev } from '$app/environment';
 
 const entries = new Map();
 
-/** Half of the 60 s a change may take to show; Cloudflare's copy (hooks.server.js) has the other half. */
-export const SERVER_MAX_AGE = 30 * 1000;
+/** Half of the 5 minutes a change may take to show; Cloudflare's copy (hooks.server.js) has the other half. */
+export const SERVER_MAX_AGE = 150 * 1000;
 
 /**
  * `fn()`'s result, never served older than `maxAge` ms. Past half of that it's still served, instantly, while

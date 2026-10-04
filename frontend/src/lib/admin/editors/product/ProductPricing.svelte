@@ -174,9 +174,10 @@
 
 {#if product && $labelings && $priceViews && $globalMargins}
   <section class="ui-section">
-    <h2 class="ui-h2">Cennik</h2>
+    <!-- each column under a head of its own: the price list's, and the calculations' across the other two -->
     <div class="ui-section__row">
       <div class="ui-section__col">
+        <h2 class="ui-h2"><span>Cennik</span></h2>
         <!-- a price list that isn't shown: just the switch, the rest stays as it was -->
         <div class="ui-box">
           <div class="toggles">
@@ -281,64 +282,62 @@
 
       {#if product.show_price}
         <div class="ui-section__col labelings">
-          <div class="ui-box">
-            <h3 class="ui-h3">Kalkulacje</h3>
-            <div class="ui-section__row">
-              {#each product.labelings as labeling, i (labeling)}
-                {@const chosenLabeling = $labelings.find((l) => l.id == labeling.labeling)}
-                {@const duplicateLabeling = checkDuplicateLabeling(labeling)}
-                {@const managed = isManagedLabeling(labeling, $labelings, company, scannerTargets)}
-                <div
-                  class="ui-box ui-box--element"
-                  class:ui-box--uneditable={!labeling.enabled}
-                  class:warning={duplicateLabeling}>
-                  <div class="ui-pair actions">
-                    <div class="enabled">
-                      <Input type="checkbox" bind:value={labeling.enabled}>Włączone</Input>
-                    </div>
-                    <div>
-                      <Button size="sm" icon="delete" on:click={() => removeLabeling(i)} disabled={managed} dangerous />
-                    </div>
+          <h2 class="ui-h2"><span>Kalkulacje</span></h2>
+          <div class="ui-section__row">
+            {#each product.labelings as labeling, i (labeling)}
+              {@const chosenLabeling = $labelings.find((l) => l.id == labeling.labeling)}
+              {@const duplicateLabeling = checkDuplicateLabeling(labeling)}
+              {@const managed = isManagedLabeling(labeling, $labelings, company, scannerTargets)}
+              <div
+                class="ui-box ui-box--element"
+                class:ui-box--uneditable={!labeling.enabled}
+                class:warning={duplicateLabeling}>
+                <div class="ui-pair actions">
+                  <div class="enabled">
+                    <Input type="checkbox" bind:value={labeling.enabled}>Włączone</Input>
                   </div>
-
-                  <Input
-                    type="select"
-                    label="Znakowanie"
-                    bind:value={labeling.labeling}
-                    api={managed}
-                    apiText={'Prowadzi do niego mapowanie znakowań.\nSkaner API ustawia znakowanie, pole i miejsce, dodaje je i usuwa.'}
-                    disabled={managed}
-                    options={labelingOptions(labeling, product.labelings, offered, scannerTargets)} />
-
-                  {#if company?.api_handling_costs && product.handling_cost}
-                    <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
-                  {/if}
-
-                  {#if chosenLabeling && labeling.enabled}
-                    <ProductPricingTable
-                      prices={labeling.prices}
-                      pricesSale={labeling.prices_sale}
-                      sale={product.sale}
-                      fixed />
-                    <ProductPricingMargins
-                      text="znakowanie"
-                      globalMargin={chosenLabeling.margin}
-                      globalMinimum={chosenLabeling.minimum}
-                      bind:globalEnabled={labeling.global_margin}
-                      bind:margin={labeling.margin}
-                      bind:minimum={labeling.minimum} />
-                  {/if}
-
-                  <LabelingField
-                    bind:x={labeling.labeling_field_x}
-                    bind:y={labeling.labeling_field_y}
-                    bind:place={labeling.labeling_place}
-                    api={managed} />
+                  <div>
+                    <Button size="sm" icon="delete" on:click={() => removeLabeling(i)} disabled={managed} dangerous />
+                  </div>
                 </div>
-              {/each}
 
-              <span class="ui-add" use:beside><Button icon="add" on:click={pushLabeling}>Dodaj</Button></span>
-            </div>
+                <Input
+                  type="select"
+                  label="Znakowanie"
+                  bind:value={labeling.labeling}
+                  api={managed}
+                  apiText={'Prowadzi do niego mapowanie znakowań.\nSkaner API ustawia znakowanie, pole i miejsce, dodaje je i usuwa.'}
+                  disabled={managed}
+                  options={labelingOptions(labeling, product.labelings, offered, scannerTargets)} />
+
+                {#if company?.api_handling_costs && product.handling_cost}
+                  <small>Do cen jednostkowych dodawane są koszty manipulacyjne</small>
+                {/if}
+
+                {#if chosenLabeling && labeling.enabled}
+                  <ProductPricingTable
+                    prices={labeling.prices}
+                    pricesSale={labeling.prices_sale}
+                    sale={product.sale}
+                    fixed />
+                  <ProductPricingMargins
+                    text="znakowanie"
+                    globalMargin={chosenLabeling.margin}
+                    globalMinimum={chosenLabeling.minimum}
+                    bind:globalEnabled={labeling.global_margin}
+                    bind:margin={labeling.margin}
+                    bind:minimum={labeling.minimum} />
+                {/if}
+
+                <LabelingField
+                  bind:x={labeling.labeling_field_x}
+                  bind:y={labeling.labeling_field_y}
+                  bind:place={labeling.labeling_place}
+                  api={managed} />
+              </div>
+            {/each}
+
+            <span class="ui-add" use:beside><Button icon="add" on:click={pushLabeling}>Dodaj</Button></span>
           </div>
         </div>
       {/if}
@@ -361,17 +360,33 @@
     font-size: 0.85rem;
     color: var(--red-500);
   }
-  /* the sale's box in its column: its fields level with the price beside it (half its padding above them) */
+  /* the sale's box in its column: its fields level with the price beside it (its padding and border above them) */
   .sale {
     gap: 0.75rem;
-    margin-top: -0.5rem;
+    margin-top: calc(-1 * (var(--quarter) + 1px));
   }
+  /* the same labeling on the same field as another calculation: a red ring inside its edge, drawn as .ui-cover's */
   .warning {
-    --border: 2px solid var(--red-300);
+    outline: solid 2px var(--red-300);
+    outline-offset: -1px;
   }
 
   .labelings {
     grid-column: 2 / -1;
+  }
+  /* a column's head: the column's gap under it */
+  .ui-section__col > .ui-h2 {
+    margin-bottom: 0;
+  }
+  /* the calculations on the mat, on the editor's own columns (see .ui-section__row): two across the two it spans, one
+     when it spans one */
+  .labelings > .ui-section__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @container (min-width: 67.375rem) {
+    .labelings > .ui-section__row {
+      grid-template-columns: var(--w3) minmax(0, 1fr);
+    }
   }
   .actions div {
     display: flex;

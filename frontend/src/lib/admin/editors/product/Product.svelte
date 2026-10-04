@@ -176,13 +176,19 @@
     (item?.categories ?? []).flatMap((c) => [c.category, ...ancestorIds(c.category, catIndex.parents)]),
   );
   // the product's own ones picked again are taken away; the ones above them can't be added (they'd be dropped)
+  // (the ones the mappings lead to with the scanner's badge, as on the product's list)
   $: categoryOptions = catOptions(catLabels).map((o) => {
     const chosen = !!item?.categories.some((c) => c.category === o.id);
     const managed = chosen && isManaged({ category: o.id });
-    return { ...o, chosen, disabled: (takenCategories.has(o.id) && !chosen) || managed };
+    const badge = isMapped({ category: o.id }) ? MAPPED : null;
+    return { ...o, chosen, badge, disabled: (takenCategories.has(o.id) && !chosen) || managed };
   });
-  // one the category mappings lead to: the scanner's, not to be taken away here
-  $: isManaged = (productCategory) => categoriesSynced && isManagedCategory(productCategory, company, categoryTargets);
+  const MAPPED = 'Prowadzi do niej mapowanie kategorii. Skaner API ją dodaje i usuwa.';
+  // one the category mappings lead to: the scanner's (a badge says so), not to be taken away here once it's saved on
+  // the product - one added while editing can still be, till then
+  $: isMapped = (productCategory) => categoriesSynced && isManagedCategory(productCategory, company, categoryTargets);
+  $: savedCategories = new Set((itemOriginal?.categories ?? []).map((c) => c.category));
+  $: isManaged = (productCategory) => isMapped(productCategory) && savedCategories.has(productCategory.category);
   let categoryToAdd = null;
   $: if (categoryToAdd != null) addCategory(categoryToAdd);
 
@@ -211,10 +217,11 @@
   $: covers = item ? productImageRows({ ...item, storage: orderVariants(item.storage) }).slice(0, 2) : [];
 
   // for the image picker: the product's files now, and before
-  $: fileContext = item && {
-    used: [...usedFiles(item)],
-    history: (item.images_history ?? []).filter((id) => !usedFiles(item).has(id)),
-  };
+  $: fileContext = item && productFiles(item);
+  function productFiles(item) {
+    const used = usedFiles(item);
+    return { used: [...used], history: (item.images_history ?? []).filter((id) => !used.has(id)) };
+  }
 
   const removeCategoryId = (id) => removeCategory(item.categories.findIndex((c) => c.category === id));
   function removeCategory(i) {
@@ -251,6 +258,7 @@
   root="/admin/produkty"
   icon="products"
   title={item?.name}
+  serial={itemOriginal?.code}
   collection="products"
   bind:item
   bind:itemOriginal
@@ -337,8 +345,8 @@
                     {#if label}<CategoryCode code={label.number} />{/if}
                     {label?.name ?? `usunięta kategoria #${productCategory.category}`}
                   </span>
-                  {#if isManaged(productCategory)}
-                    <ApiBadge text="Prowadzi do niej mapowanie kategorii. Skaner API ją dodaje i usuwa." />
+                  {#if isMapped(productCategory)}
+                    <ApiBadge text={MAPPED} />
                   {/if}
                   <Button
                     size="sm"
@@ -359,7 +367,7 @@
               on:unchoose={(e) => removeCategoryId(e.detail.value)} />
           </div>
 
-          <div class="ui-box" class:admin-notes-filled={!!item.admin_notes}>
+          <div class="ui-box notes" class:admin-notes-filled={!!item.admin_notes}>
             <h3 class="ui-h3">Notatki</h3>
             <Input type="textarea" bind:value={item.admin_notes}></Input>
           </div>
@@ -380,7 +388,7 @@
     </section>
 
     <section class="ui-section">
-      <h2 class="ui-h2">Opis</h2>
+      <h2 class="ui-h2"><span>Opis</span></h2>
       <div class="ui-section__row">
         <!-- as tall as the column on the right (at least a few lines): the text and its preview fill it -->
         <div class="ui-section__col ui-box description" style:grid-column={'1 / span 2'}>
@@ -465,27 +473,32 @@
 </Editor>
 
 <style>
-  /* a box's heading with what goes with it at its right end */
+  /* a box's heading (.ui-h3) with the scanner's badge at its right end: on the heading's line, rising into the box's
+     padding rather than onto the field, taking no more room than the heading (its margins) */
   .heading {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 0.5rem;
+  }
+  .heading > :global(.api-badge) {
+    margin: calc(1.25rem - 1.4rem) 0 calc(0.75 * var(--cell) - 1.25rem - var(--half));
   }
   .toggles {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem 1rem;
+    column-gap: 1rem; /* (each row a cell, see Input) */
   }
   /* the category rows sit close, a thin line between them */
   .categories {
     display: flex;
     flex-direction: column;
-    margin-bottom: -0.5rem; /* the picker right under the list, not a box's gap away */
+    margin-bottom: calc(-1 * var(--half)); /* the picker right under the list, not a box's gap away */
   }
+  /* each a cell (its line in it), so the picker under them keeps the box's rhythm */
   .category {
     align-items: center;
-    padding: 0.175rem 0;
+    min-height: var(--cell);
   }
   .category + .category {
     border-top: var(--border-light);
@@ -522,8 +535,21 @@
     }
   }
 
+  /* the rest of the column (the boxes on the left as tall as the categories and it), the field in all of it - never
+     shorter than its three lines */
+  .notes {
+    flex: 1;
+  }
+  .notes > :global(.wrapper) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .notes > :global(.wrapper textarea) {
+    flex: 1;
+  }
   .admin-notes-filled {
-    background-color: var(--orange-100);
+    background-color: var(--yellow-100);
   }
   /* the spinner as big as the icon it stands in for */
   .icon :global(svg) {

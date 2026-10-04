@@ -240,9 +240,14 @@
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
-    gap: 1rem;
+    gap: var(--page-pad);
   }
 
+  /* its row's tops together (the flags can wrap to more lines than a button is tall): the buttons level with the
+     categories' beside it */
+  .actions {
+    align-items: flex-start;
+  }
   .actions > div {
     display: flex;
     gap: 0.5rem;
@@ -251,7 +256,11 @@
   .actions > .flags {
     flex: 1 1 22rem;
     flex-wrap: wrap;
-    gap: 0.25rem 1rem;
+    /* one line in a button's middle, two as far apart as its height lets them */
+    align-content: center;
+    gap: calc(var(--control) - 2rem) 1rem;
+    min-height: var(--control);
+    line-height: 1rem; /* two lines no taller than a button: the bar stays two cells of the mat (see onGrid) */
   }
   /* a phone: the categories above the products */
   @media (max-width: 50rem) {

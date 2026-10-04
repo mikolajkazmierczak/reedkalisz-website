@@ -6,11 +6,14 @@ const at = (...p) => path.join(__dirname, ...p);
 // scripts/deploy.sh checks the "beta" branch out here, next to this repo
 const beta = (...p) => path.join(`${__dirname}-beta`, ...p);
 
+// the site's server reads Directus straight on this machine, not through Cloudflare (see frontend/src/lib/server/api.js)
+const API_INTERNAL_URL = 'http://127.0.0.1:8055';
+
 const betaApp = {
   name: 'sveltekit-beta',
   cwd: beta('frontend'),
   script: beta('frontend/build/index.js'),
-  env: { PORT: 5001, HOST: '127.0.0.1' },
+  env: { PORT: 5001, HOST: '127.0.0.1', API_INTERNAL_URL },
   max_memory_restart: '600M',
 };
 
@@ -37,7 +40,7 @@ module.exports = {
       name: 'sveltekit',
       cwd: at('frontend'),
       script: at('frontend/build/index.js'),
-      env: { PORT: 5000, HOST: '127.0.0.1' },
+      env: { PORT: 5000, HOST: '127.0.0.1', API_INTERNAL_URL },
       max_memory_restart: '600M',
     },
     ...(fs.existsSync(beta('frontend/build/index.js')) ? [betaApp] : []),

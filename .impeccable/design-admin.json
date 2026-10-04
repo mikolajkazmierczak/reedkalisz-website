@@ -1,0 +1,686 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-04T12:00:00.000Z",
+  "title": "Design System: REED Kalisz — Admin Panel",
+  "note": "Second system of this repo. DESIGN.md's YAML frontmatter and .impeccable/design.json belong to the public website; this sidecar's `tokens` mirrors the admin token block in DESIGN.md's admin section (frontmatter-equivalent). Source: frontend/src/lib/shared/styles/ui-admin.css.",
+  "tokens": {
+    "name": "REED Kalisz — Admin Panel",
+    "description": "REED's own carbonless job ticket — plies of a self-copying form printed in one navy ink on a soft backing board.",
+    "colors": {
+      "navy-ink": "#1b2f4e",
+      "navy-ink-hover": "#2c4268",
+      "navy-ink-pressed": "#0e1b2f",
+      "navy-deep": "#08111e",
+      "navy-pointer": "#526a8e",
+      "copy-blue": "#eff3f9",
+      "selected-blue": "#d2dbe9",
+      "rail": "#13213a",
+      "board": "#dde2e9",
+      "paper": "#f8f9fb",
+      "paper-field": "#ffffff",
+      "ply-yellow": "#f5eed3",
+      "text": "#131f33",
+      "grey-hover": "#eef1f6",
+      "grey-head": "#e5e9f0",
+      "grey-muted": "#737f91",
+      "serial-red": "#bf0417",
+      "info-blue": "#e6eef8",
+      "link-blue": "#2f5d9e",
+      "success-green": "#cdeccf",
+      "warning-orange": "#fddcb9",
+      "new-purple": "#e9dcfb",
+      "danger-red": "#efc5ca"
+    },
+    "typography": {
+      "page-title": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif",
+        "fontSize": "2rem",
+        "fontWeight": 700,
+        "letterSpacing": "-0.01em"
+      },
+      "section-head": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, sans-serif",
+        "fontSize": "1rem",
+        "fontWeight": 700,
+        "letterSpacing": "-0.005em"
+      },
+      "editor-title": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, sans-serif",
+        "fontSize": "1.5rem",
+        "fontWeight": 700
+      },
+      "box-head": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, sans-serif",
+        "fontSize": "1.1rem",
+        "fontWeight": 700,
+        "lineHeight": "1.25rem"
+      },
+      "body": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, sans-serif",
+        "fontSize": "0.95rem",
+        "fontWeight": 400
+      },
+      "caption": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, sans-serif",
+        "fontSize": "0.7rem",
+        "fontWeight": 700,
+        "letterSpacing": "0.05em"
+      },
+      "grid-head": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, sans-serif",
+        "fontSize": "0.8rem",
+        "fontWeight": 600
+      },
+      "serial": {
+        "fontFamily": "'Bricolage Admin', ui-sans-serif, system-ui, sans-serif",
+        "fontSize": "1rem",
+        "fontWeight": 600,
+        "letterSpacing": "0.04em",
+        "fontFeature": "tnum"
+      }
+    },
+    "rounded": {
+      "compact": "0.4rem",
+      "field-small": "0.5rem",
+      "small": "0.6rem",
+      "button-small": "0.6rem",
+      "field": "0.65rem",
+      "button": "0.75rem",
+      "box": "1rem"
+    },
+    "spacing": {
+      "row-pad": "calc((1.75rem - 1px - 1.5rem) / 2)",
+      "xs": "0.5rem",
+      "sm": "1rem",
+      "md": "1.5rem",
+      "section": "0.875rem",
+      "page-pad": "0.875rem"
+    },
+    "components": {
+      "button-primary": {
+        "backgroundColor": "{colors.navy-ink}",
+        "textColor": "{colors.paper-field}",
+        "rounded": "{rounded.button}",
+        "height": "2.1875rem",
+        "padding": "0 1rem"
+      },
+      "button-primary-hover": {
+        "backgroundColor": "{colors.navy-ink-hover}"
+      },
+      "button-primary-active": {
+        "backgroundColor": "{colors.navy-ink-pressed}"
+      },
+      "button-secondary": {
+        "backgroundColor": "{colors.grey-head}",
+        "textColor": "{colors.text}",
+        "rounded": "{rounded.button}",
+        "height": "2.1875rem"
+      },
+      "button-selected": {
+        "backgroundColor": "{colors.selected-blue}",
+        "textColor": "{colors.text}",
+        "rounded": "{rounded.button}"
+      },
+      "bar-button": {
+        "backgroundColor": "{colors.paper}",
+        "textColor": "{colors.text}",
+        "rounded": "{rounded.small}",
+        "height": "2.1875rem",
+        "padding": "0 1rem"
+      },
+      "bar-button-active": {
+        "backgroundColor": "{colors.navy-ink}",
+        "textColor": "{colors.paper-field}"
+      },
+      "input": {
+        "backgroundColor": "{colors.paper-field}",
+        "textColor": "{colors.text}",
+        "rounded": "{rounded.field}",
+        "height": "2.1875rem",
+        "padding": "0.25rem 0.5rem"
+      },
+      "box": {
+        "backgroundColor": "{colors.paper}",
+        "rounded": "{rounded.box}",
+        "padding": "calc(0.875rem - 1px) calc(0.875rem - 1px) calc(0.875rem - 2px)"
+      },
+      "box-element": {
+        "backgroundColor": "{colors.copy-blue}"
+      },
+      "box-optional": {
+        "backgroundColor": "{colors.ply-yellow}"
+      },
+      "box-uneditable": {
+        "backgroundColor": "{colors.grey-head}"
+      },
+      "grid-head": {
+        "backgroundColor": "{colors.paper}",
+        "typography": "{typography.grid-head}"
+      },
+      "pagination-active": {
+        "backgroundColor": "{colors.navy-ink}",
+        "textColor": "{colors.paper-field}",
+        "rounded": "{rounded.small}",
+        "width": "2.5rem",
+        "height": "2.1875rem"
+      },
+      "nav-current": {
+        "backgroundColor": "{colors.board}",
+        "textColor": "{colors.text}",
+        "height": "2.625rem"
+      }
+    }
+  },
+  "extensions": {
+    "colorMeta": {
+      "navy-ink": {
+        "role": "primary",
+        "displayName": "Navy Ink",
+        "canonical": "#1b2f4e",
+        "tonalRamp": [
+          "#08111e",
+          "#0e1b2f",
+          "#1b2f4e",
+          "#2c4268",
+          "#526a8e",
+          "#afbdd6",
+          "#c1cde0",
+          "#d2dbe9",
+          "#eff3f9"
+        ]
+      },
+      "navy-ink-hover": {
+        "role": "primary",
+        "displayName": "Navy Ink Hover",
+        "canonical": "#2c4268",
+        "tonalRamp": [
+          "#08111e",
+          "#0e1b2f",
+          "#1b2f4e",
+          "#2c4268",
+          "#526a8e",
+          "#afbdd6",
+          "#c1cde0",
+          "#d2dbe9",
+          "#eff3f9"
+        ]
+      },
+      "navy-ink-pressed": {
+        "role": "primary",
+        "displayName": "Navy Ink Pressed",
+        "canonical": "#0e1b2f",
+        "tonalRamp": [
+          "#08111e",
+          "#0e1b2f",
+          "#1b2f4e",
+          "#2c4268",
+          "#526a8e",
+          "#afbdd6",
+          "#c1cde0",
+          "#d2dbe9",
+          "#eff3f9"
+        ]
+      },
+      "navy-deep": {
+        "role": "primary",
+        "displayName": "Deep Navy",
+        "canonical": "#08111e",
+        "tonalRamp": [
+          "#08111e",
+          "#0e1b2f",
+          "#1b2f4e",
+          "#2c4268",
+          "#526a8e",
+          "#afbdd6",
+          "#c1cde0",
+          "#d2dbe9",
+          "#eff3f9"
+        ]
+      },
+      "navy-pointer": {
+        "role": "primary",
+        "displayName": "Pointer Navy",
+        "canonical": "#526a8e",
+        "tonalRamp": [
+          "#08111e",
+          "#0e1b2f",
+          "#1b2f4e",
+          "#2c4268",
+          "#526a8e",
+          "#afbdd6",
+          "#c1cde0",
+          "#d2dbe9",
+          "#eff3f9"
+        ]
+      },
+      "copy-blue": {
+        "role": "primary",
+        "displayName": "Copy Blue",
+        "canonical": "#eff3f9",
+        "tonalRamp": [
+          "#08111e",
+          "#0e1b2f",
+          "#1b2f4e",
+          "#2c4268",
+          "#526a8e",
+          "#afbdd6",
+          "#c1cde0",
+          "#d2dbe9",
+          "#eff3f9"
+        ]
+      },
+      "selected-blue": {
+        "role": "primary",
+        "displayName": "Selected Blue",
+        "canonical": "#d2dbe9",
+        "tonalRamp": [
+          "#08111e",
+          "#0e1b2f",
+          "#1b2f4e",
+          "#2c4268",
+          "#526a8e",
+          "#afbdd6",
+          "#c1cde0",
+          "#d2dbe9",
+          "#eff3f9"
+        ]
+      },
+      "serial-red": {
+        "role": "secondary",
+        "displayName": "Serial Red",
+        "canonical": "#bf0417",
+        "tonalRamp": [
+          "#bf0417",
+          "#cb3343",
+          "#d76671",
+          "#e3969e",
+          "#efc5ca",
+          "#f6e2e4"
+        ]
+      },
+      "danger-red": {
+        "role": "tertiary",
+        "displayName": "Danger Tint",
+        "canonical": "#efc5ca",
+        "tonalRamp": [
+          "#bf0417",
+          "#cb3343",
+          "#d76671",
+          "#e3969e",
+          "#efc5ca",
+          "#f6e2e4"
+        ]
+      },
+      "info-blue": {
+        "role": "tertiary",
+        "displayName": "Info Tint",
+        "canonical": "#e6eef8",
+        "tonalRamp": [
+          "#2f5d9e",
+          "#5b88c7",
+          "#bcd0e8",
+          "#d0dff0",
+          "#e6eef8"
+        ]
+      },
+      "link-blue": {
+        "role": "tertiary",
+        "displayName": "Link Blue",
+        "canonical": "#2f5d9e",
+        "tonalRamp": [
+          "#2f5d9e",
+          "#5b88c7",
+          "#bcd0e8",
+          "#d0dff0",
+          "#e6eef8"
+        ]
+      },
+      "success-green": {
+        "role": "tertiary",
+        "displayName": "Success Tint",
+        "canonical": "#cdeccf",
+        "tonalRamp": [
+          "#0a8a4e",
+          "#a3d6a7",
+          "#b8e1bb",
+          "#cdeccf"
+        ]
+      },
+      "warning-orange": {
+        "role": "tertiary",
+        "displayName": "Warning Tint",
+        "canonical": "#fddcb9",
+        "tonalRamp": [
+          "#a85f00",
+          "#e3801a",
+          "#f6ba7c",
+          "#fbca98",
+          "#fddcb9"
+        ]
+      },
+      "new-purple": {
+        "role": "tertiary",
+        "displayName": "New Tint",
+        "canonical": "#e9dcfb",
+        "tonalRamp": [
+          "#6604c2",
+          "#ceb0f6",
+          "#dcc6fa",
+          "#e9dcfb"
+        ]
+      },
+      "rail": {
+        "role": "neutral",
+        "displayName": "Rail",
+        "canonical": "#13213a"
+      },
+      "board": {
+        "role": "neutral",
+        "displayName": "Backing Board",
+        "canonical": "#dde2e9"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper Ply",
+        "canonical": "#f8f9fb"
+      },
+      "paper-field": {
+        "role": "neutral",
+        "displayName": "Field White",
+        "canonical": "#ffffff"
+      },
+      "ply-yellow": {
+        "role": "neutral",
+        "displayName": "Yellow Ply",
+        "canonical": "#f5eed3"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text Ink",
+        "canonical": "#131f33"
+      },
+      "grey-hover": {
+        "role": "neutral",
+        "displayName": "Row Hover Grey",
+        "canonical": "#eef1f6",
+        "tonalRamp": [
+          "#737f91",
+          "#b1bccb",
+          "#e5e9f0",
+          "#eef1f6"
+        ]
+      },
+      "grey-head": {
+        "role": "neutral",
+        "displayName": "Head Grey",
+        "canonical": "#e5e9f0",
+        "tonalRamp": [
+          "#737f91",
+          "#b1bccb",
+          "#e5e9f0",
+          "#eef1f6"
+        ]
+      },
+      "grey-muted": {
+        "role": "neutral",
+        "displayName": "Muted Grey",
+        "canonical": "#737f91",
+        "tonalRamp": [
+          "#737f91",
+          "#b1bccb",
+          "#e5e9f0",
+          "#eef1f6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "page-title": {
+        "displayName": "Page Title",
+        "purpose": "The header's h1, deep navy; 1.4rem on a phone."
+      },
+      "section-head": {
+        "displayName": "Section Head",
+        "purpose": "A section's name on a small paper label lying on the mat (a cell tall less 1px, whole half cells wide), its top on a mat line; no rule."
+      },
+      "editor-title": {
+        "displayName": "Editor Title",
+        "purpose": "The item's name in the editor bar, before the red serial."
+      },
+      "box-head": {
+        "displayName": "Box Head",
+        "purpose": "A head inside a box, 1.1rem on a 1.25rem line; with the box's gap under it, its row is 3/4 cell as a field label's."
+      },
+      "body": {
+        "displayName": "Body / Control",
+        "purpose": "Field values and button labels (500 on buttons)."
+      },
+      "caption": {
+        "displayName": "Printed Caption",
+        "purpose": "Field labels (and, smaller, bar stats): uppercase, tracked, navy at 90%; a label's row 3/4 cell (21px, the name over 0.25rem), so label and field make two cells."
+      },
+      "serial": {
+        "displayName": "Serial",
+        "purpose": "The red item code after the editor title; tabular figures."
+      },
+      "grid-head": {
+        "displayName": "Grid Head",
+        "purpose": "A ledger's column heads: sentence case, full ink, on the rows' paper."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ply-edge",
+        "value": "0 1px 0 rgb(14 27 47 / 0.05), 0 1px 3px rgb(14 27 47 / 0.06)",
+        "purpose": "Every box, bar, grid and pagination strip at rest (--shadow)."
+      },
+      {
+        "name": "lifted",
+        "value": "0 2px 6px rgb(14 27 47 / 0.08), 0 12px 32px rgb(14 27 47 / 0.16)",
+        "purpose": "Editor sheet, modal, dragged tile, phone menu button, the login over a page whose session ended (--shadow-lifted)."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 3px rgb(27 47 78 / 0.12)",
+        "purpose": "A focused input or select."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-colour",
+        "value": "120ms",
+        "purpose": "Button and bar-button background changes."
+      },
+      {
+        "name": "field-edge",
+        "value": "100ms",
+        "purpose": "Field border and halo on hover/focus."
+      },
+      {
+        "name": "sheet",
+        "value": "200ms ease-out",
+        "purpose": "Phone menu drawer slide; editor save button reveal."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "50rem (max-width)"
+      }
+    ],
+    "textures": [
+      {
+        "name": "mat",
+        "value": "linear-gradient(to right, rgb(27 47 78 / 0.06) 1px, transparent 1px) 0 0 / 1.75rem 1.75rem, linear-gradient(to bottom, rgb(27 47 78 / 0.06) 1px, transparent 1px) 0 0 / 1.75rem 1.75rem",
+        "purpose": "The board as a cutting mat (--mat; every line --mat-line 0.06): 1.75rem cells (--cell, 28px), all lines one strength, painted only inside its frame: the frame a 1px outline (--mat-line) half a cell in from the edges (--mat-margin, 0.875rem), the margin left unpainted but for the ruler's ticks along the frame (every quarter cell 0.4375rem, four to a square / each cell 1.75rem / every fifth cell 8.75rem; 0.2 / 0.35 / 0.55rem long; as faint as the lines, --mat-line), so a top bar's frost shows past the ruler. Drawn by the Mat component, absolutely positioned under the page content (beside the rail, short of the leftover past the last half cell) and under the editor sheet's content (reaching up under its bar), scrolling with what lies on it; the top bars' copy (<Mat bar />) is always shown and their content is centred in the two cells under its frame. A ledger's ruling is --ledger-rule 0.075."
+      },
+      {
+        "name": "perforation",
+        "value": "radial-gradient(circle, rgb(27 47 78 / 0.32) 0.09rem, transparent 0.11rem) left bottom / 0.45rem 0.25rem repeat-x",
+        "purpose": "Under the header, the editor bar and a mat modal's bar, coming in (opacity --scrolled) as content scrolls beneath them."
+      },
+      {
+        "name": "topbar-frost",
+        "value": "background rgb(221 226 233 / calc(100% - 40% * var(--scrolled))); backdrop-filter blur(calc(0.75rem * var(--scrolled)))",
+        "purpose": "Header, editor bar and a mat modal's bar: solid board at rest, turning to a see-through frost (60% board, 0.75rem blur) over the first 24px scrolled (--scrolled 0 to 1, scrolled.js); a paper modal's bar frosts in its own paper (to 82%)."
+      }
+    ],
+    "layout": {
+      "navWidth": "9rem",
+      "cell": "1.75rem (28px, --cell); --half 14px, --quarter 7px; what lies on the mat fills whole half cells, 1px inside its slot (.ui-on-mat, also on Grid's table); the leftover past the last half cell (--leftover) goes outside the mat's right frame in the page, the header and the editor bar alike (on a phone split on both sides, --lead before the mat)",
+      "headerHeight": "4.375rem (70px): the mat frame plus two cells; bar buttons, cap-trimmed titles, icons and logo centred in those cells (their middle on a line), the row a pixel shorter so the 35px buttons lie on whole pixels; the header's tabs start on half lines, each widened to reach the next (measured); the page starts on the next line (3.5rem, 56px, on a phone: frame plus 1.5 cells, centred, the content starting where the boxes start)",
+      "pagePad": "0.875rem (--page-pad, half a cell): page edges on the mat frame; page-level gaps half a cell; single-row bars and pagination 3.5rem (two cells); bars, the pagination and the category tree pad --bar-pad top and bottom and --box-pad at the sides, what's in them 14px in (border included) as in a box; taller bars rounded up to whole half cells (onGrid); the API products' double bar two cells while loading (companies' bar only), three and a half once loaded (companies' bar two cells, sorting bar 1.5)",
+      "pagePadding": "0.875rem (--mat-margin, half a cell) to the mat's frame beside the rail and at the bottom, plus 1px and --leftover on the right; on a phone --lead on the left and the rest of the leftover on the right, 5rem at the bottom (the menu button)",
+      "editorWidth": "80vw (100% phone)",
+      "sectionColumns": "at most three, each min 21.875rem and rounded to half cells, the last taking the rest; gap 0.875rem (half a cell); section labels pushed onto a mat line by onGrid",
+      "productTiles": "a product's gallery and attachments: columns of whole half cells, as many as fit at --tile (calc(9 * var(--half)), 126px; three at least on a phone), the last taking the rest, half-cell gaps; a lone \"+ Dodaj\" one tile wide (no wider than a third of the section), 1px inside a 1.5-cell slot, on its side beside a box",
+      "controlHeights": "2.1875rem (--control, 1.25 cells, 35px, everywhere, a phone too; bar buttons the same, --bar-button) / 1.5rem small / 1.2rem compact; box padding calc(0.875rem - 1px) (--box-pad, 13px; the bottom a pixel less on the mat, so simple content makes the box exactly its slot), fields half a cell apart; a field label's row 3/4 cell (21px) so label and field are two cells, a box head's row the same, a checkbox row in a box one cell",
+      "categoryTree": "calc(23 * var(--half) - 1px) = 321px, so with the gap the table starts on a line",
+      "ledgerRows": "one cell each with their rule (--row-pad calc((var(--cell) - 1px - 1.5rem) / 2) = 1.5px round a 1.5rem line), the head a pixel less, the last row two less, a wrapping row's lines a cell apart, column gap 0.4rem, cells padded --cell-pad (= --box-pad) at the sides, the empty-table text too; every rule on a mat line; tables off list pages snapped by onGrid",
+      "rail": "buttons 2.625rem (1.5 cells, 42px), no gap; groups half a cell apart, the rule halfway down the gap; the name band absorbs what the window's height leaves over the half cells so Wyloguj starts on a half line; scrolls on a short window",
+      "matModal": "the sheet whole half cells (the leftover past the frame, its min-height rounded), onGrid on it; with a bar, its title and buttons on a paper .ui-bar on the mat's first cells, frosted round like the header, the body half a cell under it; barless, the first box on the first cell; groups on paper section labels (.ui-h2) on cell lines, tile grids snapped (.ui-snap)",
+      "login": "signed out: the window a cutting mat of its own (whole half cells both ways, the leftover past its right and bottom frame), the login a paper box on it, 1px inside its slot, snapped by onGrid, 22 half cells wide (or the mat's width), centred across, on a cell line a little above the middle, the plain ply shadow; a session ending over an open page: a lifted popup over the dimmed page instead",
+      "listPageSize": "50 by default (API products and the file picker too; unused files 100)",
+      "cornerShape": "squircle on boxes, bars, tables, popups, fields, buttons, chips, tiles, the rail's current-page tab, pagination ends and the rail logo"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The ink button: every main action.",
+      "html": "<button class=\"ds-btn\">Dodaj</button>",
+      "css": ".ds-btn{font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;height:2.1875rem;padding:0 1rem;border:none;border-radius:var(--button-radius,0.75rem);corner-shape:squircle;background:var(--navy-700,#1b2f4e);color:#fff;font-size:0.95rem;font-weight:500;cursor:pointer;transition:background-color 120ms}.ds-btn:hover{background:var(--navy-600,#2c4268)}.ds-btn:active{background:var(--navy-900,#0e1b2f)}.ds-btn:focus-visible{outline:solid 2px var(--navy-700,#1b2f4e);outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Grey ply button for lesser actions; Anuluj-style light buttons.",
+      "html": "<button class=\"ds-btn-sec\">Anuluj</button>",
+      "css": ".ds-btn-sec{font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;height:2.1875rem;padding:0 1rem;border:none;border-radius:0.75rem;corner-shape:squircle;background:#e5e9f0;color:#131f33;font-size:0.95rem;font-weight:500;cursor:pointer;transition:background-color 120ms}.ds-btn-sec:hover{background:#e6eef8}.ds-btn-sec:active{background:#b1bccb}.ds-btn-sec:focus-visible{outline:solid 2px #1b2f4e;outline-offset:2px}"
+    },
+    {
+      "name": "Bar Button",
+      "kind": "button",
+      "refersTo": "bar-button",
+      "description": "Header and editor-bar buttons: ink-bordered, paper showing the board through.",
+      "html": "<button class=\"ds-barbtn\">Zapisz</button> <button class=\"ds-barbtn ds-barbtn--active\">Lista</button>",
+      "css": ".ds-barbtn{font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;height:2.1875rem;padding:0 1rem;border:solid 1.5px #1b2f4e;border-radius:0.6rem;corner-shape:squircle;background:rgb(248 249 251 / 0.6);color:#131f33;font-size:0.95rem;font-weight:700;cursor:pointer;transition:background-color 120ms}.ds-barbtn:hover{background:#e6eef8}.ds-barbtn--active{background:#1b2f4e;color:#fff}.ds-barbtn--active:hover{background:#526a8e}.ds-barbtn:focus-visible{outline:solid 2px #1b2f4e;outline-offset:2px}"
+    },
+    {
+      "name": "Field with Caption",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A printed caption over a field with a darker bottom writing line.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-caption\">Ilość <small>· zapytaj</small></span><input class=\"ds-input\" placeholder=\"0\"></label>",
+      "css": ".ds-field{display:block;font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;}.ds-caption{box-sizing:border-box;display:flex;align-items:center;gap:0.4em;min-height:1.3125rem;padding-bottom:0.25rem;font-size:0.7rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:rgb(27 47 78 / 0.9)}.ds-caption small{font-size:inherit;font-weight:600;color:rgb(27 47 78 / 0.7)}.ds-input{font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;width:100%;height:2.1875rem;padding:0.25rem 0.5rem;border:solid 1px rgb(27 47 78 / 0.26);border-bottom-color:rgb(27 47 78 / 0.42);border-radius:0.65rem;corner-shape:squircle;background:#fff;color:#131f33;font-size:0.95rem;transition:border-color 100ms,box-shadow 100ms}.ds-input::placeholder{color:rgb(27 47 78 / 0.4)}.ds-input:hover{border-color:#526a8e}.ds-input:focus{outline:none;border-color:#1b2f4e;box-shadow:0 0 0 3px rgb(27 47 78 / 0.12)}"
+    },
+    {
+      "name": "Ply Boxes",
+      "kind": "card",
+      "refersTo": "box",
+      "description": "Paper ply, copy-blue element ply and yellow optional ply on the cutting-mat board.",
+      "html": "<div class=\"ds-board\"><div class=\"ds-box\">Opis</div><div class=\"ds-box ds-box--el\">Wariant</div><div class=\"ds-box ds-box--opt\">Opcjonalne</div></div>",
+      "css": ".ds-board{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(3,1fr);gap:0.875rem;padding:calc(0.875rem + 1px);background:#dde2e9;font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;}.ds-board::before{content:'';position:absolute;inset:0.875rem;z-index:-1;background:linear-gradient(to right,rgb(27 47 78 / 0.06) 1px,transparent 1px) 0 0/1.75rem 1.75rem,linear-gradient(to bottom,rgb(27 47 78 / 0.06) 1px,transparent 1px) 0 0/1.75rem 1.75rem;outline:solid 1px rgb(27 47 78 / 0.06);outline-offset:-1px}.ds-box{padding:calc(0.875rem - 1px) calc(0.875rem - 1px) calc(0.875rem - 2px);border:solid 1px rgb(27 47 78 / 0.12);border-radius:1rem;corner-shape:squircle;background:#f8f9fb;box-shadow:0 1px 0 rgb(14 27 47 / 0.05),0 1px 3px rgb(14 27 47 / 0.06);color:#131f33}.ds-box--el{background:#eff3f9}.ds-box--opt{background:#f5eed3}"
+    },
+    {
+      "name": "Section Head",
+      "kind": "custom",
+      "refersTo": "section-head",
+      "description": "A section's name on a small paper label lying on the mat: a cell tall less 1px, whole half cells wide, its top on a mat line; no rule.",
+      "html": "<h2 class=\"ds-h2\"><span>Warianty</span></h2>",
+      "css": ".ds-h2{display:flex;margin:1px 0 0.875rem 1px;font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;font-size:1rem;font-weight:700;letter-spacing:-0.005em;color:#131f33}.ds-h2>span{display:flex;align-items:center;justify-content:center;gap:0.5em;height:calc(1.75rem - 1px);padding:0 0.875rem;white-space:nowrap;border:solid 1px rgb(27 47 78 / 0.12);border-radius:0.6rem;corner-shape:squircle;background:#f8f9fb;box-shadow:0 1px 0 rgb(14 27 47 / 0.05),0 1px 3px rgb(14 27 47 / 0.06);color:#131f33}"
+    },
+    {
+      "name": "Ledger Grid",
+      "kind": "custom",
+      "refersTo": "grid-head",
+      "description": "Ruled ledger: sentence-case full-ink head on the rows' paper, faint row rules, each row one cell with its rule (the head a pixel less, the last row two), selected row in selected-blue.",
+      "html": "<div class=\"ds-grid\"><div class=\"ds-row ds-head\"><span>Kod</span><span>Nazwa</span></div><div class=\"ds-row\"><span>AX-1001</span><span>Długopis</span></div><div class=\"ds-row ds-row--sel\"><span>AX-1002</span><span>Kubek</span></div></div>",
+      "css": ".ds-grid{border:solid 1px rgb(27 47 78 / 0.12);border-radius:1rem;corner-shape:squircle;background:#f8f9fb;box-shadow:0 1px 0 rgb(14 27 47 / 0.05),0 1px 3px rgb(14 27 47 / 0.06);overflow:hidden;font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;}.ds-row{display:grid;grid-template-columns:8rem 1fr;gap:calc(1.75rem - 1.5rem) 0.4rem;padding:calc((1.75rem - 1px - 1.5rem) / 2) calc(0.875rem - 1px);min-height:1.75rem;align-items:center;border-bottom:solid 1px rgb(27 47 78 / 0.075);color:#131f33;font-size:0.95rem}.ds-row:last-child{padding-block:calc((1.75rem - 3px - 1.5rem) / 2);min-height:calc(1.75rem - 2px);border-bottom:none}.ds-row:not(.ds-head):hover{background:#eef1f6}.ds-head{padding-block:calc((1.75rem - 2px - 1.5rem) / 2);min-height:calc(1.75rem - 1px);border-bottom:solid 1px rgb(27 47 78 / 0.3);background:#f8f9fb;font-size:0.8rem;font-weight:600;color:#131f33}.ds-row--sel{background:#d2dbe9}"
+    },
+    {
+      "name": "Pagination Strip",
+      "kind": "custom",
+      "refersTo": "pagination-active",
+      "description": "Joined ruled cells on a paper strip, the current page in navy ink.",
+      "html": "<div class=\"ds-pag\"><button>1</button><button class=\"on\">2</button><button>3</button></div>",
+      "css": ".ds-pag{display:inline-flex;padding:calc((3.5rem - 3px - 2.1875rem) / 2) calc(0.875rem - 1px);border:solid 1px rgb(27 47 78 / 0.12);border-radius:1rem;corner-shape:squircle;background:#f8f9fb}.ds-pag button{font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;width:2.5rem;height:2.1875rem;margin-left:-1px;border:solid 1px rgb(27 47 78 / 0.12);border-radius:0;background:#fff;color:#131f33;font-variant-numeric:tabular-nums;cursor:pointer}.ds-pag button:first-child{margin-left:0;border-radius:0.6rem 0 0 0.6rem;corner-shape:squircle;}.ds-pag button:last-child{border-radius:0 0.6rem 0.6rem 0;corner-shape:squircle;}.ds-pag button:hover{background:#e6eef8}.ds-pag button.on{position:relative;border-color:#1b2f4e;background:#1b2f4e;color:#fff}"
+    },
+    {
+      "name": "Rail",
+      "kind": "nav",
+      "refersTo": "nav-current",
+      "description": "The form's stub: navy rail, perforated right edge, current page a board tab with a red icon, red version serial.",
+      "html": "<nav class=\"ds-rail\"><a>Produkty</a><a class=\"on\"><svg viewBox=\"0 0 20 20\" width=\"20\" height=\"20\"><rect x=\"3\" y=\"3\" width=\"14\" height=\"14\" rx=\"1\" fill=\"currentColor\"/></svg>Kategorie</a><a>Kalkulacje</a><span class=\"ds-ver\">1.27.0</span></nav>",
+      "css": ".ds-rail{position:relative;display:flex;flex-direction:column;gap:0;width:9rem;padding:0.75rem 0.75rem 0 0.5rem;background:#13213a;font-family:'Bricolage Admin',ui-sans-serif,system-ui,sans-serif;}.ds-rail::after{content:'';position:absolute;top:0;right:0.2rem;bottom:0;width:0.25rem;background:radial-gradient(circle,#dde2e9 0.07rem,transparent 0.09rem) center top/0.25rem 0.5rem repeat-y;opacity:0.55}.ds-rail a{display:flex;align-items:center;gap:0.7rem;height:2.625rem;padding:0 0.7rem;border-radius:0.55rem;corner-shape:squircle;color:#fff;font-size:0.95rem;cursor:pointer}.ds-rail a:hover{background:rgb(255 255 255 / 0.07)}.ds-rail a.on{position:relative;z-index:1;margin-right:-0.75rem;border-radius:0.55rem 0 0 0.55rem;corner-shape:squircle;background:#dde2e9;color:#131f33}.ds-rail a.on svg{color:#bf0417}.ds-ver{margin:0.75rem -0.75rem 0 -0.5rem;padding:0.2rem;text-align:center;font-size:0.625rem;font-variant-numeric:tabular-nums;color:rgb(243 140 151 / 0.55);background:rgb(0 0 0 / 0.32)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Carbonless Job Ticket",
+    "overview": "The admin is REED's own self-copying job ticket, the kind a print shop fills in all day. Every box, bar, table and popup is a ply of that form, lying on a soft blue-grey backing board marked out as a modelling cutting mat; every rule, caption and button is printed in one navy ink; the form carries a red serial number. It refuses the SaaS card admin of floating rounded tiles on a dotted ground; its own corners are squircles, which read crisper than round corners of the same radius.\n\nThis is a restyle of a tool staff already know, so the layout and the flow are the incumbent ones: no button, title or action moved. The world lives in the finish: the ground is soft (board and off-white plies, never pure white on grey), a dark rail frames a light workspace, and density is balanced — tables are tight ledgers (one cell to a row, its rule on a mat line) but nothing is shrunk past easy reading for a full working day.\n\nThe navy family is the admin's colour by the owner's decision. Colour beyond it is functional only: a small set of status families (info blue, success green, warning orange, new purple, danger red) each used in a 100 / 200 / 300 ramp for rest / hover / pressed.",
+    "keyCharacteristics": [
+      "A pad of plies (#f8f9fb paper) on a backing board (#dde2e9) marked as a faint cutting mat: 1.75rem cells, every line one strength, inside a frame stopping half a cell (0.875rem) short of the edges, a ruler's ticks along the frame (every quarter cell, four to a square, longer at each line, longest at every fifth); it scrolls with what lies on it, as a real board would, and the top bars' content is centred in the two cells under the frame",
+      "One navy ink (#1b2f4e) for buttons, rules and captions; navy-alpha for every line, so lines darken with the ply they sit on",
+      "Copy plies: copy-blue for repeated elements, yellow for optional ones, grey for what can't be edited",
+      "A dark navy rail torn off along a perforated edge; the current page is a board-coloured tab with a red icon",
+      "REED red prints the serial: the version number in the rail and the item code in the editor bar",
+      "Squircle corners everywhere (0.3–0.75rem), flat plies with a thin edge shadow, a lifted shadow only for sheets laid over the page"
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule",
+        "body": "Every line, caption and button on the form is printed in the navy ink or that ink seen through (alpha). There is no black and no neutral grey line; a colour not in ui-admin.css is one of its families.",
+        "section": "colors"
+      },
+      {
+        "name": "The Serial Rule",
+        "body": "Red marks what identifies the form (the item code, the version, the page you're on) and what destroys data. It is never a fill for a surface, heading or rule.",
+        "section": "colors"
+      },
+      {
+        "name": "The Soft Ground Rule",
+        "body": "The workspace is board and off-white plies, never pure white on grey; pure white is reserved for a field written on a ply.",
+        "section": "colors"
+      },
+      {
+        "name": "The Printed Caption Rule",
+        "body": "Every field label is the same caption: small, bold, uppercase, tracked 0.05em, navy at 90%; bar stats take its smaller sibling. It is a functional caption only, never a decorative line above a heading, and ledger heads are not set in it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Number Rule",
+        "body": "Counts, page numbers, serials and versions use tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Ply Rule",
+        "body": "At rest a surface gets the ply edge or nothing. No glows, no hover lifts, no offset shadows; lifting is reserved for something laid over the page.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Perforation Rule",
+        "body": "Where a part tears off the form, it is drawn as a row of navy-alpha holes: under the header and editor bar once content scrolls beneath them, and down the rail's right edge (board-coloured holes).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do take every colour, radius and shadow from ui-admin.css; a colour that isn't there is one of its families.",
+      "Do draw lines in navy alpha (borders 0.12, field edges 0.26 / 0.42) so they darken with the ply they sit on.",
+      "Do put repeated elements on copy-blue, optional ones on yellow and uneditable ones on grey, and lay a nested ply flat.",
+      "Do label fields with the printed caption (0.7rem, 700, uppercase, 0.05em), and head ledger columns in sentence case (0.8rem, 600, full ink) on the rows' paper.",
+      "Do draw corners as squircles at the radius tokens (0.4–1rem).",
+      "Do give coloured buttons their family's 100 / 200 / 300 for rest / hover / pressed.",
+      "Do keep the layout and flow when restyling: buttons, titles and actions stay where staff know them."
+    ],
+    "donts": [
+      "Don't use pure white as a page or box ground; white is for a field written on a ply.",
+      "Don't set fully round corners on boxes, buttons or fields; full rounds are for circles and status pills only.",
+      "Don't fill surfaces, headings or rules with REED red; it prints the serial, the current page's icon and danger.",
+      "Don't add glows, hover lifts or offset shadows; at rest a ply has its thin edge or nothing.",
+      "Don't introduce a second type family; Bricolage Grotesque is the whole system.",
+      "Don't write a kicker or eyebrow above a heading; the uppercase caption is for field labels and bar stats only."
+    ]
+  }
+}

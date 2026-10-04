@@ -92,7 +92,7 @@
   .column {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--half); /* a box's (see .ui-box): the field two cells, each checkbox one */
   }
   .missing {
     color: var(--orange-700);

@@ -94,7 +94,7 @@
   $: icon = aliases[source][name] ?? name;
 
   const colors = {
-    dark: '#000',
+    dark: 'var(--icon-ink, #000)', // (the admin's is its navy ink)
     light: 'var(--light)',
   };
   const defaultColor = colors.dark;

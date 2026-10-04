@@ -16,6 +16,8 @@
   import Login from '@/Login.svelte';
   import Nav from '@/nav/Nav.svelte';
   import Header from '@/Header.svelte';
+  import Mat from '@c/Mat.svelte';
+  import { onGrid } from '@/onGrid';
   import Loader from '$c/Loader.svelte';
 
   // an editor with unsaved changes
@@ -48,9 +50,7 @@
   <meta name="robots" content="noindex" />
   <style>
     body {
-      background-color: var(--grey-100);
-      background-image: url('/imgs/dot_grid.png');
-      background-size: 10rem;
+      background-color: var(--board);
     }
   </style>
 </svelte:head>
@@ -69,7 +69,8 @@
 {#if $me}
   <Nav />
   <Header />
-  <div class="content">
+  <div class="content" use:onGrid>
+    <Mat />
     <slot />
   </div>
 {/if}
@@ -85,15 +86,23 @@
     height: 100vh;
   }
 
+  /* The page on the cutting mat (see Mat), beside the menu: its slots from the mat's frame, the first right under the
+     header; as wide and, at least, as tall as the window, rounded down to whole half cells - what's left over goes past
+     the mat's right and bottom frame (--leftover, --fill-height), so what lies on the mat reaches its frame */
   .content {
-    /* the header is fixed above it (4rem), the first box right under it (the menu's first button starts there too,
-       see Nav) */
-    padding: var(--header-height) 1.5rem 1.5rem calc(var(--nav-width) + 1.5rem);
+    --mat-inset: 0 var(--leftover) 0 var(--nav-width);
+    position: relative;
+    min-height: calc(var(--header-height) + var(--fill-height) + var(--mat-margin) + 1px);
+    padding: var(--header-height) calc(var(--mat-margin) + 1px + var(--leftover)) calc(var(--mat-margin) + 1px)
+      calc(var(--nav-width) + var(--mat-margin));
   }
-  /* a phone: no menu beside it (it's over the page when opened, see Nav), room under it for the menu's button */
+  /* a phone: no menu beside it (it's over the page when opened, see Nav), the leftover on both sides (--lead), room
+     under it for the menu's button */
   @media (max-width: 50rem) {
     .content {
-      padding: var(--header-height) 0.75rem 5rem;
+      --mat-inset: 0 calc(var(--leftover) - var(--lead)) 0 var(--lead);
+      padding: var(--header-height) calc(var(--mat-margin) + 1px + var(--leftover) - var(--lead)) 5rem
+        calc(var(--mat-margin) + var(--lead));
     }
     .content :global(.ui-fill) {
       height: auto;

@@ -21,8 +21,9 @@ export async function fetchSlider(api, filter, limit, page = 1, count = null) {
   return { products: data, count: total };
 }
 
-/** A slider's first page, for the server render (homepage sections, "Podobne produkty"); null when it has none. */
-export async function preloadSlider(api, slug, categoriesItems, categoriesTree, filterIds = []) {
+/** A slider's first page, for the server render (homepage sections, "Podobne produkty"); null when it has none.
+ *  `count`: its total when already known (see the homepage's load), so it isn't asked for. */
+export async function preloadSlider(api, slug, categoriesItems, categoriesTree, filterIds = [], count = null) {
   const filter = sliderFilter(slug, categoriesItems, categoriesTree, filterIds);
-  return filter ? fetchSlider(api, filter, SLIDER_PRELOAD) : null;
+  return filter ? fetchSlider(api, filter, SLIDER_PRELOAD, 1, count) : null;
 }

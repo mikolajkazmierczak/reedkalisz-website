@@ -82,99 +82,120 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-<article
-  on:click={forwardToLink}
-  on:pointerenter={(e) => {
-    touched = true;
-    if (e.pointerType === 'mouse') hovered = true;
-  }}
-  class="tile"
-  class:is-out={out_of_stock}
-  class:is-none={noneNow}
-  class:t-sale={sale}
-  class:t-new={isNew}
-  class:t-best={bestseller}
-  class:t-soon={coming_soon}>
-  <a class="tile__link" href="/produkty/{slug}" bind:this={link}>
-    <div class="tile__media">
-      {#each layers as layer (layer.id)}
-        {@const last = layer === layers.at(-1)}
-        <img
-          class="tile__img"
-          class:shown={layer.ready && (last || !layers.at(-1).ready)}
-          src={layer.src}
-          alt={last ? name : ''}
-          loading="lazy"
-          decoding="async"
-          use:onLoad={(node) => reveal(layer, node)}
-          on:transitionend={settle} />
-      {:else}
-        <div class="tile__none" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="3" y="3" width="18" height="18" />
-            <path d="m3 16 5-5 4 4 3-3 6 6" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </div>
-      {/each}
-      {#if hoverSrc && hovered}
-        {#key hoverSrc}
+{#if product._skeleton}
+  <!-- a card on its way (see CategorySlider): its parts as a card's, bars for what's in them, so it's exactly as tall -
+       two lines of name, as most rows have -->
+  <article class="tile is-skeleton" aria-hidden="true">
+    <div class="tile__link">
+      <div class="tile__media" />
+      <div class="tile__body">
+        <p class="tile__name"><span class="bone" /><span class="bone bone--short" /></p>
+        <p class="code tile__code"><span class="bone bone--code" /></p>
+      </div>
+    </div>
+    <div class="tile__foot">
+      <div class="tile__colors" />
+      <div class="tile__price">
+        <p class="tile__amount"><span class="bone bone--price" /></p>
+        <p class="tile__with">&nbsp;</p>
+      </div>
+    </div>
+  </article>
+{:else}
+  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+  <article
+    on:click={forwardToLink}
+    on:pointerenter={(e) => {
+      touched = true;
+      if (e.pointerType === 'mouse') hovered = true;
+    }}
+    class="tile"
+    class:is-out={out_of_stock}
+    class:is-none={noneNow}
+    class:t-sale={sale}
+    class:t-new={isNew}
+    class:t-best={bestseller}
+    class:t-soon={coming_soon}>
+    <a class="tile__link" href="/produkty/{slug}" bind:this={link}>
+      <div class="tile__media">
+        {#each layers as layer (layer.id)}
+          {@const last = layer === layers.at(-1)}
           <img
-            class="tile__img tile__img--hover"
-            class:ready={hoverReady}
-            src={hoverSrc}
-            alt=""
+            class="tile__img"
+            class:shown={layer.ready && (last || !layers.at(-1).ready)}
+            src={layer.src}
+            alt={last ? name : ''}
+            loading="lazy"
             decoding="async"
-            use:onLoad={() => (hoverReady = true)} />
-        {/key}
-      {/if}
-
-      <Badges {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} {noneNow} />
-    </div>
-
-    <div class="tile__body">
-      <h3 class="tile__name">{name}</h3>
-      <p class="code tile__code">{code}</p>
-    </div>
-  </a>
-
-  <div class="tile__foot">
-    <!-- Always rendered, so rows without colours keep the same height. -->
-    <div class="tile__colors">
-      {#each shownColors as { first, second, amount, available }}
-        <Color {first} {second} {amount} {available} notooltip={!touched} />
-      {/each}
-      {#if extraColors > 0}
-        <span class="tile__more tnum">+{extraColors}</span>
-      {/if}
-    </div>
-
-    <div class="tile__price">
-      <p class="tile__amount">
-        {#if price_min}
-          <span class="from">od</span>
-          {#if price_min_sale}
-            <s class="was tnum">{price_min.toFixed(2)}</s>
-            <strong
-              class="now now--sale tnum"
-              class:now--10={price_min_sale >= 10}
-              class:now--100={price_min_sale >= 100}>{price_min_sale.toFixed(2)} zł</strong>
-          {:else}
-            <strong class="now tnum" class:now--10={price_min >= 10} class:now--100={price_min >= 100}
-              >{price_min.toFixed(2)} zł</strong>
-          {/if}
-          <span class="per">/szt</span>
+            use:onLoad={(node) => reveal(layer, node)}
+            on:transitionend={settle} />
         {:else}
-          <span class="ask">Zapytaj o cenę</span>
+          <div class="tile__none" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" />
+              <path d="m3 16 5-5 4 4 3-3 6 6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        {/each}
+        {#if hoverSrc && hovered}
+          {#key hoverSrc}
+            <img
+              class="tile__img tile__img--hover"
+              class:ready={hoverReady}
+              src={hoverSrc}
+              alt=""
+              decoding="async"
+              use:onLoad={() => (hoverReady = true)} />
+          {/key}
         {/if}
-      </p>
-      <!-- Always rendered, so prices line up whether or not it's said. -->
-      <p class="tile__with">
-        {#if withMarking}ze znakowaniem{/if}
-      </p>
+
+        <Badges {isNew} {bestseller} {sale} {coming_soon} {out_of_stock} {noneNow} />
+      </div>
+
+      <div class="tile__body">
+        <h3 class="tile__name">{name}</h3>
+        <p class="code tile__code">{code}</p>
+      </div>
+    </a>
+
+    <div class="tile__foot">
+      <!-- Always rendered, so rows without colours keep the same height. -->
+      <div class="tile__colors">
+        {#each shownColors as { first, second, amount, available }}
+          <Color {first} {second} {amount} {available} notooltip={!touched} />
+        {/each}
+        {#if extraColors > 0}
+          <span class="tile__more tnum">+{extraColors}</span>
+        {/if}
+      </div>
+
+      <div class="tile__price">
+        <p class="tile__amount">
+          {#if price_min}
+            <span class="from">od</span>
+            {#if price_min_sale}
+              <s class="was tnum">{price_min.toFixed(2)}</s>
+              <strong
+                class="now now--sale tnum"
+                class:now--10={price_min_sale >= 10}
+                class:now--100={price_min_sale >= 100}>{price_min_sale.toFixed(2)} zł</strong>
+            {:else}
+              <strong class="now tnum" class:now--10={price_min >= 10} class:now--100={price_min >= 100}
+                >{price_min.toFixed(2)} zł</strong>
+            {/if}
+            <span class="per">/szt</span>
+          {:else}
+            <span class="ask">Zapytaj o cenę</span>
+          {/if}
+        </p>
+        <!-- Always rendered, so prices line up whether or not it's said. -->
+        <p class="tile__with">
+          {#if withMarking}ze znakowaniem{/if}
+        </p>
+      </div>
     </div>
-  </div>
-</article>
+  </article>
+{/if}
 
 <style>
   .tile {
@@ -223,6 +244,54 @@
     display: flex;
     flex-direction: column;
     color: inherit;
+  }
+
+  /* a skeleton (see above): each bar a line of what it stands for, all of it pulsing a shade darker */
+  .is-skeleton {
+    pointer-events: none;
+  }
+  .is-skeleton .tile__media {
+    background-color: var(--paper-2);
+    animation: pulse-media 1.4s ease-in-out infinite;
+  }
+  .bone {
+    display: flex;
+    align-items: center;
+    height: 1lh;
+  }
+  .bone::before {
+    content: '';
+    flex: 1;
+    height: 0.7em;
+    background-color: var(--paper-3);
+    animation: pulse-bone 1.4s ease-in-out infinite;
+  }
+  .bone--short {
+    width: 60%;
+  }
+  .bone--code {
+    width: 35%;
+  }
+  .tile__amount .bone--price {
+    align-self: flex-end;
+    width: 55%;
+    height: 1.5rem;
+  }
+  @keyframes pulse-media {
+    50% {
+      background-color: var(--paper-3);
+    }
+  }
+  @keyframes pulse-bone {
+    50% {
+      background-color: var(--paper-4);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .is-skeleton .tile__media,
+    .bone::before {
+      animation: none;
+    }
   }
   .tile__link::after {
     content: '';

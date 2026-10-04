@@ -13,7 +13,7 @@ export const searchparams = writable(
     ['/admin/kalkulacje/znakowania', { values, defaults: { c: null } }], // company
     ['/admin/biblioteka', { values, defaults: { l: 50, p: 1, q: null } }], // limit, page, query
     ['/admin/zapytania', { values, defaults: { l: 50, p: 1, q: null, s: null } }], // limit, page, query, sort
-    ['/admin/api/produkty', { values, defaults: { l: 25, p: 1, q: null, c: null } }], // limit, page, query, company
+    ['/admin/api/produkty', { values, defaults: { l: 50, p: 1, q: null, c: null } }], // limit, page, query, company
     ['/admin/api/znakowania', { values, defaults: { c: null } }], // company
     ['/admin/api/miejsca', { values, defaults: { c: null } }], // company
     ['/admin/api/kategorie', { values, defaults: { c: null } }], // company

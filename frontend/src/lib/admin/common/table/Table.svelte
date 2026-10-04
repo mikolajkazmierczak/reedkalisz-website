@@ -86,14 +86,11 @@
   let dragged = null; // the path of the row being dragged ("0,2")
 
   $: columns = getColumnWidths(shownHead, tree, order, maxDepth);
-  // starting with text, not a tree's buttons nor a flag's icon: it's set in from the edge (see Grid)
-  $: textFirst = !tree && !order && !shownHead[0]?.checkbox;
 </script>
 
 <Grid
   {columns}
   scrollKey={[page, limit, sort, scrollKey]}
-  indentFirst={textFirst}
   empty={items.length ? null : 'Brak elementów o podanych parametrach'}
   on:dragenter={(e) => draggingRow(e) && (dropzone = -1)}>
   <svelte:fragment slot="head">

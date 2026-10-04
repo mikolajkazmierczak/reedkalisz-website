@@ -93,8 +93,9 @@
     clearSelected();
   }
 
-  // set on filter change
+  // set on filter change (even while the last one loads); a scan asked for on another tab was for the one it opened on
   function handleCompanyChange(e) {
+    $scanRequest = null;
     selectCompany(e.detail.id);
   }
 
@@ -849,22 +850,28 @@
   let alive = true;
   onDestroy(() => (alive = false));
 
+  // the latest only: another company picked while one loads drops what that one brings
+  let loads = 0;
   async function fetchItems() {
+    const load = ++loads;
     fetching = true;
     fetchingPhase = 0;
     let unread = null; // the last scan, when it can't be read: as none, a new scan replaces it
     try {
-      [dbItems, apiItems] = await Promise.all([
+      const items = await Promise.all([
         fetchDbItems(),
         fetchSnapshot(selectedCompany).catch((e) => ((unread = e), null)),
       ]);
+      if (load !== loads) return;
+      [dbItems, apiItems] = items;
     } catch (e) {
+      if (load !== loads) return;
       dbItems = apiItems = null; // not the last company's, merged with this one
       $scanRequest = null;
       if (alive) tell(e.message);
       return;
     } finally {
-      fetching = false;
+      if (load === loads) fetching = false;
     }
     if (unread && alive) tell(unread.message);
     if ($scanRequest === selectedCompany.id) {
@@ -979,6 +986,34 @@
       refreshing = false;
     }
   });
+
+  // The loading's spinner right under the scan button's cloud, its middle under the icon's: measured, since the button
+  // centres its icon and label in its minimum width (see .ui-lead), so where the icon is depends on the label.
+  let scanLead;
+  function underScan(node, active) {
+    const place = () => {
+      const icon = scanLead?.querySelector('svg');
+      const spinner = node.querySelector('.aligned > svg');
+      if (!icon || !spinner) return;
+      const i = icon.getBoundingClientRect();
+      const width = parseFloat(getComputedStyle(spinner).width); // (not its box: it turns, its corners reach further)
+      const left = i.left + i.width / 2 - width / 2 - node.getBoundingClientRect().left;
+      node.style.setProperty('--under-scan', `${left}px`);
+    };
+    // watched only while there's a spinner (`active`: loading): the list it gives way to doesn't need it
+    const changes = new MutationObserver(place);
+    const resizes = new ResizeObserver(place);
+    const watch = (on) => {
+      changes.disconnect();
+      resizes.disconnect();
+      if (!on) return;
+      changes.observe(node, { childList: true, subtree: true });
+      resizes.observe(node);
+      place();
+    };
+    watch(active);
+    return { update: watch, destroy: () => watch(false) };
+  }
 </script>
 
 <svelte:head>
@@ -988,19 +1023,76 @@
 <!-- the page doesn't scroll, the list does (see .ui-fill) -->
 <div class="ui-fill">
   <!-- one bar, two rows: the companies and the scan, then the list's sorting -->
-  <div class="bars">
+  <div class="bars ui-snap">
     {#if supportedCompanies && selectedCompany}
       <CompanyBar
         companies={supportedCompanies}
         selected={selectedCompany}
-        disabled={fetching}
+        disabled={scanning}
         busy={scanning}
         on:change={handleCompanyChange}>
         <!-- only what's always there, so the companies next to it never move -->
-        <span slot="before" class="lead"
+        <span slot="before" class="ui-lead" bind:this={scanLead}
           ><Button disabled={fetching || !dbItems} icon="cloud" on:click={fetchApi}>Skanuj</Button></span>
 
-        <!-- labels on one line, values on the next, each on a shared baseline -->
+        <!-- the search at the other end, where it is on every page (not while scanning: it navigates, which asks
+             about leaving) -->
+        {#if !scanning}<Search {searchParams} {query} />{/if}
+
+        <small slot="busy">
+          <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
+        </small>
+      </CompanyBar>
+    {/if}
+    {#if !fetching && selectedCompany}
+      <hr class="bars-divider" />
+      <!-- the sorting (and adding what's picked) under the companies, the line between them; the company's discount
+           and last scan even before its first scan -->
+      <Bar>
+        {#if mergedItems && $colors}
+          {#if selectedCount.all}
+            <span class="ui-lead">
+              <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
+                {uploading ? 'Importowanie...' : 'Importuj'}
+              </Button>
+            </span>
+            <!-- what's picked, a number and its label on each line (the labels like the last scan's at the bar's end) -->
+            <div class="ui-counts">
+              <span class="ui-stat-value">{selectedCount.items}</span>
+              <span class="ui-stat-label">Produkty</span>
+              <span class="ui-stat-value">{selectedCount.storages}</span>
+              <span class="ui-stat-label">Warianty</span>
+            </div>
+            <span class="ui-divider" />
+          {/if}
+          {#if retiredCount}
+            <!-- deletes the retired products and variants (the confirmation says how many) -->
+            <Button
+              size="sm"
+              dangerous
+              disabled={deletingRetired}
+              icon="delete"
+              on:click={() => deleteRetired().catch(writeFailed)}>
+              {deletingRetired ? 'Usuwanie...' : 'Posprzątaj'}
+            </Button>
+          {/if}
+          <!-- what goes to the top (each one's over the ones right of it) -->
+          <div class="sorting">
+            {#each [['notInApiFirst', 'Wycofane'], ['newFirst', 'Nowe warianty'], ['complicationsFirst', 'Komplikacje'], ['dbFirst', 'Zaimportowane']] as [key, label]}
+              <Button
+                size="sm"
+                icon="arrow_up"
+                outline={!sort[key]}
+                selected={sort[key]}
+                title="Najpierw: {label.toLowerCase()}"
+                on:click={() => (sort[key] = !sort[key])}>
+                {label}
+              </Button>
+            {/each}
+          </div>
+        {/if}
+        <!-- the company's discount and last scan at the other end: labels on one line, values on the next, each on a
+             shared baseline -->
         <div class="stats">
           {#if selectedCompany.api_discount !== null}
             <label class="ui-stat-label" for="discount">Rabat</label>
@@ -1013,7 +1105,6 @@
                 max={100}
                 value={discount}
                 invalid={discountInvalid}
-                disabled={fetching}
                 on:input={(e) => discountTyped(e.detail.e)}
                 on:blur={discountLeft} />&nbsp;%
             </span>
@@ -1021,65 +1112,11 @@
           <span class="ui-stat-label">Ostatni skan</span>
           <span class="ui-stat-value">{lastScan}</span>
         </div>
-
-        <small slot="busy">
-          <span class="warning">Nie zamykaj przeglądarki</span> i nie opuszczaj tej strony, dopóki skanowanie się nie zakończy.
-        </small>
-      </CompanyBar>
-    {/if}
-    {#if !fetching && mergedItems && selectedCompany && $colors}
-      <hr class="bars-divider" />
-      <!-- the sorting (and adding what's picked) under the companies, the line between them -->
-      <Bar>
-        {#if selectedCount.all}
-          <span class="lead">
-            <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
-              {uploading ? 'Importowanie...' : 'Importuj'}
-            </Button>
-          </span>
-          <!-- what's picked, a number and its label on each line (the labels like the last scan's in the bar above) -->
-          <div class="ui-counts">
-            <span class="ui-stat-value">{selectedCount.items}</span>
-            <span class="ui-stat-label">Produkty</span>
-            <span class="ui-stat-value">{selectedCount.storages}</span>
-            <span class="ui-stat-label">Warianty</span>
-          </div>
-          <span class="ui-divider" />
-        {/if}
-        <!-- what goes to the top (each one's over the ones right of it) -->
-        <div class="sorting">
-          {#each [['notInApiFirst', 'Wycofane'], ['newFirst', 'Nowe warianty'], ['complicationsFirst', 'Komplikacje'], ['dbFirst', 'Zaimportowane']] as [key, label]}
-            <Button
-              size="sm"
-              icon="arrow_up"
-              outline={!sort[key]}
-              selected={sort[key]}
-              title="Najpierw: {label.toLowerCase()}"
-              on:click={() => (sort[key] = !sort[key])}>
-              {label}
-            </Button>
-          {/each}
-        </div>
-        <!-- what acts on the list, at the other end -->
-        <div class="list-actions">
-          {#if retiredCount}
-            <!-- deletes the retired products and variants (the confirmation says how many) -->
-            <Button
-              size="sm"
-              dangerous
-              disabled={deletingRetired}
-              icon="delete"
-              on:click={() => deleteRetired().catch(writeFailed)}>
-              {deletingRetired ? 'Usuwanie...' : 'Posprzątaj'}
-            </Button>
-          {/if}
-          <Search {searchParams} {query} />
-        </div>
       </Bar>
     {/if}
   </div>
 
-  <div class="content ui-fill-col">
+  <div class="content ui-fill-col" use:underScan={fetching}>
     {#if fetching}
       {#if fetchingPhase === 0}
         <p class="aligned"><Loader dark /> Pobieranie danych</p>
@@ -1137,32 +1174,38 @@
 {/if}
 
 <style>
-  /* the first button of each row (Skanuj, Importuj) as wide as the other, a longer label ("Importowanie...") wider */
-  .lead {
-    display: flex;
-  }
-  .lead :global(button) {
-    min-width: 7.5rem;
-  }
   /* the two bars as one: its frame theirs, a line between them */
   .bars {
-    margin-bottom: 1rem;
+    margin-bottom: var(--page-pad);
     border-radius: var(--box-radius);
     corner-shape: squircle;
     border: var(--border-light);
-    background-color: var(--light);
+    background-color: var(--paper);
+    box-shadow: var(--shadow);
   }
+  /* each bar less the frame's lines (the frame is theirs) and the 1px it sits inside its slot: the companies' bar two
+     cells; with the sorting's under it (a cell and a half, see below) and the line between them, three and a half */
   .bars > :global(.ui-bar) {
     margin: 0;
+    min-height: calc(2 * var(--cell) - 3px);
     border: none;
     background: none;
+    box-shadow: none;
+  }
+  /* the sorting's bar: Importuj and its counts as close as in the image review (see Modal's bar); a cell and a half
+     tall (less the frame's line and the one between them) - small buttons, the discount and Importuj fit in it - so the
+     two bars as one are half a cell less than two bars */
+  .bars-divider + :global(.ui-bar) {
+    min-height: calc(1.5 * var(--cell) - 3px);
+    padding-block: 0;
+    column-gap: 0.5rem;
   }
   .bars-divider {
-    margin: 0 0.5rem;
+    margin: 0 0.5rem 2px; /* (3px with its line: what the two bars gave up for the frame and the slot) */
     border: none;
     border-top: var(--border-light);
   }
-  /* no taller than the buttons (2rem), so the bar keeps its height */
+  /* at the other end of the sorting's bar, its two lines no taller than the bar */
   .stats {
     display: grid;
     grid-auto-flow: column;
@@ -1170,7 +1213,7 @@
     align-items: baseline;
     align-content: center;
     gap: 0.1rem 1.25rem;
-    height: 2rem;
+    margin-left: auto;
     line-height: 1;
   }
   label.ui-stat-label {
@@ -1189,15 +1232,16 @@
     align-items: center;
     margin: 0;
   }
-  /* the spinner right under the scan button's icon: the bar's border and padding, the button's padding, half the
-     icon (58% of 2rem) less half the spinner (a 1.5rem line); the texts under it start where its text does */
+  /* the spinner right under the scan button's icon (measured, see underScan; until then about there); the texts under
+     it start where its text does */
   .content {
-    --under-scan: calc(1px + 0.5rem + 1rem + 0.58rem - 0.75rem);
+    --under-scan: calc(0.5rem + 1rem + 0.58rem - 0.75rem);
   }
   .aligned {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-top: var(--page-pad); /* half a square of the mat under the bar, as a box would be */
     padding-left: var(--under-scan);
   }
   .indent {
@@ -1205,13 +1249,6 @@
   }
   .warning {
     color: var(--red-500);
-  }
-  /* at the other end of the bar */
-  .list-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: auto;
   }
   .sorting {
     display: flex;

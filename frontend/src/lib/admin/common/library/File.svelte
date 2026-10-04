@@ -51,9 +51,10 @@
   export let note = null; // one more line of the tooltip
 
   export let marked = false;
-  export let backing = null; // on the dots (the library, a picker on a page): its text on their grey, so it reads
+  export let backing = null; // on the mat (the library, unused files, the image review): its text on the board's colour
   export let remove = null; // marked to go: red, and this ("Usuń") in a pill on the top edge
   export let flag = null; // this ("NOWE") in a purple pill there (then the red one just its bin), and a purple ring
+  export let cleared = false; // taken off in the picker, still there to bring back: its ring dashed and faded
   export let clickable = true; // not: only looked at (a disabled button: no pointer, no focus, no hover)
   // slot "tag": what the image is for, in a pill on the bottom edge of the image
   // slots "left", "right": small buttons over the picture's top corners, shown as its magnifier is (e.g. a drag handle)
@@ -111,6 +112,7 @@
   <div
     class="wrapper"
     class:marked
+    class:cleared={cleared && !marked}
     class:remove={marked && remove}
     class:backed={backing}
     class:tagged={$$slots.tag}
@@ -225,11 +227,12 @@
   }
   .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still),
   .wrapper.marked,
+  .wrapper.cleared,
   .wrapper.flagged {
     --inset: 0.4rem; /* as far in as the text (see .text) */
     --shrink: 0.92; /* the face that much in (on a ~8.5rem tile: the inset) */
   }
-  /* hovered: a faint shade over whatever it's on (the dots, a variant's blue), its text's backing (on the dots) the
+  /* hovered: a faint shade over whatever it's on (the mat, a variant's blue), its text's backing (on the mat) the
      colour that shade makes over it */
   .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still) {
     background-color: rgb(0 0 0 / 0.1);
@@ -275,6 +278,7 @@
   }
   .file:is(:hover, :has([aria-expanded='true'])) > .wrapper:not(.still) ~ .corner,
   .wrapper.marked ~ .corner,
+  .wrapper.cleared ~ .corner,
   .wrapper.flagged ~ .corner {
     transform: none;
   }
@@ -290,6 +294,11 @@
   }
   .wrapper.marked {
     box-shadow: inset 0 0 0 2px var(--navy-700);
+  }
+  /* the one taken off in the picker (see Picker): as the marked one, its ring dashed and faded (the picture not) */
+  .wrapper.cleared {
+    outline: dashed 2px rgb(from var(--navy-700) r g b / 0.5);
+    outline-offset: -2px;
   }
   /* focused from the keyboard: a ring inside it as the marked one's, lighter - not the browser's (it ignores the
      squircle); from the pointer none */
@@ -403,7 +412,7 @@
   .face img.shown {
     opacity: 1;
   }
-  /* a light sweeping across a shade darker than what it's on (the picker's grey, a variant's blue) */
+  /* a light sweeping across a shade darker than what it's on (the board, a variant's blue) */
   .face.skeleton {
     background-color: rgb(0 0 0 / 0.06);
     background-image: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.55) 50%, transparent 70%);
@@ -435,8 +444,8 @@
     transition: transform 100ms;
     will-change: transform; /* (see .face) */
   }
-  /* a `backing` pill behind each line so it reads over the dots (a backdrop blur was too slow); the margin gives back
-     the padding */
+  /* a `backing` pill behind each line so it reads over the cutting mat's lines (a backdrop blur was too slow); the
+     margin gives back the padding */
   .title,
   .meta {
     display: block;
@@ -447,7 +456,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-radius: 0.35rem;
+    border-radius: 0.45rem;
     corner-shape: squircle;
     background-color: var(--face, var(--backing, transparent));
   }

@@ -43,7 +43,7 @@
     border: solid 1px var(--edge);
     border-radius: var(--field-radius-compact);
     corner-shape: squircle;
-    background-color: var(--light);
+    background-color: var(--paper-field);
     transition:
       background-color 100ms,
       border-color 100ms;
