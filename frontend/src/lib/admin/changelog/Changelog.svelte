@@ -25,19 +25,30 @@
 
   // 2026-10-02 -> 02.10.2026
   export const date = (iso) => iso.split('-').reverse().join('.');
+
+  // a highlight's paragraph -> its runs, every other one (between **) bold: [{ text, bold }]
+  const runs = (paragraph) => paragraph.split('**').map((text, i) => ({ text, bold: i % 2 === 1 }));
 </script>
 
 <script>
   import { createEventDispatcher } from 'svelte';
   import Modal from '@c/Modal.svelte';
+  import Button from '@c/Button.svelte';
   import { changelog, version } from './changelog.js';
 
-  // Every version, newest first; the ones out since the changelog was last seen here with their titles in orange
+  // Every version, newest first; the ones out since the changelog was last seen here with their version pills in orange
   // (`seen`: that version, see Nav). Closing it counts as seen.
   export let seen = readSeen();
   const dispatch = createEventDispatcher();
 
   const isNew = (v) => !!seen && compare(v, seen) > 0;
+
+  // the versions whose full list of changes is open
+  let open = new Set();
+  function toggle(v) {
+    open.has(v) ? open.delete(v) : open.add(v);
+    open = open;
+  }
 
   function close() {
     writeSeen(version);
@@ -47,20 +58,43 @@
 
 <Modal title="Historia zmian" maxWidth="40rem" on:close={close}>
   <div class="list">
-    {#each changelog as { version: v, date: d, title, synopsis, changes }}
+    {#each changelog as { version: v, date: d, title, highlight, all }}
       <section>
-        <h4 class:new={isNew(v)}>
-          {isNew(v) ? 'NOWE ZMIANY · ' : ''}v{v} <span class="date">· {date(d)}</span>
+        <!-- the version in a pill (orange when out since the changelog was last seen here), the title, the date -->
+        <h4>
+          <span class="version" class:new={isNew(v)}>{isNew(v) ? 'NOWE · ' : ''}v{v}</span>
+          <span class="title">{title}</span>
+          <span class="date">{date(d)}</span>
         </h4>
-        <p><b>{title}</b>: {synopsis}</p>
-        <ul>
-          {#each changes as change}
-            <li>
-              {#if typeof change === 'string'}{change}{:else}{#if change.big}<b>{change.label}</b
-                  >{:else}{change.label}{/if}{change.label.endsWith('.') ? ' ' : ': '}{change.text}{/if}
-            </li>
-          {/each}
-        </ul>
+        <!-- what matters in prose, every change behind a button -->
+        {#each highlight as paragraph}
+          <p class="prose">
+            {#each runs(paragraph) as { text, bold }}{#if bold}<b>{text}</b>{:else}{text}{/if}{/each}
+          </p>
+        {/each}
+        {#if all.length}
+          <div class="more">
+            <Button dashed size="sm" icon={open.has(v) ? 'chevron_up' : 'add'} on:click={() => toggle(v)}>
+              {open.has(v) ? 'Zwiń pełne zmiany' : 'Pełne zmiany'}
+            </Button>
+          </div>
+        {/if}
+        {#if open.has(v)}
+          <ul>
+            {#each all as change}
+              {#if typeof change === 'string'}
+                <li>{change}</li>
+              {:else}
+                <li class="group">
+                  <b>{change.label}</b>
+                  <ul>
+                    {#each change.items as item}<li>{item}</li>{/each}
+                  </ul>
+                </li>
+              {/if}
+            {/each}
+          </ul>
+        {/if}
       </section>
     {/each}
   </div>
@@ -77,18 +111,38 @@
     flex-direction: column;
     gap: 0.25rem;
   }
-  /* the version and its date: blue, orange when it's out since the changelog was last seen */
   h4 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
+    margin-bottom: 0.15rem;
+  }
+  /* blue, orange when it's out since the changelog was last seen (as the global margins' pill) */
+  .version {
+    padding: 0.1rem 0.55rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
     color: var(--blue-700);
+    background-color: var(--blue-100);
   }
-  h4.new {
+  .version.new {
     color: var(--orange-500);
+    background-color: var(--orange-100);
   }
-  /* the date fainter than the version beside it */
+  .title {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
   .date {
-    color: inherit;
-    opacity: 0.55;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--grey-500);
+    font-variant-numeric: tabular-nums;
   }
   ul {
     margin: 0;
@@ -96,5 +150,29 @@
   }
   li {
     line-height: 1.4;
+  }
+  /* a highlight: plain paragraphs, a little apart */
+  .prose {
+    margin: 0;
+    line-height: 1.5;
+  }
+  .prose + .prose {
+    margin-top: 0.35rem;
+  }
+  .more {
+    display: flex;
+    margin-top: 0.25rem;
+  }
+  /* a group of the full list: its heading, its changes under it */
+  li.group {
+    list-style: none;
+    margin-left: -1.1rem;
+    margin-top: 0.4rem;
+  }
+  li.group:first-child {
+    margin-top: 0.25rem;
+  }
+  li.group ul {
+    list-style: disc; /* (not the circles of a list in a list) */
   }
 </style>
