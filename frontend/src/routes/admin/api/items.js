@@ -1,6 +1,7 @@
 import { getUid } from '%/uid';
 import { indexScan, scanProduct, scanVariant } from '@/match';
 import { natural } from '%/order';
+import { healthLevels } from './health.js';
 
 function queryItems(items, query = null) {
   // query items name, code, storage color names and storage color code
@@ -20,9 +21,9 @@ function queryItems(items, query = null) {
 function sortItems(items, sort, complications) {
   // by: 'name' (then the code) or 'code' (then the name), `desc` the other way round; then, each over the ones
   // before (the list's buttons from the right): dbFirst: ours first; complicationsFirst: the ones that will be missing
-  // something (the Komplikacje column: `complications(item)` -> 'red' | 'orange' | null) first, red before orange;
-  // newFirst: ours with variants we don't have yet first; notInApiFirst: products or variants the api no longer has
-  // first
+  // something (the Komplikacje column: `complications(item)` -> one of healthLevels or null, see health.js) first, in
+  // that order; newFirst: ours with variants we don't have yet first; notInApiFirst: products or
+  // variants the api no longer has first
 
   const compare = (a, b) => (typeof a === 'string' ? natural(a, b) : 0);
   const way = sort.desc ? -1 : 1;
@@ -40,8 +41,8 @@ function sortItems(items, sort, complications) {
   }
 
   if (sort.complicationsFirst && complications) {
-    const rank = { red: 0, orange: 1 };
-    const levels = new Map(items.map((item) => [item, rank[complications(item)] ?? 2]));
+    const rank = (level) => (level ? healthLevels.indexOf(level) : healthLevels.length);
+    const levels = new Map(items.map((item) => [item, rank(complications(item))]));
     items.sort((a, b) => levels.get(a) - levels.get(b));
   }
 

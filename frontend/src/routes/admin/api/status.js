@@ -8,10 +8,10 @@ import { retiredOf } from './items.js';
 // What's left to do in the API tabs, from a company's saved mappings, its last scan and our products. The tabs show it
 // in the header (see apiTabs), the mapping pages next to the rules. What will be missing on the products (labelings
 // nothing imports, categories that lead nowhere) comes first, then what to tidy up (rules that do nothing).
-// -> ['Label: count', ...], or null when there's nothing
+// -> [{ label, count }, ...] (the count bold after the label), or null when there's nothing
 
 function status(counts) {
-  const notes = counts.filter(([, n]) => n).map(([label, n]) => `${label}: ${n}`);
+  const notes = counts.filter(([, n]) => n).map(([label, count]) => ({ label, count }));
   return notes.length ? notes : null;
 }
 
@@ -63,7 +63,7 @@ function labelingsStatus(company, apiItems, labelings) {
   const rules = company.api_labelings_mappings ?? [];
   const live = rules.filter((r) => apiCodes.includes(r.code)); // the others never run
   return status([
-    ['Znakowania, które się nie zaimportują', lostCodes(apiCodes, rules, labelings, company.id).length],
+    ['Znakowania bez mapowań', lostCodes(apiCodes, rules, labelings, company.id).length],
     ['Reguły prowadzące do znakowań, których nie mamy', live.filter((r) => missingTargets(r, labelings).length).length],
     ['Reguły kodów, których nie ma w API', rules.length - live.length],
     ['Zbędne reguły', uselessRules(rules, apiCodes, labelings, company.id).length],
@@ -100,7 +100,7 @@ function categoriesStatus(company, apiItems, categories) {
   const stale = staleMappings(mappings, listApiCategories(apiItems));
   const deleted = (m) => (m.categories ?? []).some((id) => !index.existing.has(id));
   return status([
-    ['Kategorie, które się nie zaimportują', unmappedPaths(mappings, apiItems, index).length],
+    ['Kategorie bez mapowań', unmappedPaths(mappings, apiItems, index).length],
     ['Mapowania do usuniętych kategorii', mappings.filter((m) => !stale.includes(m) && deleted(m)).length],
     ['Mapowania kategorii, których nie ma w API', stale.length],
   ]);

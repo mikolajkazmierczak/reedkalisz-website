@@ -102,7 +102,7 @@ function parse(company, xml) {
       const code = productCode($?.code);
       const name = plain($?.name?.pl);
       const description = parseDescription($);
-      const price = parsePrice(company, String($?.price ?? ''), true) || null; // 0 is no price
+      const price = parsePrice(company, String($?.price ?? ''), true);
       const product = {
         _incompatible: !code,
         name,

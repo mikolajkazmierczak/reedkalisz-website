@@ -5,7 +5,7 @@
   import { removeUnusedFiles, usedFiles } from '@/files';
   import globals, { colors, labelings, categories } from '@/globals';
   import { categoryIndex } from '@/categories';
-  import { itemHealth } from './health.js';
+  import { healthLevel, itemHealth, scanScope } from './health.js';
   import { selected, toggleItemSelected, toggleStorageSelected } from './selected.js';
   import { getFlag, parseColors } from './utils.js';
   import { cloudOf, openApi, openProduct } from './items.js';
@@ -24,7 +24,7 @@
 
   export let items;
   export let company;
-  export let apiItems = null; // the whole scan: whether the supplier has categories at all
+  export let apiItems = null; // the whole scan: whether the supplier has categories and prices at all
   export let sort; // { by: 'name' | 'code', desc, ... } (see items.js), set by the head's buttons
   export let scrollKey = null; // the page, search, company: another one scrolls the list back up (see Grid)
 
@@ -40,16 +40,22 @@
   globals.update(labelings);
   globals.update(categories);
   $: index = categoryIndex($categories);
-  $: withCategories = (apiItems ?? []).some((i) => i._categories?.length);
+  $: scope = scanScope(apiItems);
   $: health =
     $labelings && $categories
       ? new Map(
-          items.map((item) => [
-            item,
-            itemHealth(company, item._scan, { labelings: $labelings, index, withCategories }),
-          ]),
+          items.map((item) => [item, itemHealth(company, item._scan, { labelings: $labelings, index, ...scope })]),
         )
       : new Map();
+
+  // its tooltip: a list under a heading for each kind of what's missing
+  const notesOf = (health) =>
+    [
+      { name: 'Znakowania', what: 'bez mapowań', list: health.labelings },
+      { name: 'Kategorie', what: 'bez mapowań', list: health.unmapped },
+      { price: health.noPrice },
+      { name: 'Kategorie', what: 'zignorowane', list: health.ignored },
+    ].filter((n) => n.price || n.list?.length);
 
   let expanded = new Set();
   $: flags = (() => {
@@ -239,11 +245,32 @@
       </span>
       <span class="state">
         {#if health.get(item)}
-          {@const { level, notes } = health.get(item)}
-          <span class="warning">
-            <Icon fill name="warning" color={level === 'red' ? 'var(--red-500)' : 'var(--orange-500)'} />
-            <Tooltip
-              >{#each notes as note, i}{#if i}<br />{/if}<small>{note}</small>{/each}</Tooltip>
+          {@const h = health.get(item)}
+          {@const level = healthLevel(h)}
+          <span class="mark">
+            {#if level === 'labelings'}
+              <Icon fill name="calculator" color="var(--orange-500)" />
+            {:else if level === 'unmapped'}
+              <Icon fill name="categories" color="var(--orange-500)" />
+            {:else if level === 'noPrice'}
+              <Icon fill name="money" color="var(--orange-500)" />
+            {:else}
+              <span class="dot" />
+            {/if}
+            <Tooltip>
+              <div class="notes">
+                {#each notesOf(h) as { name, what, list, price }}
+                  {#if price}
+                    <p>Brak ceny lub cena zależy od nakładu.<br />Wyświetlimy „Zapytaj o cenę”.</p>
+                  {:else}
+                    <p><b>{name}</b> {what}:</p>
+                    <ul>
+                      {#each list as text, i}<li>{text}{i < list.length - 1 ? ',' : ''}</li>{/each}
+                    </ul>
+                  {/if}
+                {/each}
+              </div>
+            </Tooltip>
           </span>
         {/if}
       </span>
@@ -352,16 +379,41 @@
     display: flex;
     justify-content: flex-end;
   }
-  /* a warning, as big as a small button's icon, in the middle of the column */
+  /* its mark, as big as a small button's icon (the dot of the categories' mappings in its middle), in the middle of the
+     column */
   .state {
     display: flex;
     justify-content: center;
   }
-  .warning {
+  .mark {
     cursor: help;
     display: flex;
+    align-items: center;
+    justify-content: center;
     width: 1.1rem;
     height: 1.1rem;
+  }
+  .dot {
+    width: 0.3rem;
+    height: 0.3rem;
+    border-radius: 50%;
+    background-color: var(--yellow-500);
+  }
+  /* what's missing, a list under each heading */
+  .notes {
+    font-size: 0.85rem;
+  }
+  .notes p {
+    margin: 0;
+  }
+  .notes p + ul,
+  .notes ul + p,
+  .notes p + p {
+    margin-top: 0.35rem;
+  }
+  .notes ul {
+    margin: 0;
+    padding-left: 1.1rem;
   }
   .variant .index {
     opacity: 0.65;

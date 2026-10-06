@@ -94,7 +94,8 @@
   --purple-700: #6604c2; /* transport (T, TP) in the labelings, as in the pricing infographic */
 
   --yellow-100: #fbeca2; /* the API's "Do edycji" */
-  --yellow-500: #d39e00; /* left out by choice, not a mistake: the X of an ignored category or labeling */
+  --yellow-500: #d39e00; /* left out by choice, not a mistake: the X of an ignored category or labeling, the dot of a
+  category with ignored ones under it */
 
   --red-50: #f6e2e4; /* the API's "Ma zamiennik": paler than "Odrzucony" */
   --red-100: #efc5ca; /* danger, an error */

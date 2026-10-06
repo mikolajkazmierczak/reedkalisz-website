@@ -20,9 +20,12 @@ function parseStock(stock) {
   return Number(stock?.stock || 0) + Number(stock?.stocks?.[0]?.quantity || 0); // 24h + 2-3 days
 }
 
+// a feed's price ('12,34') -> the number, with the company's discount when asked; none (missing, empty, 0) -> null:
+// the site shows "Zapytaj o cenę"
 export function parsePrice(company, price, applyDiscount = false) {
   let value = price ? Number(price.replace(',', '.')) : 0;
-  if (value && applyDiscount) {
+  if (!value) return null;
+  if (applyDiscount) {
     const discount = company.api_discount ?? 0;
     value = value * ((100 - discount) / 100);
     value = Number(value.toFixed(2));

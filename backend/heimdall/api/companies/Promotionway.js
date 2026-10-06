@@ -60,6 +60,8 @@ function parse(company, offer, prices, stocks) {
   offer = xmlToJson(offer).xml.product;
   prices = xmlToJson(prices).xml.product;
   stocks = xmlToJson(stocks).xml.product;
+  // a record without any code is left out: there's nothing in it (as an empty one, `<name></name>` and all)
+  offer = offer.filter(($) => parseCode($?.baseinfo?.codeShort, $?.baseinfo?.codeFull).productCode !== null);
   const pricesByCode = byCode(prices, 'codeFull');
   const stocksByCode = byCode(stocks, 'codeFull');
 
@@ -73,7 +75,6 @@ function parse(company, offer, prices, stocks) {
       const stock = stocksByCode.get($?.baseinfo?.codeFull);
 
       return {
-        _incompatible: productCode === null || !!price?.priceFrom1,
         name,
         code: productCode,
         slug: slugify([productCode, name], { key: true }),
@@ -86,6 +87,7 @@ function parse(company, offer, prices, stocks) {
         materials: parseMaterials($?.materials),
         // isDiscount == 1 means apply discount for non brand items (from company)
         // isBrandsDiscount == 1 means apply discount for brand items
+        // the brands (Hugo Boss, Cerruti...) have prices by the amount (price_from_N) instead: none ("Zapytaj o cenę")
         price: parsePrice(company, price?.price, price?.isDiscount === '1' || price?.isBrandsDiscount === '1'),
         _categories: parseCategories($?.categories),
         _labelings: parseMarkgroups($?.markgroups),

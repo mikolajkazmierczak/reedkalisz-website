@@ -97,7 +97,7 @@ function parse(products, stocks, categories) {
       imgs: $.zdjecia.map((item) => `https://www.par.com.pl${item.zdjecie}`),
       labelings: parseDecorations($.techniki_zdobienia),
       amount: s ? Number(s.stan_magazynowy) : null,
-      price: s ? Number(s.cena_po_rabacie) : null,
+      price: (s && Number(s.cena_po_rabacie)) || null, // 0 is no price
     };
   });
 

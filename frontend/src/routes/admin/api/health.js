@@ -1,38 +1,48 @@
 import { findLabeling } from '@/labelings';
-import { resolveCategories } from './categories.js';
+import { apiPaths, mappingAt, resolveCategories } from './categories.js';
 import { resolveMapping } from './labelings.js';
-import { matchRule } from './places.js';
 
 // What an API product will be missing once imported (or scanned), from the company's mappings - the "Komplikacje" column:
-//   red:    a labeling that won't be imported (no rule and no labeling of ours with its code, a rule to a labeling we
-//           don't have, a price or area no threshold covers) - "ignoruj" rules leave one out on purpose
-//   orange: none of our categories (while the supplier has categories), a place no place rule translates (once the
-//           company has place rules: a supplier writing in Polish needs none)
-// -> { level: 'red' | 'orange', notes: [text] }, or null when nothing is missing
-export function itemHealth(company, apiItem, { labelings, index, withCategories }) {
+//   labelings: the ones that won't be imported (no rule and no labeling of ours with its code, a rule to a labeling we
+//              don't have, a price or area no threshold covers) - "ignoruj" rules leave one out on purpose
+//   unmapped:  the supplier's categories that give it none of ours without meaning to (no rule, or a rule to categories
+//              since deleted)
+//   noPrice:   no price from the supplier (none, or prices by the amount, see Promotionway) - the site shows
+//              "Zapytaj o cenę"; only while the supplier gives prices at all (USBSystem gives none)
+//   ignored:   the ones that give it none on purpose ("ignoruj", its own or from above)
+// the categories only while the supplier has categories at all ("BEZ KATEGORII": a product in none of theirs);
+// `withCategories` and `withPrices` from scanScope
+// -> { labelings: [code], unmapped: [text], noPrice: bool, ignored: [text] }, or null when nothing is missing
+export function itemHealth(company, apiItem, { labelings, index, withCategories, withPrices }) {
   if (!company || !apiItem) return null;
-  const red = [];
-  const orange = [];
-
-  const lost = lostLabelings(company, company.api_labelings_mappings ?? [], apiItem, labelings);
-  if (lost.size) red.push(`Znakowania, które się nie zaimportują: ${[...lost].join(', ')}`);
-
-  if (withCategories && !resolveCategories(company.api_categories_mappings, apiItem._categories, index).length) {
-    orange.push('Nie dostanie żadnej kategorii');
+  const mappings = company.api_categories_mappings;
+  const health = {
+    labelings: [...lostLabelings(company, company.api_labelings_mappings ?? [], apiItem, labelings)],
+    unmapped: [],
+    noPrice: withPrices && apiItem.price == null,
+    ignored: [],
+  };
+  if (withCategories) {
+    for (const path of apiPaths(apiItem._categories)) {
+      if (resolveCategories(mappings, [path], index).length) continue;
+      const name = path.length ? path.join(' › ') : 'BEZ KATEGORII';
+      health[mappingAt(mappings, path)?.length === 0 ? 'ignored' : 'unmapped'].push(name);
+    }
   }
-
-  const places = company.api_places_mappings ?? [];
-  if (places.length) {
-    const untranslated = new Set(
-      (apiItem._labelings ?? []).map((l) => (l.label ?? '').trim()).filter((p) => p && !matchRule(places, p)),
-    );
-    if (untranslated.size) orange.push(`Miejsca bez tłumaczenia: ${[...untranslated].join(', ')}`);
-  }
-
-  if (red.length) return { level: 'red', notes: [...red, ...orange] };
-  if (orange.length) return { level: 'orange', notes: orange };
-  return null;
+  return healthLevel(health) ? health : null;
 }
+
+// what the supplier's scan has at all: categories, prices
+export const scanScope = (apiItems) => ({
+  withCategories: (apiItems ?? []).some((i) => i._categories?.length),
+  withPrices: (apiItems ?? []).some((i) => i.price != null),
+});
+
+// the one mark a product gets, the first of: 'labelings' (calculator), 'unmapped' (tag), 'noPrice' (money), 'ignored'
+// (yellow dot); for sorting too
+export const healthLevels = ['labelings', 'unmapped', 'noPrice', 'ignored'];
+const has = (value) => (Array.isArray(value) ? value.length > 0 : !!value);
+export const healthLevel = (health) => healthLevels.find((key) => has(health?.[key])) ?? null;
 
 // a product's labeling codes that won't be imported with these rules ("ignoruj" ones leave a code out on purpose)
 export function lostLabelings(company, rules, apiItem, labelings) {
@@ -49,12 +59,12 @@ export function lostLabelings(company, rules, apiItem, labelings) {
 
 // each product's level, for sorting by it (`item._scan`: the scan's product, see items.js merge) -> item -> level
 export function complicationsOf(company, apiItems, labelings, index) {
-  const withCategories = (apiItems ?? []).some((i) => i._categories?.length);
+  const scope = scanScope(apiItems);
   const levels = new Map();
   return (item) => {
     if (!item._scan) return null;
     if (!levels.has(item._scan))
-      levels.set(item._scan, itemHealth(company, item._scan, { labelings, index, withCategories })?.level ?? null);
+      levels.set(item._scan, healthLevel(itemHealth(company, item._scan, { labelings, index, ...scope })));
     return levels.get(item._scan);
   };
 }

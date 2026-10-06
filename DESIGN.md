@@ -625,7 +625,7 @@ Printed in the ink, quiet and exact.
 - **Primary:** navy ink fill, white 0.95rem / 500 label, 0 1rem padding; hover one step lighter, pressed one step darker, 120ms colour transition. Focus: 2px navy outline offset 2px.
 - **Dangerous:** navy at rest, red on hover and press.
 - **Secondary / Outline / Ghost / Dashed:** grey-head fill; field-white with an inset navy-alpha edge; transparent with a navy wash; transparent with a dashed grey outline that turns navy on hover.
-- **Tones:** info, selected, success, warning, danger, new, and a diagonal orange/purple split, each its family's 100 / 200 / 300; and note, the optional boxes' ply yellow deepening to yellow-100 when pressed (left as it is by choice, not wrong - an ignored category or labeling gets a yellow-500 X).
+- **Tones:** info, selected, success, warning, danger, new, and a diagonal orange/purple split, each its family's 100 / 200 / 300; and note, the optional boxes' ply yellow deepening to yellow-100 when pressed (left as it is by choice, not wrong - an ignored category or labeling gets a yellow-500 X, a category with ignored ones under it a yellow-500 dot).
 - **Disabled:** grey-head fill, muted label, not-allowed cursor.
 
 ### Bar Buttons

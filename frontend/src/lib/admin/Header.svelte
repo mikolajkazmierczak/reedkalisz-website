@@ -62,7 +62,7 @@
             <BarButton {href} {active} warn={!!status}>{label}</BarButton>
             {#if status}
               <Tooltip>
-                {#each status as note, i}{#if i}<br />{/if}<small>{note}</small>{/each}
+                {#each status as { label, count }, i}{#if i}<br />{/if}<small>{label}: <b>{count}</b></small>{/each}
               </Tooltip>
             {/if}
           </span>

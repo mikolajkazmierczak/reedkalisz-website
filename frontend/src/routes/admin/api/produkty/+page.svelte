@@ -377,7 +377,7 @@
         enabled: false,
         company: selectedCompany.id,
         commercial_details: 1, // "NETTO"
-        show_price: false,
+        show_price: true,
         price_view: priceView.id,
         custom_prices: prices,
         custom_prices_sale: prices,

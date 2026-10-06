@@ -11,14 +11,15 @@
 
   // A mapping's products (a supplier category's, a labeling code's, a place rule's): their number as a button, in what
   // the mapping does with them - `tone` 'mapped' (grey), 'inherited' (yellow: from the category above), 'unmapped'
-  // (red) - and, when they're left out on purpose, a yellow X before it (`ignored`: its tooltip). The button
-  // opens a list of them: the supplier's cloud (its search), the picture, the name over the code, and at the end ours
-  // (open it) or a blank - searchable, shown a hundred at a time as it's scrolled (a category can have over a
-  // thousand).
+  // (red) - and, when they're left out on purpose, a yellow X before it (`ignored`: its tooltip), or a yellow dot when
+  // only some below it are (`ignoredBelow`: its tooltip; the X wins). The button opens a list of them: the supplier's
+  // cloud (its search), the picture, the name over the code, and at the end ours (open it) or a blank - searchable,
+  // shown a hundred at a time as it's scrolled (a category can have over a thousand).
   export let company;
   export let items = []; // the scan's products
   export let tone = 'mapped';
   export let ignored = null;
+  export let ignoredBelow = null;
   export let title = ''; // over the list: whose products they are
 
   const GAP = 6; // between the button and the list
@@ -97,10 +98,14 @@
 </script>
 
 <span class="products">
-  {#if ignored}
+  {#if ignored || ignoredBelow}
     <span class="ignored">
-      <Icon fill name="close" color="var(--yellow-500)" strokeWidth={1} />
-      <Tooltip><small>{ignored}</small></Tooltip>
+      {#if ignored}
+        <Icon width="0.85rem" height="0.85rem" name="close" color="var(--yellow-500)" strokeWidth={1} />
+      {:else}
+        <span class="dot" />
+      {/if}
+      <Tooltip><small class="tip">{ignored ?? ignoredBelow}</small></Tooltip>
     </span>
   {/if}
   <span class="count" bind:this={anchor}>
@@ -202,8 +207,21 @@
   }
   .ignored {
     display: flex;
+    align-items: center;
+    justify-content: center;
     width: 1.1rem;
     height: 1.1rem;
+  }
+  /* in the X's place, centred */
+  .dot {
+    width: 0.3rem;
+    height: 0.3rem;
+    border-radius: 50%;
+    background-color: var(--yellow-500);
+  }
+  /* a line per category in the dot's */
+  .tip {
+    white-space: pre-line;
   }
   /* as a select's list (see Select) */
   .backdrop {

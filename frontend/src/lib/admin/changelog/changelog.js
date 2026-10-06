@@ -25,6 +25,44 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.29.1',
+    date: '2026-10-06',
+    title: 'Komplikacje i import',
+    highlight: [
+      'Kolumna **Komplikacje** pokazuje jedną ikonę – kalkulator, etykietę, pieniądze albo żółtą kropkę – a po najechaniu listę tego, czego produktowi zabraknie. Nowe produkty z importu mają od razu **włączony Cennik**.',
+    ],
+    all: [
+      {
+        label: 'Komplikacje',
+        items: [
+          'Czerwone i pomarańczowe ostrzeżenie zastępuje jedna ikona: kalkulator (znakowania bez mapowań), etykieta (kategorie bez mapowań), pieniądze (brak ceny) albo żółta kropka (kategorie zignorowane).',
+          'Podpowiedź przy ikonie wymienia w listach znakowania bez mapowań, kategorie bez mapowań i kategorie zignorowane, a przy braku ceny mówi, że na stronie będzie „Zapytaj o cenę”.',
+          'Pokazują też produkty, które tracą tylko część kategorii producenta, a nie tylko te bez żadnej naszej kategorii.',
+          'Nie zgłaszają już nieprzetłumaczonych miejsc.',
+          'Ikona pieniędzy nie pojawia się u producentów, którzy w ogóle nie podają cen (USBSystem).',
+          'Przycisk Komplikacje przenosi na górę produkty w tej kolejności: kalkulator, etykieta, pieniądze, kropka.',
+        ],
+      },
+      {
+        label: 'Import i ceny',
+        items: [
+          'Nowo zaimportowane produkty mają włączony Cennik.',
+          'Produkty Promotionway z cenami zależnymi od ilości (m.in. Hugo Boss, Cerruti 1881, Festina, Cacharel) nie są już niekompatybilne: można je importować, a na stronie mają „Zapytaj o cenę”.',
+          'Produkty bez ceny u producenta mają po imporcie i skanowaniu pustą cenę zamiast 0 (na stronie, jak dotąd, „Zapytaj o cenę”).',
+          'Poprawka: pusty wpis z API Promotionway nie pojawia się już po skanowaniu jako niekompatybilny produkt „[object Object]”.',
+        ],
+      },
+      {
+        label: 'Mapowania',
+        items: [
+          'W zakładce Kategorie żółta kropka przed liczbą produktów oznacza ignorowane podkategorie; po najechaniu widać ich listę.',
+          'Żółty krzyżyk ignorowanej kategorii lub znakowania jest trochę mniejszy.',
+          'Podpowiedzi przycisków zakładek API mówią „Znakowania bez mapowań” i „Kategorie bez mapowań”, a liczby w nich są pogrubione.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.29.0',
     date: '2026-10-06',
     title: 'Bezpieczny zapis i mapowania',

@@ -14,7 +14,7 @@
   import Grid from '@c/table/Grid.svelte';
   import CategoryPicker from './CategoryPicker.svelte';
   import { savedRules } from '../mappings/savedRules.js';
-  import { listApiCategories, pathKey, resolveCategories } from '../categories.js';
+  import { listApiCategories, mappingAt, pathKey, resolveCategories } from '../categories.js';
   import { staleMappings, unmappedPaths } from '../status.js';
 
   export let apiCompany;
@@ -73,6 +73,24 @@
       path.length ? path.map((_, i) => pathKey(path.slice(0, i + 1))) : [pathKey(path)],
     ),
   );
+
+  // the ignored branches under each category, by the key of every category above them: their tops, as paths from there
+  // (a yellow dot beside the count of one that isn't ignored itself, listing them)
+  $: ignoredBelow = ignoredBranches(mappings, nodes);
+  function ignoredBranches(mappings, nodes) {
+    const ignored = (path) => mappingAt(mappings, path)?.length === 0;
+    const below = new Map();
+    for (const { path } of nodes) {
+      // a root is under nothing ("BEZ KATEGORII" included: [] isn't a root's parent)
+      if (path.length < 2 || !ignored(path) || ignored(path.slice(0, -1))) continue;
+      for (let depth = 1; depth < path.length; depth++) {
+        const key = pathKey(path.slice(0, depth));
+        if (!below.has(key)) below.set(key, []);
+        below.get(key).push(path.slice(depth));
+      }
+    }
+    return below;
+  }
 
   // the supplier's categories with a mapping, of their own or from above
   $: mapped = nodes.filter((n) => byPath.has(pathKey(n.path)) || inherited(n.path)).length;
@@ -212,6 +230,7 @@
           {@const parent = own ? null : inherited(node.path)}
           {@const open = q || expanded.has(pathKey(node.path))}
           {@const m = own ?? parent}
+          {@const below = ignoredBelow.get(pathKey(node.path))}
           <div class="row">
             <!-- a line under the arrow of every level above: the tree's indent; the arrow and the name are one button -->
             <span class="tree">
@@ -245,6 +264,11 @@
                 ? own
                   ? 'Ignorowana: jej produkty nie dostają od niej żadnej naszej kategorii.'
                   : `Ignorowana z nadrzędnej (${parent.path.join(' › ')}): jej produkty nie dostają od niej żadnej naszej kategorii.`
+                : null}
+              ignoredBelow={below
+                ? `Ignorowane podkategorie - ich produkty nie dostają od nich żadnej naszej kategorii:\n${below
+                    .map((p) => p.join(' › '))
+                    .join('\n')}`
                 : null} />
             <Arrow />
             <span class="targets">
