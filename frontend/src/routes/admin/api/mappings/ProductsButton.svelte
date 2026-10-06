@@ -17,6 +17,7 @@
   // shown a hundred at a time as it's scrolled (a category can have over a thousand).
   export let company;
   export let items = []; // the scan's products
+  export let done = null; // how many of them are dealt with: "done / all", the total fainter (a parent category's)
   export let tone = 'mapped';
   export let ignored = null;
   export let ignoredBelow = null;
@@ -116,7 +117,7 @@
       disabled={!items.length && tone !== 'unmapped'}
       title={items.length ? 'Pokaż produkty' : null}
       on:click={() => (place ? close() : open())}>
-      {items.length}
+      {#if done != null}{done} <span class="of">/ {items.length}</span>{:else}{items.length}{/if}
     </Button>
   </span>
 </span>
@@ -204,6 +205,10 @@
   .count :global(button) {
     min-width: 2.5rem;
     font-variant-numeric: tabular-nums;
+  }
+  /* fainter on any tone, as the bars' totals are (see Panel) */
+  .of {
+    opacity: 0.55;
   }
   .ignored {
     display: flex;

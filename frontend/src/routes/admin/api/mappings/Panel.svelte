@@ -62,7 +62,8 @@
       <div class="counts">
         {#each stats as { label, done, total }}
           <span class="count">
-            <span class="ui-stat-value">{done}{' '}<span class="of">/ {total}</span></span>
+            <span class="ui-stat-value"
+              ><span class:complete={total && done === total}>{done}</span>{' '}<span class="of">/ {total}</span></span>
             <span class="ui-stat-label">{label}</span>
           </span>
         {/each}
@@ -145,6 +146,10 @@
   }
   .of {
     color: var(--ink-muted);
+  }
+  /* all of them done */
+  .complete {
+    color: var(--green-700);
   }
   /* the hints, the same in every mapping */
   .panel :global(.muted) {

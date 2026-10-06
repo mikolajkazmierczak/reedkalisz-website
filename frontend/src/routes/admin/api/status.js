@@ -1,6 +1,6 @@
 import { categoryIndex } from '@/categories';
 import { findLabeling } from '@/labelings';
-import { apiPaths, listApiCategories, mappingAt, pathKey } from './categories.js';
+import { apiPaths, listApiCategories, pathKey, pathState } from './categories.js';
 import { hasPrintData, labelingCodes } from './company.js';
 import { placeCounts, placeWins, uselessRules as uselessPlaceRules } from './places.js';
 import { retiredOf } from './items.js';
@@ -79,15 +79,13 @@ export function staleMappings(mappings, nodes) {
   return mappings.filter((m) => !keys.has(pathKey(m.path)));
 }
 
-// the supplier's categories (as products sit in them) that give their products none of ours: no mapping at or above
-// them - an empty one keeps them out on purpose ("Ignoruj") - or one to deleted categories only -> [path]
+// the supplier's categories (as products sit in them) that give their products none of ours without meaning to (see
+// pathState: "ignoruj" and "BEZ KATEGORII" without a mapping do on purpose) -> [path]
 export function unmappedPaths(mappings, apiItems, index) {
   const paths = new Map();
   for (const item of apiItems ?? []) {
     for (const path of apiPaths(item._categories)) {
-      const ids = mappingAt(mappings, path);
-      if (ids && (!ids.length || ids.some((id) => index.existing.has(id)))) continue;
-      paths.set(pathKey(path), path);
+      if (pathState(mappings, path, index) === 'unmapped') paths.set(pathKey(path), path);
     }
   }
   return [...paths.values()];

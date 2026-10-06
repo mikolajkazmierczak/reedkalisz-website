@@ -53,9 +53,10 @@
     [
       { name: 'Znakowania', what: 'bez mapowań', list: health.labelings },
       { name: 'Kategorie', what: 'bez mapowań', list: health.unmapped },
-      { price: health.noPrice },
+      { lines: health.noPrice && ['Brak ceny lub cena zależy od nakładu.', 'Wyświetlimy „Zapytaj o cenę”.'] },
       { name: 'Kategorie', what: 'zignorowane', list: health.ignored },
-    ].filter((n) => n.price || n.list?.length);
+      { lines: health.noCategory && ['Bez kategorii u producenta'] },
+    ].filter((n) => n.lines || n.list?.length);
 
   let expanded = new Set();
   $: flags = (() => {
@@ -259,9 +260,11 @@
             {/if}
             <Tooltip>
               <div class="notes">
-                {#each notesOf(h) as { name, what, list, price }}
-                  {#if price}
-                    <p>Brak ceny lub cena zależy od nakładu.<br />Wyświetlimy „Zapytaj o cenę”.</p>
+                {#each notesOf(h) as { name, what, list, lines }}
+                  {#if lines}
+                    <p>
+                      {#each lines as line, i}{#if i}<br />{/if}{line}{/each}
+                    </p>
                   {:else}
                     <p><b>{name}</b> {what}:</p>
                     <ul>

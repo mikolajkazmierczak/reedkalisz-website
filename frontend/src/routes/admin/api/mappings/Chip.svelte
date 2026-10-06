@@ -7,7 +7,7 @@
 
   export let removable = false;
   export let inherited = false; // comes from a parent, dashed
-  export let blocked = false; // "ignoruj"
+  export let blocked = false; // "Ignoruj", "Bez kategorii": none of ours, on purpose
   export let missing = false; // points at something that no longer exists
   export let title = null;
 </script>
@@ -51,14 +51,9 @@
     border-color: var(--edge);
     color: var(--grey-500);
   }
-  /* "ignoruj" isn't one of ours: grey ground, no edge (an inherited one keeps its dashed edge) */
+  /* "Ignoruj" isn't one of ours: edged like the others, on a grey ground (an inherited one dashed and grey, as any) */
   .blocked {
-    border-color: transparent;
-    color: var(--grey-500);
     background-color: var(--grey-100);
-  }
-  .blocked.inherited {
-    border-color: var(--edge);
   }
   .missing {
     border-color: var(--red-500);

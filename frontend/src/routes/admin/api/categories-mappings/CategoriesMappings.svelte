@@ -14,8 +14,8 @@
   import Grid from '@c/table/Grid.svelte';
   import CategoryPicker from './CategoryPicker.svelte';
   import { savedRules } from '../mappings/savedRules.js';
-  import { listApiCategories, mappingAt, pathKey, resolveCategories } from '../categories.js';
-  import { staleMappings, unmappedPaths } from '../status.js';
+  import { apiPaths, listApiCategories, mappingAt, pathKey, pathState, resolveCategories } from '../categories.js';
+  import { staleMappings } from '../status.js';
 
   export let apiCompany;
   export let apiItems = null; // the api snapshot
@@ -66,13 +66,28 @@
     ];
   }
 
-  // the categories (and every one above them) with products that get none of ours: their counts are red ("BEZ
-  // KATEGORII" the empty path, above nothing)
-  $: unmapped = new Set(
-    unmappedPaths(mappings, apiItems, index).flatMap((path) =>
-      path.length ? path.map((_, i) => pathKey(path.slice(0, i + 1))) : [pathKey(path)],
-    ),
-  );
+  // the products left without meaning to (see pathState): by the key of each category they're in and every one above
+  // it ("BEZ KATEGORII" the empty path, above nothing) - a count shows how many are dealt with, red while any is left -
+  // and all of them
+  $: missing = missingProducts(mappings, apiItems, index);
+  function missingProducts(mappings, apiItems, index) {
+    const states = new Map(); // (a path's, once)
+    const byKey = new Map();
+    const all = new Set();
+    for (const item of apiItems ?? []) {
+      for (const path of apiPaths(item._categories)) {
+        const key = pathKey(path);
+        if (!states.has(key)) states.set(key, pathState(mappings, path, index));
+        if (states.get(key) !== 'unmapped') continue;
+        all.add(item);
+        for (const k of path.length ? path.map((_, i) => pathKey(path.slice(0, i + 1))) : [key]) {
+          if (!byKey.has(k)) byKey.set(k, new Set());
+          byKey.get(k).add(item);
+        }
+      }
+    }
+    return { byKey, all };
+  }
 
   // the ignored branches under each category, by the key of every category above them: their tops, as paths from there
   // (a yellow dot beside the count of one that isn't ignored itself, listing them)
@@ -92,10 +107,15 @@
     return below;
   }
 
-  // the supplier's categories with a mapping, of their own or from above
-  $: mapped = nodes.filter((n) => byPath.has(pathKey(n.path)) || inherited(n.path)).length;
-  // the products that get one of ours (not every one does: "ignoruj", categories not mapped yet)
-  $: productsMapped = (apiItems ?? []).filter((i) => resolveCategories(mappings, i._categories, index).length).length;
+  // the supplier's categories with all their products dealt with (given ours, or left out on purpose) - "BEZ KATEGORII"
+  // isn't one of theirs - and the products dealt with in every category they're in
+  $: categoryNodes = nodes.filter((n) => !n.none);
+  $: mapped = categoryNodes.filter((n) => !missing.byKey.has(pathKey(n.path))).length;
+  $: productsMapped = (apiItems?.length ?? 0) - missing.all.size;
+  // the products column as wide as a parent's "done / all" in the longest digits, while one shows it
+  $: countWidth = nodes.some((n) => n.hasChildren && missing.byKey.get(pathKey(n.path))?.size < n.items.length)
+    ? `${2.6 + 1.05 * String(Math.max(...nodes.map((n) => n.items.length))).length}rem`
+    : '4.5rem';
 
   // the mapping a category without one of its own takes after: the closest one above it
   function inherited(path) {
@@ -178,7 +198,7 @@
   note={nodes.length ? 'Kategorie nieobecne w regułach nie są usuwane przez skaner.' : null}
   stats={nodes.length
     ? [
-        { label: 'Kategorie', done: mapped, total: nodes.length },
+        { label: 'Kategorie', done: mapped, total: categoryNodes.length },
         { label: 'Produkty', done: productsMapped, total: apiItems?.length ?? 0 },
       ]
     : []}
@@ -206,7 +226,7 @@
   <svelte:fragment slot="after">
     {#if nodes.length}
       <Grid
-        columns="minmax(12rem, 20rem) 4.5rem 1.5rem minmax(18rem, 1fr)"
+        columns="minmax(12rem, 20rem) {countWidth} 1.5rem minmax(18rem, 1fr)"
         empty={visible.length ? null : `Brak kategorii pasujących do „${query}”.`}>
         <svelte:fragment slot="head">
           <span class="tree">
@@ -231,6 +251,7 @@
           {@const open = q || expanded.has(pathKey(node.path))}
           {@const m = own ?? parent}
           {@const below = ignoredBelow.get(pathKey(node.path))}
+          {@const lacking = missing.byKey.get(pathKey(node.path))?.size ?? 0}
           <div class="row">
             <!-- a line under the arrow of every level above: the tree's indent; the arrow and the name are one button -->
             <span class="tree">
@@ -254,12 +275,14 @@
                 <span class="name" title={node.path.join(' › ')}>{node.name}</span>
               {/if}
             </span>
-            <!-- red when some of its products get none of ours, else yellow with a mapping from above, grey otherwise -->
+            <!-- red when some of its products get none of ours without meaning to, else yellow with a mapping from above,
+                 grey otherwise; a parent's as "dealt with / all" while only some are -->
             <ProductsButton
               company={apiCompany}
               items={node.items}
+              done={node.hasChildren && lacking && lacking < node.items.length ? node.items.length - lacking : null}
               title={node.none ? node.name : node.path.join(' › ')}
-              tone={unmapped.has(pathKey(node.path)) ? 'unmapped' : parent ? 'inherited' : 'mapped'}
+              tone={lacking ? 'unmapped' : parent ? 'inherited' : 'mapped'}
               ignored={m && !m.categories.length
                 ? own
                   ? 'Ignorowana: jej produkty nie dostają od niej żadnej naszej kategorii.'
@@ -273,7 +296,7 @@
             <Arrow />
             <span class="targets">
               {#if own && own.categories.length === 0}
-                <Chip removable blocked on:remove={() => setCategories(node.path, null)}>ignoruj</Chip>
+                <Chip removable blocked on:remove={() => setCategories(node.path, null)}>Ignoruj</Chip>
               {:else if own}
                 {#each own.categories as id}
                   <Chip
@@ -291,7 +314,14 @@
                   </Chip>
                 {/each}
               {:else if parent}
-                <Chip inherited blocked title="Z nadrzędnej: {parent.path.join(' › ')}">ignoruj</Chip>
+                <Chip inherited blocked title="Z nadrzędnej: {parent.path.join(' › ')}">Ignoruj</Chip>
+              {:else if node.none}
+                <!-- without a mapping, products in none of the supplier's categories get none of ours: on purpose -->
+                <Chip
+                  inherited
+                  blocked
+                  title="Bez mapowania produkty bez kategorii u producenta nie dostają żadnej naszej."
+                  >Bez kategorii</Chip>
               {/if}
               {#if picking === pathKey(node.path)}
                 <CategoryPicker

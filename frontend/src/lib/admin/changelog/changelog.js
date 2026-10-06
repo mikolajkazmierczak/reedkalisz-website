@@ -25,6 +25,22 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.29.2',
+    date: '2026-10-06',
+    title: 'Liczniki kategorii',
+    highlight: [
+      'Liczniki w mapowaniu kategorii liczą teraz to, co jest **załatwione** – zmapowane albo pominięte celowo – więc przy skończonym mapowaniu pokazują pełną liczbę. Kategoria nadrzędna zmapowana tylko w części pokazuje przy produktach „załatwione / wszystkie”.',
+    ],
+    all: [
+      'Licznik Kategorie liczy kategorię nadrzędną bez mapowania jako gotową, gdy mapowania jej podkategorii obejmują wszystkie jej produkty.',
+      'Licznik Produkty liczy jako gotowe także produkty ignorowane, a jako niegotowe te, którym którakolwiek kategoria producenta nie ma mapowania.',
+      '„BEZ KATEGORII” bez mapowania oznacza „Bez kategorii”: nie jest już czerwone ani liczone do licznika Kategorie czy „Kategorie bez mapowań”, a w Komplikacjach jego produkty mają żółtą kropkę z podpowiedzią „Bez kategorii u producenta”. Wciąż można je zmapować do naszej kategorii.',
+      'Kategoria nadrzędna zmapowana tylko w części pokazuje przy produktach „załatwione / wszystkie” (liczba po kresce jest jaśniejsza); gdy nic albo wszystko jest załatwione – samą liczbę produktów.',
+      'Liczba gotowych w licznikach nad mapowaniem jest zielona, gdy wszystko jest gotowe.',
+      '„ignoruj” nazywa się „Ignoruj” i ma obwódkę jak pozostałe kategorie, na szarym tle.',
+    ],
+  },
+  {
     version: '1.29.1',
     date: '2026-10-06',
     title: 'Komplikacje i import',

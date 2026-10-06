@@ -7,7 +7,7 @@ import { isManagedCategory, mappedCategories } from '@/sync';
 // It covers the whole branch below it, unless a deeper path has a mapping of its own -
 // an empty one (`categories: []`) keeps that branch out.
 // The products in no supplier category are in the empty path, [] ("BEZ KATEGORII"): mapped like any other, above or
-// below nothing.
+// below nothing - but without a mapping it gets them no category on purpose, as "ignoruj" would (see pathState).
 
 export const pathKey = (path) => path.join('\u0000');
 
@@ -31,6 +31,16 @@ export function mappingAt(mappings, path) {
     const categories = byPath.get(pathKey(path.slice(0, depth)));
     if (categories) return categories;
   }
+}
+
+// what the mappings do with a path's products: 'mapped' (to one of ours still there; without the `index` any), 'ignored'
+// ("ignoruj", its own or from above; "BEZ KATEGORII" without a mapping), 'unmapped' (no mapping, or one to deleted
+// categories only)
+export function pathState(mappings, path, index = null) {
+  const ids = mappingAt(mappings, path);
+  if (!ids) return path.length ? 'unmapped' : 'ignored';
+  if (!ids.length) return 'ignored';
+  return !index || ids.some((id) => index.existing.has(id)) ? 'mapped' : 'unmapped';
 }
 
 export function resolveCategories(mappings, paths, index = null) {
