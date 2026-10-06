@@ -10,8 +10,10 @@
   import Arrow from '../mappings/Arrow.svelte';
   import Chip from '../mappings/Chip.svelte';
   import Panel from '../mappings/Panel.svelte';
+  import ProductsButton from '../mappings/ProductsButton.svelte';
   import Grid from '@c/table/Grid.svelte';
   import CategoryPicker from './CategoryPicker.svelte';
+  import { savedRules } from '../mappings/savedRules.js';
   import { listApiCategories, pathKey, resolveCategories } from '../categories.js';
   import { staleMappings, unmappedPaths } from '../status.js';
 
@@ -26,12 +28,10 @@
   let expanded = new Set();
   let picking = null; // the row with its category picker open (one at a time, there are ~200 options)
 
-  // once per company: a store update (even the echo of a save) mustn't wipe the edits (a new scan remounts this)
-  let loadedId;
-  $: if (apiCompany.id !== loadedId) {
-    loadedId = apiCompany.id;
-    load();
-  }
+  // loaded once per company, someone else's save loaded quietly or asked about (see savedRules.js); a new scan remounts
+  // this
+  const saved = savedRules('api_categories_mappings', { load, unsaved: () => unsaved });
+  $: saved.follow(apiCompany);
   // the order of a row's categories doesn't matter (products get them in tree order)
   const comparable = (list) => list.map((m) => ({ ...m, categories: [...(m.categories ?? [])].sort((a, b) => a - b) }));
   $: unsaved = diffSync(comparable(mappings), comparable(mappingsOriginal)).changed;
@@ -39,8 +39,8 @@
   // always in the order they're saved in, so undoing an edit by hand leaves nothing unsaved
   const pathOrder = (a, b) => pathKey(a.path).localeCompare(pathKey(b.path), 'pl');
 
-  function load() {
-    mappingsOriginal = deep.copy(apiCompany.api_categories_mappings ?? []).sort(pathOrder);
+  function load(list) {
+    mappingsOriginal = list.sort(pathOrder);
     mappings = deep.copy(mappingsOriginal);
   }
 
@@ -66,9 +66,12 @@
     ];
   }
 
-  // the categories (and every one above them) whose products won't get ours from them: their counts are red
+  // the categories (and every one above them) with products that get none of ours: their counts are red ("BEZ
+  // KATEGORII" the empty path, above nothing)
   $: unmapped = new Set(
-    unmappedPaths(mappings, apiItems, index).flatMap((path) => path.map((_, i) => pathKey(path.slice(0, i + 1)))),
+    unmappedPaths(mappings, apiItems, index).flatMap((path) =>
+      path.length ? path.map((_, i) => pathKey(path.slice(0, i + 1))) : [pathKey(path)],
+    ),
   );
 
   // the supplier's categories with a mapping, of their own or from above
@@ -76,7 +79,7 @@
   // the products that get one of ours (not every one does: "ignoruj", categories not mapped yet)
   $: productsMapped = (apiItems ?? []).filter((i) => resolveCategories(mappings, i._categories, index).length).length;
 
-  // the mapping a category takes after: its own, or the closest one above it
+  // the mapping a category without one of its own takes after: the closest one above it
   function inherited(path) {
     for (let depth = path.length - 1; depth > 0; depth--) {
       const m = byPath.get(pathKey(path.slice(0, depth)));
@@ -89,6 +92,7 @@
   $: q = query?.trim().toLowerCase();
   $: visible = nodes.filter((node) => {
     if (q) {
+      if (node.none) return node.name.toLowerCase().includes(q); // ([] is no category's parent)
       const key = pathKey(node.path);
       return nodes.some((n) => n.name.toLowerCase().includes(q) && pathKey(n.path.slice(0, node.path.length)) === key);
     }
@@ -121,6 +125,7 @@
   }
 
   async function save() {
+    if (!(await saved.check(apiCompany))) return;
     const data = mappings.map(({ path, categories }) => ({ path, categories }));
     await api.items('companies').updateOne(apiCompany.id, { api_categories_mappings: data.length ? data : null });
     heimdall.emit('companies', apiCompany.id);
@@ -134,8 +139,7 @@
         if (!after.has(id) && !now.some((t) => ancestorIds(t, index.parents).includes(id))) dropped.add(id);
       }
     }
-    mappingsOriginal = deep.copy(data);
-    mappings = deep.copy(data);
+    saved.set(data);
     if (dropped.size) {
       tell(
         `Żadne mapowanie nie prowadzi już do: ${[...dropped].map(label).join(', ')}. Produkty tego producenta, które je mają, ` +
@@ -147,19 +151,23 @@
 
   function cancel() {
     mappings = deep.copy(mappingsOriginal);
+    saved.dropped();
   }
 </script>
 
-<Panel title="Mapowanie kategorii" {unsaved} on:save={save} on:cancel={cancel}>
-  <svelte:fragment slot="summary">
-    {#if nodes.length}
-      <small class="counts">
-        <span>Kategorie <b>{mapped}</b> / {nodes.length}</span>
-        <span>Produkty <b>{productsMapped}</b> / {apiItems?.length ?? 0}</span>
-      </small>
-      <small class="muted">Kategorie, które nie występują w regułach, nie są usuwane przez skaner.</small>
-    {/if}
-  </svelte:fragment>
+<Panel
+  title="Mapowanie kategorii"
+  note={nodes.length ? 'Kategorie nieobecne w regułach nie są usuwane przez skaner.' : null}
+  stats={nodes.length
+    ? [
+        { label: 'Kategorie', done: mapped, total: nodes.length },
+        { label: 'Produkty', done: productsMapped, total: apiItems?.length ?? 0 },
+      ]
+    : []}
+  boxed={!nodes.length || !!stale.length}
+  {unsaved}
+  on:save={save}
+  on:cancel={cancel}>
   {#if !nodes.length}
     <p class="muted">Zeskanuj API, aby zobaczyć kategorie producenta.</p>
   {/if}
@@ -171,14 +179,16 @@
     </small>
     <div class="chips">
       {#each stale as m (pathKey(m.path))}
-        <Chip removable missing on:remove={() => setCategories(m.path, null)}>{m.path.join(' › ')}</Chip>
+        <Chip removable missing on:remove={() => setCategories(m.path, null)}>
+          {m.path.length ? m.path.join(' › ') : 'BEZ KATEGORII'}
+        </Chip>
       {/each}
     </div>
   {/if}
   <svelte:fragment slot="after">
     {#if nodes.length}
       <Grid
-        columns="minmax(12rem, 20rem) 4rem 1.5rem minmax(18rem, 1fr)"
+        columns="minmax(12rem, 20rem) 4.5rem 1.5rem minmax(18rem, 1fr)"
         empty={visible.length ? null : `Brak kategorii pasujących do „${query}”.`}>
         <svelte:fragment slot="head">
           <span class="tree">
@@ -192,8 +202,7 @@
             </span>
             Kategoria producenta
           </span>
-          <!-- red until the first mapping: after it, the red counts in the rows say which -->
-          <span class="count" class:unmapped={unmapped.size && !mapped}>Produkty</span>
+          <span class="products-head">Produkty</span>
           <span />
           <span>Kategorie u nas</span>
         </svelte:fragment>
@@ -202,7 +211,8 @@
           {@const own = byPath.get(pathKey(node.path))}
           {@const parent = own ? null : inherited(node.path)}
           {@const open = q || expanded.has(pathKey(node.path))}
-          <div class="row" class:mapped={own}>
+          {@const m = own ?? parent}
+          <div class="row">
             <!-- a line under the arrow of every level above: the tree's indent; the arrow and the name are one button -->
             <span class="tree">
               {#each { length: node.depth } as _}<span class="step guide" />{/each}
@@ -218,11 +228,24 @@
                     <span class="name name--in-button">{node.name}</span>
                   </Button>
                 </span>
+              {:else if node.none}
+                <!-- products in no category of the supplier's: in the bars' labels' letters, as it's none of theirs -->
+                <span class="name ui-stat-label" title="Produkty bez kategorii u producenta">{node.name}</span>
               {:else}
                 <span class="name" title={node.path.join(' › ')}>{node.name}</span>
               {/if}
             </span>
-            <span class="count" class:unmapped={unmapped.has(pathKey(node.path))}>{node.count}</span>
+            <!-- red when some of its products get none of ours, else yellow with a mapping from above, grey otherwise -->
+            <ProductsButton
+              company={apiCompany}
+              items={node.items}
+              title={node.none ? node.name : node.path.join(' › ')}
+              tone={unmapped.has(pathKey(node.path)) ? 'unmapped' : parent ? 'inherited' : 'mapped'}
+              ignored={m && !m.categories.length
+                ? own
+                  ? 'Ignorowana: jej produkty nie dostają od niej żadnej naszej kategorii.'
+                  : `Ignorowana z nadrzędnej (${parent.path.join(' › ')}): jej produkty nie dostają od niej żadnej naszej kategorii.`
+                : null} />
             <Arrow />
             <span class="targets">
               {#if own && own.categories.length === 0}
@@ -264,8 +287,8 @@
 </Panel>
 
 <style>
-  /* Lined up by what's drawn, like the categories next to the products: a name without an arrow starts where its
-     siblings' ">" does, a child's ">" (or name) where its parent's name does. The line of a level runs under the middle
+  /* Lined up by what's drawn, like our categories' tree: a name without an arrow keeps the arrow's room, so it starts
+     where its siblings' names do, and a child's ">" where its parent's name does. The line of a level runs under the middle
      of its parent's arrow, just before the children's buttons. Its type and arrow bigger than a small button's: it's
      read a lot */
   .tree {
@@ -273,7 +296,7 @@
     --font: 0.95rem;
     --icon: 1rem;
     --gap: 0.35rem; /* between the arrow and the name */
-    --arrow-in: calc(0.375 * var(--icon)); /* where the ">" starts in its icon: a name without one starts there */
+    --arrow-in: calc(0.375 * var(--icon)); /* where the ">" starts in its icon */
     --step: calc(var(--icon) - var(--arrow-in) + var(--gap));
     /* the button's padding before the arrow: 0.225rem from a level's line to the level under it */
     --pad-start: calc(var(--step) - var(--icon) / 2 - 0.225rem);
@@ -329,7 +352,9 @@
   .name {
     overflow: hidden;
     min-width: 0;
-    padding-left: calc(var(--pad-start) + var(--arrow-in)); /* without an arrow: where its siblings' ">" starts */
+    padding-left: calc(
+      var(--pad-start) + var(--icon) + var(--gap)
+    ); /* without an arrow: where its siblings' names start */
     font-size: var(--font);
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -337,27 +362,9 @@
   .name--in-button {
     padding-left: 0; /* the button's padding, the arrow and its gap are before it */
   }
-  .row.mapped .name {
-    font-weight: bold;
-  }
-  /* the two counts one over the other, the panel's dot before them in their middle */
-  .counts {
-    display: inline-grid;
-    grid-template-columns: auto auto;
-    align-items: center;
-    vertical-align: top;
-  }
-  small.counts::before {
-    grid-row: 1 / span 2;
-  }
-  .count {
-    font-size: 0.85rem;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    color: var(--grey-500);
-  }
-  .count.unmapped {
-    color: var(--red-500);
+  /* "BEZ KATEGORII" in the labels' letters, as tall as a name's line */
+  .name.ui-stat-label {
+    line-height: var(--height);
   }
   /* one line: the chips give way (cut, whole on hover), the button doesn't */
   .targets :global(.chip) {

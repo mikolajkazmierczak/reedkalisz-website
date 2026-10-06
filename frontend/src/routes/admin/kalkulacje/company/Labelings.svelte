@@ -1,7 +1,8 @@
 <script>
   import heimdall from '$/heimdall';
   import { deep, uid } from '%/utils';
-  import { tick } from 'svelte';
+  import { globals } from '@/globals';
+  import { createEventDispatcher, tick } from 'svelte';
 
   import Icon from '$c/Icon.svelte';
   import Tooltip from '$c/Tooltip.svelte';
@@ -18,6 +19,9 @@
   export let company;
   export let itemsOriginal;
   export let items;
+  export let check = async () => true; // someone else's save since these were loaded stops this one (see Company)
+
+  const dispatch = createEventDispatcher();
 
   // anonymous props for tracking changes:
   // _new: true, // whether the item is new (must be tracked since ids are reused)
@@ -89,25 +93,34 @@
   async function trySave() {
     if (saving) return; // prevent double click
     saving = true;
-
     const labelingIDs = [];
     const productIDs = [];
-    if (await tryCleanItems(items)) {
+    try {
+      if (!(await tryCleanItems(items))) return;
+      items = items; // the cleaned columns shown, should the check stop the save
+      // right before writing, past the questions above: someone may save while they're answered
+      if (!(await check())) return;
       for await (const { uid, ids } of save(changed, itemsOriginal)) {
         changed = changed.filter((c) => c._uid !== uid);
         labelingIDs.push(...ids.labelings);
         productIDs.push(...ids.products);
       }
-      if (labelingIDs.length) heimdall.emit('labelings', labelingIDs);
+      // the store as saved (the updated rows are already, the created and deleted ones not), the table then from it
+      if (labelingIDs.length) {
+        await globals.update('labelings', { ids: labelingIDs });
+        heimdall.emit('labelings', labelingIDs, { selfBroadcast: false }); // (this tab's store is read already)
+      }
       if (productIDs.length) heimdall.emit('products', productIDs);
+    } finally {
+      saving = false;
     }
-
-    saving = false;
+    if (labelingIDs.length) dispatch('saved');
   }
 
   async function cancel() {
     if (await ask('Cofnąć wszystkie niezapisane zmiany?', { ok: 'Cofnij zmiany', danger: true })) {
       items = deep.copy(itemsOriginal);
+      dispatch('cancel'); // (a version accepted to save over loads, see Company)
     }
   }
 

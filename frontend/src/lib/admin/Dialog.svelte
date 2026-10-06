@@ -78,7 +78,7 @@
         <!-- the bin for deleting only, not for every danger (leaving, undoing, a failure) -->
         <Button
           dangerous={shown.danger}
-          icon={shown.danger && shown.ok.startsWith('Usuń') ? 'delete' : 'ok'}
+          icon={shown.icon ?? (shown.danger && shown.ok.startsWith('Usuń') ? 'delete' : 'ok')}
           on:click={() => answer(true)}>
           {shown.ok}
         </Button>

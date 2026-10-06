@@ -55,13 +55,14 @@ async function save(collection, item, itemOriginal, { root } = {}) {
   heimdall.emit(collection, item.id);
   unsaved.set(false);
 
-  // rewrite url (if needed) while replacing history
-  if (oldKey != newKey) {
-    const newPathname = getNewPathname(root, oldKey, newKey);
-    goto(newPathname, { replaceState: true, noScroll: true, keepFocus: true });
-  }
-
+  follow(root, oldKey, newKey);
   return [item, itemOriginal];
+}
+
+// the url follows the item's key (a new item's id, a slug renamed here or by someone else), replacing history
+function follow(root, oldKey, newKey) {
+  if (oldKey == newKey) return;
+  goto(getNewPathname(root, oldKey, newKey), { replaceState: true, noScroll: true, keepFocus: true });
 }
 
 async function cancel(item, itemOriginal, { root } = {}) {
@@ -112,4 +113,4 @@ async function remove(collection, id, { root, prompt = null, parent = null, inde
   }
 }
 
-export default { save, remove, cancel };
+export default { save, remove, cancel, follow };

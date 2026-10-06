@@ -19,19 +19,24 @@
   let item;
   let itemOriginal;
 
-  async function read() {
-    if (id == '+') {
+  // (`itemId`: the item already open, read again - a new one's url still says '+')
+  let opened = false; // marked read once, on opening: a reload (someone else's save, their "nieprzeczytane" too) doesn't
+  async function read(itemId = id) {
+    if (itemId == '+') {
       item = defaults();
     } else {
-      const question = await api.items('questions').readOne(id, { fields });
+      const question = await api.items('questions').readOne(itemId, { fields });
       // opened: marked read (the menu stops asking for it) before it's shown
-      if (question && !question.read) {
-        await api.items('questions').updateOne(id, { read: true });
+      if (!opened && question && !question.read) {
+        // (its new `date_updated` too: the version this editor has, see overwrite.js)
+        const marked = await api.items('questions').updateOne(itemId, { read: true }, { fields: ['date_updated'] });
         question.read = true;
+        question.date_updated = marked.date_updated;
         heimdall.emit('questions', question.id); // (the id from the url is a string)
       }
       item = question;
     }
+    opened = true;
     itemOriginal = item ? deep.copy(item) : null;
   }
 
@@ -78,7 +83,8 @@
   collection="questions"
   removable={!!itemOriginal?.date_created}
   bind:item
-  bind:itemOriginal>
+  bind:itemOriginal
+  reload={read}>
   <svelte:fragment slot="bar">
     {#if itemOriginal?.date_created}
       <BarButton

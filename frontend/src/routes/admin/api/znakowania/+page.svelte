@@ -7,7 +7,7 @@
 
 <MappingPage pathname="/admin/api/znakowania" title="Znakowania" let:company let:apiItems>
   {#if hasPrintData(apiItems)}
-    <LabelingsMappings apiCompany={company} apiCodes={labelingCodes(apiItems)} />
+    <LabelingsMappings apiCompany={company} {apiItems} apiCodes={labelingCodes(apiItems)} />
   {:else}
     <Panel title="Mapowanie znakowań">
       <p class="muted">

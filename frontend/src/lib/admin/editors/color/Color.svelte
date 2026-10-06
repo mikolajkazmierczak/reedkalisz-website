@@ -17,13 +17,14 @@
   let item;
   let itemOriginal;
 
-  async function read() {
+  // (`itemId`: the item already open, read again - a new one's url still says '+')
+  async function read(itemId = id) {
     await globals.update(companies);
 
-    if (id == '+') {
+    if (itemId == '+') {
       item = defaults();
     } else {
-      item = await api.items('colors').readOne(id, { fields });
+      item = await api.items('colors').readOne(itemId, { fields });
     }
     itemOriginal = item ? deep.copy(item) : null;
   }
@@ -42,7 +43,8 @@
   collection="colors"
   removable={!!itemOriginal?.date_created}
   bind:item
-  bind:itemOriginal>
+  bind:itemOriginal
+  reload={read}>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">

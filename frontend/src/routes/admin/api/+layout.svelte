@@ -4,7 +4,7 @@
   import heimdall from '$/heimdall';
   import { header } from '@/stores';
   import { categories, companies, labelings } from '@/globals';
-  import { apiCompanyId, apiTabs, fetchSnapshot } from './company.js';
+  import { apiCompanyId, apiTabs, fetchSnapshot, latestRead } from './company.js';
   import { tabStatuses } from './status.js';
 
   // what's left to do in each tab for the picked company, from its saved mappings and its last scan
@@ -26,26 +26,24 @@
   }
 
   // our products of the company, just what tells them apart in a scan: for what it no longer has (see productsStatus)
+  // (a refresh keeps the last ones meanwhile, so the outline doesn't blink; a failed read, the tab goes without its note)
   let products = null;
   let productsOf = null;
-  let productsRun = 0;
-  $: if (company?.id !== productsOf) loadProducts(company?.id);
-  async function loadProducts(id) {
-    if (id !== productsOf) products = null; // a refresh keeps the last ones meanwhile, so the outline doesn't blink
-    productsOf = id;
-    const run = ++productsRun; // only the latest read lands: refreshes come in bursts
-    if (id == null) return;
-    const fields = ['code', 'storage.api_color_code'];
-    try {
-      const res = await api.items('products').readByQuery({ fields, filter: { company: { _eq: id } }, limit: -1 });
-      if (run === productsRun) products = res.data;
-    } catch {
-      // the tab just goes without its note
-    }
+  const fields = ['code', 'storage.api_color_code'];
+  const loadProducts = latestRead(
+    (id) =>
+      api
+        .items('products')
+        .readByQuery({ fields, filter: { company: { _eq: id } }, limit: -1 })
+        .then((res) => res.data),
+    (data) => (products = data),
+  );
+  $: if (company?.id !== productsOf) {
+    productsOf = company?.id;
+    products = null;
+    loadProducts(productsOf);
   }
-  heimdall.listen(({ match }) => {
-    if (match('products') && productsOf != null) loadProducts(productsOf); // imported, deleted
-  });
+  heimdall.listen(({ match }) => match('products') && productsOf != null && loadProducts(productsOf)); // imported, deleted
 
   $: statuses = scan && $labelings && $categories ? tabStatuses(company, scan, $labelings, $categories, products) : {};
 

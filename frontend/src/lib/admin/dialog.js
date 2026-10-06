@@ -4,21 +4,33 @@ import { writable } from 'svelte/store';
 // The admin's own alert and confirm (shown by Dialog.svelte, in the admin layout), one at a time.
 //   await ask('Usunąć produkt?', { danger: true, ok: 'Usuń' }) -> true or false
 //   await tell('Nie można usunąć kategorii...')
-export const dialogs = writable([]); // [{ title, message, ok, cancel, danger, resolve }]
+export const dialogs = writable([]); // [{ title, message, ok, cancel, danger, icon, resolve }]
 
 function open(dialog) {
   return new Promise((resolve) => dialogs.update((list) => [...list, { ...dialog, resolve }]));
 }
 
-export const ask = (message, { title = null, ok = 'OK', cancel = 'Anuluj', danger = false } = {}) =>
-  open({ title, message, ok, cancel, danger });
+// `icon`: the yes button's, in place of the tick (or the bin)
+export const ask = (message, { title = null, ok = 'OK', cancel = 'Anuluj', danger = false, icon = null } = {}) =>
+  open({ title, message, ok, cancel, danger, icon });
 
 export const tell = (message, { title = null, ok = 'OK', danger = false } = {}) =>
   open({ title, message, ok, cancel: null, danger });
 
-// someone else saved the item open in an editor
-export const editedElsewhere = () =>
-  tell('Ktoś właśnie zapisał zmiany w tym elemencie. Zapisując swoje, nadpiszesz je.', { title: 'Uwaga' });
+// someone else saved what's open here (see overwrite.js): true to load theirs - asked twice, it drops the edits here -,
+// false to keep these (Rozumiem, or Anuluj on the second question)
+export async function editedElsewhere() {
+  const refresh = await ask('Ktoś właśnie zapisał zmiany w tym elemencie.\nZapisując swoje, nadpiszesz je.', {
+    title: 'Uwaga!',
+    cancel: 'Rozumiem',
+    ok: 'Odśwież',
+    icon: 'refresh',
+  });
+  return (
+    refresh &&
+    (await ask('Stracisz swoje zmiany.', { title: 'Na pewno?', ok: 'Odśwież', danger: true, icon: 'refresh' }))
+  );
+}
 
 const UNSAVED = 'Zmiany nie zostały zapisane. Czy na pewno chcesz opuścić stronę?';
 export const askLeaving = (message = UNSAVED) => ask(message, { ok: 'Opuść', cancel: 'Zostań', danger: true });

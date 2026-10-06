@@ -58,11 +58,11 @@
     color: var(--grey-500);
   }
   .c-arrow {
-    grid-column: 6;
+    grid-column: 7;
     place-self: center;
   }
   .c-remove {
-    grid-column: 8;
+    grid-column: 9;
   }
   .c-add {
     grid-column: 4 / span 2;

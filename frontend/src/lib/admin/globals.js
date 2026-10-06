@@ -107,6 +107,10 @@ class Globals {
     }
     await read(store, ids, sortingKey);
   };
+
+  // every store read so far, read again (the changes heimdall would have told of may have been missed; update skips the
+  // ones never read)
+  refreshAll = () => Promise.all(collections.map((c) => this.update(c.store, { refresh: true })));
 }
 
 export const globals = new Globals();

@@ -1,34 +1,81 @@
 <script>
   import { createEventDispatcher, onDestroy } from 'svelte';
   import Button from '@c/Button.svelte';
+  import { CELL, remPx, whole } from '@/onGrid';
+  import { grow } from '@/grow';
   import { unsavedMapping } from '../company.js';
 
-  // The frame of every mapping: a box with a title (and `summary` beside it, its parts parted by dots) and the hints
-  // (the slot), under it its table and the rest (`after`, on the page as the API products' table), and save / cancel
-  // once something changed.
+  // The frame of every mapping: its bar - Anuluj and Zapisz once something changed, `stats` ([{ label, done, total }]),
+  // a line, then the title and `note` - joined under the companies' (see MappingPage) and sticking under the page's
+  // header, so saving is always at hand; the hints in a box under it (the slot, unless `boxed` is false), then its table
+  // and the rest (`after`, on the page as the API products' table).
   const dispatch = createEventDispatcher();
 
   export let title;
+  export let note = null;
+  export let stats = [];
+  export let boxed = true;
   export let unsaved = false;
   $: $unsavedMapping = unsaved;
   onDestroy(() => ($unsavedMapping = false));
+
+  // Stuck under the header, the bar is one of its own: its top line comes in over the first `distance` px
+  // scrolled past where it sticks - along with the scroll (--stuck, 0 to 1), as the header's frost does
+  function stuck(node) {
+    const distance = 24;
+    const set = () => {
+      // (the panel's first child: 0 until it sticks, then how far the panel has gone up under it)
+      const past = node.getBoundingClientRect().top - node.parentElement.getBoundingClientRect().top;
+      node.style.setProperty('--stuck', Math.min(1, Math.max(0, past / distance)).toFixed(3));
+    };
+    addEventListener('scroll', set, { passive: true });
+    addEventListener('resize', set);
+    set();
+    // a cell and a half, or whole half cells more when it wraps (a narrow window): what's under it stays on the mat
+    // (it isn't one of onGrid's: it lies right under the companies' bar, not 1px into a slot of its own)
+    const fit = () => {
+      node.style.minHeight = '';
+      node.style.minHeight = `${whole(node.getBoundingClientRect().height, (CELL * remPx()) / 2)}px`;
+    };
+    const resizes = new ResizeObserver(() => requestAnimationFrame(fit));
+    resizes.observe(node);
+    return {
+      destroy() {
+        removeEventListener('scroll', set);
+        removeEventListener('resize', set);
+        resizes.disconnect();
+      },
+    };
+  }
 </script>
 
 <div class="panel">
-  <div class="ui-box">
-    <div class="head">
-      <h3>{title}</h3>
-      <slot name="summary" />
-    </div>
-    <slot />
+  <div class="bar" use:stuck>
+    {#if unsaved}
+      <div class="lead" transition:grow>
+        <Button icon="close" secondary edge on:click={() => dispatch('cancel')}>Anuluj</Button>
+        <Button icon="ok" on:click={() => dispatch('save')}>Zapisz</Button>
+        {#if !stats.length}<span class="ui-divider" />{/if}
+      </div>
+    {/if}
+    {#if stats.length}
+      <div class="counts">
+        {#each stats as { label, done, total }}
+          <span class="count">
+            <span class="ui-stat-value">{done}{' '}<span class="of">/ {total}</span></span>
+            <span class="ui-stat-label">{label}</span>
+          </span>
+        {/each}
+      </div>
+      <span class="ui-divider" />
+    {/if}
+    <h3>{title}</h3>
+    {#if note}<small class="muted note">{note}</small>{/if}
   </div>
-  <slot name="after" />
-  {#if unsaved}
-    <div class="ui-pair actions">
-      <Button icon="close" secondary edge on:click={() => dispatch('cancel')}>Anuluj</Button>
-      <Button icon="ok" on:click={() => dispatch('save')}>Zapisz</Button>
-    </div>
+  {#if boxed}
+    <div class="ui-box"><slot /></div>
   {/if}
+  <slot name="after" />
 </div>
 
 <style>
@@ -38,37 +85,66 @@
     gap: var(--page-pad); /* half a cell of the mat, as a page's boxes */
     margin-bottom: 2rem;
   }
-  /* a bar under the companies' (see .ui-bar): its title part two cells of the mat on every tab (its slot, border,
-     padding, the title's row), whole half cells in all (see onGrid), what's in it from its top - the title in the same
-     place on every tab, what rounding adds to its height left under it */
-  .panel > .ui-box {
-    justify-content: flex-start;
-    padding: var(--bar-pad) var(--box-pad);
+  /* the mapping's bar, a cell and a half (its lines in it) right under the companies' bar - the two as the bars of
+     Produkty (see MappingPage) - sticking under the page's header, where it gets its own top line */
+  .bar {
+    --stuck: 0;
+    position: sticky;
+    top: var(--header-height);
+    z-index: 4; /* over the page, under the header (5): it goes up under it where the panel ends */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem; /* (as Produkty's bar under the companies) */
+    min-height: calc(1.5 * var(--cell));
+    margin-left: 1px; /* (in its slot, as the companies' bar over it: see .ui-snap) */
+    padding: 0 var(--box-pad); /* (Zapisz's height fits in its cell and a half, as Importuj's on Produkty) */
+    border: var(--border-light);
+    border-top-color: rgb(from var(--black-10) r g b / calc(alpha * var(--stuck)));
+    border-radius: 0 0 var(--box-radius) var(--box-radius); /* (square on top, stuck too: against the header) */
+    corner-shape: squircle;
+    background-color: var(--paper);
+    box-shadow: var(--shadow);
   }
   h3 {
     margin: 0;
   }
-  /* the title and its summary in the middle of a row as tall on every tab (with the padding: two cells), so the
-     summary's lines - the categories' counts are two, set close to fit - don't move the title */
-  .head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    align-content: center;
-    gap: 0.25rem 0.5rem;
-    min-height: var(--control); /* (with the box's padding and border, two cells less the 1px it sits inside) */
+  /* its dot inside it: a narrow bar wraps the two together, not leaving the dot after the title */
+  .note {
+    line-height: 1.2;
   }
-  .head > :global(small) {
-    line-height: 0.8125rem;
-  }
-  .head > :global(small::before) {
+  .note::before {
     content: '·';
     margin-right: 0.5rem;
+    font-size: 1rem;
   }
-  .actions {
-    /* the panel is a column flex, so this is the cross axis */
-    align-self: flex-start;
-    min-width: 22rem;
+  /* Anuluj and Zapisz coming in together (with the line after them when there are no counts) */
+  .lead {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  /* a line each, its label right after its number (a column of labels would read as one label broken in two), the
+     numbers from one edge (they count different things: their digits have nothing to line up with); a little in, where
+     Skanuj's rounded edge looks to start when they lead the bar; the total in the labels' muted ink; tabular digits, so
+     the title after them doesn't shift as they change */
+  .counts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.1rem;
+    height: var(--control);
+    padding-left: 0.25rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .count {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+  .of {
+    color: var(--ink-muted);
   }
   /* the hints, the same in every mapping */
   .panel :global(.muted) {
@@ -121,9 +197,14 @@
     background-color: var(--red-100);
     color: var(--text);
   }
-  .panel :global(.key--orange) {
-    background-color: var(--orange-100);
+  .panel :global(.key--yellow) {
+    background-color: var(--ply-yellow);
     color: var(--text);
+  }
+  /* the Produkty column's head, over the counts: on their side, a little faint (they're what to click, not it) */
+  .panel :global(.products-head) {
+    text-align: right;
+    color: var(--ink-muted);
   }
   .panel :global(.tools) {
     display: flex;

@@ -11,6 +11,12 @@ export const baseUrl = PUBLIC_HEIMDALL_URL;
 class Socket {
   constructor(url) {
     this.socket = io(url);
+    // this tab's: another tab of the same admin is someone else too (its saves can overwrite this one's)
+    this.tab = Math.random().toString(36).slice(2);
+    // what was sent while the connection was lost (a sleeping laptop, a background tab, heimdall restarting) never
+    // comes: a connection after the first means something may have been missed (counted first, see onReconnect)
+    this.connections = 0;
+    this.socket.on('connect', () => this.connections++);
   }
   close() {
     this.socket.close();
@@ -28,10 +34,17 @@ class Socket {
       collection,
       ids,
       user: get(me).id,
+      tab: this.tab,
       selfBroadcast,
       refresh,
     };
     this.socket.emit('changes', data);
+  }
+
+  onReconnect(listener) {
+    const connected = () => this.connections > 1 && listener();
+    this.socket.on('connect', connected);
+    return () => this.socket.off('connect', connected);
   }
 
   // a scan of the company's api: heimdall's reply (the scan, { error } or { notice }), or an Error when none can come -
@@ -67,8 +80,7 @@ class Heimdall {
   listen(func, root = false) {
     const listener = (data) => {
       const match = (collection, ids) => this.match(data, collection, ids);
-      const isMe = get(me)?.id == data.user; // (logged out: a listener that outlives the admin, e.g. the menu's)
-      func({ match, me: isMe, data });
+      func({ match, mine: data.tab === this.socket.tab, data });
     };
 
     this.socket.onChanges(listener);
@@ -77,6 +89,11 @@ class Heimdall {
       this.socket.offChanges(listener);
       if (root) this.socket.close();
     });
+  }
+
+  // the connection came back after being lost: changes made meanwhile went unheard
+  reconnected(func) {
+    onDestroy(this.socket.onReconnect(func));
   }
 
   // see Socket.fetch; the time limit is for a heimdall that's up but silent: past what heimdall gives a supplier (see

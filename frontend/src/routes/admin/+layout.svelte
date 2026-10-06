@@ -44,6 +44,9 @@
       await globals.update(collection, { ids, refresh });
     }
   }, true);
+  // what was saved while the connection was lost went unheard: the shared data read again (the pages showing it follow,
+  // see overwrite.js)
+  heimdall.reconnected(() => globals.refreshAll());
 </script>
 
 <svelte:head>

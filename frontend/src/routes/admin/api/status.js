@@ -1,6 +1,6 @@
 import { categoryIndex } from '@/categories';
 import { findLabeling } from '@/labelings';
-import { listApiCategories, mappingAt, pathKey } from './categories.js';
+import { apiPaths, listApiCategories, mappingAt, pathKey } from './categories.js';
 import { hasPrintData, labelingCodes } from './company.js';
 import { placeCounts, placeWins, uselessRules as uselessPlaceRules } from './places.js';
 import { retiredOf } from './items.js';
@@ -84,7 +84,7 @@ export function staleMappings(mappings, nodes) {
 export function unmappedPaths(mappings, apiItems, index) {
   const paths = new Map();
   for (const item of apiItems ?? []) {
-    for (const path of item._categories ?? []) {
+    for (const path of apiPaths(item._categories)) {
       const ids = mappingAt(mappings, path);
       if (ids && (!ids.length || ids.some((id) => index.existing.has(id)))) continue;
       paths.set(pathKey(path), path);

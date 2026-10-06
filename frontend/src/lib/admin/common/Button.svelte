@@ -14,7 +14,8 @@
   export let selected = false; // the chosen one of a few (navy-100, the selected blue), e.g. the company picked
   export let edge = false; // a light one on the board or a ply (a box, a popup): a ring a shade darker than its fill
   // a state in colour: 'info' (light blue), 'selected' (navy-100), 'success' (green), 'warning' (orange), 'danger' (red),
-  // 'new' (purple), 'split' (orange and purple, halved corner to corner: a warning and something new at once)
+  // 'new' (purple), 'split' (orange and purple, halved corner to corner: a warning and something new at once), 'note'
+  // (the optional boxes' yellow: left as it is, not wrong)
   export let tone = null;
   export let square = false;
   // 'sm' (1.5rem, in tables and next to small fields), 'md' (a cell and a quarter, --control: the default), 'lg' (as
@@ -56,6 +57,7 @@
   class:tone-warning={shade === 'warning'}
   class:tone-danger={shade === 'danger'}
   class:tone-new={shade === 'new'}
+  class:tone-note={shade === 'note'}
   class:tone-split={shade === 'split'}
   class:dark
   class:square={squared}
@@ -175,6 +177,11 @@
     --bg-hover: var(--purple-200);
     --bg-active: var(--purple-300);
   }
+  .tone-note {
+    --bg: var(--ply-yellow);
+    --bg-hover: color-mix(in srgb, var(--ply-yellow), var(--yellow-100));
+    --bg-active: var(--yellow-100);
+  }
   /* orange above the line from the bottom left corner to the top right one, purple under it */
   .tone-split {
     background-image: linear-gradient(to bottom right, var(--orange-100) 50%, var(--purple-100) 50%);
@@ -197,6 +204,12 @@
     color: var(--light);
     font-size: 0.95rem;
     font-weight: 500;
+    transition: color 120ms; /* with the ground (see button): turning on or off fades, as Skanuj does */
+  }
+  .content > :global(svg) {
+    transition:
+      fill 120ms,
+      stroke 120ms;
   }
   .dark .content {
     color: var(--text);

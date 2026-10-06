@@ -6,8 +6,13 @@ import { isManagedCategory, mappedCategories } from '@/sync';
 //   [{ path: ['Do pisania'], categories: [12] }, { path: ['Do pisania', 'Wkłady'], categories: [] }]
 // It covers the whole branch below it, unless a deeper path has a mapping of its own -
 // an empty one (`categories: []`) keeps that branch out.
+// The products in no supplier category are in the empty path, [] ("BEZ KATEGORII"): mapped like any other, above or
+// below nothing.
 
 export const pathKey = (path) => path.join('\u0000');
+
+// a product's supplier category paths ([item._categories]), "BEZ KATEGORII" ([[]]) when there are none
+export const apiPaths = (paths) => (paths?.length ? paths : [[]]);
 
 // path key -> categories, made once per list of mappings (a scan resolves thousands of products with one)
 const lookups = new WeakMap();
@@ -21,6 +26,7 @@ function lookup(mappings) {
 export function mappingAt(mappings, path) {
   if (!mappings?.length) return undefined;
   const byPath = lookup(mappings);
+  if (!path.length) return byPath.get(pathKey(path));
   for (let depth = path.length; depth > 0; depth--) {
     const categories = byPath.get(pathKey(path.slice(0, depth)));
     if (categories) return categories;
@@ -34,7 +40,7 @@ export function resolveCategories(mappings, paths, index = null) {
   if (!mappings?.length) return [];
   const existing = index?.existing;
   const result = [];
-  for (const path of paths ?? []) {
+  for (const path of apiPaths(paths)) {
     for (const id of mappingAt(mappings, path) ?? []) {
       if (!result.includes(id) && (!existing || existing.has(id))) result.push(id);
     }
@@ -43,19 +49,22 @@ export function resolveCategories(mappings, paths, index = null) {
 }
 
 export function listApiCategories(apiItems) {
-  // Every supplier category (and every level above it) with the number of products under it.
-  // Sorted as a tree: [{ path, name, depth, count, hasChildren }]
+  // Every supplier category (and every level above it) with the products under it, and "BEZ KATEGORII" (`none`: the
+  // empty path) first when some products are in none - only while the supplier has categories at all.
+  // Sorted as a tree: [{ path, name, depth, items, hasChildren, none }]
   const nodes = new Map();
+  const without = [];
   for (const item of apiItems ?? []) {
+    if (!item._categories?.length) without.push(item);
     const counted = new Set(); // a product in two subcategories counts once for the parent
     for (const path of item._categories ?? []) {
       for (let depth = 1; depth <= path.length; depth++) {
         const sub = path.slice(0, depth);
         const k = pathKey(sub);
-        if (!nodes.has(k)) nodes.set(k, { path: sub, name: sub.at(-1), depth: depth - 1, count: 0, children: [] });
+        if (!nodes.has(k)) nodes.set(k, { path: sub, name: sub.at(-1), depth: depth - 1, items: [], children: [] });
         if (!counted.has(k)) {
           counted.add(k);
-          nodes.get(k).count++;
+          nodes.get(k).items.push(item);
         }
       }
     }
@@ -67,6 +76,9 @@ export function listApiCategories(apiItems) {
     (parent ? parent.children : roots).push(node);
   }
   const flat = [];
+  if (nodes.size && without.length) {
+    flat.push({ path: [], name: 'BEZ KATEGORII', depth: 0, items: without, hasChildren: false, none: true });
+  }
   const walk = (list) => {
     list.sort((a, b) => a.name.localeCompare(b.name, 'pl', { numeric: true }));
     for (const { children, ...node } of list) {

@@ -2,8 +2,10 @@
 // sets it on every save, the API import on every import (scripts/sort-rows.mjs once for the ones saved before).
 // The same rows, in place: the editor keeps showing them.
 
-// codes as the suppliers number them: 'R08312.04' before 'R08312.15', 'MO9469-3' before 'MO9469-10'
-export const natural = (a, b) => (a ?? '').localeCompare(b ?? '', 'pl', { numeric: true, sensitivity: 'base' });
+// codes as the suppliers number them: 'R08312.04' before 'R08312.15', 'MO9469-3' before 'MO9469-10' (one collator:
+// localeCompare with options builds one per call, which sorting thousands of codes feels)
+const collator = new Intl.Collator('pl', { numeric: true, sensitivity: 'base' });
+export const natural = (a, b) => collator.compare(a ?? '', b ?? '');
 
 // Variants by their code (see natural); the ones without one after them, as they were.
 export const sortVariants = (storage) => reindex(orderVariants(storage));

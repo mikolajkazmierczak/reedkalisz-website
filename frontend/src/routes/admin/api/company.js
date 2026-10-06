@@ -50,3 +50,32 @@ export const labelingCodes = (items) =>
   [...new Set((items ?? []).flatMap((i) => (i._labelings ?? []).flatMap((l) => l.techniques)))].sort();
 
 export { fetchSnapshot, storeSnapshot } from '@/snapshot';
+
+// the open mapping tab's products: the scan's products (its items) -> ours merged with them (see items.js combine, set
+// by MappingPage), or null until both are read - what a mapping's lists of products say of each (imported, its cloud)
+export const scanEntries = writable(null);
+
+// A read a burst of changes would repeat (a recalculation reports every batch, an import every product): one at a
+// time, and one more at the end for what came in meanwhile; only the reply for the id asked for last lands, a failed
+// one leaves what was there. `read(id)` -> data, `land(data)`.
+export function latestRead(read, land) {
+  let wanted = null;
+  let busy = false;
+  let again = false;
+  return async function load(id) {
+    wanted = id;
+    if (busy) return void (again = true);
+    busy = true;
+    try {
+      do {
+        again = false;
+        const asked = wanted;
+        if (asked == null) continue;
+        const data = await read(asked).catch(() => undefined);
+        if (asked === wanted && data !== undefined) land(data);
+      } while (again);
+    } finally {
+      busy = false;
+    }
+  };
+}

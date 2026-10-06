@@ -63,12 +63,10 @@ function sortItems(items, sort, complications) {
   return items;
 }
 
-export function merge(company, dbItems, apiItems, { sort, query = null, complications = null }) {
-  if (!company || !dbItems || !apiItems) return;
+// ours, each marked with what the scan still has (see match.js), and the scan's products and variants we don't have
+export function combine(dbItems, apiItems) {
   const scan = indexScan(apiItems);
   const mergedItems = [];
-
-  // ours, each marked with what the scan still has (see match.js)
   const ours = new Set(); // codes of our variants
   const following = new Map(); // scan product -> our first product following it
   for (const db of dbItems) {
@@ -88,6 +86,13 @@ export function merge(company, dbItems, apiItems, { sort, query = null, complica
     else if (fresh.length || !api.storage.length)
       mergedItems.push({ ...api, _db: false, _api: true, _scan: api, storage: fresh });
   }
+
+  return mergedItems;
+}
+
+export function merge(company, dbItems, apiItems, { sort, query = null, complications = null }) {
+  if (!company || !dbItems || !apiItems) return;
+  const mergedItems = combine(dbItems, apiItems);
 
   // a product's uid is its code, told apart by its first variant when the code repeats; given in the order they
   // were built, so sorting or searching doesn't swap them
@@ -125,3 +130,66 @@ export function retiredOf(company, dbItems, apiItems) {
   const variants = inDb.filter((i) => !products.includes(i)).flatMap((i) => i.storage.filter((s) => s._db && !s._api));
   return { inDb, products, variants };
 }
+
+// the items with each of their keys (a labeling code, a place), once each however often an item has it: key -> [item]
+export function groupItems(items, keysOf) {
+  const groups = new Map();
+  for (const item of items ?? []) {
+    for (const key of new Set(keysOf(item))) (groups.get(key) ?? groups.set(key, []).get(key)).push(item);
+  }
+  return groups;
+}
+
+// A product's cloud in the lists (Produkty, a mapping's products): what the supplier still has of it - gone, some
+// colours gone (and new ones too), new colours, or all there -> { tone, title, icon } for its Button
+export function cloudOf(item) {
+  const notAll = item.storage.some((s) => !s._api);
+  const none = item.storage.every((s) => !s._api) || !item._api;
+  const fresh = item._db && item.storage.some((s) => !s._db);
+  const [tone, title] = none
+    ? ['danger', 'Wycofany']
+    : notAll && fresh
+      ? ['split', 'Wycofane i nowe kolory']
+      : notAll
+        ? ['warning', 'Wycofane kolory']
+        : fresh
+          ? ['new', 'Nowe kolory']
+          : ['success', 'Dostępny'];
+  return { tone, title, icon: none ? 'cloud_off' : 'cloud' };
+}
+
+function stripUsbSizes(input) {
+  if (typeof input !== 'string') return input;
+  return input.replace(/\s*\d+(?:\.\d+)?\s*[GT]B(?:\s*\/\s*\d+(?:\.\d+)?\s*[GT]B)*\s*$/i, '').trim();
+}
+
+// the supplier's search for a product, also for what the api no longer has (their "not found" confirms it's gone)
+function apiSearchUrl(company, code, name) {
+  switch (company.name) {
+    case 'PAR':
+      return `https://www.par.com.pl/products?search=${code}`;
+    case 'MidOcean':
+      return `https://www.midocean.com/INTERSHOP/web/WFS/midocean-PL-Site/pl_PL/-/PLN/ViewParametricSearchBySearchIndex-Browse?SearchTerm=${code}`;
+    case 'BlueCollection':
+      return `https://bluecollection.gifts/pl/${code.split('-')[0]}.html`;
+    case 'EasyGifts':
+      return `https://www.easygifts.com.pl/search.php?dosearch=1&query=${code}`;
+    case 'Macma':
+      return `https://macma.pl/search.php?dosearch=1&query=${code}`;
+    case 'Promotionway':
+      return `https://promotionway.pl/search.php?query=${code}`;
+    case 'AXPOL':
+      return `https://axpol.com.pl/pl/search/?search=product&string=${code}`;
+    case 'HappyBrands':
+      // by name: a variant's code may have its product's in front ('605RM/605R01W'), which their search doesn't know
+      return `https://happybrands.promo/searchProduct?name=${encodeURIComponent(name)}&category=0&color=&amount=`;
+    case 'USBSystem':
+      return `https://usbsystem.pl/?s=${stripUsbSizes(name).replace(' ', '+')}&post_type=product`;
+    default:
+      throw new Error('Company code not supported');
+  }
+}
+
+// opened in a new tab: our product in its editor, the supplier's search for it
+export const openProduct = (item) => window.open(`/admin/produkty/${item.slug}`, '_blank', 'noreferrer');
+export const openApi = (company, code, name) => window.open(apiSearchUrl(company, code, name), '_blank', 'noreferrer');

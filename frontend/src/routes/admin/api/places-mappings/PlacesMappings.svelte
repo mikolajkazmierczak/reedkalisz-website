@@ -7,7 +7,10 @@
   import Arrow from '../mappings/Arrow.svelte';
   import HeadIcon from '@c/table/HeadIcon.svelte';
   import Panel from '../mappings/Panel.svelte';
+  import ProductsButton from '../mappings/ProductsButton.svelte';
   import Grid from '@c/table/Grid.svelte';
+  import { savedRules } from '../mappings/savedRules.js';
+  import { groupItems } from '../items.js';
   import { countHits, matchRule, normal, placeCounts, placeWins, translatePlace, uselessRules } from '../places.js';
 
   export let apiCompany;
@@ -23,17 +26,14 @@
   $: unsaved = diffSync(rules, rulesOriginal).changed;
 
   $: places = placeCounts(apiItems);
-  // once per company, after `places` (the rules are sorted by what they translate): a store update (even the echo of
-  // a save) mustn't wipe the edits (a new scan remounts this)
-  let loadedId;
-  $: if (apiCompany.id !== loadedId) {
-    loadedId = apiCompany.id;
-    load(places);
-  }
+  // loaded once per company, someone else's save loaded quietly or asked about (see savedRules.js); a new scan remounts
+  // this. After `places` (named in the statement): the rules are sorted by what they translate
+  const saved = savedRules('api_places_mappings', { load: (list) => load(list, places), unsaved: () => unsaved });
+  $: (places, saved.follow(apiCompany));
 
-  function load(places) {
+  function load(list, places) {
     // the rules translating the most places first; the order doesn't change what they do
-    const loaded = (apiCompany.api_places_mappings ?? []).map(({ pattern, to }) => ({ _uid: uid(10), pattern, to }));
+    const loaded = list.map(({ pattern, to }) => ({ _uid: uid(10), pattern, to }));
     const hits = countHits(placeWins(loaded, places));
     loaded.sort((a, b) => (hits.get(b) ?? 0) - (hits.get(a) ?? 0));
     rulesOriginal = loaded;
@@ -45,7 +45,9 @@
     return { place, count, rule, translated: rule ? normal(rule.to) : place.trim() };
   });
   $: wins = placeWins(rules, places);
-  $: hits = countHits(wins);
+  // the products with each place, and so each rule's: the ones with a place it translates
+  $: byPlace = groupItems(apiItems, (i) => (i._labelings ?? []).map((l) => (l.label ?? '').trim()).filter(Boolean));
+  const productsOf = (rule, wins, byPlace) => [...new Set((wins.get(rule) ?? []).flatMap((p) => byPlace.get(p) ?? []))];
   $: useless = uselessRules(rules, wins);
   $: untranslated = results.filter((r) => !r.rule);
   $: patterns = rules.map((r) => r.pattern?.trim().toLowerCase()).filter(Boolean);
@@ -75,26 +77,30 @@
   }
 
   async function save() {
+    if (!(await saved.check(apiCompany))) return;
     const kept = rules.filter((r) => r.pattern?.trim());
     const data = kept.map(({ _uid, ...rule }) => rule);
     await api.items('companies').updateOne(apiCompany.id, { api_places_mappings: data.length ? data : null });
     heimdall.emit('companies', apiCompany.id);
+    saved.set(data, { show: false }); // in the order they're shown, not sorted again
     rules = kept;
     rulesOriginal = deep.copy(kept);
   }
 
   function cancel() {
     rules = deep.copy(rulesOriginal);
+    saved.dropped();
   }
 </script>
 
-<Panel title="Mapowanie miejsc znakowań" {unsaved} on:save={save} on:cancel={cancel}>
-  <svelte:fragment slot="summary">
-    {#if places.length}
-      <small>Przetłumaczono <b>{results.length - untranslated.length}</b> / {results.length}</small>
-    {/if}
-  </svelte:fragment>
-
+<Panel
+  title="Mapowanie miejsc znakowań"
+  stats={places.length
+    ? [{ label: 'Przetłumaczone', done: results.length - untranslated.length, total: results.length }]
+    : []}
+  {unsaved}
+  on:save={save}
+  on:cancel={cancel}>
   <!-- the hints as one block, the places under their label (see Panel) -->
   <div class="legend">
     <small class="muted"
@@ -104,8 +110,7 @@
         <span class="key key--grey">Wyszarzone</span> są przetłumaczone bezpośrednio.
         <span class="key">Niebieskie</span> są przetłumaczone, bo jakaś reguła zawiera część ich tekstu.
       </small>
-      <small
-        ><span class="key key--orange">Pomarańczowe</span> nie są przetłumaczone, więc zostaną dodane w oryginale.</small>
+      <small><span class="key key--yellow">Żółte</span> nie są przetłumaczone, więc zostaną dodane w oryginale.</small>
     {/if}
   </div>
 
@@ -119,7 +124,7 @@
       <div class="chips">
         {#each shownPlaces as { place, count, rule } (place)}
           {@const exact = patterns.includes(place.toLowerCase())}
-          <Button size="sm" disabled={exact} tone={!rule && !exact ? 'warning' : null} on:click={() => add(place)}>
+          <Button size="sm" disabled={exact} tone={!rule && !exact ? 'note' : null} on:click={() => add(place)}>
             {place} <span class="count">({count})</span>
           </Button>
         {/each}
@@ -144,17 +149,17 @@
     <div class="beside">
       <div class="columns">
         <Grid
-          columns="1.5rem minmax(8rem, 16rem) 3.5rem 1.5rem minmax(8rem, 16rem)"
+          columns="1.5rem minmax(8rem, 16rem) 4.5rem 1.5rem minmax(8rem, 16rem)"
           empty={rules.length ? null : 'Brak reguł. Miejsca zaimportują się tak, jak podaje je API.'}>
           <svelte:fragment slot="head">
             <HeadIcon icon="delete" label="Usuwanie" />
             <span>Miejsce (zawiera)</span>
-            <span class="hits">Dopasowania</span>
+            <span class="products-head">Produkty</span>
             <span />
             <span>U nas</span>
           </svelte:fragment>
           {#each rules as rule (rule._uid)}
-            {@const count = hits.get(rule) ?? 0}
+            {@const products = productsOf(rule, wins, byPlace)}
             <div class="row">
               {#if useless.has(rule)}
                 {@const instead = useless.get(rule)}
@@ -165,7 +170,12 @@
               {/if}
               <Button size="sm" dangerous icon="delete" on:click={() => remove(rule._uid)} />
               <Input size="small" bind:value={rule.pattern} placeholder="z API" />
-              <span class="hits" class:zero={!count} title="Dopasowania">{count}</span>
+              <!-- the products with a place it translates; red when it translates none -->
+              <ProductsButton
+                company={apiCompany}
+                items={products}
+                title="{rule.pattern || '—'} → {rule.to || '—'}"
+                tone={products.length ? 'mapped' : 'unmapped'} />
               <Arrow />
               <Input size="small" bind:value={rule.to} placeholder="tłumaczenie" />
             </div>
@@ -199,15 +209,6 @@
     font-weight: normal;
   }
 
-  .hits {
-    font-size: 0.85rem;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    color: var(--grey-500);
-  }
-  .hits.zero {
-    color: var(--red-500);
-  }
   /* over its rule, the whole row (as the labelings' mappings) */
   .useless {
     grid-column: 1 / -1;

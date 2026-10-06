@@ -1,5 +1,6 @@
 <script>
   import { onDestroy } from 'svelte';
+  import { grow } from '@/grow';
   import api from '$/api';
   import heimdall from '$/heimdall';
   import { SearchParams, searchparams } from '$/searchparams';
@@ -1023,7 +1024,7 @@
 <!-- the page doesn't scroll, the list does (see .ui-fill) -->
 <div class="ui-fill">
   <!-- one bar, two rows: the companies and the scan, then the list's sorting -->
-  <div class="bars ui-snap">
+  <div class="bars ui-bars ui-snap">
     {#if supportedCompanies && selectedCompany}
       <CompanyBar
         companies={supportedCompanies}
@@ -1045,25 +1046,28 @@
       </CompanyBar>
     {/if}
     {#if !fetching && selectedCompany}
-      <hr class="bars-divider" />
+      <hr class="bars-divider ui-bars-divider" />
       <!-- the sorting (and adding what's picked) under the companies, the line between them; the company's discount
            and last scan even before its first scan -->
       <Bar>
         {#if mergedItems && $colors}
           {#if selectedCount.all}
-            <span class="ui-lead">
-              <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
-                {uploading ? 'Importowanie...' : 'Importuj'}
-              </Button>
-            </span>
-            <!-- what's picked, a number and its label on each line (the labels like the last scan's at the bar's end) -->
-            <div class="ui-counts">
-              <span class="ui-stat-value">{selectedCount.items}</span>
-              <span class="ui-stat-label">Produkty</span>
-              <span class="ui-stat-value">{selectedCount.storages}</span>
-              <span class="ui-stat-label">Warianty</span>
+            <!-- coming in together, as the mappings' Zapisz (see grow) -->
+            <div class="importing" transition:grow>
+              <span class="ui-lead">
+                <Button disabled={uploading} icon={uploading ? 'api' : 'add'} on:click={upload}>
+                  {uploading ? 'Importowanie...' : 'Importuj'}
+                </Button>
+              </span>
+              <!-- what's picked, a number and its label on each line (the labels like the last scan's at the bar's end) -->
+              <div class="ui-counts">
+                <span class="ui-stat-value">{selectedCount.items}</span>
+                <span class="ui-stat-label">Produkty</span>
+                <span class="ui-stat-value">{selectedCount.storages}</span>
+                <span class="ui-stat-label">Warianty</span>
+              </div>
+              <span class="ui-divider" />
             </div>
-            <span class="ui-divider" />
           {/if}
           {#if retiredCount}
             <!-- deletes the retired products and variants (the confirmation says how many) -->
@@ -1174,23 +1178,11 @@
 {/if}
 
 <style>
-  /* the two bars as one: its frame theirs, a line between them */
-  .bars {
-    margin-bottom: var(--page-pad);
-    border-radius: var(--box-radius);
-    corner-shape: squircle;
-    border: var(--border-light);
-    background-color: var(--paper);
-    box-shadow: var(--shadow);
-  }
-  /* each bar less the frame's lines (the frame is theirs) and the 1px it sits inside its slot: the companies' bar two
-     cells; with the sorting's under it (a cell and a half, see below) and the line between them, three and a half */
+  /* the two bars in one frame (see .ui-bars), each less the frame's lines and the 1px it sits inside its slot: the
+     companies' bar two cells; with the sorting's under it (a cell and a half, see below) and the line between them,
+     three and a half */
   .bars > :global(.ui-bar) {
-    margin: 0;
     min-height: calc(2 * var(--cell) - 3px);
-    border: none;
-    background: none;
-    box-shadow: none;
   }
   /* the sorting's bar: Importuj and its counts as close as in the image review (see Modal's bar); a cell and a half
      tall (less the frame's line and the one between them) - small buttons, the discount and Importuj fit in it - so the
@@ -1199,11 +1191,6 @@
     min-height: calc(1.5 * var(--cell) - 3px);
     padding-block: 0;
     column-gap: 0.5rem;
-  }
-  .bars-divider {
-    margin: 0 0.5rem 2px; /* (3px with its line: what the two bars gave up for the frame and the slot) */
-    border: none;
-    border-top: var(--border-light);
   }
   /* at the other end of the sorting's bar, its two lines no taller than the bar */
   .stats {
@@ -1249,6 +1236,12 @@
   }
   .warning {
     color: var(--red-500);
+  }
+  /* Importuj, its counts and the line after them, as far apart as the bar's parts */
+  .importing {
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
   }
   .sorting {
     display: flex;

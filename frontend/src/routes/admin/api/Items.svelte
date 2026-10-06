@@ -8,6 +8,7 @@
   import { itemHealth } from './health.js';
   import { selected, toggleItemSelected, toggleStorageSelected } from './selected.js';
   import { getFlag, parseColors } from './utils.js';
+  import { cloudOf, openApi, openProduct } from './items.js';
 
   import Icon from '$c/Icon.svelte';
   import Button from '@c/Button.svelte';
@@ -108,9 +109,7 @@
     if (deleted.length) heimdall.emit('directus_files', deleted);
   }
 
-  const openProduct = (item) => window.open(`/admin/produkty/${item.slug}`, '_blank', 'noreferrer');
-  // the supplier's search, also for what the api no longer has (their "not found" confirms it's gone)
-  const openApi = (code, name) => window.open(getApiUrl(code, name), '_blank', 'noreferrer');
+  const openApiOf = (code, name) => openApi(company, code, name);
 
   async function toggleVisible(item) {
     item.enabled = !item.enabled;
@@ -146,38 +145,6 @@
       await removeFiles((storage.img ?? []).map((i) => i.img));
     }
   }
-
-  function stripUsbSizes(input) {
-    if (typeof input !== 'string') return input;
-    return input.replace(/\s*\d+(?:\.\d+)?\s*[GT]B(?:\s*\/\s*\d+(?:\.\d+)?\s*[GT]B)*\s*$/i, '').trim();
-  }
-
-  function getApiUrl(code, name) {
-    switch (company.name) {
-      case 'PAR':
-        return `https://www.par.com.pl/products?search=${code}`;
-      case 'MidOcean':
-        return `https://www.midocean.com/INTERSHOP/web/WFS/midocean-PL-Site/pl_PL/-/PLN/ViewParametricSearchBySearchIndex-Browse?SearchTerm=${code}`;
-      case 'BlueCollection':
-        return `https://bluecollection.gifts/pl/${code.split('-')[0]}.html`;
-      case 'EasyGifts':
-        return `https://www.easygifts.com.pl/search.php?dosearch=1&query=${code}`;
-      case 'Macma':
-        return `https://macma.pl/search.php?dosearch=1&query=${code}`;
-      case 'Promotionway':
-        return `https://promotionway.pl/search.php?query=${code}`;
-      case 'AXPOL':
-        return `https://axpol.com.pl/pl/search/?search=product&string=${code}`;
-      case 'HappyBrands':
-        // by name: a variant's code may have its product's in front ('605RM/605R01W'), which their search doesn't know
-        return `https://happybrands.promo/searchProduct?name=${encodeURIComponent(name)}&category=0&color=&amount=`;
-      case 'USBSystem':
-        const productName = stripUsbSizes(name).replace(' ', '+');
-        return `https://usbsystem.pl/?s=${productName}&post_type=product`;
-      default:
-        throw new Error('Company code not supported');
-    }
-  }
 </script>
 
 <!-- the number's 2rem fits 4 digits: no supplier has 10,000 products -->
@@ -202,18 +169,7 @@
   </svelte:fragment>
 
   {#each items as item}
-    {@const itemNotAllInApi = item.storage.some((s) => !s._api)}
-    {@const itemNotInApi = item.storage.every((s) => !s._api) || !item._api}
-    {@const itemHasNew = item._db && item.storage.some((s) => !s._db)}
-    {@const [cloudTone, cloudTitle] = itemNotInApi
-      ? ['danger', 'Wycofany']
-      : itemNotAllInApi && itemHasNew
-        ? ['split', 'Wycofane i nowe kolory']
-        : itemNotAllInApi
-          ? ['warning', 'Wycofane kolory']
-          : itemHasNew
-            ? ['new', 'Nowe kolory']
-            : ['success', 'Dostępny']}
+    {@const cloud = cloudOf(item)}
     {@const itemSelected = $selected.has(item._uid)}
     {@const itemExpanded = expanded.has(item._uid)}
     {@const itemCompatible = !item?._incompatible}
@@ -240,10 +196,10 @@
       <span class="index">{item._index + 1}</span>
       <Button
         size="sm"
-        icon={itemNotInApi ? 'cloud_off' : 'cloud'}
-        tone={cloudTone}
-        title={cloudTitle}
-        on:click={() => openApi(item.code, item.name)} />
+        icon={cloud.icon}
+        tone={cloud.tone}
+        title={cloud.title}
+        on:click={() => openApiOf(item.code, item.name)} />
       <span class="expand">
         {#if item.storage.length}
           <Button size="sm" dashed width="100%" on:click={() => toggleExpanded(item._uid)}>
@@ -331,7 +287,7 @@
             icon={storage._api ? 'cloud' : 'cloud_off'}
             tone={storage._api ? 'success' : 'danger'}
             title={storage._api ? 'Dostępny' : 'Wycofany'}
-            on:click={() => openApi(storage.api_color_code ?? item.code, item.name)} />
+            on:click={() => openApiOf(storage.api_color_code ?? item.code, item.name)} />
           <span />
           <span>
             {#if storage._db}

@@ -5,6 +5,7 @@
   import Input from '@c/Input.svelte';
   import Button from '@c/Button.svelte';
   import Arrow from '../mappings/Arrow.svelte';
+  import ProductsButton from '../mappings/ProductsButton.svelte';
   import Target from './Target.svelte';
   import Thresholds from './Thresholds.svelte';
 
@@ -20,6 +21,7 @@
   export let mappings;
   export let mapping;
   export let useless = false; // see uselessRules
+  export let items = []; // the scan's products with the code
 
   // the code is set when the rule is added (from the list of api codes) and never edited afterwards
   $: codeMissing = !apiCodes.includes(mapping.code);
@@ -53,6 +55,16 @@
 
   <div class="c-remove"><Button size="sm" dangerous square icon="delete" on:click={remove} /></div>
   <div class="c-code" class:missing={apiCodes.length && codeMissing}>{mapping.code || '—'}</div>
+  <!-- before the arrow, on the rule's first line (under its message: the cells after it run on over the thresholds'
+       lines); red when the rule won't work (see `broken`), a yellow X when it leaves the code out -->
+  <div class="c-products" style:grid-row={broken.length || useless ? 2 : 1}>
+    <ProductsButton
+      company={apiCompany}
+      {items}
+      title="Znakowanie {mapping.code}"
+      tone={broken.length ? 'unmapped' : 'mapped'}
+      ignored={mapping.type === 'ignore' ? 'Nie importuj: to znakowanie nie trafia na produkty.' : null} />
+  </div>
   <div class="c-type"><Input size="small" type="select" label="Typ" bind:value={mapping.type} options={types} /></div>
 
   {#if mapping.type === 'ignore'}
@@ -89,6 +101,9 @@
     color: var(--red-500);
     text-decoration: line-through;
   }
+  .c-products {
+    grid-column: 6;
+  }
   .c-type {
     grid-column: 3;
   }
@@ -98,11 +113,11 @@
     color: var(--grey-300);
   }
   .c-arrow {
-    grid-column: 6;
+    grid-column: 7;
     place-self: center;
   }
   .c-target.ignored {
-    grid-column: 7;
+    grid-column: 8;
     font-size: 0.9rem;
     color: var(--grey-500);
   }

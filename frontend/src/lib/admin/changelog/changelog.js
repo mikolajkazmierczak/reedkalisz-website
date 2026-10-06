@@ -25,6 +25,59 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.29.0',
+    date: '2026-10-06',
+    title: 'Bezpieczny zapis i mapowania',
+    highlight: [
+      'Gdy dwie osoby pracują nad tym samym, panel **nie nadpisze już po cichu cudzych zmian**: jeśli ktoś zapisał to w międzyczasie, pyta w oknie **„Uwaga!”**, czy wczytać cudzą wersję, czy zostawić swoją. Bez niezapisanych zmian cudza wersja wczytuje się sama.',
+      'W zakładkach API Kategorie, Znakowania i Miejsca **liczby produktów są przyciskami** z listą tych produktów, a kolor przycisku mówi, co się z nimi stanie.',
+      'Nowy wiersz **„BEZ KATEGORII”** pozwala zmapować produkty bez kategorii u producenta, a „Zapisz” jest w pasku u góry, który zostaje przy przewijaniu.',
+    ],
+    all: [
+      {
+        label: 'Zapisywanie',
+        items: [
+          'Przed zapisem panel sprawdza, czy ktoś inny nie zapisał tego samego w międzyczasie; jeśli tak, zamiast zapisu pokazuje okno „Uwaga!”.',
+          'Dotyczy to edytorów (produkty, kategorie, kolory, strony, fragmenty, paragrafy, zapytania), zakładek API Kategorie, Znakowania i Miejsca oraz tabeli znakowań w Kalkulacjach.',
+          '„Rozumiem” zostawia Twoje zmiany, a kolejne „Zapisz” zapisuje je na wierzch cudzych.',
+          '„Odśwież” wczytuje zapisaną wersję po potwierdzeniu w okienku „Na pewno?”, bo niezapisane zmiany przepadają.',
+          'Gdy ktoś zapisze to, co masz otwarte, a Ty nie masz niezapisanych zmian, nowa wersja wczytuje się sama, bez pytania.',
+          'Ostrzeżenie pokazuje się też o zmianach zapisanych w innej karcie panelu przez tę samą osobę.',
+          'Po powrocie połączenia, np. po wybudzeniu komputera, panel sam wczytuje zmiany zapisane w tym czasie.',
+          'Poprawka: w tabeli znakowań w Kalkulacjach cudzy zapis nie kasuje już po cichu Twoich niezapisanych zmian.',
+        ],
+      },
+      {
+        label: 'API – mapowania',
+        items: [
+          'W zakładce Kategorie liczba produktów przy kategorii producenta jest przyciskiem z listą tych produktów.',
+          'W zakładce Znakowania nowa kolumna „Produkty”, przed strzałką, pokazuje, ile produktów ma dane znakowanie, a kliknięcie – ich listę.',
+          'W zakładce Miejsca kolumna „Dopasowania” nazywa się „Produkty” i liczy produkty, a nie nazwy miejsc; kliknięcie pokazuje ich listę.',
+          'Lista produktów ma wyszukiwarkę, a przy każdym produkcie: dostępność u producenta (kliknięcie otwiera jego wyszukiwarkę), zdjęcie, nazwę i kod, a na końcu przycisk otwierający nasz produkt, gdy jest zaimportowany.',
+          'Przycisk z liczbą jest szary, gdy produkty mają regułę, żółty, gdy biorą ją z kategorii nadrzędnej, a czerwony, gdy któreś z nich nie dostaną naszej kategorii albo reguła nie zadziała.',
+          'Żółty krzyżyk przed liczbą oznacza produkty celowo pomijane („ignoruj”, „Nie importuj”); po najechaniu widać wyjaśnienie.',
+          'Nowy wiersz „BEZ KATEGORII” na górze zakładki Kategorie: produkty bez kategorii u producenta można zmapować jak każdą kategorię.',
+          'Tytuł mapowania z licznikami jest osobnym paskiem pod paskiem producentów i zostaje u góry podczas przewijania.',
+          '„Anuluj” i „Zapisz” są na początku tego paska, a nie pod tabelą.',
+          'Liczniki stoją przed tytułem, oddzielone kreską, jak „Produkty” i „Warianty” przy „Importuj”.',
+          'W Znakowaniach licznik „Znakowania” (dawniej „Zmapowano”) liczy też znakowania przypisywane według kodu, a nowy licznik „Produkty” – produkty, których wszystkie znakowania się zaimportują.',
+          'Zmapowane kategorie producenta nie są już pogrubione, a nazwy bez strzałki zaczynają się tam, gdzie nazwy ze strzałką.',
+          'Poprawka: nagłówki kolumn w tabeli znakowań stoją równo nad komórkami.',
+        ],
+      },
+      {
+        label: 'Wygląd',
+        items: [
+          'Przyciski płynnie przechodzą między stanem włączonym a wyłączonym, np. „Skanuj”.',
+          '„Anuluj” i „Zapisz” w mapowaniach oraz „Importuj” w Produktach wsuwają się płynnie, a reszta paska przesuwa się razem z nimi.',
+          'Wypełnione Notatki produktu mają ten sam jasnożółty kolor co okienka „Marża na…” w cenach produktu.',
+          'W zakładce Miejsca nieprzetłumaczone miejsca są żółte, a nie pomarańczowe.',
+          'Chmurka z numerem nowej wersji („NOWE”) w historii zmian jest żółta, a nie pomarańczowa.',
+        ],
+      },
+    ],
+  },
+  {
     version: '1.28.2',
     date: '2026-10-05',
     title: 'Nowa historia zmian',

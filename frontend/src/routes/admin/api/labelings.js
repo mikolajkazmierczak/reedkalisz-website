@@ -41,10 +41,11 @@ export function resolveMapping(selectedCompany, mappings, apiCode, apiItem, area
 
   const { type, data } = mapping;
   if (type === 'ignore') return null;
-  if (type === 'direct') return { company: data.company, code: data.code };
+  // (a rule being edited can have the old type's data for one update - Mapping.svelte switches it -: nothing yet)
+  if (type === 'direct') return data && !Array.isArray(data) ? { company: data.company, code: data.code } : null;
 
   const value = type === 'price' ? apiItem.price : area;
-  const threshold = chooseThreshold(value, data);
+  const threshold = Array.isArray(data) ? chooseThreshold(value, data) : null;
   if (!threshold) {
     warn(`No threshold for "${apiCode}" (for ${type} "${value}").`);
     return null;

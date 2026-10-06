@@ -15,11 +15,12 @@
   let item;
   let itemOriginal;
 
-  async function read() {
-    if (id == '+') {
+  // (`itemId`: the item already open, read again - a new one's url still says '+')
+  async function read(itemId = id) {
+    if (itemId == '+') {
       item = defaults();
     } else {
-      item = await api.items('commercial_details').readOne(id, { fields });
+      item = await api.items('commercial_details').readOne(itemId, { fields });
     }
     itemOriginal = item ? deep.copy(item) : null;
   }
@@ -38,7 +39,8 @@
   collection="commercial_details"
   removable={!!itemOriginal?.date_created}
   bind:item
-  bind:itemOriginal>
+  bind:itemOriginal
+  reload={read}>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">

@@ -50,7 +50,9 @@
 
   $: parseData(data);
 
-  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
+  let changed = false; // (savable or not: see Editor's `edited`)
+  $: diff(item, itemOriginal, { editorPreset: true }).then((r) => {
+    changed = r.changed;
     unsaved.set(!dataParsingError && changed);
   });
 </script>
@@ -62,6 +64,8 @@
   collection="fragments"
   bind:item
   bind:itemOriginal
+  reload={read}
+  edited={changed || !!dataParsingError}
   {save}
   {cancel}>
   {#if item}

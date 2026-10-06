@@ -36,7 +36,7 @@
   import Button from '@c/Button.svelte';
   import { changelog, version } from './changelog.js';
 
-  // Every version, newest first; the ones out since the changelog was last seen here with their version pills in orange
+  // Every version, newest first; the ones out since the changelog was last seen here with their version pills in yellow
   // (`seen`: that version, see Nav). Closing it counts as seen.
   export let seen = readSeen();
   const dispatch = createEventDispatcher();
@@ -60,7 +60,7 @@
   <div class="list">
     {#each changelog as { version: v, date: d, title, highlight, all }}
       <section>
-        <!-- the version in a pill (orange when out since the changelog was last seen here), the title, the date -->
+        <!-- the version in a pill (yellow when out since the changelog was last seen here), the title, the date -->
         <h4>
           <span class="version" class:new={isNew(v)}>{isNew(v) ? 'NOWE · ' : ''}v{v}</span>
           <span class="title">{title}</span>
@@ -119,7 +119,7 @@
     row-gap: 0.25rem;
     margin-bottom: 0.15rem;
   }
-  /* blue, orange when it's out since the changelog was last seen (as the global margins' pill) */
+  /* blue, the optional boxes' yellow when it's out since the changelog was last seen */
   .version {
     padding: 0.1rem 0.55rem;
     border-radius: 1rem;
@@ -131,8 +131,8 @@
     background-color: var(--blue-100);
   }
   .version.new {
-    color: var(--orange-500);
-    background-color: var(--orange-100);
+    color: var(--orange-700);
+    background-color: var(--ply-yellow);
   }
   .title {
     font-size: 1.05rem;

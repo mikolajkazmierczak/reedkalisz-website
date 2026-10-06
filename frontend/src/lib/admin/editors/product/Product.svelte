@@ -89,13 +89,14 @@
     }
   }
 
-  async function read() {
+  // `id`: the item already open, read again (its slug may have changed, a new one's url still says '+')
+  async function read(id = null) {
     await globals.update(companies);
     await globals.update(commercialDetails);
     await globals.update(categories);
     await globals.update(labelings);
 
-    if (slug == '+') {
+    if (id == null && slug == '+') {
       item = defaults();
       // every product has a company: the one the list was narrowed to, or REED
       const picked = $companies.find((c) => c.id == searchParams.producent);
@@ -103,7 +104,7 @@
       // add category from search params
       if (searchParams.c != null) item.categories = [...item.categories, { category: searchParams.c }];
     } else {
-      const filter = { slug: { _eq: slug } };
+      const filter = id != null ? { id: { _eq: id } } : { slug: { _eq: slug } };
       item = (await api.items('products').readByQuery({ fields, filter })).data[0];
       // shown in their order (see order.js) from the start - one saved before it had it is saved in it next time
       if (item) {
@@ -245,11 +246,13 @@
   // on gets its prices switched on), and a look before that saw changes that weren't there (switched off and on again)
   $: checkUnsaved(item, itemOriginal, errors.materials, correctSlug);
   let checking = 0;
+  let changed = false; // (savable or not: see Editor's `edited`)
   async function checkUnsaved(item, itemOriginal, materialsError, correctSlug) {
     const run = ++checking;
     await tick();
-    const { changed } = await diff(item, itemOriginal, { editorPreset: true });
+    const result = await diff(item, itemOriginal, { editorPreset: true });
     if (run !== checking) return; // a newer look is on its way
+    changed = result.changed;
     unsaved.set(!materialsError && correctSlug && item.company != null && changed);
   }
 </script>
@@ -262,6 +265,8 @@
   collection="products"
   bind:item
   bind:itemOriginal
+  reload={read}
+  edited={changed}
   removable={!!itemOriginal?.date_created}
   {remove}
   {save}>
@@ -548,8 +553,9 @@
   .notes > :global(.wrapper textarea) {
     flex: 1;
   }
+  /* the optional boxes' yellow (as the product's own margins) */
   .admin-notes-filled {
-    background-color: var(--yellow-100);
+    background-color: var(--ply-yellow);
   }
   /* the spinner as big as the icon it stands in for */
   .icon :global(svg) {

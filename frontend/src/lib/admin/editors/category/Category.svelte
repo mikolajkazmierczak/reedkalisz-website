@@ -31,15 +31,16 @@
   let deleting = false; // prevent double click
   let deletingSwapId = null; // id of the category that is being swapped with the one being deleted
 
-  async function read() {
+  // `id`: the item already open, read again (its slug may have changed, a new one's url still says '+')
+  async function read(id = null) {
     await globals.update(categories);
-    if (slug == '+') {
+    if (id == null && slug == '+') {
       item = defaults();
       // add parent and index from search params
       if (searchParams.parent != null) item.parent = searchParams.parent;
       if (searchParams.index != null) item.index = searchParams.index;
     } else {
-      const filter = { slug: { _eq: slug } };
+      const filter = id != null ? { id: { _eq: id } } : { slug: { _eq: slug } };
       item = (await api.items('categories').readByQuery({ fields, filter })).data[0];
     }
     itemOriginal = item ? deep.copy(item) : null;
@@ -103,7 +104,9 @@
     });
   $: correctSlug = item && !['+', ''].includes(item.slug);
 
-  $: diff(item, itemOriginal, { editorPreset: true }).then(({ changed }) => {
+  let changed = false; // (savable or not: see Editor's `edited`)
+  $: diff(item, itemOriginal, { editorPreset: true }).then((r) => {
+    changed = r.changed;
     unsaved.set(correctSlug && changed);
   });
 </script>
@@ -137,7 +140,9 @@
   removable={!!itemOriginal?.date_created}
   remove={removeFromBar}
   bind:item
-  bind:itemOriginal>
+  bind:itemOriginal
+  reload={read}
+  edited={changed}>
   {#if item}
     <section class="ui-section">
       <div class="ui-section__row">

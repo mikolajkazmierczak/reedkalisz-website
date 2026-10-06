@@ -14,15 +14,7 @@ export function itemHealth(company, apiItem, { labelings, index, withCategories 
   const red = [];
   const orange = [];
 
-  const rules = company.api_labelings_mappings ?? [];
-  const lost = new Set();
-  for (const { techniques = [], area } of apiItem._labelings ?? []) {
-    for (const code of techniques) {
-      if (rules.find((r) => r.code === code)?.type === 'ignore') continue;
-      const resolved = resolveMapping(company, rules, code, apiItem, area, () => {});
-      if (!resolved || !findLabeling(labelings, resolved.company, resolved.code)) lost.add(code);
-    }
-  }
+  const lost = lostLabelings(company, company.api_labelings_mappings ?? [], apiItem, labelings);
   if (lost.size) red.push(`Znakowania, które się nie zaimportują: ${[...lost].join(', ')}`);
 
   if (withCategories && !resolveCategories(company.api_categories_mappings, apiItem._categories, index).length) {
@@ -40,6 +32,19 @@ export function itemHealth(company, apiItem, { labelings, index, withCategories 
   if (red.length) return { level: 'red', notes: [...red, ...orange] };
   if (orange.length) return { level: 'orange', notes: orange };
   return null;
+}
+
+// a product's labeling codes that won't be imported with these rules ("ignoruj" ones leave a code out on purpose)
+export function lostLabelings(company, rules, apiItem, labelings) {
+  const lost = new Set();
+  for (const { techniques = [], area } of apiItem._labelings ?? []) {
+    for (const code of techniques) {
+      if (rules.find((r) => r.code === code)?.type === 'ignore') continue;
+      const resolved = resolveMapping(company, rules, code, apiItem, area, () => {});
+      if (!resolved || !findLabeling(labelings, resolved.company, resolved.code)) lost.add(code);
+    }
+  }
+  return lost;
 }
 
 // each product's level, for sorting by it (`item._scan`: the scan's product, see items.js merge) -> item -> level

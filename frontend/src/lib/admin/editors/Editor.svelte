@@ -1,11 +1,13 @@
 <script>
   import { goto } from '$app/navigation';
+  import { tick } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
 
   import heimdall from '$/heimdall';
+  import api from '$/api';
   import { unsaved } from '@/stores';
-  import { editedElsewhere } from '@/dialog';
+  import { overwriteGuard } from '@/overwrite';
   import Icon from '$c/Icon.svelte';
   import BarButton, { barIconStroke } from '@c/BarButton.svelte';
   import Mat from '@c/Mat.svelte';
@@ -42,6 +44,10 @@
   export let cancel = async (action) => await action();
   export let remove = async (action) => await action();
   export let removable = false; // shows the delete button in the bar (pass it once the item exists)
+  // reads the item again by its id (the editor's own read): someone else's save is loaded with it, see overwrite.js
+  export let reload = null;
+  // edits made, savable or not ($unsaved is only the savable ones): someone else's save asks instead of wiping them
+  export let edited = false;
 
   function checkCollection() {
     if (collection == null) throw new Error('Collection name was not provided to the Editor instance');
@@ -51,13 +57,46 @@
     goto(root, { noScroll: true });
   }
 
+  // someone else's save of this item: its `date_updated` against the one loaded (an editor without `reload`, or an item
+  // without the field - a file - isn't checked); loaded, the url follows a slug they renamed
+  const key = (it) => it?.slug ?? it?.id;
+  const guard = overwriteGuard({
+    loaded: () => itemOriginal?.date_updated,
+    unsaved: () => edited || $unsaved,
+    reload: async () => {
+      const before = key(itemOriginal);
+      await reload(item.id);
+      unsaved.set(false); // (the edits went with the reload: the url following a rename isn't a leave, see editing.save)
+      await tick(); // (the editor's new item is bound down here with its update)
+      if (itemOriginal) editing.follow(root, before, key(itemOriginal));
+    },
+  });
+  $: checked =
+    !!reload && !!collection && item?.id != null && item.id !== '+' && itemOriginal?.date_updated !== undefined;
+  // the saved `date_updated` (null when never updated), undefined when the item is gone; a failed read throws
+  const stamp = async () => {
+    const filter = { id: { _eq: item.id } };
+    const { data } = await api.items(collection).readByQuery({ fields: ['date_updated'], filter, limit: 1 });
+    return data.length ? data[0].date_updated : undefined;
+  };
+  async function recheck() {
+    if (!checked || saving) return;
+    const current = await stamp().catch(() => undefined); // (unreadable, or deleted: nothing to load)
+    if (current !== undefined) await guard.seen(current);
+  }
+
   let saving = false;
   async function handleSave() {
     if (saving) return; // a second click would create a new item twice
     saving = true;
     try {
+      if (checked) {
+        const current = await stamp();
+        if (current !== undefined && !(await guard.check(current))) return; // (deleted: the save says so)
+      }
       await save(async () => {
         [item, itemOriginal] = await editing.save(collection, item, itemOriginal, { root });
+        guard.reset();
       });
     } finally {
       saving = false;
@@ -66,7 +105,9 @@
 
   async function handleCancel() {
     await cancel(async () => {
+      const before = item;
       [item, itemOriginal] = await editing.cancel(item, itemOriginal, { root });
+      if (checked && item !== before) await guard.dropped(); // (confirmed: a version accepted to save over loads)
     });
   }
 
@@ -80,9 +121,10 @@
 
   $: if ($unsaved) checkCollection();
 
-  heimdall.listen(({ match, me }) => {
-    if (collection && item?.id != null && item.id !== '+' && match(collection, item.id) && !me) editedElsewhere();
+  heimdall.listen(({ match, mine }) => {
+    if (checked && match(collection, item.id) && !mine) recheck();
   });
+  heimdall.reconnected(recheck);
 </script>
 
 <svelte:head>

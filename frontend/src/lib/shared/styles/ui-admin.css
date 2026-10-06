@@ -94,6 +94,7 @@
   --purple-700: #6604c2; /* transport (T, TP) in the labelings, as in the pricing infographic */
 
   --yellow-100: #fbeca2; /* the API's "Do edycji" */
+  --yellow-500: #d39e00; /* left out by choice, not a mistake: the X of an ignored category or labeling */
 
   --red-50: #f6e2e4; /* the API's "Ma zamiennik": paler than "Odrzucony" */
   --red-100: #efc5ca; /* danger, an error */
@@ -388,6 +389,30 @@ span.ui-add.ui-add--side > button svg {
   width: 1px;
   height: var(--control);
   background-color: var(--black-10);
+}
+
+/* the API's companies and the tab's own bar under them as one frame, a line between them: a bar in it gives up its own
+   frame for it (Produkty: both; the mapping tabs: the companies' only, the mapping's going on under the frame with its
+   own, to stick by itself - see MappingPage and Panel) */
+.ui-bars {
+  margin-bottom: var(--page-pad);
+  border-radius: var(--box-radius);
+  corner-shape: squircle;
+  border: var(--border-light);
+  background-color: var(--paper);
+  box-shadow: var(--shadow);
+}
+.ui-bars > .ui-bar {
+  margin: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+.ui-bars-divider {
+  flex: none;
+  margin: 0 0.5rem 2px; /* (3px with its line: what the bars gave up for the frame and the slot) */
+  border: none;
+  border-top: var(--border-light);
 }
 
 /* the first button of the API bars (Skanuj beside the companies, Importuj under them): as wide on every tab and in

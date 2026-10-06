@@ -54,7 +54,7 @@
 
 <style>
   .c-target {
-    grid-column: 7;
+    grid-column: 8;
   }
   .missing :global(select) {
     outline: solid 2px var(--red-500);
