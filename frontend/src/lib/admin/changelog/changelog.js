@@ -25,6 +25,15 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.29.3',
+    date: '2026-10-08',
+    title: 'Poprawka godzin',
+    highlight: [
+      'Godziny utworzenia i aktualizacji w **Zapytaniach**, **Paragrafach** i plikach biblioteki oraz **Ostatni skan** w API Produkty były o 2 godziny za wcześnie (zimą o 1) – teraz pokazują czas polski, jak wszędzie indziej.',
+    ],
+    all: [],
+  },
+  {
     version: '1.29.2',
     date: '2026-10-06',
     title: 'Liczniki kategorii',
