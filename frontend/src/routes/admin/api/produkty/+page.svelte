@@ -12,7 +12,7 @@
   import { recalculateProducts, recalculateProductsGenerator } from '@/calculations';
   import { categories, colors, companies, globalMargins, globals, labelings, priceViews } from '@/globals';
   import { categoryIndex, sortCategoryRows } from '@/categories';
-  import { mappedLabelings, syncsCategories, syncsLabelings } from '@/sync';
+  import { labelingTargets, mappedLabelings, syncsCategories, syncsLabelings } from '@/sync';
   import { dequal } from 'dequal';
   import { planCategories, resolveCategories } from '../categories.js';
   import { merge, retiredOf } from '../items.js';
@@ -479,7 +479,10 @@
     const syncCategories =
       syncsCategories(selectedCompany) && categoriesIndex && apiItems.some((i) => i._categories?.length);
     const labelingsChanges = { create: [], remove: [] }; // the updates go into the patches below
-    const labelingTargets = mappedLabelings(selectedCompany, labelingCodes(apiItems));
+    // what the mappings lead to now (saved with the scan for the next one), and with what the last scan led to: the
+    // labelings the scanner manages (see sync.js)
+    const scanTargets = labelingTargets(selectedCompany, labelingCodes(apiItems));
+    const managedTargets = mappedLabelings(selectedCompany, labelingCodes(apiItems));
     const categoriesChanges = { create: [], remove: [] };
     const removedImages = []; // image rows gone from the api
     const removedGallery = []; // (the gallery's)
@@ -537,7 +540,7 @@
           updatedItemsIds.changedDetails.add(dbItem.id);
         }
         if (syncLabelings && apiItem._labelings) {
-          const plan = planLabelings(selectedCompany, dbItem, apiItem, labelingTargets);
+          const plan = planLabelings(selectedCompany, dbItem, apiItem, managedTargets);
           if (plan.create.length || plan.update.length || plan.remove.length) {
             labelingsChanges.create.push(...plan.create);
             labelingsChanges.remove.push(...plan.remove);
@@ -672,7 +675,8 @@
       await request();
       statusLog = `Postęp: ${i + 1}/${requests.length}`;
     }
-    await afterWriting();
+    // (only once they were synced: a scan without any labelings keeps the last scan's)
+    await afterWriting(syncLabelings ? { api_labelings_targets: [...scanTargets].sort() } : {});
     statusLog = null;
 
     const all = new Set(Object.values(updatedItemsIds).flatMap((ids) => [...ids]));
@@ -938,7 +942,10 @@
         return failed(`Nie udało się przygotować skanu do zapisu: ${e.message}`);
       }
     }
-    async function saveScan() {
+    async function saveScan(scanUpdates) {
+      for (const [key, value] of Object.entries(scanUpdates)) {
+        if (!dequal(selectedCompany[key], value)) companyUpdates[key] = value;
+      }
       if (snapshotChanged) {
         const formData = new FormData();
         const fileName = `api_snapshot_${selectedCompany.name.toLowerCase()}.json.gz`;

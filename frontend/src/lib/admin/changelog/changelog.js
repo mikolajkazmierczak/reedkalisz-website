@@ -25,6 +25,22 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.29.4',
+    date: '2026-10-12',
+    title: 'Znakowania po skanie',
+    highlight: [
+      'Skaner sam sprząta znakowania produktów: po dodaniu albo zmianie reguły w **API Znakowania** zamienia stare znakowanie na nowe, a te, których producent już nie podaje, usuwa.',
+    ],
+    all: [
+      'Poprawka: znakowanie producenta, którego kod ma regułę, skan zamienia na znakowanie z reguły albo usuwa, gdy produkt już je ma.',
+      'Poprawka: znakowanie producenta, którego kod jest ignorowany, skan usuwa z produktów.',
+      'Poprawka: po zmianie reguły na inne znakowanie skan zamienia stare na nowe, z marżami, zamiast dodawać nowe obok.',
+      'Znakowanie, którego kodu producent już nie podaje, skan usuwa z produktów.',
+      'Ostrzeżenie „Żadna reguła nie prowadzi już do…” po zapisaniu reguł pojawia się tylko dla znakowań, których skan nie usunie (dodanych przez import po ostatnim skanie).',
+      'W edytorze produktu znakowania, które następny skan zamieni albo usunie, mają już robota i nie da się ich zmienić ręcznie.',
+    ],
+  },
+  {
     version: '1.29.3',
     date: '2026-10-08',
     title: 'Poprawka godzin',

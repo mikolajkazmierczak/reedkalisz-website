@@ -92,8 +92,8 @@
     await deleteFields(data, ['_uid']);
     await api.items('companies').updateOne(apiCompany.id, { api_labelings_mappings: data });
     heimdall.emit('companies', apiCompany.id);
-    // the scanner only removes labelings the rules (or the codes without one) lead to: one no longer led to stays on
-    // the products
+    // the scanner only removes labelings the rules (or the api's codes) lead to, or the last scan led to: one the last
+    // scan didn't write (an import did) and no longer led to stays on the products
     const led = (list) => mappedLabelings({ ...apiCompany, api_labelings_mappings: list }, apiCodes);
     const before = led(mappingsOriginal);
     const after = led(data);
