@@ -25,6 +25,19 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.29.5',
+    date: '2026-10-12',
+    title: 'Enter w prawo',
+    highlight: [
+      'W **Kalkulacjach > Znakowania** można wybrać, dokąd Enter przechodzi po edycji komórki: przyciski na początku paska, przed producentami – wybrany pokazuje **ENTER ↓** albo **ENTER →**. Domyślnie, jak dotąd, w dół; wybór zostaje zapamiętany w tej przeglądarce.',
+    ],
+    all: [
+      'Na początku paska z producentami w Kalkulacje > Znakowania są przyciski ↓ i →: wybrany pokazuje „ENTER”, a kliknięcie drugiego zmienia kierunek.',
+      'Przy Enterze w prawo Shift+Enter cofa w lewo, a w ostatniej komórce wiersza Enter zostaje w niej, tak jak w dół zostaje w ostatnim wierszu.',
+      'Przy Enterze w prawo po ostatnim nakładzie w nagłówku Enter przechodzi na przycisk „Dodaj nakład”.',
+    ],
+  },
+  {
     version: '1.29.4',
     date: '2026-10-12',
     title: 'Znakowania po skanie',

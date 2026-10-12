@@ -1,20 +1,10 @@
 <script context="module">
+  import { readMemo, writeMemo } from '$/memo';
+
   // the last version this browser showed the changelog of (a convenience: in a private window it opens every time)
   const KEY = 'admin-changelog-seen';
-  export function readSeen() {
-    try {
-      return localStorage.getItem(KEY);
-    } catch {
-      return null;
-    }
-  }
-  function writeSeen(version) {
-    try {
-      localStorage.setItem(KEY, version);
-    } catch {
-      // not kept
-    }
-  }
+  export const readSeen = () => readMemo(KEY, null, { raw: true });
+  const writeSeen = (version) => writeMemo(KEY, version, { raw: true });
 
   // -> < 0, 0, > 0, as a - b; a missing one is older than any
   export function compare(a, b) {

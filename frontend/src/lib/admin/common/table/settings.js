@@ -2,21 +2,13 @@
 // the columns hidden, and what each blame column shows - both by the column's label.
 //   { hidden: ['Kod'], blame: { Aktualizacja: ['first_name', 'date'] } }
 
+import { readMemo, writeMemo } from '$/memo';
+
 const storageKey = (key) => `admin-table:${key}`;
 
 export function readSettings(key) {
-  try {
-    const saved = JSON.parse(localStorage.getItem(storageKey(key)));
-    return { hidden: saved?.hidden ?? [], blame: saved?.blame ?? {} };
-  } catch {
-    return { hidden: [], blame: {} };
-  }
+  const saved = readMemo(storageKey(key));
+  return { hidden: saved?.hidden ?? [], blame: saved?.blame ?? {} };
 }
 
-export function writeSettings(key, settings) {
-  try {
-    localStorage.setItem(storageKey(key), JSON.stringify(settings));
-  } catch {
-    // not kept: it lasts while the page is open
-  }
-}
+export const writeSettings = (key, settings) => writeMemo(storageKey(key), settings);

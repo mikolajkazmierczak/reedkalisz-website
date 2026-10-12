@@ -1,5 +1,6 @@
 import api from '$/api';
 import { errors } from '@/stores';
+import { writeMemo } from '$/memo';
 import { writable } from 'svelte/store';
 
 export const auth = writable(false);
@@ -11,11 +12,7 @@ export async function readme() {
     me.set(user);
     auth.set(true);
     // an admin's browser: Umami counts none of its visits to the website from now on, logged in or not
-    try {
-      localStorage.setItem('umami.disabled', '1');
-    } catch {
-      // storage blocked: counted, as before
-    }
+    writeMemo('umami.disabled', '1', { raw: true }); // (storage blocked: counted, as before)
     return me;
   } catch (err) {
     // DO NOT set $me to null or the user will loose all their progress

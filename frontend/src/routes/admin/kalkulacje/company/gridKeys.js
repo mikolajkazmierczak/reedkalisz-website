@@ -1,15 +1,23 @@
+import { memo } from '$/memo';
+
+// where Enter goes from a field being edited, picked above the table: 'down', or 'right' along the row
+export const enterMove = memo('admin-grid-enter', 'down', { valid: (v) => v === 'down' || v === 'right' });
+
 // Moving around a table of fields as in a spreadsheet (as reed-system's tables do). A field reached is selected whole:
 // the arrows go to the nearest field that way, Tab along the row (into the next one at its end), Enter starts editing
 // it - as F2 or a click on it again do, and as typing does, the value then replaced. Edited, the field keeps its own
-// keys but these: Enter commits and goes down, Tab along, the up and down arrows up or down, Escape puts back what was
-// there. A cell is a <td> or <th> holding a field; rows and columns are the table's own (its head's amounts included).
-// Past the last field of a row the right arrow lands on the button of the cell marked `data-grid-end` (adding a
-// column), the left arrow from there back on the field it came from.
+// keys but these: Enter commits and goes down (or along, see enterMove), Tab along, the up and down arrows up or down,
+// Escape puts back what was there. A cell is a <td> or <th> holding a field; rows and columns are the table's own (its
+// head's amounts included). Past the last field of a row the right arrow lands on the button of the cell marked
+// `data-grid-end` (adding a column) - as Enter going along does in its row - the left arrow from there back on the field
+// it came from.
 export function gridKeys(table) {
   let editing = null; // the field being edited
   let reached = null; // the field `before` is of
   let before = ''; // what was in it when it was reached
   let cameFrom = null; // the field the end's button was reached from
+  let enter = 'down';
+  const unsubscribe = enterMove.subscribe((value) => (enter = value));
 
   const fieldIn = (cell) => cell?.querySelector('input:not([type=checkbox]):not(:disabled)') ?? null;
   const placeOf = (input) => {
@@ -46,6 +54,11 @@ export function gridKeys(table) {
       if (next) return land(next);
     }
   }
+
+  // Enter along the row (Shift+Enter back): past its last field the end's button when it's in the row (after the
+  // amounts), else staying - not into the next row
+  const enterAlong = (input, back) =>
+    move(input, 0, back) || (back > 0 && !!input.closest('tr').querySelector('[data-grid-end]') && toEnd(input));
 
   // past a row's last field: the end's button, if there is one
   function toEnd(input) {
@@ -88,7 +101,9 @@ export function gridKeys(table) {
         const moved =
           e.key === 'Tab'
             ? move(input, 0, back, true)
-            : move(input, e.key === 'ArrowUp' ? -1 : e.key === 'ArrowDown' ? 1 : back, 0);
+            : e.key === 'Enter' && enter === 'right'
+              ? enterAlong(input, back)
+              : move(input, e.key === 'ArrowUp' ? -1 : e.key === 'ArrowDown' ? 1 : back, 0);
         if (!moved) land(input);
       } else if (e.key === 'Escape') {
         own();
@@ -142,6 +157,7 @@ export function gridKeys(table) {
   table.addEventListener('focusout', focusout);
   return {
     destroy() {
+      unsubscribe();
       table.removeEventListener('keydown', keydown, true);
       table.removeEventListener('pointerdown', pointerdown);
       table.removeEventListener('focusin', focusin);

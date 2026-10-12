@@ -5,6 +5,7 @@
   import Filters from '@c/Filters.svelte';
   import { companyIcon } from '@c/CompanyIcon.svelte';
   import Company from '../company/Company.svelte';
+  import EnterMove from '../company/EnterMove.svelte';
 
   const searchParams = new SearchParams('/admin/kalkulacje/znakowania');
   $: [company] = $searchparams.get(searchParams.pathname).values();
@@ -46,6 +47,8 @@
   {#if pages}
     <div class="actions ui-bar">
       <div class="left">
+        <EnterMove />
+        <span class="ui-divider" />
         <div class="pages">
           <Filters filters={pages} selected={selectedCompany} on:change={handlePageChange} />
         </div>
@@ -70,5 +73,12 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+  }
+  /* Enter's buttons and the companies a bit closer than the bar's parts */
+  .actions > .left {
+    gap: 0.75rem;
+  }
+  .left > .ui-divider {
+    margin-inline: 0;
   }
 </style>
