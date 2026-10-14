@@ -38,6 +38,9 @@ export const business = {
   sameAs: ['https://www.facebook.com/reed.reklama.kalisz'],
 };
 
+/** The phone as a link's: `tel:`, no spaces. */
+export const tel = `tel:${business.telephone.replace(/\s/g, '')}`;
+
 /** A BreadcrumbList from `[{ name, path }]`, paths relative to the site. */
 export const breadcrumbList = (items) => ({
   '@context': 'https://schema.org',

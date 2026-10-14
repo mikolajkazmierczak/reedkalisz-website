@@ -131,7 +131,7 @@
     background-color: rgba(17, 17, 16, 0.06);
     color: var(--ink);
     cursor: pointer;
-    transition: background-color var(--dur-fast) var(--ease);
+    transition: background-color var(--dur-fast) var(--ease-hover);
   }
   .toggle:hover {
     background-color: rgba(17, 17, 16, 0.12);

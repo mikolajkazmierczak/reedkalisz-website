@@ -4,7 +4,7 @@ import { makeTree, treeGetItemsFromPath } from '%/utils';
 import { allOut, parseAmount, AMOUNT, NONE } from '$/storage';
 import { NEUTRAL_QUARTERS, NO_COLOR_LINE, WOOD_RINGS } from '$/colors';
 import { parseColor, plural } from '#/utils';
-import { business, SITE } from '#/seo';
+import { business, SITE, tel } from '#/seo';
 import { deepestCategory } from '#/products/product';
 
 // The product report as a pdfmake document: what the product page shows (its data read the page's way, see
@@ -851,7 +851,7 @@ export function reportDocument(product, { categories, images = {}, logo, date = 
                 text: [
                   {
                     text: business.telephone,
-                    link: `tel:${business.telephone.replace(/\s/g, '')}`,
+                    link: tel,
                     bold: true,
                     decoration: 'underline',
                   },
@@ -919,7 +919,7 @@ export function reportDocument(product, { categories, images = {}, logo, date = 
     { text: 'tel. ' },
     {
       text: business.telephone,
-      link: `tel:${business.telephone.replace(/\s/g, '')}`,
+      link: tel,
       color: c.orange,
       decoration: 'underline',
     },

@@ -8,14 +8,14 @@
 </script>
 
 <nav class="rail" aria-label="Kategorie">
-  <h2 class="rail__title label">{title}</h2>
+  <!-- not a heading: it would come before the page's h1 (the nav is named by its aria-label) -->
+  <p class="rail__title label">{title}</p>
   <MenuItems {items} {expandable} />
 </nav>
 
 <style>
   .rail__title {
-    display: block;
     margin-bottom: var(--sp-2);
-    color: var(--ink-400);
+    line-height: 1.08;
   }
 </style>

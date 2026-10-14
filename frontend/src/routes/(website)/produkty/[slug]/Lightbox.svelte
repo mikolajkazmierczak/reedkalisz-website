@@ -4,7 +4,7 @@
   import { baseUrl } from '$/api';
   import Icon from '$c/Icon.svelte';
   import Color from '#c/Color.svelte';
-  import { parseColor } from '#/utils';
+  import { lockScroll, parseColor } from '#/utils';
 
   // imgs: [{ img, variant? }], variant = { code, first, second }
   export let imgs;
@@ -145,11 +145,10 @@
   onMount(() => {
     dialog.focus();
     // the page stays put behind it
-    const overflow = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = 'hidden';
+    const unlock = lockScroll();
     return () => {
       sweeps.forEach(clearTimeout);
-      document.documentElement.style.overflow = overflow;
+      unlock();
     };
   });
 </script>

@@ -19,6 +19,22 @@ export function parseColor(first, second) {
   return { label, bg, fg, multicolor };
 }
 
+/**
+ * Stops the page scrolling behind an overlay; returns the undo. Where scrollbars take room (Windows, a Mac with a
+ * mouse) the gone scrollbar's width is kept as padding, so the page doesn't jump sideways.
+ */
+export function lockScroll() {
+  const root = document.documentElement;
+  const { overflow, paddingRight } = root.style;
+  const bar = window.innerWidth - root.clientWidth;
+  root.style.overflow = 'hidden';
+  if (bar > 0) root.style.paddingRight = `${bar}px`;
+  return () => {
+    root.style.overflow = overflow;
+    root.style.paddingRight = paddingRight;
+  };
+}
+
 /** Polish plural: `plural(3, ['produkt', 'produkty', 'produktów'])` → 'produkty'. */
 export function plural(n, [one, few, many]) {
   if (n === 1) return one;

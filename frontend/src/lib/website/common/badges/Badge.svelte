@@ -15,7 +15,7 @@
     border: 1.5px solid #fff;
     border-radius: var(--r-pill);
     font-family: var(--font-mono);
-    font-size: 0.625rem;
+    font-size: var(--fs-label);
     font-weight: 600;
     line-height: 1.4;
     letter-spacing: 0.08em;

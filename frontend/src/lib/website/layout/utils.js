@@ -1,10 +1,10 @@
 import { invalidate } from '$app/navigation';
 import { uid } from '%/utils';
 import api, { baseUrl } from '$/api';
+import { GROUNDS } from '#/layout/grounds';
 
 const createTile = ($) => ({
   _id: uid(),
-  _empty: $?._empty ?? false,
   row: $.row, // required
   column: $.column, // required
   width: $.width, // required
@@ -14,9 +14,11 @@ const createTile = ($) => ({
   button: $?.button ?? '',
   uri: $?.uri ?? '',
   img: $?.img ?? '',
-  dark: $?.dark ?? false, // dark text
-  contrast: $?.contrast ?? false, // dark or light background depending on text color
-  red: $?.red ?? false, // red background
+  // the pastel it stands on and how its picture takes the banner (see grounds). One from before the grounds had its
+  // photo over the whole banner (and red, dark and contrast, its text's colours: gone, the text has its card)
+  ground: $?.ground || GROUNDS[0].id,
+  fit: $?.fit ?? 'full-cover',
+  margin: $?.margin ?? false, // its picture's room inset from the banner's edges and the card (see Tile)
   hide: $?.hide ?? false,
 });
 
@@ -46,6 +48,10 @@ export const create = {
   catalogue: () => ({ _id: uid(), type: 'catalogue' }),
   headquarters: () => ({ _id: uid(), type: 'headquarters' }),
 };
+
+/** A banner added in the editor at `place` ({ row, column }): a cell, its texts there to be written over. */
+export const newBanner = (place) =>
+  createTile({ ...place, width: 1, height: 1, title: 'Nowy baner', button: 'Zobacz' });
 
 /** Built into the page: always there, once, and can't be hidden, edited or deleted; other blocks go around them. */
 export const FIXED = ['catalogue', 'headquarters'];
@@ -84,7 +90,7 @@ export function parseBack(parsed) {
   });
 }
 
-function isUUID(str) {
+export function isUUID(str) {
   // Check if the string is a valid UUID (version 1-5)
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(str);
@@ -107,7 +113,7 @@ export function parseHref(uri) {
   }
   try {
     const { hostname, pathname } = new URL(uri);
-    const isExternal = hostname !== window.location.hostname;
+    const isExternal = hostname !== globalThis.location?.hostname;
     if (isExternal) {
       return { href: uri, target: '_blank' }; // external url (http://...)
     } else {

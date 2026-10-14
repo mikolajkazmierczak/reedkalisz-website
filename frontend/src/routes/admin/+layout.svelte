@@ -23,6 +23,12 @@
   // an editor with unsaved changes
   guardLeaving(() => $unsaved, { discard: () => ($unsaved = false) });
 
+  // the admin's look on <html> (the server puts it there; arriving from the website it's put here), off on leaving
+  onMount(() => {
+    document.documentElement.classList.add('ui-admin');
+    return () => document.documentElement.classList.remove('ui-admin');
+  });
+
   let ready = false;
   onMount(async () => {
     await readme();

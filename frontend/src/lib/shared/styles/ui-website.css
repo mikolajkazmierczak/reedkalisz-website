@@ -81,9 +81,12 @@
   /* layout */
   /* every page's column */
   --page: 80rem; /* 1280px */
-  --gutter: clamp(0.875rem, 0.4rem + 1.8vw, 2rem);
-  /* how far a ground reaches past the column, its text staying in it (the catalogue's cells, the banners) */
+  --gutter: clamp(1rem, 0.4rem + 1.8vw, 2rem);
+  /* how far a ground reaches past the column, its text staying in it (the catalogue's cells) */
   --bleed: clamp(0.625rem, 0.75 * var(--gutter), 1.5rem);
+  /* how far a .btn pill starting a text column hangs past it: its round end reads about (1 - π/4) of its radius in
+     from its box, so set flush it looks indented (see .hang) */
+  --pill-hang: 0.3rem;
   --rail: 16.5rem;
   /* page titles stand on the logo */
   --logo-h: 4.4375rem;
@@ -98,20 +101,16 @@
 
   /* motion */
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  /* a hover's colours: starting soft, so a pointer there for a frame (crossing a control's edge, its hand shaking
+     on it) changes nothing seen; --ease's quick start shows a frame's hover as a flash */
+  --ease-hover: cubic-bezier(0.4, 0, 0.2, 1);
   --dur-fast: 110ms;
   --dur: 200ms;
 
   /* older names, still read by the website's components and shared ones */
-  --white: #ffffff;
   --light: var(--paper-2);
   --main: var(--red);
 
-  /* admin controls overlay */
-  --main-0: #fbeff0;
-  --main-1: #f3c9cd;
-  --main-2: #e59aa1;
-  --main-3: #d3616c;
-  --main-4: #c62b3b;
   --scroll-thumb: var(--ink-300); /* see global.css */
   --scroll-track: transparent;
 }
@@ -139,12 +138,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* (none of these reach the admin's look, `.ui-admin`: the homepage's editor on the website, see ui-admin-scope.css) */
+h1:where(:not(.ui-admin *)),
+h2:where(:not(.ui-admin *)),
+h3:where(:not(.ui-admin *)),
+h4:where(:not(.ui-admin *)),
+h5:where(:not(.ui-admin *)),
+h6:where(:not(.ui-admin *)) {
   margin: 0;
   font-weight: 700;
   line-height: 1.08;
@@ -157,17 +157,17 @@ p {
   text-wrap: pretty;
 }
 
-a {
+a:where(:not(.ui-admin *)) {
   color: var(--red);
   text-decoration: none;
 }
-a:hover {
+a:where(:not(.ui-admin *)):hover {
   color: var(--red-deep);
 }
 
-img,
-svg,
-video {
+img:where(:not(.ui-admin *)),
+svg:where(:not(.ui-admin *)),
+video:where(:not(.ui-admin *)) {
   display: block;
   max-width: 100%;
 }
@@ -180,7 +180,7 @@ textarea {
   color: inherit;
 }
 
-::selection {
+:where(:not(.ui-admin *))::selection {
   background-color: var(--red);
   color: #fff;
 }
@@ -190,7 +190,7 @@ textarea {
   caret-color: var(--red);
 }
 
-:focus-visible {
+:focus-visible:where(:not(.ui-admin *)) {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
   border-radius: var(--r-sm);
@@ -198,8 +198,9 @@ textarea {
 
 /* === Primitives === */
 
-/* Tracked uppercase label in mono: codes, breadcrumbs, small group headings. */
-.label {
+/* Tracked uppercase label in mono: codes, breadcrumbs, small group headings. (Like .code, .select and .sheet, not
+   inside the admin's look, whose components have their own .label: see ui-admin-scope.css.) */
+.label:where(:not(.ui-admin *)) {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   font-weight: 500;
@@ -208,7 +209,7 @@ textarea {
   color: var(--text-subtle);
 }
 
-.code {
+.code:where(:not(.ui-admin *)) {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   letter-spacing: 0.04em;
@@ -264,10 +265,13 @@ textarea {
   letter-spacing: 0.01em;
   white-space: nowrap;
   cursor: pointer;
+  /* The label's colour swaps at once, a moment in, once the ground is getting on for half way there: faded along
+     with it, it would pass through the ground's own shade (white to ink over orange), the label blinking out; and a
+     pointer only passing (out again before then) doesn't swap it at all. */
   transition:
-    background-color var(--dur) var(--ease),
-    color var(--dur) var(--ease),
-    border-color var(--dur) var(--ease);
+    background-color var(--dur) var(--ease-hover),
+    border-color var(--dur) var(--ease-hover),
+    color 0s linear calc(var(--dur) * 0.3);
 }
 .btn--ink {
   background-color: var(--ink);
@@ -321,8 +325,8 @@ textarea {
 /* Controls are squircles (fallback to rounded). */
 .btn,
 .go,
-.select,
-.select select,
+.select:where(:not(.ui-admin *)),
+.select:where(:not(.ui-admin *)) select,
 .search-field,
 .pg__btn,
 .skip-link,
@@ -333,11 +337,11 @@ textarea {
 /* === Form controls === */
 
 /* Shared skin for selects and the search field; the native arrow is replaced by our chevron. */
-.select {
+.select:where(:not(.ui-admin *)) {
   position: relative;
   display: inline-flex;
 }
-.select select {
+.select:where(:not(.ui-admin *)) select {
   appearance: none;
   -webkit-appearance: none;
   min-height: 2.5rem;
@@ -355,16 +359,16 @@ textarea {
   font-weight: 600;
   line-height: 1;
   cursor: pointer;
-  transition: border-color var(--dur-fast) var(--ease);
+  transition: border-color var(--dur-fast) var(--ease-hover);
 }
-.select select:hover {
+.select:where(:not(.ui-admin *)) select:hover {
   border-color: var(--ink-600);
 }
 /* One offset focus ring, no red border inside it. */
-.select select:focus {
+.select:where(:not(.ui-admin *)) select:focus {
   outline: none;
 }
-.select select:focus-visible {
+.select:where(:not(.ui-admin *)) select:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
@@ -376,7 +380,7 @@ textarea {
   border: 1px solid var(--ink-300);
   border-radius: var(--r-pill);
   background-color: var(--surface);
-  transition: border-color var(--dur-fast) var(--ease);
+  transition: border-color var(--dur-fast) var(--ease-hover);
 }
 .search-field:hover {
   border-color: var(--ink-600);
@@ -398,7 +402,7 @@ textarea {
   border-radius: var(--r-pill);
   background-color: var(--surface);
   font-size: var(--fs-sm);
-  transition: border-color var(--dur-fast) var(--ease);
+  transition: border-color var(--dur-fast) var(--ease-hover);
 }
 textarea.field {
   border-radius: var(--r-field);
@@ -462,15 +466,11 @@ textarea.field {
 
 /* === The sheet === */
 
-.sheet {
+.sheet:where(:not(.ui-admin *)) {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: var(--surround);
-}
-
-.island {
-  background-color: var(--bg);
 }
 
 @media (min-width: 47.5rem) {
@@ -557,6 +557,12 @@ textarea.field {
   padding-inline: var(--gutter);
 }
 
+/* On a .btn, or on a row of them (each line's first one hangs): the pill's round end sits optically on the column's
+   edge, like the text above it, instead of looking indented. */
+.hang {
+  margin-inline-start: calc(-1 * var(--pill-hang));
+}
+
 /* Two-tone display line: second clause in ink. */
 .two-tone em {
   font-style: normal;
@@ -565,7 +571,7 @@ textarea.field {
 
 /* === Non-selectable controls === */
 /* Scoped to the public sheet. Never on an element containing a field: Safari can block the caret. */
-.sheet :is(button, .btn, .go, .label, .skip-link) {
+.sheet :is(button, .btn, .label) {
   -webkit-user-select: none;
   user-select: none;
 }

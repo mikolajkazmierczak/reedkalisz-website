@@ -1,80 +1,97 @@
 ---
 name: REED Kalisz — Public Website
-description: The category standard played straight — a white-ground B2B catalog with one cool neutral ramp and a single red reserved for action.
+description: A printer's poster, not a catalog template — one paper sheet edge to edge, flat navy fields, 2px ink rules instead of shadows, red for action and orange for contact.
 colors:
-  brand-red: "#bf0417"
-  brand-red-hover: "#980312"
-  brand-red-active: "#72020d"
-  brand-wash: "#fbf2f3"
-  page-white: "#ffffff"
-  surface-subtle: "#f6f7f9"
-  surface-sunken: "#eceef2"
-  border-hairline: "#dde0e7"
-  border-strong: "#c3c8d3"
-  ink: "#141821"
-  ink-muted: "#4d5565"
-  ink-subtle: "#666d7d"
-  instock-green: "#14652a"
-  status-new-bg: "#e8f1fb"
-  status-new-fg: "#17548f"
-  status-best-bg: "#fdf2d6"
-  status-best-fg: "#7d5200"
-  status-soon-bg: "#f4ecfd"
-  status-soon-fg: "#63359b"
-  status-out-bg: "#eef0f4"
-  status-out-fg: "#4d5565"
+  reed-red: "#bf0417"
+  reed-red-hover: "#a20313"
+  reed-red-deep: "#8c020f"
+  reed-red-tint: "#fbeff0"
+  navy: "#1b2f4e"
+  navy-text: "#cfdcee"
+  navy-text-muted: "#a9bcd6"
+  contact-orange: "#c2560b"
+  contact-orange-deep: "#b04d0a"
+  contact-orange-bright: "#ff8a3d"
+  badge-purple: "#5b2a86"
+  badge-green: "#166534"
+  badge-blue: "#4f86d9"
+  badge-blue-light: "#d9e7fb"
+  paper: "#fdfdfc"
+  paper-2: "#f4f3f0"
+  paper-3: "#e9e7e2"
+  paper-4: "#d8d5cf"
+  surface: "#ffffff"
+  ink: "#111110"
+  ink-700: "#2e2d2b"
+  ink-600: "#47443f"
+  ink-500: "#55524d"
+  ink-400: "#78746d"
+  ink-300: "#a8a49c"
+  border: "rgba(17, 17, 16, 0.14)"
+  border-strong: "rgba(17, 17, 16, 0.26)"
 typography:
-  display:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-    fontSize: "clamp(2rem, 1.35rem + 2.75vw, 3.25rem)"
-    fontWeight: 700
-    lineHeight: 1.15
-    letterSpacing: "-0.018em"
+  hero:
+    fontFamily: "'Bricolage Grotesque', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "clamp(2.25rem, 1.2rem + 4.4vw, 4rem)"
+    fontWeight: 800
+    lineHeight: 0.96
+    letterSpacing: "-0.035em"
   headline:
-    fontFamily: "{typography.display.fontFamily}"
-    fontSize: "clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem)"
+    fontFamily: "{typography.hero.fontFamily}"
+    fontSize: "clamp(1.875rem, 1.35rem + 2.2vw, 3rem)"
     fontWeight: 700
-    lineHeight: 1.15
-    letterSpacing: "-0.018em"
+    lineHeight: 1.08
+    letterSpacing: "-0.028em"
   title:
-    fontFamily: "{typography.display.fontFamily}"
-    fontSize: "clamp(1.3rem, 1.15rem + 0.7vw, 1.75rem)"
+    fontFamily: "{typography.hero.fontFamily}"
+    fontSize: "clamp(1.375rem, 1.15rem + 0.95vw, 2rem)"
     fontWeight: 700
-    lineHeight: 1.15
-    letterSpacing: "-0.018em"
+    lineHeight: 1.08
+    letterSpacing: "-0.025em"
   subtitle:
-    fontFamily: "{typography.display.fontFamily}"
-    fontSize: "clamp(1.1rem, 1.03rem + 0.3vw, 1.25rem)"
+    fontFamily: "{typography.hero.fontFamily}"
+    fontSize: "clamp(1.0625rem, 1rem + 0.3vw, 1.25rem)"
     fontWeight: 700
     lineHeight: 1.15
-    letterSpacing: "-0.018em"
+    letterSpacing: "-0.025em"
   body:
-    fontFamily: "{typography.display.fontFamily}"
+    fontFamily: "{typography.hero.fontFamily}"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.55
     letterSpacing: "normal"
   body-small:
-    fontFamily: "{typography.display.fontFamily}"
+    fontFamily: "{typography.hero.fontFamily}"
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.55
-  label:
-    fontFamily: "{typography.display.fontFamily}"
-    fontSize: "0.6875rem"
+  caption:
+    fontFamily: "{typography.hero.fontFamily}"
+    fontSize: "0.8125rem"
+    fontWeight: 400
+    lineHeight: 1.4
+  price:
+    fontFamily: "{typography.hero.fontFamily}"
+    fontSize: "1.4375rem"
     fontWeight: 700
-    lineHeight: 1.3
-    letterSpacing: "0.03em"
+    lineHeight: 1.2
+    letterSpacing: "-0.02em"
+  label:
+    fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
+    fontSize: "0.6875rem"
+    fontWeight: 500
+    letterSpacing: "0.11em"
   code:
     fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
     fontSize: "0.8125rem"
     fontWeight: 400
-    letterSpacing: "0.01em"
+    letterSpacing: "0.04em"
 rounded:
-  sm: "4px"
-  md: "6px"
-  lg: "10px"
-  full: "999px"
+  square: "0"
+  card: "1.125rem"
+  field: "1.5rem"
+  banner: "clamp(1.5rem, 0.74rem + 3.24vw, 4rem)"
+  pill: "62.4375rem"
 spacing:
   1: "0.25rem"
   2: "0.5rem"
@@ -82,6 +99,7 @@ spacing:
   4: "1rem"
   5: "1.25rem"
   6: "1.5rem"
+  7: "1.75rem"
   8: "2rem"
   10: "2.5rem"
   12: "3rem"
@@ -89,281 +107,368 @@ spacing:
   20: "5rem"
   24: "6rem"
 components:
-  button-primary:
-    backgroundColor: "{colors.brand-red}"
-    textColor: "{colors.page-white}"
-    rounded: "{rounded.md}"
+  button-ink:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
+    padding: "0 {spacing.6}"
+    height: "2.75rem"
+    typography: "{typography.body-small}"
+  button-ink-hover:
+    backgroundColor: "{colors.ink-700}"
+  button-light:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.pill}"
+    padding: "0 {spacing.6}"
+    height: "2.75rem"
+    typography: "{typography.body-small}"
+  button-light-hover:
+    backgroundColor: "{colors.paper-2}"
+  button-orange:
+    backgroundColor: "{colors.contact-orange}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
+    padding: "0 {spacing.6}"
+    height: "2.75rem"
+    typography: "{typography.body-small}"
+  button-orange-hover:
+    backgroundColor: "{colors.contact-orange-bright}"
+    textColor: "{colors.ink}"
+  button-ghost-orange:
+    textColor: "{colors.contact-orange-bright}"
+    rounded: "{rounded.pill}"
+    padding: "0 {spacing.6}"
+    height: "2.75rem"
+    typography: "{typography.body-small}"
+  button-ghost-orange-hover:
+    backgroundColor: "{colors.contact-orange-bright}"
+    textColor: "{colors.ink}"
+  button-ghost-light:
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
+    padding: "0 {spacing.6}"
+    height: "2.75rem"
+    typography: "{typography.body-small}"
+  button-ghost-light-hover:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+  button-tel:
+    textColor: "{colors.contact-orange-deep}"
+    rounded: "{rounded.pill}"
+    padding: "0 {spacing.4}"
+    height: "2.25rem"
+    typography: "{typography.body-small}"
+  button-tel-hover:
+    backgroundColor: "{colors.contact-orange}"
+    textColor: "{colors.surface}"
+  button-disabled:
+    backgroundColor: "{colors.paper-4}"
+    textColor: "{colors.ink-400}"
+  button-go:
+    backgroundColor: "{colors.reed-red}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
     padding: "0 {spacing.5}"
-    height: "42px"
+    height: "2.625rem"
     typography: "{typography.body-small}"
-  button-primary-hover:
-    backgroundColor: "{colors.brand-red-hover}"
-  button-primary-active:
-    backgroundColor: "{colors.brand-red-active}"
-  button-primary-disabled:
-    backgroundColor: "{colors.border-strong}"
-    textColor: "{colors.page-white}"
-  button-submit:
-    backgroundColor: "{colors.brand-red}"
-    textColor: "{colors.page-white}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.3} {spacing.6}"
-    height: "44px"
-    typography: "{typography.body-small}"
-  button-outline:
-    backgroundColor: "{colors.page-white}"
+  button-go-hover:
+    backgroundColor: "{colors.reed-red-hover}"
+  button-go-active:
+    backgroundColor: "{colors.reed-red-deep}"
+  input-field:
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.2} {spacing.3}"
+    rounded: "{rounded.pill}"
+    padding: "{spacing.3} {spacing.4}"
+    height: "2.75rem"
     typography: "{typography.body-small}"
-  input-text:
-    backgroundColor: "{colors.page-white}"
+  input-textarea:
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.3}"
+    rounded: "{rounded.field}"
+    padding: "{spacing.3} {spacing.4}"
     typography: "{typography.body-small}"
-  input-search:
-    backgroundColor: "{colors.page-white}"
+  input-select:
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "0 {spacing.1} 0 {spacing.3}"
-    height: "40px"
+    rounded: "{rounded.pill}"
+    padding: "0 2rem 0 {spacing.4}"
+    height: "2.5rem"
     typography: "{typography.body-small}"
-  card-product:
-    backgroundColor: "{colors.page-white}"
+  hero-band:
+    backgroundColor: "{colors.navy}"
+    textColor: "{colors.surface}"
+    padding: "{spacing.12} 0"
+    typography: "{typography.hero}"
+  navy-band:
+    backgroundColor: "{colors.navy}"
+    textColor: "{colors.navy-text}"
+    padding: "{spacing.8} 0"
+  ask-band:
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
+    padding: "{spacing.12} 0"
+    typography: "{typography.headline}"
+  catalogue-cell:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.square}"
     padding: "{spacing.4}"
-  card-product-out-of-stock:
-    backgroundColor: "{colors.surface-subtle}"
+    typography: "{typography.subtitle}"
+  catalogue-cell-hover:
+    backgroundColor: "{colors.paper-2}"
+    textColor: "{colors.reed-red}"
+  product-card:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.square}"
+    padding: "{spacing.4}"
+  product-card-out:
+    backgroundColor: "{colors.paper-2}"
+  inquiry-panel:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.card}"
+    padding: "{spacing.5}"
+  banner:
+    rounded: "{rounded.banner}"
   badge-new:
-    backgroundColor: "{colors.status-new-bg}"
-    textColor: "{colors.status-new-fg}"
-    rounded: "{rounded.full}"
+    backgroundColor: "{colors.badge-purple}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
     padding: "0.1875rem {spacing.2}"
     typography: "{typography.label}"
   badge-sale:
-    backgroundColor: "{colors.brand-wash}"
-    textColor: "{colors.brand-red-hover}"
-    rounded: "{rounded.full}"
+    backgroundColor: "{colors.reed-red}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
     padding: "0.1875rem {spacing.2}"
     typography: "{typography.label}"
   badge-bestseller:
-    backgroundColor: "{colors.status-best-bg}"
-    textColor: "{colors.status-best-fg}"
-    rounded: "{rounded.full}"
+    backgroundColor: "{colors.badge-green}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
     padding: "0.1875rem {spacing.2}"
     typography: "{typography.label}"
   badge-soon:
-    backgroundColor: "{colors.status-soon-bg}"
-    textColor: "{colors.status-soon-fg}"
-    rounded: "{rounded.full}"
+    backgroundColor: "{colors.badge-blue-light}"
+    textColor: "{colors.navy}"
+    rounded: "{rounded.pill}"
     padding: "0.1875rem {spacing.2}"
     typography: "{typography.label}"
   badge-out:
-    backgroundColor: "{colors.status-out-bg}"
-    textColor: "{colors.status-out-fg}"
-    rounded: "{rounded.full}"
+    backgroundColor: "{colors.ink-600}"
+    textColor: "{colors.surface}"
+    rounded: "{rounded.pill}"
     padding: "0.1875rem {spacing.2}"
     typography: "{typography.label}"
-  nav-item:
-    textColor: "{colors.ink-muted}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.2} {spacing.3}"
-    typography: "{typography.body-small}"
-  nav-item-active:
-    textColor: "{colors.brand-red}"
-  menu-item-current:
-    backgroundColor: "{colors.brand-wash}"
-    textColor: "{colors.brand-red}"
-    rounded: "{rounded.md}"
-    padding: "{spacing.2} {spacing.3}"
-    typography: "{typography.body-small}"
-  page-number-active:
-    backgroundColor: "{colors.brand-wash}"
-    textColor: "{colors.brand-red}"
-    rounded: "{rounded.md}"
-    size: "36px"
-    typography: "{typography.body-small}"
+  badge-none:
+    backgroundColor: "{colors.paper-3}"
+    textColor: "{colors.ink-600}"
+    rounded: "{rounded.pill}"
+    padding: "0.1875rem {spacing.2}"
+    typography: "{typography.label}"
+  rail-contact:
+    backgroundColor: "{colors.navy}"
+    textColor: "{colors.navy-text-muted}"
+    padding: "{spacing.5} {spacing.5} {spacing.3}"
+  footer:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.ink-300}"
+    padding: "{spacing.12} 0 {spacing.10}"
 ---
 
 # Design System: REED Kalisz — Public Website
 
 ## Overview
 
-**Creative North Star: "The Well-Run Catalog"**
+**Creative North Star: "The Printer's Poster"**
 
-This is the arrangement a B2B catalog buyer already knows — sticky header with search, category rail on the left, a grid of product cards, a product page that ends in a question — executed to a finish the category rarely reaches. Nothing here is trying to be novel. The system's ambition lives entirely in the finish: one cool neutral ramp doing all the structural work, a single red that earns its rarity, an optical type ramp that fluidly narrows between phone and desktop, and a 4px spacing rhythm that never guesses. Density is catalog-grade: two product cards across on a phone, four beside the rail on a desktop, cards tight enough to compare and loose enough to read.
+The public site is set like a poster from a print shop, not assembled from a catalog template. One paper sheet runs edge to edge with no mount, no floating cards on a grey page, no island gaps. Its structure comes from flat fields of navy (the hero, the Siedziba band, the SEO band, the rail's contact head, the /kontakt head) and from 2px ink rules wherever a softer system would reach for a shadow. Type does the shouting: Bricolage Grotesque at 800 for the hero, two-toned, with the second clause in bright orange on the navy.
 
-The world is white-ground and hairline-drawn. Surfaces separate by a 1px cool border before they separate by shadow; shadow is the response to a pointer, not a permanent property of a card. Colour is deliberately scarce — the catalog's own product photography is the only saturated thing on most screens, which is why the chrome around it stays a cool grey and the brand red never becomes a surface fill.
+Colour is assigned by job, not by taste. REED red means act, current, focus, sale and the logo tile. Navy means structure. Orange means contact, everywhere a visitor can write or call, and nothing else - except the hero, where its bright tint is "z Twoim logo": that clause, and the logo's place on everything the machine makes (owner's call, 2026-10-14). The product photography stays the only free colour on most screens.
 
-Two contextual facts belong in the record. First: the previous site carried exactly one `@media` rule in its entire source tree and had no mobile layout at all, which is why this system states its responsive rules explicitly and at named breakpoints rather than leaving them to be inferred. Second: the admin panel at `/admin` is a separate system with its own `ui-admin.css`, recorded below under **Design System: REED Kalisz — Admin Panel**; nothing in this website system applies to it.
+Blocks are square and bounded by rules; controls are pills (squircled where the browser supports `corner-shape`). Inside the catalogue the arrangement is the familiar one: a left rail that is the whole navigation, a product grid, a product page that ends in an inquiry. The finish is a poster's: tight rules, real counts, nothing invented. The admin panel at `/admin` is a separate system with its own `ui-admin.css` (its look in `ui-admin-scope.css`, on `.ui-admin`, so the homepage's editor wears it too), recorded below under **Design System: REED Kalisz — Admin Panel**. Nothing in this website system applies to it: its look hangs on `.ui-admin` (the admin's `<html>`, and the homepage editor's panel on the website), and the website's global element and class rules stop at it (`:where(:not(.ui-admin *))`).
 
 **Key Characteristics:**
-- White ground, one cool neutral ramp (`--n-0` … `--n-950`), hairline borders before shadows
-- One red, reserved: primary action, active state, focus, required marks, errors, sale
-- Archivo variable, self-hosted in two subsets; system mono for product and supplier codes
-- Fluid `clamp()` type ramp; 4px spacing scale; radii of 4/6/10px and a pill
-- Explicit responsive rules at 560 / 640 / 720 / 900 / 1100px
-- Inquiry is the terminal action on every product surface; no cart affordances exist anywhere
+- Paper ground (`paper`) edge to edge; warm ink ramp; white only for the surfaces that hold a product or a field
+- Flat navy fields for structure; 2px ink rules for separation; no resting shadows
+- Three working hues with fixed jobs: red = action/state, navy = structure, orange = contact
+- Bricolage Grotesque (optical-size axis) for all text; the platform mono for codes, labels and badges
+- Square blocks, pill controls, and one card radius for the inquiry panel; nothing in between
+- A sticky 16.5rem rail on desktop; a slim bar with Zadzwoń and Menu pills on a phone
+- The inquiry is the terminal action; no cart affordances exist anywhere
 
 ## Colors
 
-A white page, one cool blue-grey neutral ramp carrying every structural job, and a single saturated red that appears only where the user can act or where the system must answer.
+A warm paper sheet and an ink ramp do the neutral work. Three hues each own exactly one meaning.
 
 ### Primary
-- **REED Red** (`#bf0417`): The fixed brand asset. It fills primary buttons (search submit, "Zapytaj o ten produkt", form submit, empty-state CTAs), marks the active nav item and its 2px underline, colours the current category in the rail, paints the focus-visible ring and the caret, flags a required field, sets error text, and prices a sale. Hover deepens to `#980312`, press to `#72020d`. It is never a surface fill and never a large area.
-- **Brand Wash** (`#fbf2f3`): The only tinted ground the red is allowed. It backs the current category item, the active page number, an invalid input, the form-level error block, and the admin-only note. A one-step tint, never a block of colour.
+- **REED Red** (`reed-red`): action, state, focus. It fills the directional "go" buttons, the ready search submit, the skip link and the product-page toast. It colours a hovered or current link, the current category and the selection highlight, and it supplies the focus ring, the caret and `accent-color`. It is also the sale badge and a sale card's edge, and the logo tile. Hover steps to `reed-red-hover`, press to `reed-red-deep`. `reed-red-tint` backs an invalid field and a form error, and nothing else.
 
 ### Secondary
-- **Stock Green** (`#14652a`): Availability and confirmation only — the in-stock dot and label on the product summary, and the inquiry-sent success panel. It exists specifically so that "we have it" and "we got your message" are not mistaken for "it's on sale".
+- **Navy** (`navy`): structure. The hero field, the Siedziba band, the SEO band, the rail's contact head (logo, phone and email, Kontakt), the /kontakt page head and the menu overlay's head. Text on navy is white for headings, `navy-text` for ledes and lists, `navy-text-muted` for quieter lines. Links on navy stay white and underline; they never turn red on navy.
+- **Contact Orange** (`contact-orange`): contact. Every /kontakt and phone control is orange: the rail and band "Napisz do nas" / Kontakt buttons, the phone bar's Zadzwoń pill, the closing ask's phone button, the error page's Kontakt and the empty-category ask. The question form takes it too, as its focus ring, caret, checkbox and framed inquiry panel. Outlined orange text on paper uses `contact-orange-deep`. On navy (the hero, the phone menu) and on ink (footer link hover) the dark orange doesn't read, so it switches to `contact-orange-bright`. The hero's emphasised clause uses the bright shade for the same reason.
 
 ### Tertiary
-Status pills carry their own hue families, each a tinted ground with a same-hue foreground: **Catalog Blue** (`#e8f1fb` / `#17548f`) for new, **Signal Amber** (`#fdf2d6` / `#7d5200`) for bestseller, **Quiet Violet** (`#f4ecfd` / `#63359b`) for coming soon, and **Cool Grey** (`#eef0f4` / `#4d5565`) for out of stock. Sale reuses the brand pair.
+Product badges and card edges have their own fixed hues, each white-ringed so it reads on any photo: **Purple** (`badge-purple`) for Nowość, **Green** (`badge-green`) for Bestseller, **Blue Light** (`badge-blue-light`, navy text) for Wkrótce with **Blue** (`badge-blue`) as that card's edge and as the selected photo in the lightbox, ink-600 for out of stock, and a quiet paper-3 pill for Chwilowy brak. The sale badge is REED red.
 
 ### Neutral
-- **Page White** (`#ffffff`): The page ground and every card, panel and input surface.
-- **Subtle Surface** (`#f6f7f9`): The footer band, the spec table, the promo tile, an out-of-stock card, hover grounds on nav and pagination, and the scrollbar track.
-- **Sunken** (`#eceef2`): The deepest grey surface, used sparingly where a well must read as recessed.
-- **Hairline** (`#dde0e7`): The default 1px border on cards, inputs, dividers and section rules.
-- **Strong Hairline** (`#c3c8d3`): The hover state of any bordered control, and the dashed border on the empty state.
-- **Ink** (`#141821`): Headings and body text.
-- **Muted Ink** (`#4d5565`): Secondary prose, nav items at rest, link lists, prose body.
-- **Subtle Ink** (`#666d7d`): Codes, captions, "od", unit notes, placeholders. Tuned to this exact value so it clears 4.5:1 on white *and* on the subtle surface — it is the darkest-tolerable grey, not a free choice.
+- **Paper** (`paper`): the page ground, the rail, the catalogue cells, the closing ask band.
+- **Paper 2 / 3 / 4** (`paper-2`, `paper-3`, `paper-4`): the catalogue map band and hover grounds; the price divider in a card and skeleton bones; the disabled button.
+- **Surface** (`surface`): white, kept for what holds a product or an input: product cards, media wells, fields, selects, the inquiry panel.
+- **Ink** (`ink`): text, every 2px rule, the ink button, the footer ground.
+- **Ink 700 to 300**: ink-500 is muted prose (7.6:1 on paper). ink-400 is the darkest-tolerable subtle text (4.6:1 on paper), used for codes, "od", counts and units. ink-300 is control hairlines and footer small print.
+- **Border / Border Strong** (`border`, `border-strong`): translucent ink hairlines inside a block (card edges, the catalogue's 1px cell gaps, map column heads).
 
 ### Named Rules
-**The Reserved Red Rule.** Red means *act, here* or *this is current*. Primary action, active nav/category, focus ring, required mark, error, sale. That is the whole list. A surface, a heading, a divider or a decorative panel never takes red, and no second accent hue is introduced beside it.
+**The Three Jobs Rule.** Red is action and state, navy is structure, orange is contact. A colour never borrows another's job: no navy buttons, no red bands, no orange promotions.
 
-**The Green Is Not A Discount Rule.** Availability and confirmation use Stock Green, never the brand red. A buyer must never read "in stock" as "on sale".
+**The Orange Means Contact Rule.** If a control writes to REED, calls REED or goes to /kontakt, it is orange, and nothing else is. Promotions are not contact: the sale badge is red.
 
-**The Measured Pair Rule.** Every status pill is a tinted ground with a same-hue foreground, measured at ≥6:1. A new status colour ships only after its pair is measured, and subtle ink never goes lighter than `#666d7d`.
+**The Bright-On-Dark Rule.** On navy or ink, contact uses `contact-orange-bright` (5.7:1 on navy) and its fills take ink text. The dark orange is for paper only.
 
 ## Typography
 
-**Display / Body Font:** Archivo variable (weight 400–800, width 75–125%), self-hosted as `latin` and `latin-ext` woff2 subsets with `font-display: swap`, falling back to `ui-sans-serif, system-ui`
-**Label/Mono Font:** the platform mono stack (`ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas`), used exclusively for product and supplier codes
+**Display / Body Font:** Bricolage Grotesque from Google Fonts with `font-optical-sizing: auto`, falling back to `ui-sans-serif, system-ui`.
+**Label / Mono Font:** the platform mono stack, used for product and supplier codes, the tracked `.label` caption and the product badges.
 
-**Character:** One family does everything. Archivo is a grotesque with enough width and enough weight range to make a headline feel set rather than scaled up, and it holds Polish diacritics cleanly at 13px in a card. Headings run bold (700) with a −0.018em optical tuck and balanced wrapping; body runs 400 at 1.55. Synthesised weights are switched off, so the variable axis is the only source of weight.
+**Character:** a grotesque with some ink trap and swagger at display size, and calm at 13px in a card. Headings are 700 (the hero 800), tucked to −0.025em or tighter, `text-wrap: balance`. Body is 400 at 1.55, paragraphs `text-wrap: pretty`.
 
 ### Hierarchy
-- **Display** (700, fluid 2rem→3.25rem, 1.15): The homepage's lead title, set by the CMS title block.
-- **Headline** (700, fluid 1.75rem→2.5rem, 1.15): Page-level `h1` — category name, product name, Kontakt.
-- **Title** (700, fluid 1.3rem→1.75rem, 1.15): Product-page section heads ("Opis", "Cennik", "Zapytaj o produkt"), each underlined by a hairline rule.
-- **Subtitle** (700, fluid 1.1rem→1.25rem, 1.15): Pricing-block heads, footer column heads, empty-state heads.
-- **Body** (400, 1rem, 1.55): Default. CMS prose runs 1.7 line-height capped at 68ch; contact and no-result copy at 46–52ch.
-- **Body Small** (400, 0.875rem): The catalog's working size — nav, breadcrumbs, form fields, table cells, pagination, footer links.
-- **Label** (700, 0.6875rem, +0.03em, uppercase): Status pills only, plus two field captions ("7 KOLORÓW", the pricing type tag). A functional caption, never a decorative line above a heading.
-- **Code** (mono, 0.8125rem, +0.01em, subtle ink): Product and supplier codes, everywhere they appear.
+- **Hero** (800, fluid 2.25 to 4rem, 0.96, −0.035em): the homepage hero line alone, two-toned, max 16ch.
+- **Headline** (700, fluid 1.875 to 3rem, 1.08): page titles and every homepage section head (Title blocks, Katalog, Siedziba, the closing ask). The hero size belongs only to the hero.
+- **Title** (700, fluid 1.375 to 2rem): band heads (SEO), the catalogue map, CMS prose `h2`.
+- **Subtitle** (700, fluid 1.0625 to 1.25rem): catalogue cell names, SEO block heads, footer column heads.
+- **Body** (400, 1rem, 1.55): default. CMS prose runs 1.7 in ink-500, capped at 68ch. Ledes run fluid 1 to 1.125rem.
+- **Body Small** (0.875rem): the working size of controls, nav, city lists and band copy. Buttons set it at 700.
+- **Caption** (0.8125rem): counts, the footer's rights line, map leaves.
+- **Price** (700, 1.4375rem, −0.02em, tabular): a card's price, stepping down via container queries in narrow cards so it never wraps.
+- **Label** (mono 500, 0.6875rem, +0.11em, uppercase, ink-400): functional captions such as "Brak zdjęcia". Badges reuse the mono uppercase at 600/+0.08em.
+- **Code** (mono, 0.8125rem, +0.04em, ink-400): product and supplier codes.
 
 ### Named Rules
-**The One Family Rule.** Archivo carries every text role. The mono stack exists for one job — codes — and no third family is added.
+**The One Voice Rule.** Bricolage carries every text role; mono exists for codes, functional captions and badges. No third family.
 
-**The Tabular Number Rule.** Any number that sits in a column or compares against a neighbour (prices, page numbers, quantity breaks, colour counts) takes tabular figures via `.tnum`. Prices align down a card row or they are not aligned at all.
+**The Hero Owns Its Size Rule.** `hero` appears once per site. Section heads stop at `headline`, so the hero stays the loudest thing on the sheet.
 
-**The Two-Line Clamp Rule.** Product names in a card clamp to two lines with an ellipsis, so every card in a row shares a footer baseline regardless of name length.
+**The Tabular Number Rule.** Prices, counts and page numbers that sit in a row take tabular figures.
 
 ## Layout
 
-A single centred container caps at 1400px with a fluid gutter (`clamp(1rem, 0.4rem + 2.2vw, 2.5rem)`), so the page breathes wider as the viewport does rather than stepping. The sticky header is 60px tall and grows to 68px from 900px up; every sticky rail offsets from that token plus 1.5rem, never from a hardcoded number.
+The rail and the column. From 61.25rem a 16.5rem rail sits sticky on the left behind a 2px ink right rule. It is a fixed frame: the navy contact head and the search hold the top, only the category tree scrolls (with faded edges). Every page's content column is capped at 80rem (`--page`) with a fluid gutter of `clamp(1rem, 0.4rem + 1.8vw, 2rem)`. Bands and fields bleed past the column to the sheet's edges while their text stays in it. The catalogue's ruled cells reach a further `--bleed` past the column so their text lines up with the page text. The ink footer starts its column after the rail too, so it lines up with the content, not the viewport.
 
-Spacing is a strict 4px scale (0.25rem through 6rem). Component internals live in the 2–5 range, block separation in 6–12, page-section separation in 12–24; the footer opens on a 6rem top margin.
+Spacing is a 0.25rem scale. Block internals use 2 to 6. Homepage blocks are 2.5rem apart (1.25rem under a Title, 4rem before one). Bands run 2rem (Siedziba on phones) to 3rem (Siedziba beside its map, SEO, closing ask) of vertical padding. The hero has more above than below, both growing with the page (2.5 to 5.5rem over it, about 72px at 1440px; 2 to 4rem under it, about 56px; 2rem over it on a phone, under the bar).
 
-Five breakpoints, each doing a specific job:
-- **560px** — product cards gain their larger internal padding; the catalog grid leaves its fixed two-column phone layout for an auto-fill from a 210px floor; the CMS tile grid goes from one column to two.
-- **640px** — the inquiry form's fields split into two columns (email/phone side by side, name and message full-width); pagination widens its page window from ±1 to ±2.
-- **720px** — the footer becomes two (or three, when link columns exist) named columns.
-- **900px** — the main breakpoint. Desktop nav and header search appear and the burger and drawer disappear; the category rail becomes a permanent 16rem sticky column beside the listing; the product page splits into a 7fr media column with a sticky rail and a 5fr summary, detail spanning full width below; contact splits 5fr/7fr; the catalog grid drops its auto-fill floor to 200px, which yields four columns beside the rail.
-- **1100px** — the category rail widens to 18rem.
+Below 61.25rem the rail is gone. A sticky, frosted paper bar 3.25rem tall (3.75rem from 47.5rem) carries the logo, an orange-outlined Zadzwoń pill and an ink-outlined Menu pill (below 24rem Zadzwoń drops its handset icon, below 21.25rem both pills narrow, so the bar fits a 320px phone). Menu opens a full-screen overlay on paper under a navy head that reuses the rail's content. The bar is the same on every page, the homepage's too: the hero starts under it, its machine first and as wide as the text column, on its edge.
 
-**The Catalog Never Single-Columns Rule.** The product grid is two columns on the narrowest phone. One column turns twenty-five products into a mile of scroll, so the fixed two-column floor holds below 560px and auto-fill takes over above it.
+Breakpoints, each with a job:
+- **35rem / 38.75rem**: product cards take their larger padding; catalogue cells go two across; the map's column gap widens.
+- **47.5rem**: the hero leaves its phone order (machine first) for the title across, the lede and buttons beside the machine; the SEO copy goes two columns; the footer goes two columns; the top bar grows.
+- **56.25rem**: CMS banners keep their authored grid placement (below it they linearise to two columns, one below 35rem); Siedziba sets its map beside the text; the product page's floating Zapytaj button disappears.
+- **61.25rem**: the rail appears; the phone bar goes.
+- **64rem / 68.75rem / 75rem**: catalogue cells three across; the map four columns; the SEO copy three columns.
 
-**The Authored Placement Rule.** The CMS tile grid honours REED's authored 4-column placement from 900px up, untouched. Below that it linearises to two columns (one below 560px) via a `max-width` query using `!important`, because `Tile.svelte` writes grid placement as an inline style and nothing weaker can override it. The override lives in the narrow query so desktop is never "undone".
+### Named Rules
+**The Hang Rule.** A pill button that starts a text column hangs past it by `--pill-hang` (0.3rem), because its round end otherwise reads as indented. Set flush, it looks out of line with the text above it. On a row of pills, each line's first one hangs. Stacked full-width pills on a phone hang on both sides.
 
-**The Tile Sizes Itself Rule.** A CMS tile spans one to four columns, so its text scales to the tile via container queries (`cqw`), not to the viewport. Tile titles run `clamp(1.125rem, 8.5cqw, 2.5rem)` and tile padding `clamp(0.75rem, 4cqw, 1.75rem)`.
+**The Column Edge Rule.** Text aligns to the column at every width: the footer's beside the rail, the banners' edges, the catalogue cells' text inside their bleed. A field may run wider than the column; its words may not.
+
+**The Authored Placement Rule.** A CMS banner's 4-column placement is honoured untouched from 56.25rem up. Below that it linearises via `!important`, the only thing that beats `Tile.svelte`'s inline grid placement, and banner text scales with container units (`cqw`), not the viewport.
 
 ## Elevation & Depth
 
-Hybrid, leaning flat. At rest the system separates surfaces with a 1px cool hairline and a tonal step (white card on white page; subtle-grey footer, spec table and out-of-stock card). Shadow is reserved for two situations: something that is floating over the page by construction (the mobile drawer), and something responding to a pointer (a card or tile lifting on hover). All three shadows are two-layer — a tight contact offset plus a wide soft blur — tinted with the neutral ramp's darkest ink (`rgba(20, 24, 33, …)`) rather than pure black, so they sit cool against the grey.
+Flat. Depth is carried by fields and rules, not by light. A band is a flat navy field; a section boundary is a 2px ink rule (top and bottom of Siedziba, the bar's foot, the rail's edge, the SEO, map and ask bands, the category toolbar). Rules never double where a band meets a band or the hero. A hover on a card or pager thickens its edge with a 1px outer ring of the same colour (ink on hover), so nothing shifts. A CMS banner hovers with a 2px inset ink frame. Neither is a shadow in any visual sense.
 
 ### Shadow Vocabulary
-- **Contact** (`box-shadow: 0 1px 2px rgba(20,24,33,0.06), 0 1px 3px rgba(20,24,33,0.08)`): The sticky header once the page has scrolled past 4px, alongside its border appearing.
-- **Lift** (`box-shadow: 0 2px 4px rgba(20,24,33,0.05), 0 8px 20px rgba(20,24,33,0.09)`): Product card, promo tile and CMS tile on hover, paired with a −2/−3px translate.
-- **Float** (`box-shadow: 0 4px 8px rgba(20,24,33,0.06), 0 16px 40px rgba(20,24,33,0.12)`): The mobile drawer, which genuinely overlays the page.
-
-The header additionally uses a frosted treatment: an 88% background mix with `backdrop-filter: saturate(180%) blur(12px)`, its bottom border transparent until scroll.
+- **Overlay** (`0 0.25rem 1rem` to `0 0.5rem 1.5rem` of ink at 0.18 to 0.28): only on things that genuinely float over the page. These are the product page's toast, the phone's floating Zapytaj button and a gallery thumbnail zoomed 2× over its neighbours.
 
 ### Named Rules
-**The Flat-At-Rest Rule.** A surface is a hairline and a tonal step. Shadow is a response — scroll, hover, or genuine overlay — and every hover lift is cancelled under `prefers-reduced-motion`.
+**The Rule Not Shadow Rule.** A 2px ink rule separates; a navy field groups. A resting card, band or panel never takes a shadow.
 
 ## Shapes
 
-Softly rounded, not pill-shaped. Four radii do all the work: 4px on the smallest controls (the inline search submit, the global focus ring), 6px as the default for buttons, inputs, nav items, selects, specs and alerts, 10px on the larger containers (product card, CMS tile, form panel, map frame, empty state), and a full pill on status badges alone. Colour swatches are perfect circles with a 1px `rgba(0,0,0,0.2)` ring so a white swatch still reads as an object.
+Two shapes and one exception. Blocks are square: product cards, catalogue cells, bands, the footer map (`square`). Controls are full pills (`pill`) squircled with `corner-shape: squircle`: buttons, fields, selects, the search field, pager buttons, badges, the skip link. A textarea can't be a pill, so it takes `field`. The question form's inquiry panel is the one rounded container (`card`, squircled, 2px orange frame over a faint orange halftone). CMS banners take `banner`, squircled, at every width: 4rem on the widest, 1.5rem on a phone.
 
-Borders are the primary drawing tool: 1px hairline at rest, strong hairline on hover, red on focus. The one dashed border in the system marks an empty state. Product imagery sits in a square (1:1) media well with contained fit; CMS tiles use 4:3 at tablet and 16:10 on a phone. Motion is uniform: `cubic-bezier(0.16, 1, 0.3, 1)` at 120ms (micro), 200ms (default) or 340ms (drawer and disclosure), with a global reduced-motion clamp.
+Icons are inline stroked SVG (2 to 2.2px stroke, round caps) in `currentColor`. Arrows slide 0.1875rem on hover and stay put under reduced motion. Colour swatches are circles with a 1px inner ring. Motion uses two curves: `cubic-bezier(0.2, 0.7, 0.3, 1)` (`ease`) for movement (arrows, chevrons, the map's dots, photo fades) and, for a hover's colours (grounds, borders, rings, link colours), `cubic-bezier(0.4, 0, 0.2, 1)` (`ease-hover`), which starts soft: a pointer there for a frame, crossing a control's edge or a hand shaking on it, changes nothing seen, where the quick start showed it as a flash. 110ms for hovers and borders, 200ms for buttons, arrows and photo fades. A button's label colour doesn't fade but swaps at once, 30% in (its ground about 40% of the way): faded, white to ink over orange, it passed through the ground's own shade and blinked out. A global reduced-motion clamp applies.
 
 ## Components
 
 ### Buttons
-- **Shape:** Gently rounded (6px); the compact in-field submit is 4px.
-- **Primary:** REED Red ground, white label, 600 weight at 0.875rem, 42px min height, 1.25rem side padding. The form submit is taller (44px) with 0.75rem/1.5rem padding. Hover deepens one step, press deepens two; disabled goes to the strong hairline grey with `not-allowed`.
-- **Directional (GoButton):** A forward button places its arrow after the label and slides it +3px on hover; a back button reverses both. The arrow is inline SVG at 16px, stroked in `currentColor`.
-- **Outline / ghost:** White ground, hairline border, ink label — the burger and the mobile filters toggle. Hover strengthens the border and drops to the subtle grey ground.
-- **Tile button:** Inside CMS tiles only, a transparent 2px-outlined button in light (or ink, when the tile is dark) that inverts to a solid fill on tile hover.
+- **Shape:** full pill, squircled, 2.75rem min height, 1.5rem side padding, 0.875rem at 700, 2px border (transparent on filled variants).
+- **Ink:** the neutral primary on paper ("Strona główna"). Hover lifts to ink-700.
+- **Light:** white on navy: the hero's catalogue button.
+- **Orange:** contact on paper or in a band (Siedziba, empty category, error page, rail Kontakt). Hover turns bright orange with ink text.
+- **Ghost orange:** contact on navy (the hero's "Napisz do nas", the phone menu's Kontakt). Bright orange outline and text, filling bright on hover.
+- **Ghost light:** a white-outlined pill on navy or ink: the footer's social link.
+- **Phone:** the closing ask's and the phone bar's call pill: orange outline, `contact-orange-deep` text, filling orange on hover.
+- **Go:** REED red pill with a trailing arrow that slides on hover (reversed for back). It is the CMS Title block's link.
+- **Disabled:** paper-4 ground, ink-400 text, `not-allowed`.
 
-### Chips
-- **Style:** Status pills are fully rounded, uppercase 0.6875rem at 700 with +0.03em, on a tinted ground with same-hue text. No border.
-- **State:** Static markers, not interactive filters — new, sale, bestseller, coming soon, out of stock. They overlay the top of the product card's media well.
+### Navy Bands
+- **Hero:** full-bleed navy, ruled below (not where banners lead the page: they start right under it, its navy going on behind their top), white two-tone hero line (the emphasised clause in bright orange), a `navy-text` lede at 50ch, a Light plus Ghost orange pair hung on the column. The machine is a shop drawing (`HeroMachine`, 716 x 422): white line work on the navy over a faint fading grid, parts filled so lines behind them hide, line weight constant on screen, and one orange mark per station, the client's logo's place in the bright orange of the hero line's "z Twoim logo" (REED's own plate on the printer's door stays red; the glows, heat, stay red) (the forms' and the printer's prints, the stamp's ink, the mug's and the pen's engravings, the front shirt's print, the wall calendar's logo on its header; the engraver's head carries a faint band of it, the logo's paint, as big as the logo it engraves). Left to right: a printer of continuous self-copying forms low on its post, the forms out between two rolls a page at a time, a knife at the perforation and a box on the floor under it; a printer (REED's plate on its door) with a paper hopper on top (one blank sheet in front, two fainter ones behind it) and an out tray where its vents were; then, close by, one belt with a stamp press over a business card (its lever pivoting over the ram, its swing arrowed), an engraver (a narrow beam, a small cylindrical head, a tapered tip, its band hidden behind the mug at the logo's height while it engraves) over a mug with a slim rotator beside it, and a laser over a pen (its clip by the cap, pointing to the tip), the card and the pen fed from faint dispensers behind (outlines only, their blanks stacked in them), the mugs waiting in a row behind the engraver's, going back towards its post, each further back and fainter, a thin chute into boxes (REED's red packing tape round them and the forms' box, faint, the logo repeating along it, and on the closed big box down it too, top to bottom a little left of its middle, over the other where they cross (both faint as one), under its shipping label (a white card, outlined, as faint as the tape); the open boxes carry no tape over their tops; pinned at the belt's end roller, a strut under it to the bench, its foot on the box's rim, its top on the line what slides down it takes, at its tilt; pens leaning against each other and the box's right edge), printed shirts on a rail over them and a three-fold calendar hanging on the wall behind the shirts (a little faint, at 75%; today a heavier box in the first month); business cards (one leaning on the stack, face out, a red print and no logo), paper, roll-ups and two desk calendars (the one behind fainter; big spiral rings, the month's grid filling it) wait on the brace under the belt. It runs, in CSS keyframes in the drawing's own units, written by the script into the head from timings in seconds (one table per machine), only while it's on screen (an IntersectionObserver stops it) and at 60 frames a second at most (its CSS animations paused, their time set by the component on requestAnimationFrame, every frame under 1/60s since the last skipped; the screen's own rate is 120 or more on some), and never under reduced motion, where it stands still with every mark made; every jump back is a step, unseen. On the belt, a 5.6s cycle: the stamp's plate heats up while it's still up (a soft red halo, the plate itself the sparks' hot red; from 0.6s before it moves), the stamp comes down (its lever pulled, its spring stretched), brightest as it lands, and is cool again once it's back up, the engraver comes down behind the mug and the rotator's wheel onto its side, and the mug turns once round, its handle back where it was (its handle drawn behind and in front, squeezed to the cosine of its angle; the mark there from half the turn, when its place passes the engraver at the back, coming round to the front as the turn ends), the laser fires, each mark appearing as it's made; then the belt runs 22 ticks in 2.28s (its rollers and the motor's pulley turning) to carry the three off its end, down the chute and into the box, and new blanks come out of the dispensers, their stacks coming down a place (each stack drawn a blank taller than its housing shows, so it loops unseen), while the next mug slides in from its row and turns solid, the ones behind moving up a place and a new faint one appearing at the back (then back as they were, the mug in its place: the same); the tools start again 0.6s after. The printer (6.4s) prints ten sheets one after another, each into the hopper (the sheets behind coming forward a place and filling in, a new faint one appearing at the back) and out of its slot into the tray, shaking a little while it prints, then rests; the forms printer (17.4s) cuts six pages one after another, each fed out (the rolls' stripes turning with it), held while the knife crosses the perforation and falling into its box, then rests. From 47.5rem it stands beside the lede and buttons at the column's right, its floor line (the viewBox ends there; the hatching shows past it) level with the buttons' bottom, as tall as the title, lede and buttons together, or scaled down just so far that it touches none of them: clear of each title line beside it, and of each of the lede's lines and the buttons by the columns' gap, going by where it's drawn, not by its box (its top left is mostly empty: the printer's hopper and the stamp's lever stand well in from its side, so it can reach up beside the title's short lines; its outline is read off the drawing once, what its clips hide left out) (`heroFit`, measured on every resize once the fonts are in; it also puts "Porządnie," on its own line where that lets the machine be bigger). Absolute in its cell, it adds nothing to the row, so the lede always sits right under the title. On a phone it goes first, its tallest parts just over the clear bar's line, and the title shrinks a little (at most 10%) so "do kieszeni. Porządnie," fits one line. The lede's last sentence, "Na własnych maszynach, w Kaliszu, od 2002 roku.", is a line of its own.
+- **Siedziba:** navy, ruled top and bottom, a Headline head, a muted lede (64ch at most, balanced: two lines where they fit, and none ever left with a word or two), a dot map of Poland, a list of places and an orange "Napisz do nas" hung on the column; the map under the lede on phones, beside the text (which centres against it) from 56.25rem, taking 45% of the row (20 to 32rem), not all it could before the text gets any. The map is the hero's blueprint grid made of dots (`layout/elements/poland.js`: a hand-traced outline, a square grid of 0.15° rows, about 17 km), the grid's dots at 30% of the navy text colour; the two missing at the top are the Vistula Lagoon, kept (owner's call, 2026-10-14). Where the website's visitors came from (`visits.js`, a snapshot of Umami's cities, read off its panel since the free plan has no API) the dots are orange, contact's colour, bigger and brighter in eight steps on a log scale, so Warsaw's hundreds and a town's one or two both tell: one visitor a pale orange dot just bigger than the grid's (`--cold`), the most a big bright one (`--hot`, the bright orange; mixed in oklab), no outline. Kalisz is the bright orange ringed white with a white dot in its centre (in the list the same), biggest, with a slow spreading orange ring (still under reduced motion). The list names Kalisz and the eleven most visited places, each after its dot (sized and coloured as on the map), and nothing says what the dots count: the list implies the reach, and no wording claims clients there (the dots are visits; owner's call, 2026-10-14). Pointing at a place, in the list or on the map (any orange dot: the ones not in the list are named too), grows its dot 1.8×, drawn over all the others, and shows its name above it, bigger, both going back as the pointer leaves; in the list it goes white and bolder (Kalisz, bold already, orange), each name as wide as its bold so nothing moves. The list ends "i wiele innych", which grows every other dot, then "Twoje miasto?" (a button after a ring): pointed at, tapped or focused and clicked, one of the grid's grey dots (no visitor from there yet) lights up white, grown, "Twoje miasto?" over it, a different one each time, fading out as the pointer leaves.
+- **SEO:** navy, ruled above, a Title head and a lede. The long copy is always open, in 1 to 3 columns with a thin navy column rule.
+- **Rail contact head:** navy, as tall as the category toolbar's foot, carrying the logo, the phone and email line in small type, and the full-width Kontakt (orange, white on /kontakt).
 
-### Cards / Containers
-- **Corner Style:** 10px.
-- **Background:** White; an out-of-stock card drops to the subtle grey and dims its image to 55% at 0.4 saturation.
-- **Shadow Strategy:** Flat at rest; Lift plus a −2px translate on hover (see Elevation).
-- **Border:** 1px hairline, strengthening on hover, turning red on focus-within.
-- **Internal Padding:** 0.75rem on a phone, 1rem from 560px up. Media well is 1:1 with contained, multiplied product imagery; body carries the name and code; the footer pins to the bottom with colour swatches above the price.
+### Catalogue Cells
+Ruled cells on paper. The rules are the hairline grid background showing through 1px gaps. Each cell carries a section icon, a Subtitle name and a real count ("Na zamówienie" for made-to-order sections). The grid runs 1, 2, then 3 across, and a short last row spans. Hover grounds the cell in paper-2, turns the name red and lifts the icon slightly.
+
+### Catalogue Map
+A paper-2 band behind a 2px rule, always open: a Title head over 2 to 4 columns of section heads, subcategories and hairline-indented leaves, red on hover, with taller rows for touch.
+
+### Closing Ask
+The page ends on the question: a paper band behind a 2px rule, a Headline, a muted lede, and the write and call buttons beneath. On a phone the buttons stack full width and hang on both sides.
+
+### CMS Banners
+Tiles authored on a 4-column grid, squircled at every width (`banner`: 4rem on the widest, 1.5rem on a phone) and apart (0.75 to 1.25rem), in the column like the product cards under them. Banners leading the page start right under the hero, its navy going on behind their top (3 to 6rem). Every banner stands on a ground (`ground`, one of eight pastels in `layout/grounds.js`, light tints of the site's own colours, Papier first and a new banner's; one saved before the grounds gets Papier and its photo over the whole tile) with its title, subtitle and a small button (the whole tile is the link) on a paper panel ruled 2px in ink at its left, legible on any picture, its corners nested in the tile's (the tile's radius less the inset, 0.75rem at least). There is no red tile and no text colour to pick any more: the ground and the panel replaced them. Panel sizes follow the window, not the tile, so every banner on a page has the same panel, centred on the tile's height, never narrower than its longest word (no word is hyphenated: a broken one left the panel a hole beside it); tiles grow to fit it, their proportions a minimum (`overflow: clip`, not a scroll container, so they can). A tile narrower than 30rem (a phone's, a tablet's half tile; a container query on the tile) puts its picture's room under the panel, 16:9, from the panel's foot to the tile's sides and foot; the panel there is no wider than the tile, a word too long for it hyphenated (`hyphens: auto`, the page in Polish; broken only where it can't be), and its button is only its arrow, in the panel's top right corner, so the panel is shorter. Below 56.25rem the tiles follow one another in their grid's order, row by row, two across, their proportions a minimum height on the tile taken from its cell's width (4:3; a wide one, 3-4 columns, takes the row at its own, columns to rows, 4:1 for a row of four), never the cell's aspect ratio: the cells stretch, so two in a row are always as tall as each other, and a card taller than the proportions grows its tile. Below 35rem, one to a row, a tile is as tall as its content (the card with the picture beside it, smaller; on a phone under it). The picture (served as WebP by Directus's `banner` preset once it exists: the homepage's load asks Directus, so the page is rendered with the address that works and nothing swaps on the page, and a failed ask keeps the last answer; one failing anyway falls back to the original, checked once mounted too; loaded lazily, decoded off the main thread) takes the tile one of four ways (`fit`), always centred: in the room beside the panel (`side-`: from the panel's edge, no gap, to the tile's top, right and bottom edges) or in the whole tile under the panel (`full-`), covering it (`-cover`: as big as covering the room takes, once its proportions are known; the room cuts nothing, so what sticks out runs under the panel and only the tile's edges cut it; no shadow) or contained (`-contain`: whole, edge to edge, a soft shadow under it). A banner's `margin` ("Margines", for a picture with no room of its own round it) insets the room from the tile's edges and the panel by half the panel's padding (0.8 of it on a narrow tile). Banners stay title, subtitle and button as live text, never text baked into the picture: it is indexed, read aloud, and survives the re-crops below 56.25rem.
+
+**The homepage editor** (an admin's "Edytuj układ") is a panel over the rail (18rem: the rail's 16.5 and part of the gutter, never over the page's text), in the admin's look and with its components, loaded only when editing starts. The page beside it is the page as it is, every change showing at once. Every block is framed in faint dashed navy with its name on a tab, darker under the pointer; a click picks a block or a banner (a banner framed 4px in navy, a hidden one faded grey; the picked one gets a navy pill across the middle of each side, white-edged, its arrow pointing out outside the edge growing it a cell that way, the one pointing in inside it shrinking it from that side, one with nowhere to go not shown (a side with neither, no pill); and, while it's pointed at (so typing in the panel leaves it as it is), big navy arrows outlined white, each by the middle of its side, its tip 0.5rem in from that side's pill, as far from the edge on every side (one with no pill as by a one-button pill; by a two-button one further in), only those it can take: each moves it the fewest cells it can: into free cells, a step or over the banners on the way (one too big to swap with, a whole row's, say), or past a strip of the banners beside it that none sticks out of, they taking its place, a swap; never off the grid, down past the spare row or leaving a row empty), and in the grid's free cells and one spare row a dashed, squircled "+ Baner" adds one there. A picked block (not a built-in one) also gets its own buttons, up, down, hide and delete, in the tag's navy right beside its name, the two sticking to the window's top while the block scrolls by. The panel shows the page's blocks (picked from the list, the page scrolls to them; Tytuł, Kafelki or Kategoria added on top), a block's settings (moved, hidden, deleted; a title's lines, button and link; a category; a tiles block's banners) or a banner's: the picture from the admin's file library (a field's row, the picture small on a check, its name and size), how it takes the banner (four drawn choices on a squircled 2:1 banner, a disc doing what the picture will in its room, dashed where it isn't the whole banner: as big as covering it takes and cut only by the banner's edges, or touching it edge to edge when contained, beside the card or in the whole banner) and "Margines" under them (the drawings showing the inset room), the ground (the admin's select with swatches), the title and subtitle as plain lines (each a line on the banner; what the page keeps stays HTML), the button and its link (its size is the arrows on its sides on the page, its place the big ones inside them; the tiles block's panel says so, and that phones stack banners in the same order). Its foot keeps or drops the changes ("Zapisz zmiany", "Odrzuć"), or leaves ("Zakończ edycję"); the admin's floating buttons step aside while it's open, and offer "Edytuj układ" on the homepage only. Leaving the page with changes asks first, the admin's own question ("Zostań" / "Opuść"; closing the tab gets the browser's); leaving without them closes the editor.
+
+### Product Cards
+- **Corner Style:** square.
+- **Background:** white; out of stock drops to paper-2 with a greyed, half-faded image; Chwilowy brak fades the whole card to 0.8 until hovered.
+- **Edge:** a 1px hairline, recoloured by state (red sale, purple new, green bestseller, blue coming soon). On hover it turns ink and doubles through an outer ring.
+- **Structure:** a 1:1 white media well (a second photo fades in on hover), a two-line clamped 700 name over its mono code, colour swatches cut off with "+N", then the price row behind a paper-3 divider: "od", the price in `price`, red when on sale with the old price beside it. Focus draws a 3px red inset outline on the whole card.
+
+### Badges
+Mono uppercase pills with a 1.5px white ring: Nowość purple, Promocja red, Bestseller green, Wkrótce blue-light with navy text, Brak ink-600, Chwilowy brak paper-3.
 
 ### Inputs / Fields
-- **Style:** White ground, 1px hairline, 6px radius, 0.75rem padding, 0.875rem text. Labels sit above at 600 weight; a required field is marked with a red asterisk.
-- **Focus:** Border turns REED Red with a 3px translucent red halo (`color-mix(…, 16%)`). The global `:focus-visible` ring is a 2px red outline at 2px offset.
-- **Error / Disabled:** An invalid field takes the red border plus the brand wash ground, with red-active error text below at 0.8125rem; a form-level error is a wash-filled 6px block. The submit disables until consent is checked and explains itself in a subtle-ink hint.
-- **Search:** A single bordered shell holding a subtle-ink magnifier, a borderless 38px input, and a compact red submit inside the right edge; the shell owns the hover and focus-within treatment.
+White pill fields on an ink-300 hairline that darkens to ink-600 on hover. Focus is a 2px offset ring in the focus colour, with no border change inside it. That colour is red in general and orange inside the question form. Selects swap the native arrow for an ink chevron. The search field is one pill that takes the ring itself, with a compact round submit that turns red once there's a query. Errors stay red (`reed-red-tint` ground, `reed-red-deep` text) even inside the orange form.
 
 ### Navigation
-- **Desktop nav:** 0.875rem at 600, muted ink, 6px radius. Hover darkens to ink over subtle grey. The active item goes red and grows a 2px red underline inset to its padding box.
-- **Category rail:** A recursive list; nested levels indent behind a 1px hairline rail rather than a heavy border. Top level is ink at 600/1rem; an ancestor of the current page goes ink and 600; the exact current page goes red on brand wash.
-- **Mobile:** Below 900px the nav collapses into a bordered burger that toggles a full-width drawer beneath the header — search first, then a stack of 600-weight links divided by hairlines, the active one in red. The drawer animates open on a `grid-template-rows: 0fr → 1fr` transition over 340ms behind a 42%-ink scrim, closes on Escape or route change, and locks body scroll while open. The category rail uses the same disclosure pattern behind a "filters" toggle.
-- **Pagination:** 36px square number buttons, transparent-bordered and muted at rest, subtle-grey on hover; the current page takes a red border, brand wash and red text. Gaps render as an ellipsis; the page window is ±1 on a phone and ±2 from 640px.
-
-### Colour Swatch
-The system's one genuinely custom primitive: a 20px circle with a hairline ring, showing a single fill, a diagonally split two-colour fill (the second colour is a 45°-rotated half overlay), a multicolour asset, or a "?" at 50% opacity when the colour is unknown. Cards show up to six and count the rest as "+N". Hover raises a tooltip carrying the colour name and its availability; on a card the tooltips are rendered outside the card because the card's hover transform would break their positioning.
-
-### Browser Surfaces
-Selection is brand-100 ground with brand-900 text; caret and `accent-color` are REED Red; scrollbars are themed in both the WebKit pseudo-element form (12px, 3px-inset pill thumb on the subtle track) and the standard `scrollbar-color` form behind an `@supports` split.
+- **Rail:** the whole navigation, a fixed frame (navy head, search, scrolling category tree with REED's own emoji titles), sticky beside the content.
+- **Phone bar and menu:** described under Layout. Zadzwoń is orange because it is contact; Menu stays ink.
+- **Pagination:** pill buttons on an ink-300 hairline, thickening to an ink ring on hover.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** spend red only on action, current state, focus, required marks, errors and sale — the Reserved Red Rule is the system's central constraint.
-- **Do** use Stock Green (`#14652a`) for availability and for the inquiry-sent confirmation, so confirmation never reads as discount.
-- **Do** draw separation with a 1px hairline (`#dde0e7`) and a tonal step first; add shadow only for scroll, hover or a genuine overlay.
-- **Do** ship new status colours as a measured tinted-ground/same-hue-foreground pair at ≥6:1, and keep subtle ink no lighter than `#666d7d`.
-- **Do** size every gap on the 4px scale and every radius from 4/6/10/pill; no in-between values.
-- **Do** state responsive behaviour explicitly at 560 / 640 / 720 / 900 / 1100px, and offset sticky elements from `--header-h`, never from a literal pixel height.
-- **Do** keep the catalog at two columns on the narrowest phone and let auto-fill take over from a 210px (560px+) or 200px (900px+) floor.
-- **Do** scale text inside a CMS tile with container query units, because a tile's width is authored per-tile and unrelated to the viewport.
-- **Do** give numbers that share a column tabular figures, and set product and supplier codes in the mono stack.
-- **Do** end every product surface with the inquiry, and let it own the only primary button on the page.
+- **Do** give every contact control (to /kontakt, to the phone, the question form) the contact orange, bright on navy and ink, deep for outlined text on paper.
+- **Do** keep red for action, current state, focus, the sale badge and the logo tile.
+- **Do** use navy for structural bands only, with white heads and `navy-text` copy on them.
+- **Do** separate blocks with a 2px ink rule and never double it where two bands meet.
+- **Do** hang a pill that starts a text column by `--pill-hang` (`.hang`), and hang stacked full-width pills on both sides.
+- **Do** keep text on the column edge at every width, including inside full-bleed bands, banners and the footer beside the rail.
+- **Do** set section heads at `headline` and leave `hero` to the hero.
+- **Do** keep blocks square and controls pill-shaped and squircled; the inquiry panel's card radius and the banners are the only rounded containers.
+- **Don't** fold the SEO copy or the catalogue map behind a disclosure: opening one makes the page jump, and visitors who never click miss what's in it (owner's call, 2026-10-13).
+- **Do** end the homepage on the closing ask and every product page on the inquiry.
 
 ### Don't:
-- **Don't** fill a surface, heading, divider or decorative panel with REED Red, and don't introduce a second accent hue beside it.
-- **Don't** design any cart, checkout, price-total, quantity-stepper or order-status affordance; inquiry is the business model, not a stopgap.
-- **Don't** imply social proof — no testimonial cards, client logo strips, case-study tiles, star ratings or counter statistics, and no placeholder shapes that read as any of those. None of that evidence exists.
-- **Don't** add a third type family, and don't fake weights: the Archivo variable axis and the mono stack are the whole system.
-- **Don't** write a kicker, eyebrow or decorative label line above a heading. The uppercase label role is for functional captions ("7 KOLORÓW") and status pills only.
-- **Don't** use hard offset shadows, glyph or emoji icons, or a system display face; icons are inline stroked SVG at 16–22px in `currentColor`.
-- **Don't** hardcode a colour, radius, duration or gap in a component when a token exists, and don't reach for the legacy `--main` / `--white` / `--light` aliases in new work — they exist only to keep old shared components alive.
-- **Don't** hardcode homepage composition: the CMS block system (title / tiles / category / whitespace) must keep working, and a tile's authored 4-column placement must survive untouched from 900px up.
-- **Don't** replace the REED logo, recolour it, or set it in type.
-- **Don't** let a hover transform ship without a `prefers-reduced-motion` cancellation.
+- **Don't** use orange for promotions, sale prices or decoration; the sale badge and sale price are red.
+- **Don't** put a resting shadow on a card, band or panel. Shadows belong to genuine overlays only (toast, floating button, zoomed thumbnail).
+- **Don't** add a third shape (an in-between radius on a card or a band), or round the product cards.
+- **Don't** add a third type family, and don't set a second element at hero size.
+- **Don't** write a kicker, eyebrow or decorative label line above a heading. Mono uppercase is for codes, functional captions and badges.
+- **Don't** design cart, checkout, quantity or order-status affordances; inquiry is the business model.
+- **Don't** imply proof that doesn't exist: no testimonials, client logos or names, case studies, ratings, turnaround promises ("wycena w 24 h") or invented counts. The catalogue count is rendered from data.
+- **Don't** use glyph or emoji icons in the chrome (REED's own emoji in category titles are content, not icons); icons are inline stroked SVG in `currentColor`.
+- **Don't** hardcode a colour, radius, duration or gap when a token exists, and don't reach for the legacy `--main` / `--light` aliases in new work.
+- **Don't** hardcode homepage composition: the CMS blocks (title, tiles, category, plus the fixed catalogue and Siedziba) must keep working.
+- **Don't** replace, recolour or retype the REED logo.
 
 ---
 
@@ -371,7 +476,7 @@ Selection is brand-100 ground with brand-900 text; caret and `accent-color` are 
 
 <!-- A second, separate system in this file. The YAML frontmatter at the top belongs to the public website; the admin's
      tokens are the block below (normative for /admin), mirrored in .impeccable/design-admin.json. Source of truth:
-     frontend/src/lib/shared/styles/ui-admin.css. -->
+     frontend/src/lib/shared/styles/ui-admin-scope.css (imported by ui-admin.css). -->
 
 ```yaml
 name: REED Kalisz — Admin Panel
@@ -546,7 +651,7 @@ A one-ink palette: navy does all structural work on a soft cool ground, red is r
 - **Serial Red** (`serial-red`): REED's red, printed only as the form's serial — the item code after the editor title, the version number at the foot of the rail (there at 55% of a pink tint of it, full on hover) — the current page's icon in the rail, field errors, the red top or full edge of a danger / error modal, and the hover of a dangerous button.
 
 ### Tertiary
-- **Status tints** (`info-blue`, `success-green`, `warning-orange`, `new-purple`, `danger-red`, each with 200 / 300 steps in ui-admin.css): Tone buttons and row states. Never text colours, never large surfaces.
+- **Status tints** (`info-blue`, `success-green`, `warning-orange`, `new-purple`, `danger-red`, each with 200 / 300 steps in ui-admin-scope.css): Tone buttons and row states. Never text colours, never large surfaces.
 - **Link Blue** (`link-blue`): Text links inside a box, lightening to `#5b88c7` under the pointer.
 
 ### Neutral
@@ -560,7 +665,7 @@ A one-ink palette: navy does all structural work on a soft cool ground, red is r
 - **Navy alpha lines**: borders `rgb(27 47 78 / 0.12)`, a field's edge 0.26 with its bottom writing line 0.42, ink table lines 0.5, a ledger's head rule 0.3 and row ruling 0.075 (`--ledger-rule`), the cutting mat's cells, frame and ruler ticks all 0.06 (`--mat-line`), captions 0.9 / 0.7. The "black" overlays are navy too (backdrops 0.22 for an editor, 0.48 for a popup).
 
 ### Named Rules
-**The One Ink Rule.** Every line, caption and button on the form is printed in the navy ink or that ink seen through (alpha). There is no black and no neutral grey line; a colour not in ui-admin.css is one of its families.
+**The One Ink Rule.** Every line, caption and button on the form is printed in the navy ink or that ink seen through (alpha). There is no black and no neutral grey line; a colour not in ui-admin-scope.css is one of its families.
 
 **The Serial Rule.** Red marks what identifies the form (the item code, the version, the page you're on) and what destroys data. It is never a fill for a surface, heading or rule.
 
@@ -665,7 +770,7 @@ A paper panel (1rem squircle, lifted) on a 48% navy backdrop, 1.5rem side paddin
 ## Do's and Don'ts
 
 ### Do:
-- **Do** take every colour, radius and shadow from ui-admin.css; a colour that isn't there is one of its families.
+- **Do** take every colour, radius and shadow from ui-admin-scope.css; a colour that isn't there is one of its families.
 - **Do** draw lines in navy alpha (borders 0.12, field edges 0.26 / 0.42) so they darken with the ply they sit on.
 - **Do** put repeated elements on copy-blue, optional ones on yellow and uneditable ones on grey, and lay a nested ply flat.
 - **Do** label fields with the printed caption (0.7rem, 700, uppercase, 0.05em), and head ledger columns in sentence case (0.8rem, 600, full ink) on the rows' paper.

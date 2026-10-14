@@ -19,8 +19,12 @@ const CACHED = [
 const BROWSER_CACHE = 'public, max-age=0, s-maxage=150';
 const EDGE_CACHE = 'max-age=150';
 
+// the admin's pages carry its look on <html> (see ui-admin-scope.css; the admin layout keeps it on in-site navigation)
+const adminLook = ({ html }) => html.replace('<html lang="pl">', '<html lang="pl" class="ui-admin">');
+
 export async function handle({ event, resolve }) {
-  const response = await resolve(event);
+  const admin = event.route.id?.startsWith('/admin');
+  const response = await resolve(event, admin ? { transformPageChunk: adminLook } : undefined);
   const publicPage = event.request.method === 'GET' && !event.isDataRequest && event.route.id?.startsWith('/(website)');
   if (!publicPage || response.headers.has('cache-control')) return response;
   if (response.status !== 200) {

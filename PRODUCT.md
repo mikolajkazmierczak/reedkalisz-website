@@ -39,8 +39,8 @@ A supporting mechanism, real but secondary as a public claim: products are impor
 ## Capabilities and Constraints
 
 - **Stack:** SvelteKit 4 frontend (`frontend/`, dev on port 5000) over a Directus REST API (`backend/directus`, port 8055), plus "Heimdall", a custom socket server and supplier-API middleman (`backend/heimdall`, port 9999). Caddy fronts all three. Shared field definitions and calculation logic live in `shared/`.
-- **Styling is hand-written CSS**: three files in `frontend/src/lib/shared/styles/` (`global.css`, `ui-website.css`, `ui-admin.css`) plus component-scoped `<style>` blocks. No CSS framework, no design-token layer beyond the `--main-0..9` red scale and a handful of surface/state variables. The public site sets its type in **URW DIN** (Adobe Fonts/Typekit); Fira Sans, loaded globally from Google Fonts, is the admin panel's face.
-- **The public site is effectively not responsive.** The whole `src` tree contains exactly one `@media` rule, in a scrollbar declaration. Fixed pixel widths (e.g. `width: 800px` on the contact page) and a `padding: 0 4rem` fixed header mean small screens break. The viewport meta tag is present, so nothing structural blocks a fix. **This is a known gap, not a decision** — the user has confirmed mobile must work, and responsive behavior is a requirement for future public-site work.
+- **Styling is hand-written CSS**: four files in `frontend/src/lib/shared/styles/` (`global.css`, `ui-website.css`, `ui-admin.css` and the admin's look it imports, `ui-admin-scope.css`) plus component-scoped `<style>` blocks. No CSS framework; each side keeps its tokens as custom properties in its own file. The public site sets its type in **Bricolage Grotesque** (Google Fonts); the admin panel uses it too, a little smaller (`Bricolage Admin`, see ui-admin-scope.css).
+- **The public site is responsive.** It was effectively not until the 2026 rebuild (one `@media` rule in the whole tree, fixed pixel widths); every public surface now lays out from a 375px phone up, with a collapsing rail and named breakpoints in its CSS. Mobile working is a user-confirmed requirement for all future public-site work.
 - Nine supplier adapters exist (AXPOL, BlueCollection, BlueCollectionXML, EasyGifts, Macma, MidOcean, PAR, Promotionway, USBSystem). Availability is computed live rather than stored.
 - Directus exposes a public field allowlist; a newly added column returns 403 for the whole public query until it is granted.
 - The production instance is treated as read-only from this workspace: inspect, never mutate.
@@ -52,7 +52,7 @@ A supporting mechanism, real but secondary as a public claim: products are impor
 ## Brand Commitments
 
 - **Name:** REED, Kalisz. Public site at `reed.kalisz.pl`.
-- **The red identity is fixed.** The `--main-0` … `--main-9` scale anchored on `--main: #bf0417` is a brand asset, as are the existing logo files (`frontend/static/logo.svg`, `logo_black.svg`, `logo_red.svg`, `logo_white.svg`).
+- **The red identity is fixed.** REED red (`--red`, `#bf0417`) is a brand asset, as are the existing logo files (`frontend/static/logo.svg`, `logo_black.svg`, `logo_red.svg`, `logo_white.svg`).
 - **Polish only.** All copy, route names (`/produkty`, `/kategorie`, `/kontakt`) and labels stay Polish. No i18n layer is planned; do not design for translation.
 - **Inquiry-only, no checkout.** No cart, no online payment, no order status. This is the business model, not a missing feature — never design toward e-commerce affordances.
 - **Convention over novelty, at a high craft bar.** Offered a full slate of distinctive visual worlds for the public site on 2026-09-22, the user deliberately chose the category standard — the arrangement a B2B catalog buyer already expects — and named the quality bar as large retail catalogs (IKEA, Muji, Decathlon) for structure and responsive behavior, and SaaS-grade marketing sites (Stripe, Linear, Vercel) for typographic and spacing finish. Future design work executes conventions straight, without irony or smuggled novelty, and competes on craft and speed rather than on arrangement.
@@ -75,4 +75,4 @@ A supporting mechanism, real but secondary as a public claim: products are impor
 
 ## Accessibility & Inclusion
 
-No formal standard has been established for this project. One concrete, user-confirmed requirement stands: the public site must work on small screens, which today it does not.
+No formal standard has been established for this project. One concrete, user-confirmed requirement stands: the public site must work on small screens.

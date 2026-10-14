@@ -1,4 +1,4 @@
-import api from '$lib/server/api';
+import api, { apiUrl } from '$lib/server/api';
 import { makeTree, treeGetAllChildrenIDs } from '%/utils';
 import { enabledFilter, countProducts } from '#/products/fields';
 import { categoryFilter } from '#/sections';
@@ -57,6 +57,23 @@ async function preloadSliders(layout, categoriesItems, categoriesTree, rows) {
   return Object.fromEntries(slugs.map((slug, i) => [slug, pages[i]]));
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Whether Directus serves the `banner` preset yet (a banner's picture as WebP, see grounds' productSrc), asked of one
+ * banner's picture: the page is rendered with the address that works. A failing one swapped for the original once the
+ * page came alive made the banners flash in. No answer (Directus unreachable or failing: a 5xx; no preset is a 400)
+ * throws: the last answer stands (see load).
+ */
+async function bannerPreset(layout) {
+  const id = layout.flatMap((e) => e.tiles ?? []).find((t) => UUID.test(t.img ?? ''))?.img;
+  if (!id) return false;
+  const res = await fetch(`${apiUrl}/assets/${id}?key=banner`, { method: 'HEAD' });
+  if (res.status >= 500) throw new Error(`Directus answered ${res.status}`);
+  return res.ok;
+}
+let lastPreset = false;
+
 /**
  * Server-side, so the browser doesn't fetch it all again on hydration. The sliders' cards are streamed on in-site
  * navigation (the page shows at once, skeleton cards in their place, see CategorySlider) and awaited for a full page
@@ -71,5 +88,15 @@ export async function load({ depends, parent, isDataRequest }) {
   const summary = cached('summary', SERVER_MAX_AGE, async () => catalogueSummary(categoriesTree, await rows));
   const sliders = rows.then((rows) => preloadSliders(layout, categoriesItems, categoriesTree, rows));
   sliders.catch(() => {}); // handled even when the summary fails first: an unhandled rejection ends the process
-  return { layout, summary: await summary, sliders: isDataRequest ? sliders : await sliders };
+  // (a failed ask keeps the last answer, not a "no" serving every banner's full-size original until the next one)
+  const preset = cached('banner-preset', SERVER_MAX_AGE, () => bannerPreset(layout)).then(
+    (yes) => (lastPreset = yes),
+    () => lastPreset,
+  );
+  return {
+    layout,
+    summary: await summary,
+    sliders: isDataRequest ? sliders : await sliders,
+    bannerPreset: await preset,
+  };
 }

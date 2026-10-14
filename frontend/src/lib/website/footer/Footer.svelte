@@ -8,9 +8,15 @@
 
   // /kontakt already shows these fragments; keep only the rights line there.
   $: isContact = $page.url.pathname === '/kontakt';
+
+  // the year after the © as of today, so the CMS line doesn't go stale every January ("© 2002–2024" stays as typed)
+  const year = new Date().getFullYear();
+  const rightsHtml = marked.parse(
+    rights.content.replace(/©\s*(\d{4})(?![\d–-])/, (all, y) => (y < year ? `© ${year}` : all)),
+  );
 </script>
 
-<footer class="foot island">
+<footer class="foot">
   {#if !isContact}
     <div class="foot__main">
       <div class="wrap cols">
@@ -22,7 +28,7 @@
         <div class="col">
           <div class="prose tight">{@html marked.parse(office.content)}</div>
           <a
-            class="btn btn--ghost-light social"
+            class="btn btn--ghost-light social hang"
             href="https://www.facebook.com/reed.reklama.kalisz"
             target="_blank"
             rel="noopener noreferrer">
@@ -46,8 +52,7 @@
             class="map__link"
             href="https://www.openstreetmap.org/?mlat=51.757428&amp;mlon=18.061910#map=17/51.757428/18.061910"
             target="_blank"
-            rel="noreferrer"
-            >Dobrzecka 95, Kalisz — otwórz mapę<span class="visually-hidden"> (w nowej karcie)</span></a>
+            rel="noreferrer">Otwórz mapę: Dobrzecka 95, Kalisz<span class="visually-hidden"> (w nowej karcie)</span></a>
         </div>
       </div>
     </div>
@@ -55,7 +60,7 @@
 
   <div class="foot__rights">
     <div class="wrap">
-      {@html marked.parse(rights.content)}
+      {@html rightsHtml}
     </div>
   </div>
 </footer>
@@ -64,10 +69,15 @@
   .foot {
     background-color: var(--ink);
   }
+  /* Beside the rail the page's column starts after it: so does the footer's (the error page has no rail). */
+  @media (min-width: 61.25rem) {
+    :global(.sheet:has(.shell)) .foot {
+      padding-inline-start: var(--rail);
+    }
+  }
 
   .foot__main {
     padding: var(--sp-12) 0 var(--sp-10);
-    background-color: var(--ink);
     color: #fff;
   }
 
@@ -93,7 +103,7 @@
 
   .tight {
     max-width: 46ch;
-    color: #a8a49c;
+    color: var(--ink-300);
     font-size: var(--fs-sm);
     line-height: 1.6;
   }
@@ -122,16 +132,18 @@
 
   .foot__rights {
     padding: var(--sp-4) 0;
-    background-color: var(--ink);
-    border-top: 1px solid #2e2d2b;
-    color: #78746d;
+    border-top: 1px solid var(--ink-700);
+    color: var(--ink-300);
     font-size: var(--fs-xs);
   }
   .foot__rights :global(p) {
     margin: 0;
   }
   .foot__rights :global(a) {
-    color: #a8a49c;
+    color: var(--paper-3);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.3);
+    text-underline-offset: 0.18em;
   }
   .foot__rights :global(a:hover) {
     color: #fff;
@@ -151,7 +163,7 @@
     background-color: var(--paper-2);
   }
   .map__link {
-    color: #a8a49c;
+    color: var(--ink-300);
     font-size: var(--fs-xs);
     text-decoration: underline;
     text-underline-offset: 0.18em;

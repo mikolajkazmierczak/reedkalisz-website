@@ -111,7 +111,7 @@
   }
 
   // SEO comes from the product itself: its name, and an excerpt of its description
-  $: metaTitle = `${name} — ${code}`;
+  $: metaTitle = `${name} (${code})`;
   $: metaDescription =
     describe(description) || `${name} (${code}) z Twoim logo. Ceny ze znakowaniem, wycena na zapytanie.`;
   $: ogImage = mainGalleryImgs[0] ? `${baseUrl}/assets/${mainGalleryImgs[0].img}?key=medium` : null;
@@ -191,7 +191,7 @@
 <div class="shell">
   <SideRail items={data.menus.side} />
 
-  <div class="shell__main">
+  <div class="shell__main" id="tresc">
     <div class="wrap">
       {#if breadcrumbs.length}
         <nav class="crumbs label" aria-label="Ścieżka nawigacji">
@@ -488,8 +488,8 @@
     transition:
       opacity var(--dur) var(--ease),
       transform var(--dur) var(--ease),
-      background-color var(--dur) var(--ease),
-      color var(--dur) var(--ease);
+      background-color var(--dur) var(--ease-hover),
+      color 0s linear calc(var(--dur) * 0.3);
   }
   .fab.show {
     opacity: 1;
@@ -603,11 +603,9 @@
     width: 100%;
   }
   .buy__colors-n {
+    margin-left: var(--sp-2);
     color: var(--ink-400);
     font-size: var(--fs-xs);
-  }
-  .buy__colors-n {
-    margin-left: var(--sp-2);
   }
 
   .specs {
@@ -687,7 +685,7 @@
     text-decoration: underline;
     text-decoration-color: var(--ink-300);
     text-underline-offset: 0.2em;
-    transition: text-decoration-color var(--dur-fast) var(--ease);
+    transition: text-decoration-color var(--dur-fast) var(--ease-hover);
   }
   .buy__file:hover .buy__file-name {
     text-decoration-color: currentColor;
@@ -843,7 +841,6 @@
       --ground: var(--paper);
     }
     .buy__ask-title {
-      margin-bottom: var(--sp-4);
       padding-bottom: var(--sp-2);
       border-bottom: 2px solid var(--orange);
     }

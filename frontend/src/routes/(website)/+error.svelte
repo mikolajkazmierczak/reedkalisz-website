@@ -22,7 +22,7 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="wrap">
+<div class="wrap" id="tresc">
   <div class="err">
     <p class="err__status tnum">{$page.status}</p>
     {#if notFound}

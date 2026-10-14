@@ -37,12 +37,13 @@
   <Admin />
 {/if}
 
-<a class="skip-link" href="#main">Przejdź do treści</a>
+<!-- to each page's column (#tresc), past the rail; the error page has no rail -->
+<a class="skip-link" href="#tresc">Przejdź do treści</a>
 
 <div class="sheet">
   <MobileBar sideMenu={data.menus.side} />
 
-  <main id="main">
+  <main>
     <slot />
   </main>
 

@@ -2,46 +2,23 @@
   import { goto } from '$app/navigation';
 
   export let text = 'BUTTON';
-  export let arrow = true;
-  export let arrowLeft = false;
-
-  export let fontSize = null;
-
   export let href = null;
   export let target = '_self';
 
-  export let onclick = null;
-
-  if (href && onclick) {
-    throw new Error('GoButton: href and onclick cannot be used together');
-  }
-
   function handleClick() {
-    if (href) {
-      if (target == '_self') {
-        goto(href);
-      } else if (target == '_blank') {
-        window.open(href, '_blank')?.focus();
-      } else {
-        throw new Error('GoButton: invalid target');
-      }
-    } else if (onclick) {
-      onclick();
-    }
+    if (!href) return;
+    if (target == '_self') goto(href);
+    else if (target == '_blank') window.open(href, '_blank')?.focus();
+    else throw new Error('GoButton: invalid target');
   }
 </script>
 
-<!-- Label first so the baseline is the text's, not the svg's; order is flipped with flex-direction. -->
-<button class="go" class:reverse={arrowLeft} type="button" on:click={handleClick} style:font-size={fontSize}>
+<!-- Label first so the baseline is the text's, not the svg's. -->
+<button class="go" type="button" on:click={handleClick}>
   <span>{text}</span>
-  {#if arrow}
-    <svg class="go__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path
-        d={arrowLeft ? 'M19 12H5M11 6l-6 6 6 6' : 'M5 12h14M13 6l6 6-6 6'}
-        stroke-linecap="round"
-        stroke-linejoin="round" />
-    </svg>
-  {/if}
+  <svg class="go__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
 </button>
 
 <style>
@@ -59,7 +36,7 @@
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
-    transition: background-color var(--dur) var(--ease);
+    transition: background-color var(--dur) var(--ease-hover);
   }
   .go:hover {
     background-color: var(--accent-hover);
@@ -68,22 +45,12 @@
     background-color: var(--red-deep);
   }
 
-  .go.reverse {
-    flex-direction: row-reverse;
-  }
-  .go:not(.reverse) {
-    flex-direction: row;
-  }
-
   .go__icon {
     width: 1rem;
     height: 1rem;
     transition: transform var(--dur) var(--ease);
   }
-  .go:not(.reverse):hover .go__icon {
+  .go:hover .go__icon {
     transform: translateX(0.1875rem);
-  }
-  .go.reverse:hover .go__icon {
-    transform: translateX(-0.1875rem);
   }
 </style>

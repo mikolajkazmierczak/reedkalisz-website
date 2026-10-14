@@ -73,7 +73,6 @@
     left: 0;
     transform: translate(-50%, -50%);
     border-radius: 50%; /* TODO: probably should be calculated differently */
-    background-color: var(--primary-3);
     transition:
       width 300ms,
       height 300ms;

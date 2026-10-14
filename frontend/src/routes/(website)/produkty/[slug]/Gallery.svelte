@@ -19,7 +19,7 @@
   $: showMain = !small;
   $: showPicker = small ? shown.length > 0 : shown.length !== 1;
 
-  const label = (i) => (shown.length > 1 ? `${alt} — zdjęcie ${i + 1} z ${shown.length}` : alt);
+  const label = (i) => (shown.length > 1 ? `${alt}, zdjęcie ${i + 1} z ${shown.length}` : alt);
 
   // The lightbox takes focus and returns it on close, leaving the main photo at the one looked at last.
   let zoomed = null;

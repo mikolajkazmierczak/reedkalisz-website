@@ -1,6 +1,6 @@
 <script>
-  // The cutting mat under the page (see --mat in ui-admin.css): faint squares inside a frame that stops short of the
-  // board's edges, a ruler's ticks along the frame - four to a square, longer at each line, longest at every fifth.
+  // The cutting mat under the page (see --mat in ui-admin-scope.css): faint squares inside a frame that stops short of
+  // the board's edges, a ruler's ticks along the frame - four to a square, longer at each line, longest at every fifth.
   // It lies under what's on it and scrolls with it, as a board would: as big as its parent, inset by `--mat-inset`
   // (beside the menu, short of the leftover past the last half cell, up under an editor's bar).
   // Only its cells, frame and ticks are drawn: its margin shows what's under it (the board, a bar's frosting).

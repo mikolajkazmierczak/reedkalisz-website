@@ -21,7 +21,7 @@
   $: title = data.category?.name ?? (query ? `Wyniki: ${query}` : 'Cały katalog');
   // a section's copy of a category ("PROMOCJE / Długopisy") isn't the category itself
   $: section = data.category?.category != null && SECTIONS.find((s) => s.id === data.category.section);
-  $: documentTitle = section ? `${title} — ${section.name}` : title;
+  $: documentTitle = section ? `${title} (${section.name})` : title;
   $: icon = breadcrumbs.length === 1 && sectionKind(data.category.name);
 
   function getBreadcrumbs(category, tree) {
@@ -68,11 +68,11 @@
 
   $: metaDescription =
     describe(data.category?.description) ||
-    `${title} — ${countLabel} w katalogu REED Kalisz. Ceny ze znakowaniem, wycena na zapytanie.`;
+    `${title}: ${countLabel} w katalogu REED Kalisz. Ceny ze znakowaniem, wycena na zapytanie.`;
 </script>
 
 <svelte:head>
-  <title>{documentTitle}{data.page > 1 ? ` — strona ${data.page}` : ''} | REED Kalisz</title>
+  <title>{documentTitle}{data.page > 1 ? `, strona ${data.page}` : ''} | REED Kalisz</title>
   <meta name="description" content={metaDescription} />
   <!-- Don't index search results. -->
   {#if query}<meta name="robots" content="noindex, follow" />{/if}
@@ -84,7 +84,7 @@
 <div class="shell">
   <SideRail items={data.menus.side} />
 
-  <div class="shell__main">
+  <div class="shell__main" id="tresc">
     <div class="wrap content">
       <div class="intro">
         <div class="crumbs-slot">
@@ -132,7 +132,7 @@
         <div class="toolbar">
           {#if data.products?.length}
             <div class="toolbar__pager">
-              <Pagination limit={data.limit} page={data.page} count={data.count} limitLocked label="Paginacja — góra" />
+              <Pagination limit={data.limit} page={data.page} count={data.count} limitLocked label="Paginacja (góra)" />
             </div>
           {/if}
           <p class="toolbar__count tnum">{countLabel}</p>
@@ -157,7 +157,7 @@
           <h2>
             {#if query}Brak wyników dla „{query}”{:else}Brak produktów w tej kategorii{/if}
           </h2>
-          <p>Napisz do nas z nazwą albo kodem — sprowadzamy produkty na zamówienie.</p>
+          <p>Napisz do nas z nazwą albo kodem. Sprowadzamy produkty na zamówienie.</p>
           <a class="btn btn--orange" href="/kontakt">Napisz do nas</a>
         </div>
       {/if}

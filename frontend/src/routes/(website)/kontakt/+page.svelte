@@ -11,18 +11,18 @@
   <title>Kontakt | REED Kalisz</title>
   <meta
     name="description"
-    content="REED Kalisz — druk, grawerowanie laserowe, pieczątki i gadżety reklamowe. ul. Dobrzecka 95, 62-800 Kalisz." />
+    content="REED Kalisz: druk, grawerowanie laserowe, pieczątki i gadżety reklamowe. ul. Dobrzecka 95, 62-800 Kalisz." />
   {@html jsonLd(business)}
 </svelte:head>
 
 <div class="shell">
   <SideRail items={data.menus.side} />
 
-  <div class="shell__main">
+  <div class="shell__main" id="tresc">
     <section class="band">
       <div class="wrap">
         <h1 class="band__title">Kontakt</h1>
-        <p class="band__lede">Biuro w Kaliszu, pn–pt 10:00–14:00. Napisz albo zadzwoń — odpiszemy z ceną i terminem.</p>
+        <p class="band__lede">Biuro w Kaliszu, pn–pt 10:00–14:00. Napisz albo zadzwoń, odpiszemy z ceną i terminem.</p>
       </div>
     </section>
 

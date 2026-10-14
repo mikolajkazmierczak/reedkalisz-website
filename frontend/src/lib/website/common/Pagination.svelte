@@ -28,7 +28,7 @@
   };
   const setPage = (p) => {
     if (noSearchParams) page = p;
-    else browser && goto(`?l=${limit}&p=${p}${keep()}`, { noScroll: noSearchParams });
+    else browser && goto(`?l=${limit}&p=${p}${keep()}`);
   };
 
   const limits = [25, 50, 100];
@@ -124,9 +124,9 @@
     color: var(--ink);
     cursor: pointer;
     transition:
-      border-color var(--dur-fast) var(--ease),
-      box-shadow var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
+      border-color var(--dur-fast) var(--ease-hover),
+      box-shadow var(--dur-fast) var(--ease-hover),
+      color var(--dur-fast) var(--ease-hover);
   }
   .pg__btn:hover:not(:disabled) {
     border-color: var(--ink);
@@ -170,7 +170,7 @@
     /* Undo the bar's user-select: none. */
     -webkit-user-select: text;
     user-select: text;
-    transition: border-color var(--dur-fast) var(--ease);
+    transition: border-color var(--dur-fast) var(--ease-hover);
   }
   .pg__field:hover {
     border-color: var(--ink-600);

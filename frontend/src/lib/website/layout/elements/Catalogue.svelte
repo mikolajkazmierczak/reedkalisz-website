@@ -1,6 +1,9 @@
 <script>
   import SectionIcon from '#c/SectionIcon.svelte';
-  import { plural } from '#/utils';
+  import { plural, sectionKind } from '#/utils';
+
+  // made to the client's design, so a count of the few listed reads as a thin shop rather than what they are
+  const MADE_TO_ORDER = ['stamp', 'outdoor', 'plate'];
 
   export let summary;
 </script>
@@ -8,7 +11,7 @@
 {#if summary?.sections?.length}
   <section class="catalogue" aria-labelledby="catalogue-title">
     <header class="catalogue__head">
-      <h2 class="catalogue__title" id="catalogue-title">Działy katalogu</h2>
+      <h2 class="catalogue__title" id="catalogue-title">Katalog</h2>
       <a class="catalogue__all" href="/kategorie/_">
         Wszystkie produkty
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
@@ -21,8 +24,12 @@
         <a class="sec" href={s.href}>
           <div class="sec__icon"><SectionIcon name={s.name} /></div>
           <div class="sec__text">
-            <h2 class="sec__name">{s.name}</h2>
-            <span class="sec__count tnum">{s.count} {plural(s.count, ['pozycja', 'pozycje', 'pozycji'])}</span>
+            <h3 class="sec__name">{s.name}</h3>
+            {#if MADE_TO_ORDER.includes(sectionKind(s.name))}
+              <span class="sec__count">Na zamówienie</span>
+            {:else}
+              <span class="sec__count tnum">{s.count} {plural(s.count, ['pozycja', 'pozycje', 'pozycji'])}</span>
+            {/if}
           </div>
         </a>
       {/each}
@@ -39,8 +46,10 @@
     gap: var(--sp-2) var(--sp-5);
     padding-bottom: var(--sp-4);
   }
+  /* a section head, as big as the Title blocks' (see Title) */
   .catalogue__title {
-    font-size: var(--fs-h2);
+    font-size: var(--fs-h1);
+    letter-spacing: -0.028em;
   }
   .catalogue__all {
     display: inline-flex;
@@ -50,7 +59,7 @@
     font-size: var(--fs-sm);
     font-weight: 700;
     white-space: nowrap;
-    transition: color var(--dur-fast) var(--ease);
+    transition: color var(--dur-fast) var(--ease-hover);
   }
   .catalogue__all svg {
     width: 0.9375rem;
@@ -91,8 +100,8 @@
     background-color: var(--bg);
     color: var(--ink);
     transition:
-      background-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
+      background-color var(--dur-fast) var(--ease-hover),
+      color var(--dur-fast) var(--ease-hover);
   }
   .sec:hover {
     background-color: var(--paper-2);

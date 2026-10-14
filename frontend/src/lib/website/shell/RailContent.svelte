@@ -23,7 +23,7 @@
   in:growHead|global={{ enabled: expandable }}
   out:growHead|global={{ enabled: expandable, out: true }}>
   <div class="brand-row">
-    <a class="brand" href="/" aria-label="REED Kalisz — strona główna">
+    <a class="brand" href="/" aria-label="REED Kalisz, strona główna">
       <img src="/logo.svg" alt="REED" width="200" height="69" />
     </a>
     <a
@@ -114,8 +114,8 @@
     color: var(--ink-500);
     cursor: pointer;
     transition:
-      background-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
+      background-color var(--dur-fast) var(--ease-hover),
+      color var(--dur-fast) var(--ease-hover);
   }
   .search button svg {
     width: 0.9375rem;
@@ -148,7 +148,7 @@
   .reach a {
     color: #fff;
     white-space: nowrap;
-    transition: color var(--dur-fast) var(--ease);
+    transition: color var(--dur-fast) var(--ease-hover);
   }
   .reach a:hover {
     color: var(--orange-bright);

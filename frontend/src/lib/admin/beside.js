@@ -1,6 +1,7 @@
 // "+ Dodaj" at the end of a grid of boxes (a product's photos, files, variants): `ui-add--side` (turned on its side,
-// see ui-admin.css) while it's on a row with a box before it, as a wide button when it's on a row of its own. Worked out
-// from the page, again as the grid changes width or what's in it (its place in the grid doesn't depend on its size).
+// see ui-admin-scope.css) while it's on a row with a box before it, as a wide button when it's on a row of its own.
+// Worked out from the page, again as the grid changes width or what's in it (its place in the grid doesn't depend on
+// its size).
 export function beside(node) {
   const grid = node.parentElement;
   const check = () => {

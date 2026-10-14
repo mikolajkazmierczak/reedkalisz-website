@@ -8,8 +8,7 @@
   import Tooltip from '$c/Tooltip.svelte';
   import HoverCircle from '$c/HoverCircle.svelte';
 
-  import { layout, editing as layoutEditing, modified as layoutModified } from '#/layout/store';
-  import { save as layoutSave } from '#/layout/utils';
+  import { editing as layoutEditing } from '#/layout/store';
 
   const iconSize = '70%';
 
@@ -22,7 +21,7 @@
     : category?.slug;
   $: categoryUrl = categorySlug ? '/admin/kategorie/' + categorySlug : null;
 
-  // more specific pathnames go first (since '/produkty' also matches '/')
+  // a page's own, by how its path starts (the homepage's: just it, every path starts with '/')
   $: edits = [
     {
       pathname: '/produkty',
@@ -38,40 +37,20 @@
     },
     {
       pathname: '/',
+      exact: true,
       label: 'Edytuj układ',
       icon: 'grid',
-      data: layout,
       editing: layoutEditing,
-      modified: layoutModified,
-      save: layoutSave,
     },
   ];
 
-  $: edit = edits.find((e) => pathname.startsWith(e.pathname));
+  $: edit = edits.find((e) => (e.exact ? pathname === e.pathname : pathname.startsWith(e.pathname)));
 
-  // stores
-  $: data = edit?.data;
   $: editing = edit?.editing;
-  $: modified = edit?.modified;
-
-  async function handleToggle() {
-    $editing = !$editing;
-    if ($modified && edit?.save) {
-      try {
-        await edit.save($data);
-      } catch (e) {
-        // back to editing, with the changes: the website has no error panel, a silent failure looked saved
-        $editing = true;
-        alert(`Nie udało się zapisać układu. Spróbuj ponownie.\n${e.message}`);
-        return;
-      }
-      $modified = false;
-    }
-    edit = edit;
-  }
 </script>
 
-<div class="admin">
+<!-- editing the homepage, its panel has the saving and closing (see the layout's Editor) -->
+<div class="admin" class:away={$layoutEditing}>
   {#if edit?.url || $editing !== undefined}
     <div class="strip" transition:slide={{ duration: 200 }}>
       {#if edit?.url}
@@ -83,11 +62,11 @@
           </div>
         </a>
       {:else if $editing !== undefined}
-        <button on:click={handleToggle}>
+        <button on:click={() => ($editing = true)}>
           <HoverCircle color="var(--red-deep)" />
-          <Tooltip>{$editing ? ($modified ? 'Zapisz' : 'Anuluj') : edit.label}</Tooltip>
+          <Tooltip>{edit.label}</Tooltip>
           <div class="content">
-            <Icon name={$editing ? ($modified ? 'save' : 'edit') : edit.icon} width={iconSize} color="#fff" />
+            <Icon name={edit.icon} width={iconSize} color="#fff" />
           </div>
         </button>
       {/if}
@@ -119,6 +98,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--margin);
+  }
+
+  .admin.away {
+    display: none;
   }
 
   .strip {

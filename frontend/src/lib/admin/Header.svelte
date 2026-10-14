@@ -92,7 +92,7 @@
     display: flex;
     padding: var(--mat-margin) calc(var(--mat-margin) + 1px + var(--leftover)) 0
       calc(var(--nav-width) + var(--mat-margin));
-    height: var(--header-height); /* see ui-admin.css */
+    height: var(--header-height); /* see ui-admin-scope.css */
     /* its mat where the page's starts and ends (see Mat) */
     --mat-left: var(--nav-width);
     --mat-right: var(--leftover);

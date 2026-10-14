@@ -130,11 +130,13 @@
             use:onLoad={(node) => reveal(layer, node)}
             on:transitionend={settle} />
         {:else}
-          <div class="tile__none" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <!-- said, so it reads as a product without a photo, not a picture that failed to load -->
+          <div class="tile__none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
               <rect x="3" y="3" width="18" height="18" />
               <path d="m3 16 5-5 4 4 3-3 6 6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
+            <span class="label">Brak zdjęcia</span>
           </div>
         {/each}
         {#if hoverSrc && hovered}
@@ -208,9 +210,9 @@
     background-color: var(--surface);
     box-shadow: 0 0 0 0 var(--edge);
     transition:
-      border-color var(--dur-fast) var(--ease),
-      box-shadow var(--dur-fast) var(--ease),
-      background-color var(--dur-fast) var(--ease);
+      border-color var(--dur-fast) var(--ease-hover),
+      box-shadow var(--dur-fast) var(--ease-hover),
+      background-color var(--dur-fast) var(--ease-hover);
   }
   .tile.t-soon {
     --edge: var(--blue);
@@ -350,14 +352,18 @@
     }
   }
   .tile__none {
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-3);
     width: 100%;
     height: 100%;
+    background-color: var(--paper-2);
     color: var(--paper-4);
   }
   .tile__none svg {
-    width: 32%;
+    width: 26%;
   }
 
   .tile__body {

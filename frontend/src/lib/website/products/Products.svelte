@@ -31,7 +31,7 @@
     </svg>
     <h2>Brak produktów</h2>
     <p>
-      W tej kategorii nie ma jeszcze produktów. Sprawdź inną kategorię lub napisz do nas — wiele rzeczy sprowadzamy na
+      W tej kategorii nie ma jeszcze produktów. Sprawdź inną kategorię lub napisz do nas. Wiele rzeczy sprowadzamy na
       zamówienie.
     </p>
     <a class="btn btn--orange empty__cta" href="/kontakt">Napisz do nas</a>
@@ -68,9 +68,7 @@
     color: inherit;
     text-decoration: none;
     overflow: hidden;
-    transition:
-      border-color var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease);
+    transition: border-color var(--dur) var(--ease-hover);
   }
   .promo:hover {
     border-color: var(--border-strong);

@@ -215,8 +215,8 @@
     background-color: var(--surface);
     cursor: pointer;
     transition:
-      background-color var(--dur-fast) var(--ease),
-      border-color var(--dur-fast) var(--ease);
+      background-color var(--dur-fast) var(--ease-hover),
+      border-color var(--dur-fast) var(--ease-hover);
   }
   .qf__consent input::after {
     content: '';

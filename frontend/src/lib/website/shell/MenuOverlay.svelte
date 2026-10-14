@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
   import RailContent from './RailContent.svelte';
   import { cover } from './menuMotion';
+  import { lockScroll } from '#/utils';
 
   export let open = false;
   export let sideMenu = [];
@@ -9,6 +10,7 @@
   let overlay;
   let closeBtn;
   let wasOpen = false;
+  let unlock = null;
 
   $: if (typeof document !== 'undefined' && open !== wasOpen) {
     wasOpen = open;
@@ -22,14 +24,15 @@
     return [...rest, ...document.querySelectorAll('.skip-link')];
   }
   async function onOpen() {
-    document.body.style.overflow = 'hidden';
+    unlock = lockScroll();
     await tick();
     for (const el of behind()) el.inert = true;
     closeBtn?.focus();
     overlay?.querySelector('.item.exact')?.scrollIntoView({ block: 'center' });
   }
   function onClose() {
-    document.body.style.overflow = '';
+    unlock?.();
+    unlock = null;
     for (const el of behind()) el.inert = false;
     document.querySelector('.mbar .menu-btn')?.focus({ preventScroll: true });
   }
@@ -136,8 +139,8 @@
     font-weight: 700;
     cursor: pointer;
     transition:
-      background-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
+      background-color var(--dur-fast) var(--ease-hover),
+      color var(--dur-fast) var(--ease-hover);
   }
   .close:hover {
     background-color: #fff;

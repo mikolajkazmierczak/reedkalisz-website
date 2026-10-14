@@ -65,7 +65,7 @@
     border-radius: var(--border-radius);
     corner-shape: squircle;
     padding: 0 1rem;
-    height: var(--bar-button); /* see ui-admin.css */
+    height: var(--bar-button); /* see ui-admin-scope.css */
     font-size: 0.95rem;
     text-decoration: none;
     white-space: nowrap;

@@ -1,5 +1,7 @@
 <script>
-  import api from '$/api';
+  import api, { baseUrl } from '$/api';
+  import Icon from '$c/Icon.svelte';
+  import { bytesToReadable } from '%/utils';
   import { read as fields } from '%/fields/directus_files';
 
   import Button from '@c/Button.svelte';
@@ -11,6 +13,10 @@
 
   export let selected;
   export let fileContext = null; // in a product: { used, history } file ids, shown first
+  // 'tile': the file as the library shows it (a product's pictures); 'button': a field's row, its picture small on the
+  // left and its name and size beside it (the homepage editor's banner)
+  export let look = 'tile';
+  export let empty = 'Wybierz plik'; // the button's text while there's none
   let file;
   let fileData; // just what File shows
 
@@ -62,7 +68,32 @@
   $: read(selected);
 </script>
 
-<File {...fileData} marked={false} on:click={open} />
+{#if look === 'button'}
+  <button class="pick" type="button" on:click={open}>
+    <span class="pick__thumb">
+      {#if selected}
+        <img src="{baseUrl}/assets/{selected}?key=thumb" alt="" />
+      {:else}
+        <Icon name="image_add" width="55%" dark />
+      {/if}
+    </span>
+    <span class="pick__text">
+      <span class="pick__name">{selected ? (fileData?.title ?? fileData?.filename_download ?? '…') : empty}</span>
+      {#if selected && fileData}
+        <span class="pick__meta"
+          >{[
+            fileData.width && `${fileData.width} × ${fileData.height}`,
+            fileData.filesize && bytesToReadable(fileData.filesize),
+          ]
+            .filter(Boolean)
+            .join(' · ')}</span>
+      {/if}
+    </span>
+    <Icon name="chevron_right" width="1rem" dark />
+  </button>
+{:else}
+  <File {...fileData} marked={false} on:click={open} />
+{/if}
 
 {#if opened}
   <!-- the library's own bar on top, not the frosted one -->
@@ -79,3 +110,61 @@
     </Library>
   </Modal>
 {/if}
+
+<style>
+  /* a field's row: its picture on the left, small, on the light check of a transparent one; its name beside it */
+  .pick {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--half);
+    width: 100%;
+    padding: var(--quarter);
+    padding-right: var(--half);
+    border: 1px solid var(--edge);
+    border-bottom-color: var(--edge-line);
+    border-radius: var(--field-radius);
+    corner-shape: squircle;
+    background-color: var(--paper-field);
+    text-align: left;
+    transition: border-color 100ms;
+  }
+  .pick:hover,
+  .pick:focus-visible {
+    border-color: var(--navy-500);
+  }
+  .pick__thumb {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: calc(2 * var(--cell));
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    corner-shape: squircle;
+    background: repeating-conic-gradient(var(--grey-100) 0 25%, var(--paper-field) 0 50%) 50% / 0.75rem 0.75rem;
+  }
+  .pick__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .pick__text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+  .pick__name {
+    overflow: hidden;
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .pick__meta {
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+</style>
