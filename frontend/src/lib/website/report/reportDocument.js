@@ -24,8 +24,7 @@ const c = {
   redTint: '#fbeff0',
   navy: '#1b2f4e',
   purple: '#5b2a86',
-  orange: '#c2560b',
-  orangeLight: '#ffa45e',
+  orange: '#bc4a0b', // the website's --orange-deep: orange text on white
   green: '#166534',
   blueLight: '#d9e7fb',
 };

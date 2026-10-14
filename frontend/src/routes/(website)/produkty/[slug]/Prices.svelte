@@ -8,33 +8,17 @@
   export let prices;
   export let pricesSale;
   export let pricesWithLabeling;
-  /** False when the caller already shows the note beside its own heading. */
+  /** False when the section's head already shows the note for every price list. */
   export let showIncludes = true;
+
+  $: includes = pricesWithLabeling && showIncludes;
 </script>
 
-{#if pricesWithLabeling && showIncludes}
-  <div class="includes"><IncludesLabeling /></div>
-{/if}
-
-{#if (field[0] && field[1]) || place}
-  <div class="meta">
-    {#if field[0] && field[1]}
-      <span class="meta__item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-          <path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>Pole znakowania: <b class="tnum">{field[0]}&times;{field[1]} mm</b></span>
-      </span>
-    {/if}
-    {#if place}
-      <span class="meta__item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-          <path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z" stroke-linejoin="round" />
-          <circle cx="12" cy="10" r="2.4" />
-        </svg>
-        <span>Miejsce znakowania: <b>{place}</b></span>
-      </span>
-    {/if}
+{#if $$slots.default || includes}
+  <!-- the labeling's name (the slot); the note beside it, when the section's head doesn't carry it for every list -->
+  <div class="head">
+    <slot />
+    {#if includes}<IncludesLabeling />{/if}
   </div>
 {/if}
 
@@ -42,39 +26,19 @@
   <PricesTable
     prices={prices.filter((p) => p.enabled)}
     pricesSale={pricesSale.filter((p) => p.enabled)}
-    withLabeling={!!pricesWithLabeling} />
+    withLabeling={!!pricesWithLabeling}
+    field={field[0] && field[1] ? `${field[0]}×${field[1]} mm` : null}
+    {place} />
 </div>
 
 <style>
-  .includes {
-    margin-bottom: var(--sp-3);
-  }
-  .meta {
+  .head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--sp-2) var(--sp-5);
-    margin-bottom: var(--sp-3);
-  }
-  /* the icon, then the text: a long place (supplier's "RIGHT HANDED / LEFT HANDED / …") wraps beside it */
-  .meta__item {
-    display: inline-flex;
-    align-items: flex-start;
-    gap: var(--sp-2);
-    min-width: 0;
-    color: var(--text-muted);
-    font-size: var(--fs-sm);
-  }
-  .meta__item svg {
-    flex: none;
-    width: 1rem;
-    height: 1rem;
-    margin-top: 0.15rem; /* level with the first line */
-    color: var(--text-subtle);
-  }
-  .meta__item b {
-    color: var(--text);
-    font-weight: 600;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+    margin-bottom: var(--sp-2);
   }
 
   .prices {

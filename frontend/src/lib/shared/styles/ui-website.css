@@ -20,10 +20,11 @@
 
   --purple: #5b2a86;
 
-  --orange: #c2560b;
-  --orange-bright: #ff8a3d;
-  --orange-light: #ffa45e;
-  --orange-deep: #b04d0a;
+  --orange: #f36e2f; /* contact: fills (ink on them; white is 3:1), outlines, text on navy (4.5:1) and ink */
+  --orange-small: #ff7637; /* thin lines, button text and marks on navy or ink: thin, the orange reads darker (5:1 on navy) */
+  --orange-light: #ff8e59; /* a filled orange button's hover; small text on navy or ink, which reads darker still (5.9:1 on navy) */
+  --orange-large: #f4661d; /* large text on paper or white: as light as 3:1 allows */
+  --orange-deep: #bc4a0b; /* orange text on paper or white (5:1), where the orange is 2.9:1 */
 
   --green: #166534;
 
@@ -291,20 +292,20 @@ textarea {
 }
 .btn--orange {
   background-color: var(--orange);
-  color: #fff;
-}
-.btn--orange:hover {
-  background-color: var(--orange-bright);
   color: var(--ink);
 }
-/* on navy (the hero, the phone menu): the contact orange's bright shade, the dark one doesn't read there */
+.btn--orange:hover {
+  background-color: var(--orange-light);
+  color: var(--ink);
+}
+/* on navy (the hero, the phone menu) */
 .btn--ghost-orange {
-  border-color: var(--orange-bright);
-  color: var(--orange-bright);
+  border-color: var(--orange-small);
+  color: var(--orange-small);
 }
 .btn--ghost-orange:hover {
-  border-color: var(--orange-bright);
-  background-color: var(--orange-bright);
+  border-color: var(--orange);
+  background-color: var(--orange);
   color: var(--ink);
 }
 .btn--ghost-light {

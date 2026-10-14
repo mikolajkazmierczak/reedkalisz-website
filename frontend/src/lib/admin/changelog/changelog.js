@@ -25,6 +25,23 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.30.1',
+    date: '2026-10-14',
+    title: 'Nowy pomarańczowy i cennik',
+    highlight: [
+      '**Pomarańczowy kontaktu** jest nowy, żywszy: przyciski „Napisz do nas”, „Kontakt” i „Zadzwoń”, formularz zapytania, mapa w „Siedzibie” i hasło w nagłówku strony głównej. Napisy na pomarańczowych przyciskach są teraz czarne zamiast białych, żeby były czytelne.',
+      '**Cennik produktu** jest zwięźlejszy: „Ceny zawierają znakowanie” stoi raz, obok nagłówka „Cennik”, gdy dotyczy wszystkich cen, a pole i miejsce znakowania są ostatnimi wierszami tabeli z cenami, więc od razu widać, do którego znakowania należą.',
+    ],
+    all: [
+      'Kilka miejsc znakowania do wyboru stoi w cenniku jedno pod drugim.',
+      '„Pole znakowania” i „Miejsce znakowania” nazywają się w cenniku „Pole” i „Miejsce”.',
+      'Słowo „Zapytanie” w ramce zapytania na stronie produktu jest jaśniejsze.',
+      'Kalisz na liście miejsc w „Siedzibie” ma cieńszą białą obwódkę.',
+      'E-mail i telefon na karcie produktu (PDF) mają nowy odcień pomarańczowego.',
+      'Poprawka: kartki z drukarki druków samokopiujących na rysunku w nagłówku nie mają już dziurek i pasków po bokach, a perforacja między nimi to cienka przerywana linia.',
+    ],
+  },
+  {
     version: '1.30.0',
     date: '2026-10-14',
     title: 'Porządki na stronie głównej',

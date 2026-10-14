@@ -618,9 +618,9 @@
     {/each}
   </g>
 
-  <!-- the forms printer, on its post at the far left: its print unit, the two rolls the forms come out between
-       (tractor holes and tear-off strips down the sides, a perforation between pages), the knife that cuts a page off,
-       and the box on the floor it falls into -->
+  <!-- the forms printer, on its post at the far left: its print unit, the two rolls the forms come out between (a
+       perforation between pages, nothing down the sides: tractor holes would read as fanfold, which REED doesn't
+       print), the knife that cuts a page off, and the box on the floor it falls into -->
   <g>
     <rect class="b" x="96" y="210" width="12" height="230" />
     <path class="p" d="M92 440h20l3 12h-26z" />
@@ -649,13 +649,18 @@
     {#each [{ tops: feed, cls: 'feed', clip: 'nip' }, { tops: [CUT], cls: 'fall', clip: 'floor' }] as { tops, cls, clip }}
       <g clip-path="url(#hm-{clip})">
         <g class={cls}>
+          <!-- the fills first, so a page's fill doesn't cover the perforation above it; the joined pages' edge there is
+               only the perforation, the lowest one's bottom and a cut page's top are cut edges -->
           {#each tops as y}
-            <rect class="b" x="32" {y} width="50" height={PAGE} />
-            <path class="soft perf" d="M39 {y}V{y + PAGE}M75 {y}V{y + PAGE}M32 {y + PAGE}H82" />
-            {#each range(y + 4, y + PAGE - 4, 8) as hy}
-              <circle class="soft" cx="35.5" cy={hy} r="1.2" />
-              <circle class="soft" cx="78.5" cy={hy} r="1.2" />
-            {/each}
+            <rect class="b" x="32" {y} width="50" height={PAGE} stroke="none" />
+          {/each}
+          {#each tops as y, i}
+            {#if cls === 'fall'}
+              <rect x="32" {y} width="50" height={PAGE} />
+            {:else}
+              <path d="M32 {y}V{y + PAGE}M82 {y}V{y + PAGE}{i ? '' : `M32 ${y + PAGE}H82`}" />
+              <path class="soft perf" d="M32 {y}H82" />
+            {/if}
             <path class="soft" d="M44 {y + 8}H70M44 {y + 13}H70M44 {y + 18}H64" />
             <rect class="mark" x="44" y={y + 24} width="11" height="5" />
             <path class="soft" d="M44 {y + 34}H70M44 {y + 39}H66" />
@@ -967,7 +972,7 @@
   /* a faint band of the logo's orange round the engraving head, as big as the logo it engraves on the mug: its paint,
      behind the mug while it engraves, level with the logo's place */
   .stripe {
-    fill: var(--orange-bright);
+    fill: var(--orange-small);
     fill-opacity: 0.45;
     stroke: none;
   }
@@ -997,7 +1002,7 @@
   }
   /* the logo's space: the hero line's orange ("z Twoim logo"), outlined like the parts */
   .mark {
-    fill: var(--orange-bright);
+    fill: var(--orange-small);
     stroke-width: 1;
   }
   .beam {

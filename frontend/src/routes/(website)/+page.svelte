@@ -374,9 +374,9 @@
     width: 100%;
     aspect-ratio: 716 / 422;
   }
-  /* as .btn--ghost-orange */
+  /* the reference orange: the smaller oranges are tuned to look like this one */
   .hero__title em {
-    color: var(--orange-bright);
+    color: var(--orange);
   }
   .hero__title {
     font-size: var(--fs-hero);
@@ -591,7 +591,7 @@
   }
   .ask__tel:hover {
     background-color: var(--orange);
-    color: #fff;
+    color: var(--ink);
   }
 
   /* Spacing between blocks (replaces the old PRZERWA element). */

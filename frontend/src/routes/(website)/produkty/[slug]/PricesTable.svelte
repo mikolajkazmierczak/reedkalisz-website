@@ -1,10 +1,14 @@
 <script>
   import { onMount } from 'svelte';
+  import PricesSpec from './PricesSpec.svelte';
 
   export let prices;
   export let pricesSale;
   /** The price row is labelled with what the price includes. */
   export let withLabeling = false;
+  /** The labeling's field ("40×4 mm") and place, as the table's last rows. */
+  export let field = null;
+  export let place = null;
 
   // Horizontal when it fits, else vertical — measured from the table itself, not a breakpoint.
   let box;
@@ -51,6 +55,7 @@
             </td>
           </tr>
         {/each}
+        <PricesSpec {field} {place} />
       </tbody>
     </table>
   {:else}
@@ -82,6 +87,7 @@
               </td>
             {/each}
           </tr>
+          <PricesSpec {field} {place} span={prices.length} />
         </tbody>
       </table>
     </div>
@@ -104,7 +110,7 @@
 
   th,
   td {
-    padding: var(--sp-2);
+    padding: 0.375rem var(--sp-2);
     border: 1px solid var(--border);
     text-align: right;
     white-space: nowrap;

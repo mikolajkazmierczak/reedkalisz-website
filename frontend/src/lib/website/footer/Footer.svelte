@@ -127,7 +127,7 @@
     text-underline-offset: 0.18em;
   }
   .tight :global(a:hover) {
-    color: var(--orange-bright);
+    color: var(--orange-light);
   }
 
   .foot__rights {

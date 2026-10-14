@@ -70,6 +70,9 @@
   // the paragraph (net or gross, what's binding) is about the prices: over them, under the description without them
   $: post = commercial_details?.content ?? null;
   $: pricesShown = showCustomPrices || pricedLabelings.length > 0;
+  // labeling prices always include the marking: when the custom ones do too (or aren't shown), the note goes once,
+  // beside "Cennik", instead of on every price list
+  $: allIncludeLabeling = !showCustomPrices || !!custom_prices_with_labeling;
   $: size = [size_x, size_y, size_z].filter((s) => s).join(' x ') + 'mm';
 
   $: enabledStorage = storage?.filter((s) => s.enabled) ?? [];
@@ -224,7 +227,10 @@
 
             {#if pricesShown}
               <section class="sec sec--pricing">
-                <h2 class="sec__title" id="cennik">Cennik</h2>
+                <div class="sec__head">
+                  <h2 class="sec__title" id="cennik">Cennik</h2>
+                  {#if allIncludeLabeling}<IncludesLabeling />{/if}
+                </div>
                 {#if post}
                   <div class="prose pricings__post">{@html marked.parse(post + '\n\n---')}</div>
                 {/if}
@@ -232,6 +238,7 @@
                   {#if showCustomPrices}
                     <div class="pricing">
                       <Prices
+                        showIncludes={!allIncludeLabeling}
                         field={[labeling_field_x, labeling_field_y]}
                         place={labeling_place}
                         prices={custom_prices}
@@ -243,7 +250,13 @@
                   {#each pricedLabelings as labeling}
                     {@const { code, type, name, company } = labeling.labeling}
                     <div class="pricing">
-                      <div class="pricing__head">
+                      <Prices
+                        showIncludes={!allIncludeLabeling}
+                        field={[labeling.labeling_field_x, labeling.labeling_field_y]}
+                        place={labeling.labeling_place}
+                        prices={labeling.prices}
+                        pricesSale={labeling.prices_sale}
+                        pricesWithLabeling>
                         <h3 class="pricing__title">
                           <span>{name}</span>
                           <span class="pricing__meta">
@@ -252,15 +265,7 @@
                             {#if $me && company?.name}<span class="company">({company.name})</span>{/if}
                           </span>
                         </h3>
-                        <IncludesLabeling />
-                      </div>
-                      <Prices
-                        showIncludes={false}
-                        field={[labeling.labeling_field_x, labeling.labeling_field_y]}
-                        place={labeling.labeling_place}
-                        prices={labeling.prices}
-                        pricesSale={labeling.prices_sale}
-                        pricesWithLabeling />
+                      </Prices>
                     </div>
                   {/each}
                 </div>
@@ -532,8 +537,8 @@
   }
   .buy__ask-word {
     margin-right: 0.25rem;
-    color: var(--orange);
-    font-size: var(--fs-h3);
+    color: var(--orange-large);
+    font-size: max(var(--fs-h3), 1.1875rem); /* 19px bold at least: large text, which needs 3:1 */
     font-weight: 700;
   }
   .buy__ask-title strong {
@@ -718,6 +723,22 @@
     border-bottom: var(--rule);
     font-size: var(--fs-h2);
   }
+  /* "Cennik" with the note on its right, the rule under both */
+  .sec__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+    margin-bottom: var(--sp-4);
+    padding-bottom: var(--sp-2);
+    border-bottom: var(--rule);
+  }
+  .sec__head .sec__title {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
 
   /* each card takes three rows (its name, its availability, its photos - see Storage), so a row of cards lines up */
   .storages {
@@ -729,7 +750,7 @@
   .pricings {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-8);
+    gap: var(--sp-6);
   }
   .pricings__post {
     margin-bottom: var(--sp-6);
@@ -737,14 +758,6 @@
   .pricing {
     position: relative;
     min-width: 0;
-  }
-  .pricing__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--sp-2) var(--sp-4);
-    margin-bottom: var(--sp-3);
   }
   .pricing__title {
     display: flex;

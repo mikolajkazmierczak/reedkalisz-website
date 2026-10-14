@@ -190,8 +190,8 @@
 <style>
   .headquarters {
     --dot: rgb(207 220 238 / 0.3); /* the grid's */
-    --cold: #e7b393; /* a visitor or two: the orange, pale */
-    --hot: var(--orange-bright); /* the most: contact's orange, lit, to read on the navy */
+    --cold: #eab099; /* a visitor or two: the orange, pale */
+    --hot: var(--orange-small); /* the most: contact's orange, as a dot */
     background-color: var(--navy);
     color: #fff;
   }
@@ -260,7 +260,7 @@
   }
   /* Kalisz: orange, ringed white, a white dot in its centre (as in the list) */
   .home .dot circle {
-    fill: var(--orange-bright) !important;
+    fill: var(--orange-small) !important;
     stroke: #fff;
     stroke-width: 0.14;
   }
@@ -308,7 +308,7 @@
   /* Kalisz calls out: a ring of its orange, spreading and fading */
   .pulse {
     fill: none;
-    stroke: var(--orange-bright);
+    stroke: var(--orange-small);
     stroke-width: 0.12;
     transform-box: fill-box;
     transform-origin: center;
@@ -388,11 +388,11 @@
   }
   .city--home::before {
     width: 0.8rem;
-    border: 2px solid #fff;
-    background: radial-gradient(circle closest-side, #fff 0 45%, var(--orange-bright) 49%);
+    border: 1px solid #fff; /* thin, and a small core: this small, more white would drown the orange */
+    background: radial-gradient(circle closest-side, #fff 0 32%, var(--orange-small) 37%);
   }
   .city--home.on {
-    color: var(--orange-bright);
+    color: var(--orange-small);
   }
   /* three pale orange dots, growing */
   .city--more::before {

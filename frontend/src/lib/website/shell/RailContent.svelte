@@ -151,7 +151,7 @@
     transition: color var(--dur-fast) var(--ease-hover);
   }
   .reach a:hover {
-    color: var(--orange-bright);
+    color: var(--orange-light);
   }
   .reach .tel {
     font-weight: 700;

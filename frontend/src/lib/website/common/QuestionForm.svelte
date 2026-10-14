@@ -133,7 +133,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
-    --focus: var(--orange);
+    --focus: var(--orange-deep); /* a ring on paper needs 3:1 */
     accent-color: var(--orange);
     caret-color: var(--orange);
   }
@@ -222,7 +222,7 @@
     content: '';
     width: 1.0625rem;
     height: 1.0625rem;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5' fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.25 3.25L13 5' fill='none' stroke='%23111110' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
       center / contain no-repeat;
     transform: scale(0.4);
     opacity: 0;

@@ -77,7 +77,7 @@
   }
   .call:hover {
     background-color: var(--orange);
-    color: #fff;
+    color: var(--ink);
   }
   .call svg {
     width: 1rem;
