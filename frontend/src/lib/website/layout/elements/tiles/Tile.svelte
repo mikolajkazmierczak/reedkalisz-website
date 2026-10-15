@@ -366,21 +366,55 @@
     translate: -50% -50%;
   }
 
-  /* A narrow tile (a phone's, a half tile on a tablet): the picture's room under the card, as wide as the tile and
-     16:9, from the card's foot to the tile's sides and foot (with a margin, inset from them a little more: most of the
-     card's padding) - beside it there'd be no room left. The card no wider than the tile, a word too long for it
-     hyphenated (broken only where it can't be); its button only its arrow, in its top right corner, so the card is
-     shorter. */
+  /* A banner on its own in a phone's row, wide enough for the card beside the picture (from 30rem): the picture's
+     room first, from the tile's top, left and bottom edges to the card, the card at the tile's right as far in from
+     its edge as from its top and foot; its subtitle runs on (its lines set for a narrow card). */
+  @media (max-width: 34.9375rem) {
+    .content {
+      --out: calc(var(--margin) - var(--inset));
+      grid-template-columns: minmax(0, 1fr) 17rem;
+      align-items: stretch;
+    }
+    .panel {
+      justify-content: center;
+      min-width: 0;
+      max-width: none;
+    }
+    .subtitle .line {
+      display: inline;
+    }
+    .picture {
+      order: -1;
+      z-index: auto;
+      position: relative;
+      inset: auto;
+    }
+    .fit,
+    .full .fit {
+      inset: calc(-1 * var(--inset)) 0 calc(-1 * var(--inset)) calc(-1 * var(--inset));
+    }
+    .margin .fit,
+    .full.margin .fit {
+      inset: var(--out) var(--margin) var(--out) var(--out);
+    }
+  }
+
+  /* A narrow tile (a phone's, a half tile on a tablet, a one-column one on a small screen), a poster: the picture's
+     room first, at least 16:10, from the tile's top and sides down to the card (with a margin, in from them and the
+     card a little more: most of the card's padding), taking what a taller tile beside it leaves; the card under it
+     across the tile, a label, its subtitle running on. A word too long for it hyphenated (broken only where it can't
+     be); its button only its arrow, in its top right corner, so the card is shorter. */
   @container (max-width: 29.99rem) {
     .content {
       --margin: calc(var(--pad-y) * 0.8); /* (the tile is the container: its content takes it) */
+      --out: calc(var(--margin) - var(--inset));
       grid-template-columns: minmax(0, 1fr);
-      align-items: start;
+      grid-template-rows: minmax(0, 1fr) auto;
+      align-items: stretch;
     }
     .panel {
-      justify-self: start;
       min-width: 0;
-      max-width: 100%;
+      max-width: none;
     }
     .panel.arrowed {
       display: grid;
@@ -392,6 +426,9 @@
       hyphens: auto;
       overflow-wrap: break-word;
     }
+    .subtitle .line {
+      display: inline;
+    }
     .button {
       padding: 0.3rem;
       font-size: 0.9375rem;
@@ -400,19 +437,19 @@
       display: none;
     }
     .picture {
+      order: -1;
       z-index: auto;
       position: relative;
       inset: auto;
-      aspect-ratio: 16 / 9;
+      min-height: calc((100cqw - 2 * var(--inset)) * 0.625);
     }
     .fit,
     .full .fit {
-      inset: 0 calc(-1 * var(--inset)) calc(-1 * var(--inset));
+      inset: calc(-1 * var(--inset)) calc(-1 * var(--inset)) 0;
     }
     .margin .fit,
     .full.margin .fit {
-      --out: calc(var(--margin) - var(--inset));
-      inset: var(--margin) var(--out) var(--out);
+      inset: var(--out) var(--out) var(--margin);
     }
   }
 

@@ -25,6 +25,22 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.30.2',
+    date: '2026-10-15',
+    title: 'Banery na telefonie',
+    highlight: [
+      '**Banery na telefonie** wyglądają teraz jak plakaty: zdjęcie na górze, a pod nim karta z napisem na całą szerokość baneru. Tak samo wyglądają połówki banerów na tablecie i wąskie banery na mniejszych ekranach.',
+    ],
+    all: [
+      'Zdjęcie baneru na telefonie i w wąskich banerach stoi nad kartą z napisem, a karta zajmuje całą szerokość baneru.',
+      'Podtytuł w wąskich banerach płynie w jednym ciągu, bez łamania linii wpisanych w panelu, bo karta jest tam szersza.',
+      'Gdy baner stojący obok jest wyższy, dodatkowe miejsce dostaje zdjęcie, a nie pusty pas pod nim.',
+      'Na ekranach szerokich na ok. 480–560 px zdjęcie baneru stoi po lewej, a karta po prawej, w równych odstępach od brzegów baneru.',
+      'Na półce pod taśmą na rysunku w nagłówku stoją dwie pieczątki samotuszujące, a wizytówki są mniejsze.',
+      'Poprawka: rysunek maszyny w nagłówku od razu ma swój rozmiar, zamiast powiększać się chwilę po wczytaniu strony.',
+    ],
+  },
+  {
     version: '1.30.1',
     date: '2026-10-14',
     title: 'Nowy pomarańczowy i cennik',

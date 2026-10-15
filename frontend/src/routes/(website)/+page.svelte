@@ -1,4 +1,5 @@
 <script>
+  import { browser } from '$app/environment';
   import { beforeNavigate } from '$app/navigation';
   import { page } from '$app/stores';
   import { deep, treeFlatten } from '%/utils';
@@ -13,7 +14,7 @@
   import Catalogue from '#/layout/elements/Catalogue.svelte';
   import Headquarters from '#/layout/elements/Headquarters.svelte';
   import HeroMachine from '#c/HeroMachine.svelte';
-  import { heroFit } from '#c/heroFit';
+  import { heroFit, heroScript } from '#c/heroFit';
   import { SITE, jsonLd, business, tel } from '#/seo';
 
   const types = [
@@ -140,6 +141,8 @@
           <span class="hero__machine"><HeroMachine /></span>
         </div>
       </div>
+      <!-- (fitted as the page is read, before it's shown: see heroFit; the page woken up, the action fits it) -->
+      {#if !browser}{@html heroScript}{/if}
     </section>
 
     <div class="blocks">

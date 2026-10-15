@@ -7,8 +7,8 @@
   // box on the floor; a printer taking paper in at the top and putting it out, printed, in a tray; then along one
   // belt a stamp press over a business card, an engraver over a mug (its rotator beside it), a laser over a pen - the
   // card and pen fed from faint dispensers behind, the mugs waiting in a row behind theirs - and a chute into boxes,
-  // printed shirts hanging over them and a three-fold calendar on the wall behind. Business cards, paper, rolled-up
-  // roll-ups and two desk calendars wait on the brace under the belt.
+  // printed shirts hanging over them and a three-fold calendar on the wall behind. Business cards, paper with two
+  // self-inking stamps on it, rolled-up roll-ups and two desk calendars wait on the brace under the belt.
   //
   // It runs (unless motion is reduced, and only while it's on screen): each station works on its blank, which gets its
   // mark then, and the belt carries the three down the chute into the box; new blanks come out of the dispensers, the
@@ -549,19 +549,33 @@
     <path class="soft" d="M268 414H386M268 420H386M398 414H562M398 420H562" />
 
     <!-- a stack of business cards, one stood in front leaning back on it, face out, its print the mark -->
-    <rect class="b" x="276" y="392" width="38" height="22" />
-    {#each range(395.5, 410.5, 3.5) as y}
-      <path class="soft" d="M276 {y}H314" />
+    <rect class="b" x="276" y="396" width="31" height="18" />
+    {#each range(399, 411, 3) as y}
+      <path class="soft" d="M276 {y}H307" />
     {/each}
-    <rect class="card" x="292" y="396" width="32" height="18" />
-    <rect class="mark" x="296" y="400" width="9" height="4.5" rx="0.8" />
-    <path class="soft" d="M296 407.5H314M296 411H319" />
+    <rect class="card" x="289" y="399" width="26" height="15" />
+    <rect class="mark" x="292" y="402" width="7.5" height="3.7" rx="0.7" />
+    <path class="soft" d="M292 408H307M292 411H311" />
 
     <!-- paper for the printer -->
-    <rect class="b" x="331" y="408" width="50" height="6" />
-    <rect class="b" x="328" y="402" width="50" height="6" />
-    <rect class="b" x="332" y="396" width="50" height="6" />
-    <path class="soft" d="M357 396V414" />
+    <rect class="b" x="325" y="408" width="50" height="6" />
+    <rect class="b" x="322" y="402" width="50" height="6" />
+    <rect class="b" x="326" y="396" width="50" height="6" />
+    <path class="soft" d="M351 396V414" />
+
+    <!-- two self-inking stamps standing on it, the smaller behind (fainter): drawn about the middle of the foot, the
+         housing with its button over the clear frame, the ink pad in it between the housing's legs, the clear base with
+         its label (the mark) -->
+    {#each [[360, 0.66], [342, 0.85]] as [cx, scale], i}
+      <g class:farish={!i} transform="translate({cx} 396) scale({scale})">
+        <rect class="clear" x="-12" y="-17.5" width="24" height="8" />
+        <rect class="ink" x="-11.5" y="-15" width="23" height="3.5" />
+        <path class="b" d="M-14 -9.5V-27Q-14 -30 -11 -30H11Q14 -30 14 -27V-9.5H11.5V-15.5H-11.5V-9.5Z" />
+        <rect class="b" x="-3" y="-18" width="6" height="3" rx="1.5" />
+        <rect class="clear" x="-13" y="-9.5" width="26" height="9.5" rx="1" />
+        <rect class="mark" x="-5" y="-7" width="10" height="4" rx="0.8" />
+      </g>
+    {/each}
 
     <!-- two desk calendars standing beside them, one behind the other (fainter): the spiral's rings along the top, the
          month's grid under them -->
@@ -948,6 +962,19 @@
     stroke-width: 0.8;
     stroke-opacity: 0.28;
     stroke-dasharray: 10 4 2 4;
+  }
+  /* the smaller stamp, behind the other: less faint than the far calendar */
+  .farish {
+    opacity: 0.6;
+  }
+  /* a stamp's clear plastic: the parts' fill, see-through */
+  .clear {
+    fill: #21395d;
+    fill-opacity: 0.5;
+  }
+  /* its ink pad, seen through it: darker than the navy */
+  .ink {
+    fill: #0b1628;
   }
   /* a sheet of paper standing behind another, faint (not .sheet: the site's page is one) */
   .leaf {

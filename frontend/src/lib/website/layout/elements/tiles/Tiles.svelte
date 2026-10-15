@@ -113,8 +113,8 @@
     }
   }
 
-  /* One a row: as tall as their content - the card with the picture beside it (smaller, not the card adrift in a tall
-     banner), or under it on a phone. */
+  /* One a row: as tall as their content - a poster (see Tile), or from 30rem the picture beside the card (not the card
+     adrift in a tall banner). */
   @media (max-width: 34.9375rem) {
     .tiles:not(.editing) {
       grid-template-columns: 1fr;
