@@ -112,6 +112,7 @@
                 class="prose head__desc"
                 id="category-desc"
                 class:open={descOpen}
+                class:clamped={descOverflows && !descOpen}
                 use:clamp={data.category.description}>
                 {@html marked.parse(data.category.description)}
               </div>
@@ -254,7 +255,8 @@
     overflow: hidden;
     font-size: var(--fs-sm);
   }
-  .head__desc::after {
+  /* The fade only when text is cut, else a short description looks cut off. */
+  .head__desc.clamped::after {
     content: '';
     position: absolute;
     inset: auto 0 0;
@@ -264,9 +266,6 @@
   }
   .head__desc.open {
     max-height: none;
-  }
-  .head__desc.open::after {
-    display: none;
   }
   .desc__more {
     margin-top: var(--sp-2);

@@ -25,6 +25,15 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.31.1',
+    date: '2026-10-21',
+    title: 'Krótkie opisy kategorii',
+    highlight: [
+      'Poprawka: krótki opis kategorii nie zanika już u dołu, jakby był ucięty. Zanika tylko dłuższy, z „Czytaj dalej”.',
+    ],
+    all: [],
+  },
+  {
     version: '1.31.0',
     date: '2026-10-20',
     title: 'Heimdall się podpisuje',
