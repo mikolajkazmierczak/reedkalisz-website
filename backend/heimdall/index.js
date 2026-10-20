@@ -3,6 +3,7 @@ import 'dotenv/config';
 import polka from 'polka';
 import { Server as socketio } from 'socket.io';
 import api from './api/index.js';
+import { proxy } from './directus.js';
 import { timedOut } from './api/utils.js';
 
 const doLog = true;
@@ -14,6 +15,7 @@ const { PORT, HOST } = process.env;
 const cors = { origin: true };
 
 const app = polka()
+  .use(proxy) // (before the body is parsed: it goes on as it came)
   .use(bodyParser.text())
   .listen(PORT, HOST, () => console.log(`🚀 Lift off on port ${PORT}!`));
 const io = new socketio(app.server, {

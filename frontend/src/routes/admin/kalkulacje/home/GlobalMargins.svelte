@@ -39,12 +39,15 @@
     // UPDATE all PRODUCTS that both:
     // - have either global_full_margin or global_product_margin set to true
     // - have any labelings set
-    await recalculateProducts({
-      _and: [
-        { _or: [{ global_full_margin: { _eq: true } }, { global_product_margin: { _eq: true } }] },
-        { 'count(labelings)': { _neq: 0 } },
-      ],
-    });
+    await recalculateProducts(
+      {
+        _and: [
+          { _or: [{ global_full_margin: { _eq: true } }, { global_product_margin: { _eq: true } }] },
+          { 'count(labelings)': { _neq: 0 } },
+        ],
+      },
+      { trigger: 'global_margins' },
+    );
 
     saving = false;
   }

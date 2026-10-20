@@ -54,7 +54,7 @@ export async function duplicateProduct(id) {
   copy.slug = slugify([copy.code, copy.name], { key: true });
 
   const { id: newId } = await api.items('products').createOne(copy, { fields: ['id'] });
-  await recalculateProducts({ id: { _eq: newId } }, { emit: false });
+  await recalculateProducts({ id: { _eq: newId } }, { emit: false, trigger: 'duplicate' });
   heimdall.emit('products', newId);
   return copy.slug;
 }

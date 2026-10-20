@@ -49,7 +49,7 @@
     {
       "name": "heimdall-test",
       "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "PORT=9998 node index.js"],
+      "runtimeArgs": ["-c", "PORT=9998 API=http://127.0.0.1:8056 node index.js"],
       "cwd": "backend/heimdall",
       "port": 9998
     },

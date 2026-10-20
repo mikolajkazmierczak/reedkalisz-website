@@ -47,6 +47,7 @@
   import { clearSelected, countSelected, selected } from '../selected.js';
   import { findColorId, round } from '../utils.js';
   import { ask, guardLeaving, tell } from '@/dialog';
+  import { startCalculation, startScan } from '@/logs';
 
   import Loader from '$c/Loader.svelte';
   import Button from '@c/Button.svelte';
@@ -399,7 +400,7 @@
       const newProduct = await api.items('products').createOne(newItem);
       newIds.products.push(newProduct.id);
       if (newProduct.labelings.length) {
-        recalculateProducts({ id: { _eq: newProduct.id } });
+        recalculateProducts({ id: { _eq: newProduct.id } }, { trigger: 'import' });
       }
     }
   }
@@ -457,9 +458,9 @@
     return chunks;
   }
 
-  async function updatePricesAndStorages(previousItems, afterWriting) {
+  async function updatePricesAndStorages(previousItems, afterWriting, log) {
     // update the price and storage amounts if they changed, the name, description, sizes, materials and images too,
-    // and make the labelings and categories follow the api (for companies with mappings)
+    // and make the labelings and categories follow the api (for companies with mappings) - written as heimdall's
     fetchingPhase = 2;
     const updatedItemsIds = {
       disabled: new Set(),
@@ -629,6 +630,21 @@
       }
     }
 
+    // what it changes, kept with the scan (product ids, and the rows of each kind) - written or not (see below)
+    const changedIds = Object.fromEntries(Object.entries(updatedItemsIds).map(([kind, ids]) => [kind, [...ids]]));
+    changedIds.newImages = newImages.map((group) => group.product.id);
+    const counts = {
+      api: apiItems.length,
+      db: dbItems.length,
+      ...Object.fromEntries(Object.entries(changedIds).map(([kind, ids]) => [kind, ids.length])),
+      labelingsCreated: labelingsChanges.create.length,
+      labelingsRemoved: labelingsChanges.remove.length,
+      categoriesCreated: categoriesChanges.create.length,
+      categoriesRemoved: categoriesChanges.remove.length,
+      imagesRemoved: removedImages.length + removedGallery.length,
+    };
+    log.set({ changes: changedIds, counts });
+
     // A lot gone at once - products, variants, or the stock of what is in stock - is more likely the api failing for a
     // moment than the supplier retiring them: then nothing is written until an admin says so (the scan can be
     // repeated later). Stock changes every day, so it takes a quarter of the stocked variants emptied.
@@ -640,6 +656,7 @@
       emptied > 25 && emptied > stocked / 4 && `${emptied} z ${stocked} wariantów na stanie straciłoby cały stan.`,
     ].filter(Boolean);
     if (lines.length) {
+      log.set({ warnings: lines });
       const question =
         `${lines.join('\n')}\n\nTo wygląda na chwilową awarię API ${selectedCompany.name}. ` +
         'Jeśli nie zapiszesz, nic się nie zmieni - zeskanuj ponownie później.';
@@ -658,16 +675,16 @@
     const only = { fields: ['id'] }; // what the requests answer with
     for (const [collection, changes] of Object.entries(patches)) {
       const rows = [...changes].map(([id, data]) => ({ id, ...data }));
-      inChunks(rows, (chunk) => api.items(collection).updateBatch(chunk, only));
+      inChunks(rows, (chunk) => heimdall.api.items(collection).updateBatch(chunk, only));
     }
-    inChunks(removedImages, (chunk) => api.items('products_storage_image').deleteMany(chunk));
-    inChunks(removedGallery, (chunk) => api.items('products_image').deleteMany(chunk));
+    inChunks(removedImages, (chunk) => heimdall.api.items('products_storage_image').deleteMany(chunk));
+    inChunks(removedGallery, (chunk) => heimdall.api.items('products_image').deleteMany(chunk));
     for (const [collection, { create, remove }] of [
       ['products_labeling', labelingsChanges],
       ['products_categories', categoriesChanges],
     ]) {
-      inChunks(remove, (chunk) => api.items(collection).deleteMany(chunk));
-      inChunks(create, (chunk) => api.items(collection).createMany(chunk, only));
+      inChunks(remove, (chunk) => heimdall.api.items(collection).deleteMany(chunk));
+      inChunks(create, (chunk) => heimdall.api.items(collection).createMany(chunk, only));
     }
 
     statusLog = `Postęp: 0/${requests.length}`;
@@ -683,19 +700,28 @@
     return { ...updatedItemsIds, all };
   }
 
-  async function updatePricelists(ids) {
+  async function updatePricelists(ids, scanLog) {
     // recalculate labeling prices for all items with the given ids, a hundred at a time (the ids go in the url);
-    // the other tabs hear about them with the rest (updateDb)
+    // the other tabs hear about them with the rest (updateDb); one row in calculations_logs, pointing at the scan
     fetchingPhase = 3;
+    if (!ids.length) return;
     let done = 0;
     statusLog = `Postęp: 0/${ids.length}`;
-    for (const chunk of chunked(ids)) {
-      // (as one "1,2,3": more than 20 in the url's filter[id][_in][n] are read as an object, matching nothing)
-      for await (const results of recalculateProductsGenerator({ id: { _in: chunk.join(',') } }, { emit: false })) {
-        done += results.ids.length;
-        statusLog = `Postęp: ${done}/${ids.length}`;
+    const log = await startCalculation('scan', { filter: { id: { _in: ids } }, scan: scanLog });
+    try {
+      for (const chunk of chunked(ids)) {
+        // (as one "1,2,3": more than 20 in the url's filter[id][_in][n] are read as an object, matching nothing)
+        const filter = { id: { _in: chunk.join(',') } };
+        for await (const results of recalculateProductsGenerator(filter, { emit: false, log })) {
+          done += results.ids.length;
+          statusLog = `Postęp: ${done}/${ids.length}`;
+        }
       }
+    } catch (e) {
+      await log.fail(e);
+      throw e;
     }
+    await log.finish('done');
     statusLog = null;
   }
 
@@ -711,11 +737,12 @@
     return dbItems.filter((item) => item.labelings.some((l) => !priced.has(l.id))).map((item) => item.id);
   }
 
-  async function updateDb(previousItems, afterWriting) {
+  async function updateDb(previousItems, afterWriting, log) {
     // update prices and storages, then recalculate labeling prices, then fetch updated dbItems
-    const updatedItemsIds = await updatePricesAndStorages(previousItems, afterWriting);
+    const updatedItemsIds = await updatePricesAndStorages(previousItems, afterWriting, log);
     if (!updatedItemsIds) {
       // not written (see updatePricesAndStorages): the list stays on the scan before
+      await log.finish('skipped');
       apiItems = previousItems;
       newImages = [];
       fetching = false;
@@ -726,7 +753,8 @@
     if (newImages.length) newImages = await reviewGroups(newImages).catch((e) => (console.warn(e), []));
     const { changedPrice, repricedLabelings, all } = updatedItemsIds;
     const recalculate = new Set([...changedPrice, ...repricedLabelings, ...(await unpricedProducts())]);
-    await updatePricelists([...recalculate]);
+    await updatePricelists([...recalculate], log);
+    await log.finish('done');
 
     fetching = false; // this must be set before emitting heimdall events, or the product list won't reload
     heimdall.emit('products', [...new Set([...all, ...recalculate])]);
@@ -807,9 +835,11 @@
     if (fetching) return;
     fetching = true;
     fetchingPhase = 1;
+    const log = await startScan(selectedCompany.id); // (who asked for it: see logs.js)
     // (no reply: not connected, too long, or heimdall gone meanwhile - see heimdall.js)
     const data = await heimdall.ask(selectedCompany).catch((lost) => ({ lost }));
-    if (alive) await scanned(data); // leaving the page meanwhile calls it off
+    if (alive) await scanned(data, log);
+    else log.fail('Strona została opuszczona przed zapisem.'); // leaving the page calls it off
   }
 
   async function fetchDbItems() {
@@ -893,15 +923,16 @@
   globals.update(categories);
 
   // heimdall's reply to fetchApi: phase 1 ends here, written (updateDb) or not at all
-  async function scanned(data) {
-    const failed = (why, title = 'Skanowanie nie powiodło się') => {
+  async function scanned(data, log) {
+    const failed = (why, title = 'Skanowanie nie powiodło się', status = 'error') => {
       fetching = false;
       fetchingPhase = 0;
+      log.finish(status, { error: why });
       tell(`${why}\nBaza danych nie została zmodyfikowana.`, { title, danger: true });
     };
     const again = 'Spróbuj ponownie za chwilę. Jeśli to się powtarza, zgłoś to naszemu ogromnemu działowi IT.';
     if (data?.lost) return failed(`${data.lost.message}\n${again}`);
-    if (data?.notice) return failed(data.notice, 'Skanowanie niemożliwe');
+    if (data?.notice) return failed(data.notice, 'Skanowanie niemożliwe', 'refused');
     if (!data || data?.error) {
       const why = data?.error ? `Błąd pobierania z API ${selectedCompany.name}: ${data.error}` : 'Brak odpowiedzi.';
       return failed(`${why}\n${again}`);
@@ -954,16 +985,16 @@
         formData.append('filename_download', fileName);
         formData.append('file', packed, fileName);
         if (selectedCompany.api_snapshot) {
-          await api.files.updateOne(selectedCompany.api_snapshot, formData);
+          await heimdall.api.files.updateOne(selectedCompany.api_snapshot, formData);
         } else {
-          const { id } = await api.files.createOne(formData);
-          await api.files.updateOne(id, { tags: ['hidden'] }); // out of the library, as the avatars
+          const { id } = await heimdall.api.files.createOne(formData);
+          await heimdall.api.files.updateOne(id, { tags: ['hidden'] }); // out of the library, as the avatars
           companyUpdates.api_snapshot = id;
         }
         heimdall.emit('directus_files', companyUpdates?.api_snapshot || selectedCompany.api_snapshot);
       }
       if (Object.keys(companyUpdates).length > 0) {
-        const saved = await api.items('companies').updateOne(selectedCompany.id, companyUpdates);
+        const saved = await heimdall.api.items('companies').updateOne(selectedCompany.id, companyUpdates);
         storeSnapshot(saved, items); // before the tabs hear of it, so they don't download it again
         heimdall.emit('companies', selectedCompany.id);
       }
@@ -971,7 +1002,10 @@
 
     const previousItems = apiItems; // the last scan, to tell names we set from ones renamed by hand
     apiItems = items;
-    await updateDb(previousItems, saveScan).catch(writeFailed);
+    await updateDb(previousItems, saveScan, log).catch((e) => {
+      log.fail(e);
+      writeFailed(e);
+    });
   }
 
   // a change made elsewhere (or here: hiding a product, deleting one) reloads the list in the background,

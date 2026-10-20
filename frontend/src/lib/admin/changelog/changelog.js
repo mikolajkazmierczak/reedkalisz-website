@@ -25,6 +25,16 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.31.0',
+    date: '2026-10-20',
+    title: 'Heimdall się podpisuje',
+    highlight: [
+      'To, co zapisuje **skanowanie API** i każde **przeliczenie cen** (po zmianie marż, widoku cen albo znakowania, po imporcie i zduplikowaniu produktu), jest teraz podpisane jako **Heimdall**, a nie jako osoba, która je uruchomiła. W „Aktualizacji” produktu widać więc, czy ostatnio zmienił go ktoś z was, czy Heimdall.',
+      'Tak samo podpisane są **wcześniejsze zmiany**: około 4600 produktów, które ostatnio zmienił skan albo przeliczenie, a nie ktoś z was, ma teraz w „Aktualizacji” Heimdalla, z tą samą datą co wcześniej. Rozpoznano je według prostej heurystyki: skaner i przeliczenie zapisują wiele produktów w ciągu kilku sekund, a edytor jeden. Kilkadziesiąt niepewnych zostało przy waszym imieniu.',
+    ],
+    all: [],
+  },
+  {
     version: '1.30.2',
     date: '2026-10-15',
     title: 'Banery na telefonie',

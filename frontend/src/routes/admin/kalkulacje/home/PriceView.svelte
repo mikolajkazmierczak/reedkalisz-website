@@ -35,8 +35,8 @@
 
   async function updateProducts(swapID = null) {
     const filter = { price_view: { _eq: item.id } };
-    if (swapID) await recalculateProducts(filter, { newPriceView: swapID });
-    else await recalculateProducts(filter);
+    if (swapID) await recalculateProducts(filter, { newPriceView: swapID, trigger: 'price_view' });
+    else await recalculateProducts(filter, { trigger: 'price_view' });
   }
 
   async function save() {

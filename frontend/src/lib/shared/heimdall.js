@@ -2,7 +2,9 @@ import { PUBLIC_HEIMDALL_URL } from '$env/static/public';
 import { get } from 'svelte/store';
 import { onDestroy } from 'svelte';
 
+import { Directus } from '@directus/sdk';
 import { io } from 'socket.io-client';
+import api from '$/api';
 import { me } from '$/auth';
 
 // this should be "https://reed.kalisz.pl" not "https://reed.kalisz.pl/heimdall", or "https://localhost:9999"
@@ -70,8 +72,9 @@ class Socket {
 }
 
 class Heimdall {
-  constructor(socket) {
+  constructor(socket, api) {
     this.socket = socket;
+    this.api = api;
   }
 
   emit(collection, ids, options) {
@@ -115,5 +118,10 @@ class Heimdall {
   }
 }
 
+// Directus as heimdall (see backend/heimdall/directus.js): what a scan writes and every recalculation are saved as
+// heimdall's, not as the admin's who started it (who did is in api_logs and calculations_logs). The admin's own session
+// goes along - their token, refreshed as theirs is - for heimdall to check it's an admin's.
+const directus = new Directus(`${baseUrl}/heimdall/directus`, { storage: api.storage, auth: api.auth });
+
 const socket = new Socket(baseUrl);
-export default new Heimdall(socket);
+export default new Heimdall(socket, directus);

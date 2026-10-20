@@ -102,7 +102,7 @@ async function saveItem(item, itemsOriginal) {
     // the global is already updated here, because it updates after every UPDATE, and DELETEs are last
     const filter = { labelings: { labeling: { _eq: item.id } } };
     const swapLabelings = new Map([[item.id, item._swap]]); // will delete the labeling if swapID is null
-    const { ids } = await recalculateProducts(filter, { swapLabelings, emit: false });
+    const { ids } = await recalculateProducts(filter, { swapLabelings, emit: false, trigger: 'labeling' });
 
     await api.items('labelings').deleteOne(item.id);
 
@@ -128,7 +128,7 @@ async function saveItem(item, itemsOriginal) {
     // if prices or calculation fields changed, recalculate products
     if (pricesChanged || calculationFieldsChanged) {
       const filter = { labelings: { labeling: { _eq: updated.id } } };
-      const { ids } = await recalculateProducts(filter, { emit: false });
+      const { ids } = await recalculateProducts(filter, { emit: false, trigger: 'labeling' });
       return { labelings: [updated.id], products: ids };
     }
 
