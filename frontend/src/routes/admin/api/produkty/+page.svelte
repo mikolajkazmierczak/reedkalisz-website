@@ -669,6 +669,15 @@
       if (!write) return null;
     }
 
+    // "Skan": every product it changes, its row or only its variants, labelings, categories or images (the
+    // product-stamps hook gives it the server's time)
+    const scannedAt = new Date().toISOString();
+    for (const id of new Set([
+      ...Object.values(updatedItemsIds).flatMap((ids) => [...ids]),
+      ...patches.products.keys(),
+    ]))
+      patch('products', id, { scanned_at: scannedAt });
+
     // a hundred rows per request, one request at a time (a first scan after adding mappings touches most products)
     const requests = [];
     const inChunks = (rows, send) => chunked(rows).forEach((chunk) => requests.push(() => send(chunk)));

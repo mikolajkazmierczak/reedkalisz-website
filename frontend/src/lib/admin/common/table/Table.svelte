@@ -12,9 +12,9 @@
   import { readSettings, writeSettings } from './settings';
 
   // A list of the admin, from data: `head` says the columns ({ label, icon, checkbox, blame, color, category, company,
-  // thumb, float, width, sort }), `mapper` turns an item into { href, values } (and `hrefNew`, `codeNew` for "add a
-  // subcategory"). Drawn in the Grid of every admin table; items with `children` make a tree, `order` lets them be
-  // dragged into place.
+  // thumb, float, width, sort }; `blame: 'date'`: a date, the time if picked, no name), `mapper` turns an item into
+  // { href, values } (and `hrefNew`, `codeNew` for "add a subcategory"). Drawn in the Grid of every admin table; items
+  // with `children` make a tree, `order` lets them be dragged into place.
 
   export let searchParams = null;
   export let limit = null;
@@ -43,7 +43,11 @@
     writeSettings(settingsKey, { hidden, blame: blames });
   }
   // each column with its place among the values (`i`); none left (labels renamed): all of them
-  $: allHead = head.map((h, i) => ({ ...h, i, show: blames[h.label] ?? defaultBlame }));
+  $: allHead = head.map((h, i) => ({
+    ...h,
+    i,
+    show: blames[h.label] ?? (h.blame === 'date' ? ['date'] : defaultBlame),
+  }));
   $: visible = allHead.filter((h) => !hidden.includes(h.label));
   $: shownHead = visible.length ? visible : allHead;
   $: shownLabels = shownHead.map((h) => h.label);
@@ -56,7 +60,10 @@
     hidden = head.map((h) => h.label).filter((label) => !labels.includes(label));
     save();
   }
-  const blameOptions = (show) => blameParts.map((p) => ({ ...p, disabled: show.length === 1 && show[0] === p.id }));
+  const partsOf = (blame) =>
+    blame === 'date' ? blameParts.filter((p) => p.id === 'date' || p.id === 'time') : blameParts;
+  const blameOptions = (blame, show) =>
+    partsOf(blame).map((p) => ({ ...p, disabled: show.length === 1 && show[0] === p.id }));
   function showBlame(label, show) {
     blames = { ...blames, [label]: show };
     save();
@@ -113,7 +120,7 @@
               icon="settings"
               title="{label}: co pokazać"
               value={show}
-              options={blameOptions(show)}
+              options={blameOptions(blame, show)}
               on:change={(e) => showBlame(label, e.detail.value)} />
           {/if}
         {/if}

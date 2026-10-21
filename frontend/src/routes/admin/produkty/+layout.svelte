@@ -212,6 +212,8 @@
           { label: 'Nazwa', sort: 'name', float: true, thumb: true },
           { blame: true, label: 'Utworzenie', sort: 'date_created', float: true },
           { blame: true, label: 'Aktualizacja', sort: 'date_updated', float: true },
+          { blame: 'date', label: 'Skan', sort: 'scanned_at', float: true },
+          { blame: 'date', label: 'Przeliczenie', sort: 'recalculated_at', float: true },
         ]}
         mapper={($) => ({
           href: `/admin/produkty/${$.slug}`,
@@ -221,6 +223,8 @@
             { thumb: productThumb($), text: $.name },
             { user: $.user_created, datetime: $.date_created },
             { user: $.user_updated, datetime: $.date_updated },
+            { user: null, datetime: $.scanned_at },
+            { user: null, datetime: $.recalculated_at },
           ],
         })}
         {searchParams}

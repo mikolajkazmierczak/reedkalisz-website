@@ -323,8 +323,10 @@ async function recalculateProduct(
   Object.assign(product, { price_min: min, price_max: max, price_min_sale: minSale, price_max_sale: maxSale });
 
   const updates = recalculationChanges(saved, product);
-  if (updates) await api.items('products').updateOne(product.id, updates, { fields: ['id'] }); // (not read back)
-  return !!updates;
+  if (!updates) return false;
+  updates.recalculated_at = new Date().toISOString(); // ("Przeliczenie": the product-stamps hook gives it the server's time)
+  await api.items('products').updateOne(product.id, updates, { fields: ['id'] }); // (not read back)
+  return true;
 }
 
 /**

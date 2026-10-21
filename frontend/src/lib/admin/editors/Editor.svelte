@@ -58,10 +58,14 @@
   }
 
   // someone else's save of this item: its `date_updated` against the one loaded (an editor without `reload`, or an item
-  // without the field - a file - isn't checked); loaded, the url follows a slug they renamed
+  // without the field - a file - isn't checked) - a product's scan and recalculation dates too, which leave
+  // `date_updated` as it is (see the product-stamps hook); loaded, the url follows a slug they renamed
   const key = (it) => it?.slug ?? it?.id;
+  const stampFields = () =>
+    collection === 'products' ? ['date_updated', 'scanned_at', 'recalculated_at'] : ['date_updated'];
+  const stampOf = (it) => Object.fromEntries(stampFields().map((field) => [field, it[field] ?? null]));
   const guard = overwriteGuard({
-    loaded: () => itemOriginal?.date_updated,
+    loaded: () => itemOriginal && stampOf(itemOriginal),
     unsaved: () => edited || $unsaved,
     reload: async () => {
       const before = key(itemOriginal);
@@ -73,11 +77,11 @@
   });
   $: checked =
     !!reload && !!collection && item?.id != null && item.id !== '+' && itemOriginal?.date_updated !== undefined;
-  // the saved `date_updated` (null when never updated), undefined when the item is gone; a failed read throws
+  // the saved stamp (its dates null when never set), undefined when the item is gone; a failed read throws
   const stamp = async () => {
     const filter = { id: { _eq: item.id } };
-    const { data } = await api.items(collection).readByQuery({ fields: ['date_updated'], filter, limit: 1 });
-    return data.length ? data[0].date_updated : undefined;
+    const { data } = await api.items(collection).readByQuery({ fields: stampFields(), filter, limit: 1 });
+    return data.length ? stampOf(data[0]) : undefined;
   };
   async function recheck() {
     if (!checked || saving) return;

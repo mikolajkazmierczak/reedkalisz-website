@@ -25,6 +25,24 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.32.0',
+    date: '2026-10-22',
+    title: 'Skan i przeliczenie osobno',
+    highlight: [
+      'Lista produktów ma dwie nowe kolumny, **Skan** i **Przeliczenie**: kiedy ostatnio skanowanie API albo przeliczenie cen coś w produkcie zmieniło. Pokazują datę, a w ustawieniach kolumny można dodać godzinę. Te same daty są w edytorze produktu, pod „Aktualizacją”.',
+      '**Aktualizacja** pokazuje teraz tylko ostatnią zmianę zapisaną ręcznie: skan ani przeliczenie jej nie zmieniają, więc Heimdall już się w niej nie podpisuje.',
+      'Wcześniejsze daty odtworzono z codziennych kopii zapasowych według heurystyki, po tym, co zmieniał każdy zapis: ostatnia ręczna zmiana wróciła do „Aktualizacji” prawie wszędzie, a „Skan” i „Przeliczenie” sięgają końca września. Starsze skany i przeliczenia, których nie dało się ustalić, zostały puste, tak samo jak „Aktualizacja” kilkudziesięciu produktów.',
+    ],
+    all: [
+      '„Aktualizacja” produktu zmienia się tylko przy ręcznym zapisie, z imieniem osoby, która go zrobiła; skan i przeliczenie cen ustawiają „Skan” i „Przeliczenie”.',
+      'Kolumny „Skan” i „Przeliczenie” na liście produktów, z sortowaniem; w ich ustawieniach są tylko data i godzina.',
+      'Skan, który zmienił tylko stan, znakowania, kategorie albo zdjęcia produktu, też ustawia jego „Skan”.',
+      'Edytor produktu pokazuje „Skan” i „Przeliczenie” pod „Aktualizacją” („Brak”, gdy ich nie ma).',
+      'Zduplikowany produkt nie przejmuje „Skanu” ani „Przeliczenia” oryginału.',
+      'Poprawka: edytor produktu otwarty w czasie skanu, który zmienił tylko stan, znakowania albo kategorie, wczytuje te zmiany albo pyta w oknie „Uwaga!”, zamiast cofnąć je przy zapisie.',
+    ],
+  },
+  {
     version: '1.31.1',
     date: '2026-10-21',
     title: 'Krótkie opisy kategorii',

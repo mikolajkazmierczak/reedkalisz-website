@@ -35,7 +35,14 @@ async function save(collection, item, itemOriginal, { root } = {}) {
   const itemData = deep.copy(item);
 
   // cleanup
-  await deleteFields(itemData, ['user_created', 'date_created', 'user_updated', 'date_updated']);
+  await deleteFields(itemData, [
+    'user_created',
+    'date_created',
+    'user_updated',
+    'date_updated',
+    'scanned_at',
+    'recalculated_at',
+  ]);
 
   // save
   if (isNew) {

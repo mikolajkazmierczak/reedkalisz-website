@@ -12,7 +12,7 @@ import { usedFiles } from '@/files';
 // hidden until an admin shows it, and uses the very same image files (deleting one product keeps what the other uses).
 // It is REED's: a supplier's feed doesn't have its code, so the scanner would take it for a retired product.
 
-const own = ['id', 'user_created', 'date_created', 'user_updated', 'date_updated'];
+const own = ['id', 'user_created', 'date_created', 'user_updated', 'date_updated', 'scanned_at', 'recalculated_at'];
 
 // the rows it has, as new ones: without their ids (and whose they were)
 const fresh = (value) => {

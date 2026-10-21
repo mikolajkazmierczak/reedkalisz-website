@@ -1,6 +1,6 @@
 // Directus as heimdall: what the admin sends through here (a scan's writes, a recalculation - the frontend's
-// `heimdall.api`) is saved as heimdall's (`user_updated`, the activity), not as the admin's who started it - Directus
-// takes those from the token, whatever the request says.
+// `heimdall.api`) is saved as heimdall's (the activity, `user_updated` but a product's: see the product-stamps hook),
+// not as the admin's who started it - Directus takes those from the token, whatever the request says.
 // Only for an admin: their own token is checked first, and only then is the body read and sent on with heimdall's.
 // Served at /directus and /heimdall/directus: Caddy takes the /heimdall off on prod, locally nothing is in front.
 
