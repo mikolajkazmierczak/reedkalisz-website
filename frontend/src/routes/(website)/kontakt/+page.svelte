@@ -1,10 +1,15 @@
 <script>
+  import { onMount } from 'svelte';
   import { marked } from 'marked';
   import SideRail from '#/shell/SideRail.svelte';
   import QuestionForm from '#c/QuestionForm.svelte';
   import { jsonLd, business } from '#/seo';
 
   export let data;
+
+  // OpenStreetMap's page, put in once ours is up, as in the footer
+  let mapOn = false;
+  onMount(() => (mapOn = true));
 </script>
 
 <svelte:head>
@@ -41,12 +46,16 @@
       </div>
 
       <div class="map">
-        <iframe
-          title="REED Kalisz na mapie OpenStreetMap"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=18.06013941764832%2C51.75668907327362%2C18.063679933547977%2C51.75816671026607&amp;layer=mapnik&amp;marker=51.75742789781386%2C18.061909675598145"
-        ></iframe>
+        {#if mapOn}
+          <iframe
+            class="map__frame"
+            title="REED Kalisz na mapie OpenStreetMap"
+            loading="lazy"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=18.06013941764832%2C51.75668907327362%2C18.063679933547977%2C51.75816671026607&amp;layer=mapnik&amp;marker=51.75742789781386%2C18.061909675598145"
+          ></iframe>
+        {:else}
+          <div class="map__frame" aria-hidden="true"></div>
+        {/if}
         <a
           class="map__link"
           href="https://www.openstreetmap.org/?mlat=51.757428&amp;mlon=18.061910#map=19/51.757428/18.061910"
@@ -124,7 +133,7 @@
     gap: var(--sp-2);
     min-width: 0;
   }
-  .map iframe {
+  .map__frame {
     width: 100%;
     aspect-ratio: 4 / 3;
     border: var(--rule);
@@ -141,7 +150,7 @@
       gap: var(--sp-10);
       align-items: start;
     }
-    .map iframe {
+    .map__frame {
       aspect-ratio: 16 / 10;
     }
   }

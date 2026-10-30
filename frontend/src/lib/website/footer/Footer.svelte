@@ -1,8 +1,12 @@
 <script>
+  import { onMount } from 'svelte';
   import { marked } from 'marked';
   import { page } from '$app/stores';
 
   export let fragments;
+
+  let mapOn = false;
+  onMount(() => (mapOn = true));
 
   const { about, office, rights } = fragments;
 
@@ -41,13 +45,16 @@
         </div>
 
         <div class="col col--map">
-          <iframe
-            class="map"
-            title="REED Kalisz, ul. Dobrzecka 95, na mapie OpenStreetMap"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=18.05306%2C51.75300%2C18.07076%2C51.76186&amp;layer=mapnik&amp;marker=51.757428%2C18.061910"
-          ></iframe>
+          {#if mapOn}
+            <iframe
+              class="map"
+              title="REED Kalisz, ul. Dobrzecka 95, na mapie OpenStreetMap"
+              loading="lazy"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=18.05306%2C51.75300%2C18.07076%2C51.76186&amp;layer=mapnik&amp;marker=51.757428%2C18.061910"
+            ></iframe>
+          {:else}
+            <div class="map" aria-hidden="true"></div>
+          {/if}
           <a
             class="map__link"
             href="https://www.openstreetmap.org/?mlat=51.757428&amp;mlon=18.061910#map=17/51.757428/18.061910"
