@@ -25,6 +25,23 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.32.1',
+    date: '2026-10-31',
+    title: 'Numer telefonu we fragmencie',
+    highlight: [
+      '**Numer telefonu na stronie to teraz +48 731 79 79 72**, także w stopce i w Kontakcie, zamiast trzech dawnych.',
+      'Numer z panelu bocznego, paska u dołu telefonu, strony głównej, karty PDF i danych dla Google zmienia się teraz w nowym fragmencie **Numer telefonu**. Numer w stopce i w Kontakcie jest wpisany w treść fragmentu **Biuro**.',
+      'Fragmenty stopki nazywają się teraz „O firmie”, „Biuro” i „Stopka”. **Fragmentu „Kontakt” już nie ma**: strona Kontakt pokazuje „Biuro” i „O firmie”, te same co stopka.',
+    ],
+    all: [
+      'Nowy fragment „Numer telefonu”: numer w panelu bocznym, na pasku telefonu, na stronie głównej, w karcie PDF i w danych dla Google.',
+      'Fragment „Biuro” ma jeden numer, +48 731 79 79 72, zamiast trzech.',
+      'Fragmenty „[Stopka] O firmie REED”, „[Stopka] Biuro” i „[Stopka] Copyright” nazywają się „O firmie”, „Biuro” i „Stopka”.',
+      'Strona Kontakt pokazuje fragmenty „Biuro” i „O firmie”; fragment „Kontakt” usunięto.',
+      'Fragment „Układ strony głównej” nie ma już opisu formatu JSON nad edytorem.',
+    ],
+  },
+  {
     version: '1.32.0',
     date: '2026-10-22',
     title: 'Skan i przeliczenie osobno',

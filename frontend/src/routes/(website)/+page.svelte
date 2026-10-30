@@ -15,7 +15,7 @@
   import Headquarters from '#/layout/elements/Headquarters.svelte';
   import HeroMachine from '#c/HeroMachine.svelte';
   import { heroFit, heroScript } from '#c/heroFit';
-  import { SITE, jsonLd, business, tel } from '#/seo';
+  import { SITE, jsonLd, localBusiness, tel } from '#/seo';
 
   const types = [
     { type: 'title', label: 'Tytuł', icon: 'text_t' },
@@ -109,7 +109,7 @@
     content="Gadżety reklamowe z logo, druk cyfrowy, grawerowanie laserowe i pieczątki. Znakowanie robimy u siebie w Kaliszu od 2002 roku." />
   <meta property="og:title" content="REED Kalisz: gadżety reklamowe, druk, grawer laserowy" />
   <meta property="og:image" content="{SITE}/imgs/machine-playful.webp" />
-  {@html jsonLd(business)}
+  {@html jsonLd(localBusiness(data.phone))}
 </svelte:head>
 
 <div class="shell">
@@ -324,7 +324,7 @@
         </div>
         <div class="ask__acts hang">
           <a class="btn btn--orange" href="/kontakt">Napisz do nas</a>
-          <a class="btn ask__tel tnum" href={tel}>{business.telephone}</a>
+          <a class="btn ask__tel tnum" href={tel(data.phone)}>{data.phone}</a>
         </div>
       </div>
     </section>

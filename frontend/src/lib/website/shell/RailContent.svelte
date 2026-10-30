@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import Menu from '#/menu/Menu.svelte';
   import { growHead, dropIn } from './menuMotion';
+  import { tel } from '#/seo';
 
   export let items;
   /** Phone menu: categories open in place instead of by navigating. */
@@ -47,7 +48,7 @@
 
   <div class="reach">
     <p>
-      <a class="tel" href="tel:+48627531591">+48&nbsp;62&nbsp;753&nbsp;15&nbsp;91</a><span
+      <a class="tel" href={tel($page.data.phone)}>{$page.data.phone.replaceAll(' ', '\u00a0')}</a><span
         class="sep"
         aria-hidden="true">/</span
       ><a href="mailto:info@reed.kalisz.pl">info@reed.kalisz.pl</a>

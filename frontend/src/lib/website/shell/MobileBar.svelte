@@ -1,7 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import MenuOverlay from './MenuOverlay.svelte';
-  import { business, tel } from '#/seo';
+  import { tel } from '#/seo';
 
   export let sideMenu = [];
 
@@ -17,7 +17,7 @@
       <img src="/logo.svg" alt="REED" width="139" height="48" />
     </a>
     <!-- the phone a tap away, not behind the menu -->
-    <a class="call" href={tel} aria-label="Zadzwoń: {business.telephone}">
+    <a class="call" href={tel($page.data.phone)} aria-label="Zadzwoń: {$page.data.phone}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path
           d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"

@@ -3,7 +3,7 @@
   import { marked } from 'marked';
   import SideRail from '#/shell/SideRail.svelte';
   import QuestionForm from '#c/QuestionForm.svelte';
-  import { jsonLd, business } from '#/seo';
+  import { jsonLd, localBusiness } from '#/seo';
 
   export let data;
 
@@ -17,7 +17,7 @@
   <meta
     name="description"
     content="REED Kalisz: druk, grawerowanie laserowe, pieczątki i gadżety reklamowe. ul. Dobrzecka 95, 62-800 Kalisz." />
-  {@html jsonLd(business)}
+  {@html jsonLd(localBusiness(data.phone))}
 </svelte:head>
 
 <div class="shell">
@@ -33,7 +33,9 @@
 
     <div class="wrap body">
       <div class="prose info">
-        {@html marked.parse(data.fragment.content)}
+        <!-- the footer's Biuro and O firmie (hidden here), from the layout -->
+        <div>{@html marked.parse(data.footerFragments.office.content)}</div>
+        <div>{@html marked.parse(data.footerFragments.about.content)}</div>
       </div>
 
       <div class="ask" id="zapytanie">

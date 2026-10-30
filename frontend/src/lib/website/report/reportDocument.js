@@ -788,7 +788,7 @@ function variants(product, d, images) {
  * `product`: as the product page reads it; `categories`: all of them (the trail is made of the enabled ones);
  * `images`: data URLs (JPEG/PNG) by file id; `logo`: the logo's svg; `date`: when it's made.
  */
-export function reportDocument(product, { categories, images = {}, logo, date = new Date() }) {
+export function reportDocument(product, { categories, images = {}, logo, phone, date = new Date() }) {
   const d = derive(product, categories);
   const post = product.commercial_details?.content;
 
@@ -849,8 +849,8 @@ export function reportDocument(product, { categories, images = {}, logo, date = 
                 // as the website's: the phone (with +48) in bold, then the email
                 text: [
                   {
-                    text: business.telephone,
-                    link: tel,
+                    text: phone,
+                    link: tel(phone),
                     bold: true,
                     decoration: 'underline',
                   },
@@ -917,8 +917,8 @@ export function reportDocument(product, { categories, images = {}, logo, date = 
     { text: '   ·   ' },
     { text: 'tel. ' },
     {
-      text: business.telephone,
-      link: tel,
+      text: phone,
+      link: tel(phone),
       color: c.orange,
       decoration: 'underline',
     },

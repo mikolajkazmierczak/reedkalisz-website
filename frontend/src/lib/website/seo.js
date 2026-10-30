@@ -8,7 +8,10 @@ export const SITE = 'https://reed.kalisz.pl';
 export const jsonLd = (data) =>
   `<script type="application/ld+json">${JSON.stringify(data).replaceAll('<', String.raw`\u003c`)}</script>`;
 
-/** REED as a local business: only the facts the site already states. */
+/** The "Numer telefonu" fragment: the phone the site shows, "+48 731 79 79 72" (the layout reads it as `phone`). */
+export const PHONE = 13;
+
+/** REED as a local business: only the facts the site already states (with its phone: `localBusiness`). */
 export const business = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
@@ -17,7 +20,6 @@ export const business = {
   url: SITE,
   logo: `${SITE}/logo.svg`,
   image: `${SITE}/imgs/machine-playful.webp`,
-  telephone: '+48 62 753 15 91',
   email: 'info@reed.kalisz.pl',
   foundingDate: '2002',
   address: {
@@ -38,8 +40,11 @@ export const business = {
   sameAs: ['https://www.facebook.com/reed.reklama.kalisz'],
 };
 
-/** The phone as a link's: `tel:`, no spaces. */
-export const tel = `tel:${business.telephone.replace(/\s/g, '')}`;
+/** `business` with the phone, for JSON-LD. */
+export const localBusiness = (phone) => ({ ...business, telephone: phone });
+
+/** A phone as a link's: `tel:`, no spaces. */
+export const tel = (phone) => `tel:${phone.replace(/\s/g, '')}`;
 
 /** A BreadcrumbList from `[{ name, path }]`, paths relative to the site. */
 export const breadcrumbList = (items) => ({

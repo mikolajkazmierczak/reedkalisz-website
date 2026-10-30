@@ -1,4 +1,5 @@
-import { baseUrl } from '$/api';
+import api, { baseUrl } from '$/api';
+import { PHONE } from '#/seo';
 import { reportDocument, reportImages, fonts } from './reportDocument.js';
 
 // The product's card ("Karta produktu"): the product as its page shows it, as a PDF to download - made in the browser
@@ -42,6 +43,9 @@ async function loadLogo() {
   return svg.slice(svg.indexOf('<svg')); // without the xml prolog and doctype
 }
 
+// the site's phone, from its fragment (the admin has no website layout to take it from)
+const loadPhone = async () => (await api.items('fragments').readOne(PHONE, { fields: ['content'] })).content.trim();
+
 // "R08424 Kubek izotermiczny Secure 400 ml.pdf", without what a file name can't have
 const filename = (product) =>
   `${product.code} ${product.name}`
@@ -54,7 +58,12 @@ const filename = (product) =>
  * page's items, the admin's store), `enabled` whether it's on the website (a hidden one says so).
  */
 export async function downloadReport(product, { categories, enabled = true }) {
-  const [{ default: pdfMake }, logo, images] = await Promise.all([import('pdfmake'), loadLogo(), loadImages(product)]);
+  const [{ default: pdfMake }, logo, images, phone] = await Promise.all([
+    import('pdfmake'),
+    loadLogo(),
+    loadImages(product),
+    loadPhone(),
+  ]);
 
   const origin = window.location.origin;
   pdfMake.addFonts(
@@ -68,6 +77,6 @@ export async function downloadReport(product, { categories, enabled = true }) {
   // nothing but our fonts is fetched (the images come in as data)
   pdfMake.setUrlAccessPolicy((url) => url.startsWith(`${origin}/fonts/pdf/`));
 
-  const doc = reportDocument({ ...product, enabled }, { categories, images, logo, date: new Date() });
+  const doc = reportDocument({ ...product, enabled }, { categories, images, logo, phone, date: new Date() });
   await pdfMake.createPdf(doc).download(filename(product));
 }
