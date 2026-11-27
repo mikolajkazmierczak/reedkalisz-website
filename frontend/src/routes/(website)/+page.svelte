@@ -188,6 +188,11 @@
           {#if catalogueCount}Katalog liczy ponad {catalogueCount} produktów, a znakujemy je{:else}Produkty z katalogu
             znakujemy{/if} we własnej pracowni: grawerem laserowym, tampodrukiem i drukiem cyfrowym.
         </p>
+        <!-- the admins' wording: who the offer is for, and that prices are net unless a product says otherwise -->
+        <p class="seo__note">
+          Naszą ofertę kierujemy wyłącznie do partnerów biznesowych i podmiotów gospodarczych. Wszystkie podane ceny są
+          kwotami netto, do których należy doliczyć podatek VAT, chyba że przy produkcie podano inaczej.
+        </p>
 
         <div class="seo__cols">
           <section class="seo__block">
@@ -319,7 +324,9 @@
           <h2 class="ask__title" id="ask-title">Nie wiesz, co wybrać?</h2>
           <p class="ask__lede">
             <span class="ask__s">Napisz albo zadzwoń, pomożemy dobrać produkt i&nbsp;znakowanie.</span>
-            <span class="ask__s">Biuro w&nbsp;Kaliszu, pn–pt 10:00–14:00.</span>
+            <span class="ask__s">
+              Biuro w&nbsp;Kaliszu, pn–pt 10:00–14:00. <strong class="ask__mail">Preferujemy kontakt mailowy.</strong>
+            </span>
           </p>
         </div>
         <div class="ask__acts hang">
@@ -427,6 +434,15 @@
     margin-top: var(--sp-4);
     color: #e3ebf6;
     font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+    line-height: 1.6;
+  }
+  /* a terms line under the lede: smaller, in the blocks' colour, ruled off from it */
+  .seo__note {
+    max-width: 62ch;
+    margin-top: var(--sp-5);
+    padding-left: var(--sp-4);
+    border-left: 2px solid #2d4468; /* (the columns' rule: orange on the navy means contact) */
+    font-size: var(--fs-sm);
     line-height: 1.6;
   }
   /* Keep each block whole across columns. */
@@ -581,6 +597,11 @@
   /* a line per sentence (as Siedziba's) */
   .ask__s {
     display: block;
+  }
+  /* (the lede is muted: what they'd rather have stands out in the text's own colour) */
+  .ask__mail {
+    color: var(--text);
+    font-weight: 700;
   }
   .ask__acts {
     display: flex;

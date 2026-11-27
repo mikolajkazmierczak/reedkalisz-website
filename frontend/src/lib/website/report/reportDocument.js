@@ -2,6 +2,7 @@ import { marked } from 'marked';
 import qrEnc from 'pdfmake/js/qrEnc.js';
 import { makeTree, treeGetItemsFromPath } from '%/utils';
 import { allOut, parseAmount, AMOUNT, NONE } from '$/storage';
+import { taxOf } from '#/products/tax';
 import { NEUTRAL_QUARTERS, NO_COLOR_LINE, WOOD_RINGS } from '$/colors';
 import { parseColor, plural } from '#/utils';
 import { business, SITE, tel } from '#/seo';
@@ -105,6 +106,7 @@ function derive(product, categories) {
     customPrices,
     labelings,
     from: from ? { price: from[0].price, withLabeling: from[1] } : null,
+    tax: taxOf(product.commercial_details), // "netto" or "brutto", beside every price
     trail,
     url: `${SITE}/produkty/${product.slug}`,
   };
@@ -380,7 +382,7 @@ function badges(product, d) {
   // the page's Badges, in its order and colours
   const list = [
     product.out_of_stock && pill('Koniec nakładu', '#ffffff', c.ink600),
-    !product.out_of_stock && allOut(d.variants) && pill('Chwilowy brak', c.ink600, c.paper3),
+    !product.out_of_stock && allOut(d.variants) && pill('Brak', c.ink600, c.paper3),
     product.sale && pill('Promocja', '#ffffff', c.red),
     product.new && pill('Nowość', '#ffffff', c.purple),
     product.bestseller && pill('Bestseller', '#ffffff', c.green),
@@ -478,7 +480,7 @@ function summary(product, d) {
           fontSize: 22,
           characterSpacing: -0.6,
         },
-        { text: '  / szt', color: c.ink400, fontSize: 9 },
+        { text: `  ${d.tax} / szt.`, color: c.ink400, fontSize: 9 },
         d.from.withLabeling ? { text: '  ze znakowaniem', color: c.red, bold: true, fontSize: 9 } : '',
       ],
       margin: [0, 10, 0, 0],
@@ -600,12 +602,12 @@ function labelingMeta(field, place) {
 
 // The price ladder as PricesTable lays it across: quantities over prices, a sale price over the struck-out one.
 // A long one continues in another table below.
-function priceTable(prices, pricesSale, withLabeling) {
+function priceTable(prices, pricesSale, withLabeling, tax) {
   const tables = [];
   const per = Math.ceil(prices.length / Math.ceil(prices.length / PRICE_COLUMNS));
   for (let start = 0; start < prices.length; start += per) {
     const part = prices.slice(start, start + per);
-    const head = { text: 'PLN / szt.', color: c.ink400, font: 'BricolageSemi', fontSize: 7 };
+    const head = { text: `PLN ${tax}/szt.`, color: c.ink400, font: 'BricolageSemi', fontSize: 7 };
     tables.push({
       table: {
         widths: [60, ...part.map(() => '*')],
@@ -661,6 +663,7 @@ function pricing(product, d) {
           product.custom_prices.filter((p) => p.enabled),
           (product.custom_prices_sale ?? []).filter((p) => p.enabled),
           !!product.custom_prices_with_labeling,
+          d.tax,
         ),
       ].filter(Boolean),
       unbreakable: true,
@@ -698,6 +701,7 @@ function pricing(product, d) {
           l.prices.filter((p) => p.enabled),
           l.prices_sale.filter((p) => p.enabled),
           true,
+          d.tax,
         ),
       ].filter(Boolean),
       unbreakable: true,

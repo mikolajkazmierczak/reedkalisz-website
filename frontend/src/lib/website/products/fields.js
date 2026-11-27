@@ -14,6 +14,7 @@ export const fields = [
 
   'price_min',
   'price_min_sale',
+  'commercial_details.content', // net or gross (see tax)
 
   'custom_prices_with_labeling',
   'custom_prices.enabled',

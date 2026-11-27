@@ -314,7 +314,7 @@ A warm paper sheet and an ink ramp do the neutral work. Three hues each own exac
 - **Contact Orange** (`contact-orange`): contact. Every /kontakt and phone control is orange: the rail and band "Napisz do nas" / Kontakt buttons, the phone bar's Zadzwoń pill, the closing ask's phone button, the error page's Kontakt and the empty-category ask. The question form takes it too, as its caret, checkbox and framed inquiry panel. One orange works everywhere, picked between the orange pens in the product photography and the hero's old bright clause (owner's call, 2026-10-14): it reads on navy (4.5:1) and on ink, the hero's emphasised clause included, and anything on it is ink (6.4:1; white would be 3:1). Orange text on paper or white, and the form's focus ring there, use `contact-orange-deep` (5:1), since the orange itself is 2.9:1 on paper. A filled orange button lightens to `contact-orange-light` on hover. Thin or small on navy or ink (the ghost button's outline and text, the map's dots and Kalisz, the hero drawing's logo marks) the orange reads darker than in the hero's big clause, so there it is `contact-orange-small`, a step lighter at the same hue and full chroma (5:1 on navy), to look the same. Small text there (the rail's and the footer's link hovers) reads darker still and takes `contact-orange-light`. Large orange text on paper or white (the inquiry panel's "Zapytanie", kept at 19px bold or more so it counts as large) takes `contact-orange-large`, as light as 3:1 allows.
 
 ### Tertiary
-Product badges and card edges have their own fixed hues, each white-ringed so it reads on any photo: **Purple** (`badge-purple`) for Nowość, **Green** (`badge-green`) for Bestseller, **Blue Light** (`badge-blue-light`, navy text) for Wkrótce with **Blue** (`badge-blue`) as that card's edge and as the selected photo in the lightbox, ink-600 for out of stock, and a quiet paper-3 pill for Chwilowy brak. The sale badge is REED red.
+Product badges and card edges have their own fixed hues, each white-ringed so it reads on any photo: **Purple** (`badge-purple`) for Nowość, **Green** (`badge-green`) for Bestseller, **Blue Light** (`badge-blue-light`, navy text) for Wkrótce with **Blue** (`badge-blue`) as that card's edge and as the selected photo in the lightbox, ink-600 for out of stock, and a quiet paper-3 pill for Brak (every variant out of stock). The sale badge is REED red.
 
 ### Neutral
 - **Paper** (`paper`): the page ground, the rail, the catalogue cells, the closing ask band.
@@ -430,12 +430,12 @@ Tiles authored on a 4-column grid, squircled at every width (`banner`: 4rem on t
 
 ### Product Cards
 - **Corner Style:** square.
-- **Background:** white; out of stock drops to paper-2 with a greyed, half-faded image; Chwilowy brak fades the whole card to 0.8 until hovered.
+- **Background:** white; out of stock drops to paper-2 with a greyed, half-faded image; Brak fades the whole card to 0.8 until hovered.
 - **Edge:** a 1px hairline, recoloured by state (red sale, purple new, green bestseller, blue coming soon). On hover it turns ink and doubles through an outer ring.
 - **Structure:** a 1:1 white media well (a second photo fades in on hover), a two-line clamped 700 name over its mono code, colour swatches cut off with "+N", then the price row behind a paper-3 divider: "od", the price in `price`, red when on sale with the old price beside it. Focus draws a 3px red inset outline on the whole card.
 
 ### Badges
-Mono uppercase pills with a 1.5px white ring: Nowość purple, Promocja red, Bestseller green, Wkrótce blue-light with navy text, Brak ink-600, Chwilowy brak paper-3.
+Mono uppercase pills with a 1.5px white ring: Nowość purple, Promocja red, Bestseller green, Wkrótce blue-light with navy text, Koniec nakładu ink-600, Brak paper-3.
 
 ### Inputs / Fields
 White pill fields on an ink-300 hairline that darkens to ink-600 on hover. Focus is a 2px offset ring in the focus colour, with no border change inside it. That colour is red in general and orange inside the question form. Selects swap the native arrow for an ink chevron. The search field is one pill that takes the ring itself, with a compact round submit that turns red once there's a query. Errors stay red (`reed-red-tint` ground, `reed-red-deep` text) even inside the orange form.

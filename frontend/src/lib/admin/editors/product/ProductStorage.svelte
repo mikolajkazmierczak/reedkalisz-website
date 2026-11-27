@@ -1,7 +1,7 @@
 <script>
   import { globals, colors, companies } from '@/globals';
   import { isApiCompany } from '@/sync';
-  import { parseAmount, AMOUNT, NONE } from '$/storage';
+  import { parseAmount, AMOUNT } from '$/storage';
   import { createEventDispatcher } from 'svelte';
   import { sortable, moveTo } from '@/sortable';
   import { beside } from '@/beside';
@@ -90,8 +90,7 @@
                 bind:value={storage.amount}
                 api={scanner.variant(storage)}
                 disabled={scanner.variant(storage)}>
-                <!-- (the site's "Chwilowy brak" doesn't fit beside the label: "Brak" here) -->
-                Ilość{#if state.state !== AMOUNT}<small>{state.state === NONE ? 'BRAK' : state.label}</small>{/if}
+                Ilość{#if state.state !== AMOUNT}<small>{state.label}</small>{/if}
               </Input>
             </div>
             <Input bind:value={storage.api_color_code}>

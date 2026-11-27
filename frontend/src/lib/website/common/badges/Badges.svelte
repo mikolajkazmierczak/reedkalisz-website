@@ -6,7 +6,7 @@
   export let sale = false;
   export let coming_soon = false;
   export let out_of_stock = false; // "Koniec nakładu": the supplier makes no more
-  export let noneNow = false; // every variant out of stock for now: "Chwilowy brak" (not with Koniec nakładu)
+  export let noneNow = false; // every variant out of stock: "Brak" (not with Koniec nakładu)
   /** Inline badges sit in the flow; otherwise they pin to the media corner. */
   export let inline = false;
 
@@ -16,7 +16,7 @@
 {#if any}
   <div class="badges" class:inline>
     {#if out_of_stock}<Badge tone="out" label="Koniec nakładu" />
-    {:else if noneNow}<Badge tone="none" label="Chwilowy brak" />{/if}
+    {:else if noneNow}<Badge tone="none" label="Brak" />{/if}
     {#if sale}<Badge tone="sale" label="Promocja" />{/if}
     {#if isNew}<Badge tone="new" label="Nowość" />{/if}
     {#if bestseller}<Badge tone="bestseller" label="Bestseller" />{/if}

@@ -3,6 +3,7 @@
   import { allOut } from '$/storage';
   import Badges from '#c/badges/Badges.svelte';
   import { productImages } from '#/products/images';
+  import { taxOf } from '#/products/tax';
 
   export let product;
   $: ({
@@ -18,6 +19,7 @@
     price_min_sale,
     storage,
   } = product);
+  $: tax = taxOf(product.commercial_details);
 
   /** Whether the lowest price includes marking: labeling prices always do, custom ones when flagged. */
   function includesMarking({ price_min, custom_prices, custom_prices_sale, custom_prices_with_labeling, labelings }) {
@@ -185,7 +187,7 @@
               <strong class="now tnum" class:now--10={price_min >= 10} class:now--100={price_min >= 100}
                 >{price_min.toFixed(2)} zł</strong>
             {/if}
-            <span class="per">/szt</span>
+            <span class="per">{tax}/szt.</span>
           {:else}
             <span class="ask">Zapytaj o cenę</span>
           {/if}
@@ -234,7 +236,7 @@
   .tile.is-out {
     background-color: var(--paper-2);
   }
-  /* out of stock for now (Chwilowy brak): a little faded, whole again under the pointer */
+  /* every variant out of stock (Brak): a little faded, whole again under the pointer */
   .tile.is-none {
     opacity: 0.8;
   }
@@ -441,9 +443,6 @@
   .per {
     color: var(--ink-400);
     font-size: var(--fs-xs);
-  }
-  .per {
-    margin-left: -0.2em;
   }
   .now {
     font-size: 1.4375rem;

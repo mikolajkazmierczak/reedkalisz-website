@@ -1,6 +1,6 @@
 <script>
   // The labeling's field and place as the price table's last rows, labelled in its first column like "Ilość" and
-  // "PLN / szt.". Several places (joined with " / " on import) are alternatives: one to a line.
+  // "PLN netto/szt.". Several places (joined with " / " on import) are alternatives: one to a line.
   export let field = null;
   export let place = null;
   /** How many columns the value spans. */

@@ -10,6 +10,8 @@
   export let pricesWithLabeling;
   /** False when the section's head already shows the note for every price list. */
   export let showIncludes = true;
+  /** "netto" or "brutto" (see tax). */
+  export let tax = 'netto';
 
   $: includes = pricesWithLabeling && showIncludes;
 </script>
@@ -27,6 +29,7 @@
     prices={prices.filter((p) => p.enabled)}
     pricesSale={pricesSale.filter((p) => p.enabled)}
     withLabeling={!!pricesWithLabeling}
+    {tax}
     field={field[0] && field[1] ? `${field[0]}×${field[1]} mm` : null}
     {place} />
 </div>

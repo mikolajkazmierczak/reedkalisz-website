@@ -17,6 +17,7 @@
   import Icon from '$c/Icon.svelte';
   import Recommended from './Recommended.svelte';
   import { deepestCategory } from '#/products/product';
+  import { taxOf } from '#/products/tax';
   import { plural } from '#/utils';
   import { describe, jsonLd, breadcrumbList } from '#/seo';
 
@@ -69,6 +70,7 @@
   $: pricedLabelings = (labelings ?? []).filter((l) => l.enabled && (hasPrice(l.prices) || hasPrice(l.prices_sale)));
   // the paragraph (net or gross, what's binding) is about the prices: over them, under the description without them
   $: post = commercial_details?.content ?? null;
+  $: tax = taxOf(commercial_details); // "netto" or "brutto", beside every price
   $: pricesShown = showCustomPrices || pricedLabelings.length > 0;
   // labeling prices always include the marking: when the custom ones do too (or aren't shown), the note goes once,
   // beside "Cennik", instead of on every price list
@@ -91,7 +93,7 @@
     .sort(([a], [b]) => a.price - b.price);
   $: priceFrom = allPrices[0]?.[0].price ?? null;
   $: priceFromWithLabeling = allPrices[0]?.[1] ?? false;
-  $: noneNow = !out_of_stock && allOut(enabledStorage); // Chwilowy brak
+  $: noneNow = !out_of_stock && allOut(enabledStorage); // Brak
 
   // made in this browser; report.js (and pdfmake) load on the first click
   let carding = false;
@@ -243,7 +245,8 @@
                         place={labeling_place}
                         prices={custom_prices}
                         pricesSale={custom_prices_sale}
-                        pricesWithLabeling={custom_prices_with_labeling} />
+                        pricesWithLabeling={custom_prices_with_labeling}
+                        {tax} />
                     </div>
                   {/if}
 
@@ -256,7 +259,8 @@
                         place={labeling.labeling_place}
                         prices={labeling.prices}
                         pricesSale={labeling.prices_sale}
-                        pricesWithLabeling>
+                        pricesWithLabeling
+                        {tax}>
                         <h3 class="pricing__title">
                           <span>{name}</span>
                           <span class="pricing__meta">
@@ -288,7 +292,7 @@
                   <p class="buy__price">
                     <span class="buy__from">od</span>
                     <strong class="tnum">{priceFrom.toFixed(2)} zł</strong>
-                    <span class="buy__unit">/ szt</span>
+                    <span class="buy__unit">{tax} / szt.</span>
                     {#if priceFromWithLabeling}<span class="buy__with">ze znakowaniem</span>{/if}
                   </p>
                   <a class="buy__tocennik" href="#cennik" on:click={glide}>Pełny cennik według nakładu ↓</a>

@@ -53,7 +53,7 @@
     border: 1px solid var(--border);
     background-color: var(--surface);
   }
-  /* out of stock for now (CHWILOWY BRAK): its swatch and photos faded, its text as clear as any card's (fading the
+  /* out of stock (BRAK): its swatch and photos faded, its text as clear as any card's (fading the
      whole card would take its grey state below a readable contrast); whole again under the pointer */
   .storage.none .swatch,
   .storage.none :global(.gallery) {
@@ -120,8 +120,8 @@
   .amount > small {
     color: var(--ink-400);
   }
-  /* as small as the label, in one piece, its capitals a little closer (still clear) so "CHWILOWY BRAK" fits beside the
-     label more often */
+  /* as small as the label, in one piece, its capitals a little closer (still clear) so a state fits beside the label
+     more often */
   .state {
     font-size: 0.8333em;
     font-weight: 700;

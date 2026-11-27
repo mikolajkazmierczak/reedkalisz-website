@@ -25,6 +25,22 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
+    version: '1.33.0',
+    date: '2026-11-27',
+    title: 'Netto przy cenach',
+    highlight: [
+      'Przy każdej cenie na stronie znów stoi **„netto”**: na kafelkach („od … zł netto/szt.”), na karcie produktu („od … zł netto / szt.”), w tabelach cen („PLN netto/szt.”) i w karcie PDF. Produkty z paragrafem **BRUTTO** mają w tych miejscach „brutto”: o tym decyduje treść paragrafu („Ceny brutto…”), więc paragraf trzeba wybrać dobrze.',
+      'Na stronie głównej, pod „Gadżety reklamowe z logo i drukarnia w Kaliszu”, jest zdanie o tym, że oferta jest **tylko dla firm**, a ceny są netto, chyba że przy produkcie podano inaczej.',
+    ],
+    all: [
+      '„netto” albo „brutto” (według paragrafu produktu) przy cenie na kafelkach, na karcie produktu, w tabelach cen i w karcie PDF.',
+      'Na stronie głównej, w sekcji „Gadżety reklamowe z logo i drukarnia w Kaliszu”: oferta tylko dla partnerów biznesowych i podmiotów gospodarczych, ceny netto.',
+      'W „Nie wiesz, co wybrać?” na stronie głównej: „Preferujemy kontakt mailowy.”',
+      'Kolor bez sztuk na stanie ma na stronie „BRAK” zamiast „CHWILOWY BRAK”, także w dymku koloru na kafelku i w karcie PDF.',
+      'Znaczek produktu, którego żaden kolor nie jest na stanie, to „Brak” zamiast „Chwilowy brak”, na stronie i w karcie PDF.',
+    ],
+  },
+  {
     version: '1.32.1',
     date: '2026-10-31',
     title: 'Numer telefonu we fragmencie',

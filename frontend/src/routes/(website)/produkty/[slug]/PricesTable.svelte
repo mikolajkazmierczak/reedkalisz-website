@@ -6,6 +6,8 @@
   export let pricesSale;
   /** The price row is labelled with what the price includes. */
   export let withLabeling = false;
+  /** "netto" or "brutto", in the price row's label. */
+  export let tax = 'netto';
   /** The labeling's field ("40×4 mm") and place, as the table's last rows. */
   export let field = null;
   export let place = null;
@@ -35,7 +37,7 @@
         <tr>
           <th scope="col">Ilość</th>
           <th scope="col">
-            PLN / szt.
+            PLN {tax}/szt.
             {#if withLabeling}<small class="with">ze znakowaniem</small>{/if}
           </th>
         </tr>
@@ -72,7 +74,7 @@
         <tbody>
           <tr>
             <th scope="row">
-              PLN / szt.
+              PLN {tax}/szt.
               {#if withLabeling}<small class="with">ze znakowaniem</small>{/if}
             </th>
             {#each prices as { price }, i}
@@ -95,7 +97,7 @@
 </div>
 
 <style>
-  /* Currency once in the row label; columns fit their figures. Long ladders scroll. */
+  /* Currency (and net or gross) once in the row label; columns fit their figures. Long ladders scroll. */
   .scroller {
     overflow-x: auto;
     margin-inline: calc(var(--gutter) * -1);
