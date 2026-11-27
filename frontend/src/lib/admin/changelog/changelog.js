@@ -25,7 +25,7 @@
 // - Once published an entry stays as it is, unless asked to clarify it.
 export const changelog = [
   {
-    version: '1.33.0',
+    version: '1.32.2',
     date: '2026-11-27',
     title: 'Netto przy cenach',
     highlight: [
